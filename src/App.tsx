@@ -20,7 +20,7 @@ const AppLayout = () => {
     <div className="max-w-md mx-auto min-h-screen relative">
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/feed" element={<Feed />} />
+        <Route path="/boards" element={<Boards />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/create" element={<CreateQuest />} />
         <Route path="*" element={<NotFound />} />
