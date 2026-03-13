@@ -10,6 +10,7 @@ import CreateQuest from "./pages/CreateQuest";
 import NotFound from "./pages/NotFound";
 import BottomNav from "./components/BottomNav";
 
+
 const queryClient = new QueryClient();
 
 const AppLayout = () => {
