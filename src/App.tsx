@@ -3,8 +3,8 @@ import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import Home from "./pages/Home";
-import Feed from "./pages/Feed";
+import Boards from "./pages/Home";
+import Home from "./pages/Feed";
 import Profile from "./pages/Profile";
 import CreateQuest from "./pages/CreateQuest";
 import NotFound from "./pages/NotFound";
@@ -20,7 +20,7 @@ const AppLayout = () => {
     <div className="max-w-md mx-auto min-h-screen relative">
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/feed" element={<Feed />} />
+        <Route path="/boards" element={<Boards />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/create" element={<CreateQuest />} />
         <Route path="*" element={<NotFound />} />
