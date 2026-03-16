@@ -2,16 +2,20 @@ import { useAppStore } from "@/data/appState";
 import { currentUser, Quest } from "@/data/mockData";
 import { ArrowLeft, Sparkles } from "lucide-react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 
 const CreateQuest = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const preselectedGroup = searchParams.get("groupId");
   const { groups, addQuest } = useAppStore();
-  const [step, setStep] = useState(1);
+
+  const isInBoardCreation = !!preselectedGroup;
+  const [step, setStep] = useState(isInBoardCreation ? 1 : 1);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
+  const [selectedGroup, setSelectedGroup] = useState<string | null>(preselectedGroup);
   const [isFollowerOnly, setIsFollowerOnly] = useState(false);
 
   const handleCreate = () => {
@@ -22,13 +26,20 @@ const CreateQuest = () => {
       description: description.trim() || undefined,
       createdBy: currentUser,
       groupId: selectedGroup || undefined,
-      isFollowerOnly,
+      isFollowerOnly: isInBoardCreation ? false : isFollowerOnly,
       participants: [currentUser],
       isDone: false,
       createdAt: new Date().toISOString().split("T")[0],
+      comments: [],
     };
     addQuest(quest);
-    navigate(-1);
+
+    // Post-creation redirection
+    if (selectedGroup) {
+      navigate(`/boards?open=${selectedGroup}`, { replace: true });
+    } else {
+      navigate("/profile", { replace: true });
+    }
   };
 
   return (
@@ -36,12 +47,20 @@ const CreateQuest = () => {
       {/* Header */}
       <div className="flex items-center gap-3 mb-8">
         <button
-          onClick={() => (step === 1 ? navigate(-1) : setStep(1))}
+          onClick={() => (step === 1 || isInBoardCreation ? navigate(-1) : setStep(1))}
           className="p-2 rounded-xl bg-muted text-muted-foreground"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <h1 className="text-xl font-bold text-foreground">New Quest</h1>
+        <div>
+          <h1 className="text-xl font-bold text-foreground">New Quest</h1>
+          {isInBoardCreation && (
+            <p className="text-xs text-muted-foreground">
+              For {groups.find((g) => g.id === preselectedGroup)?.emoji}{" "}
+              {groups.find((g) => g.id === preselectedGroup)?.name}
+            </p>
+          )}
+        </div>
       </div>
 
       <motion.div
@@ -77,19 +96,29 @@ const CreateQuest = () => {
               />
             </div>
 
-            <button
-              onClick={() => title.trim() && setStep(2)}
-              disabled={!title.trim()}
-              className="w-full py-4 rounded-xl bg-primary text-primary-foreground font-bold text-base disabled:opacity-40 active:scale-[0.98] transition-transform"
-            >
-              Next — Choose Audience →
-            </button>
+            {isInBoardCreation ? (
+              <button
+                onClick={handleCreate}
+                disabled={!title.trim()}
+                className="w-full py-4 rounded-xl bg-primary text-primary-foreground font-bold text-base flex items-center justify-center gap-2 disabled:opacity-40 active:scale-[0.98] transition-transform"
+              >
+                <Sparkles className="w-5 h-5" />
+                Launch Quest
+              </button>
+            ) : (
+              <button
+                onClick={() => title.trim() && setStep(2)}
+                disabled={!title.trim()}
+                className="w-full py-4 rounded-xl bg-primary text-primary-foreground font-bold text-base disabled:opacity-40 active:scale-[0.98] transition-transform"
+              >
+                Next — Choose Audience →
+              </button>
+            )}
           </div>
         ) : (
           <div className="space-y-5">
             <p className="text-sm text-muted-foreground">Who should see this quest?</p>
 
-            {/* Follower only option */}
             <button
               onClick={() => {
                 setIsFollowerOnly(true);
@@ -107,7 +136,6 @@ const CreateQuest = () => {
               </p>
             </button>
 
-            {/* Group options */}
             {groups.map((g) => (
               <button
                 key={g.id}
