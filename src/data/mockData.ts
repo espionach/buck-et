@@ -3,14 +3,39 @@ export interface User {
   name: string;
   avatar: string;
   bio: string;
+  profilePicture?: string;
+}
+
+export interface Comment {
+  id: string;
+  userId: string;
+  user: User;
+  text: string;
+  createdAt: string;
 }
 
 export interface Group {
   id: string;
   name: string;
   emoji: string;
+  description?: string;
   members: User[];
   activeQuests: number;
+  createdAt: string;
+}
+
+export interface GroupInvitation {
+  id: string;
+  groupId: string;
+  group: Group;
+  invitedBy: User;
+  status: "pending" | "accepted" | "declined";
+}
+
+export interface FollowRequest {
+  id: string;
+  from: User;
+  status: "pending" | "accepted" | "declined";
 }
 
 export interface Quest {
@@ -23,8 +48,10 @@ export interface Quest {
   participants: User[];
   isDone: boolean;
   createdAt: string;
+  completedAt?: string;
   photos?: string[];
   notes?: string;
+  comments: Comment[];
 }
 
 export const currentUser: User = {
@@ -42,20 +69,29 @@ export const friends: User[] = [
   { id: "u6", name: "Luna Martinez", avatar: "🌙", bio: "night owl vibes" },
 ];
 
+export const nonFollowedUsers: User[] = [
+  { id: "u7", name: "Kai Nakamura", avatar: "🎿", bio: "mountain life" },
+  { id: "u8", name: "Zoe Thompson", avatar: "🧁", bio: "baking adventures" },
+];
+
 export const groups: Group[] = [
   {
     id: "g1",
     name: "Sunset Chasers",
     emoji: "🌅",
+    description: "We chase sunsets every weekend",
     members: [currentUser, friends[0], friends[1], friends[2]],
     activeQuests: 3,
+    createdAt: "2026-02-15",
   },
   {
     id: "g2",
     name: "Foodie Gang",
     emoji: "🍜",
+    description: "Exploring every food spot in the city",
     members: [currentUser, friends[3], friends[4]],
     activeQuests: 2,
+    createdAt: "2026-02-20",
   },
   {
     id: "g3",
@@ -63,7 +99,30 @@ export const groups: Group[] = [
     emoji: "⚔️",
     members: [currentUser, friends[0], friends[2], friends[4], friends[1]],
     activeQuests: 5,
+    createdAt: "2026-01-10",
   },
+];
+
+export const pendingGroupInvitations: GroupInvitation[] = [
+  {
+    id: "gi1",
+    groupId: "g-new",
+    group: {
+      id: "g-new",
+      name: "Film Club",
+      emoji: "🎬",
+      members: [friends[0], friends[4]],
+      activeQuests: 1,
+      createdAt: "2026-03-14",
+    },
+    invitedBy: friends[0],
+    status: "pending",
+  },
+];
+
+export const pendingFollowRequests: FollowRequest[] = [
+  { id: "fr1", from: nonFollowedUsers[0], status: "pending" },
+  { id: "fr2", from: nonFollowedUsers[1], status: "pending" },
 ];
 
 export const quests: Quest[] = [
@@ -77,6 +136,10 @@ export const quests: Quest[] = [
     participants: [currentUser, friends[1], friends[2]],
     isDone: false,
     createdAt: "2026-03-12",
+    comments: [
+      { id: "c1", userId: "u3", user: friends[1], text: "I'll bring the blankets!", createdAt: "2026-03-12" },
+      { id: "c2", userId: "u4", user: friends[2], text: "Can we make it 6am? 😅", createdAt: "2026-03-13" },
+    ],
   },
   {
     id: "q2",
@@ -88,6 +151,9 @@ export const quests: Quest[] = [
     participants: [currentUser, friends[3]],
     isDone: false,
     createdAt: "2026-03-11",
+    comments: [
+      { id: "c3", userId: "u5", user: friends[3], text: "Reservation for 6pm?", createdAt: "2026-03-11" },
+    ],
   },
   {
     id: "q3",
@@ -98,6 +164,7 @@ export const quests: Quest[] = [
     participants: [friends[4], friends[0]],
     isDone: false,
     createdAt: "2026-03-10",
+    comments: [],
   },
   {
     id: "q4",
@@ -108,6 +175,9 @@ export const quests: Quest[] = [
     participants: [friends[0], friends[2]],
     isDone: false,
     createdAt: "2026-03-12",
+    comments: [
+      { id: "c4", userId: "u2", user: friends[0], text: "Meet at Goodwill on 5th!", createdAt: "2026-03-12" },
+    ],
   },
   {
     id: "q5",
@@ -117,6 +187,7 @@ export const quests: Quest[] = [
     participants: [friends[4]],
     isDone: false,
     createdAt: "2026-03-09",
+    comments: [],
   },
   {
     id: "q6",
@@ -128,7 +199,11 @@ export const quests: Quest[] = [
     participants: [currentUser, friends[0], friends[1], friends[2]],
     isDone: true,
     createdAt: "2026-03-07",
+    completedAt: "2026-03-08",
     notes: "Best bonfire yet — Jake brought the guitar!",
+    comments: [
+      { id: "c5", userId: "u1", user: currentUser, text: "Legendary night 🔥", createdAt: "2026-03-08" },
+    ],
   },
   {
     id: "q7",
@@ -139,5 +214,7 @@ export const quests: Quest[] = [
     participants: [currentUser, friends[0], friends[2]],
     isDone: true,
     createdAt: "2026-03-05",
+    completedAt: "2026-03-06",
+    comments: [],
   },
 ];
