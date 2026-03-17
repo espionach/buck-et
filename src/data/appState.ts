@@ -6,6 +6,7 @@ import {
   Comment,
   GroupInvitation,
   FollowRequest,
+  GroupMember,
   quests as initialQuests,
   groups as initialGroups,
   currentUser,
@@ -28,6 +29,9 @@ interface AppState {
   markDone: (questId: string) => void;
   addGroup: (group: Group) => void;
   updateGroup: (groupId: string, updates: Partial<Group>) => void;
+  removeMemberFromGroup: (groupId: string, userId: string) => void;
+  leaveGroup: (groupId: string) => void;
+  inviteToGroup: (groupId: string, user: User) => void;
   acceptGroupInvitation: (invitationId: string) => void;
   declineGroupInvitation: (invitationId: string) => void;
   acceptFollowRequest: (requestId: string) => void;
@@ -76,6 +80,37 @@ export const useAppStore = create<AppState>((set) => ({
   updateGroup: (groupId, updates) =>
     set((s) => ({
       groups: s.groups.map((g) => (g.id === groupId ? { ...g, ...updates } : g)),
+    })),
+
+  removeMemberFromGroup: (groupId, userId) =>
+    set((s) => ({
+      groups: s.groups.map((g) =>
+        g.id === groupId
+          ? {
+              ...g,
+              members: g.members.filter((m) => m.id !== userId),
+              memberRoles: g.memberRoles.filter((mr) => mr.user.id !== userId),
+            }
+          : g
+      ),
+    })),
+
+  leaveGroup: (groupId) =>
+    set((s) => ({
+      groups: s.groups.filter((g) => g.id !== groupId),
+    })),
+
+  inviteToGroup: (groupId, user) =>
+    set((s) => ({
+      groups: s.groups.map((g) =>
+        g.id === groupId
+          ? {
+              ...g,
+              members: [...g.members, user],
+              memberRoles: [...g.memberRoles, { user, role: "member" as const }],
+            }
+          : g
+      ),
     })),
 
   acceptGroupInvitation: (invitationId) =>

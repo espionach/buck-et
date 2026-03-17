@@ -1,14 +1,15 @@
 import { useAppStore } from "@/data/appState";
-import { currentUser } from "@/data/mockData";
+import { currentUser, User } from "@/data/mockData";
 import GroupCard from "@/components/GroupCard";
 import QuestCard from "@/components/QuestCard";
+import GroupSettings from "@/components/GroupSettings";
 import { Plus, Search, Check, X, Settings, ArrowLeft } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
 const Boards = () => {
-  const { groups, quests, groupInvitations, acceptGroupInvitation, declineGroupInvitation, updateGroup } = useAppStore();
+  const { groups, quests, groupInvitations, acceptGroupInvitation, declineGroupInvitation } = useAppStore();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const openGroup = searchParams.get("open");
@@ -16,9 +17,8 @@ const Boards = () => {
   const [selectedGroup, setSelectedGroup] = useState<string | null>(openGroup);
   const [search, setSearch] = useState("");
   const [showSettings, setShowSettings] = useState(false);
-  const [editName, setEditName] = useState("");
-  const [editEmoji, setEditEmoji] = useState("");
   const [showAllInvites, setShowAllInvites] = useState(false);
+  const [viewingProfile, setViewingProfile] = useState<User | null>(null);
 
   useEffect(() => {
     if (openGroup) setSelectedGroup(openGroup);
@@ -44,21 +44,68 @@ const Boards = () => {
   const selectedGroupData = groups.find((g) => g.id === selectedGroup);
 
   const handleOpenSettings = () => {
-    if (selectedGroupData) {
-      setEditName(selectedGroupData.name);
-      setEditEmoji(selectedGroupData.emoji);
-      setShowSettings(true);
-    }
+    setShowSettings(true);
   };
 
-  const handleSaveSettings = () => {
-    if (selectedGroup && editName.trim()) {
-      updateGroup(selectedGroup, { name: editName.trim(), emoji: editEmoji });
-      setShowSettings(false);
-    }
+  const handleViewProfile = (user: User) => {
+    setViewingProfile(user);
+    setShowSettings(false);
   };
 
   const pendingInvitations = groupInvitations.filter((i) => i.status === "pending");
+
+  const { following } = useAppStore();
+  const isFollowing = (user: User) => following.some((f) => f.id === user.id);
+
+  // Profile view for member clicked in settings
+  if (viewingProfile) {
+    const profileQuests = quests.filter(
+      (q) =>
+        q.createdBy.id === viewingProfile.id ||
+        q.participants.some((p) => p.id === viewingProfile.id)
+    );
+    const isFollowed = isFollowing(viewingProfile);
+
+    return (
+      <div className="min-h-screen pb-24 px-5 pt-14">
+        <button
+          onClick={() => setViewingProfile(null)}
+          className="text-sm text-primary font-semibold mb-4 flex items-center gap-1"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Board
+        </button>
+
+        <div className="flex items-center gap-4 mb-6">
+          <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-2xl">
+            {viewingProfile.avatar}
+          </div>
+          <div>
+            <h2 className="text-lg font-bold text-foreground">{viewingProfile.name}</h2>
+            <p className="text-sm text-muted-foreground">{viewingProfile.bio}</p>
+          </div>
+        </div>
+
+        {!isFollowed ? (
+          <div className="text-center py-16">
+            <p className="font-bold text-foreground mb-1">Private Account</p>
+            <p className="text-sm text-muted-foreground mb-4">Follow to see their quests</p>
+            <button className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm mx-auto">
+              Request to Follow
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {profileQuests.length === 0 ? (
+              <p className="text-center text-sm text-muted-foreground py-8">No quests to show</p>
+            ) : (
+              profileQuests.map((q, i) => <QuestCard key={q.id} quest={q} index={i} showGroup />)
+            )}
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen pb-24 px-5 pt-14">
@@ -244,45 +291,18 @@ const Boards = () => {
               </button>
             </div>
 
-            {/* Settings modal */}
+            {/* Settings panel */}
             <AnimatePresence>
-              {showSettings && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="overflow-hidden mb-4"
-                >
-                  <div className="p-4 rounded-2xl bg-card border border-border space-y-3">
-                    <h3 className="font-bold text-foreground text-sm">Edit Board</h3>
-                    <div className="flex gap-2">
-                      <input
-                        value={editEmoji}
-                        onChange={(e) => setEditEmoji(e.target.value)}
-                        className="w-14 px-2 py-2.5 rounded-xl bg-muted border border-border text-center text-xl focus:outline-none focus:ring-2 focus:ring-primary/30"
-                      />
-                      <input
-                        value={editName}
-                        onChange={(e) => setEditName(e.target.value)}
-                        className="flex-1 px-3 py-2.5 rounded-xl bg-muted border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-                      />
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={handleSaveSettings}
-                        className="flex-1 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm"
-                      >
-                        Save
-                      </button>
-                      <button
-                        onClick={() => setShowSettings(false)}
-                        className="px-4 py-2.5 rounded-xl bg-muted text-muted-foreground font-semibold text-sm"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
+              {showSettings && selectedGroupData && (
+                <GroupSettings
+                  group={selectedGroupData}
+                  onClose={() => setShowSettings(false)}
+                  onLeave={() => {
+                    setSelectedGroup(null);
+                    setShowSettings(false);
+                  }}
+                  onViewProfile={handleViewProfile}
+                />
               )}
             </AnimatePresence>
 

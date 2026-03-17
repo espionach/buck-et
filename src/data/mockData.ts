@@ -14,12 +14,21 @@ export interface Comment {
   createdAt: string;
 }
 
+export type GroupMemberRole = "owner" | "member" | "invited";
+
+export interface GroupMember {
+  user: User;
+  role: GroupMemberRole;
+}
+
 export interface Group {
   id: string;
   name: string;
   emoji: string;
   description?: string;
   members: User[];
+  memberRoles: GroupMember[];
+  ownerId: string;
   activeQuests: number;
   createdAt: string;
 }
@@ -81,6 +90,13 @@ export const groups: Group[] = [
     emoji: "🌅",
     description: "We chase sunsets every weekend",
     members: [currentUser, friends[0], friends[1], friends[2]],
+    memberRoles: [
+      { user: currentUser, role: "owner" },
+      { user: friends[0], role: "member" },
+      { user: friends[1], role: "member" },
+      { user: friends[2], role: "member" },
+    ],
+    ownerId: currentUser.id,
     activeQuests: 3,
     createdAt: "2026-02-15",
   },
@@ -90,6 +106,12 @@ export const groups: Group[] = [
     emoji: "🍜",
     description: "Exploring every food spot in the city",
     members: [currentUser, friends[3], friends[4]],
+    memberRoles: [
+      { user: friends[3], role: "owner" },
+      { user: currentUser, role: "member" },
+      { user: friends[4], role: "member" },
+    ],
+    ownerId: friends[3].id,
     activeQuests: 2,
     createdAt: "2026-02-20",
   },
@@ -98,6 +120,14 @@ export const groups: Group[] = [
     name: "Weekend Warriors",
     emoji: "⚔️",
     members: [currentUser, friends[0], friends[2], friends[4], friends[1]],
+    memberRoles: [
+      { user: currentUser, role: "owner" },
+      { user: friends[0], role: "member" },
+      { user: friends[2], role: "member" },
+      { user: friends[4], role: "member" },
+      { user: friends[1], role: "member" },
+    ],
+    ownerId: currentUser.id,
     activeQuests: 5,
     createdAt: "2026-01-10",
   },
@@ -112,6 +142,11 @@ export const pendingGroupInvitations: GroupInvitation[] = [
       name: "Film Club",
       emoji: "🎬",
       members: [friends[0], friends[4]],
+      memberRoles: [
+        { user: friends[0], role: "owner" },
+        { user: friends[4], role: "member" },
+      ],
+      ownerId: friends[0].id,
       activeQuests: 1,
       createdAt: "2026-03-14",
     },
