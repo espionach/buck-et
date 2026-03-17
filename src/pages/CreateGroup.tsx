@@ -1,5 +1,5 @@
 import { useAppStore } from "@/data/appState";
-import { currentUser, Group } from "@/data/mockData";
+import { currentUser, Group, GroupMember } from "@/data/mockData";
 import { ArrowLeft, Plus, X } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
