@@ -29,6 +29,9 @@ interface AppState {
   markDone: (questId: string) => void;
   addGroup: (group: Group) => void;
   updateGroup: (groupId: string, updates: Partial<Group>) => void;
+  removeMemberFromGroup: (groupId: string, userId: string) => void;
+  leaveGroup: (groupId: string) => void;
+  inviteToGroup: (groupId: string, user: User) => void;
   acceptGroupInvitation: (invitationId: string) => void;
   declineGroupInvitation: (invitationId: string) => void;
   acceptFollowRequest: (requestId: string) => void;
