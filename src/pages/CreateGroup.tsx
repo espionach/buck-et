@@ -25,12 +25,20 @@ const CreateGroup = () => {
       currentUser,
       ...following.filter((f) => selectedMembers.includes(f.id)),
     ];
+    const memberRoles: GroupMember[] = [
+      { user: currentUser, role: "owner" },
+      ...following
+        .filter((f) => selectedMembers.includes(f.id))
+        .map((u) => ({ user: u, role: "invited" as const })),
+    ];
     const group: Group = {
       id: `g${Date.now()}`,
       name: name.trim(),
       emoji,
       description: description.trim() || undefined,
       members,
+      memberRoles,
+      ownerId: currentUser.id,
       activeQuests: 0,
       createdAt: new Date().toISOString().split("T")[0],
     };

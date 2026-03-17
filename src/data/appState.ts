@@ -6,6 +6,7 @@ import {
   Comment,
   GroupInvitation,
   FollowRequest,
+  GroupMember,
   quests as initialQuests,
   groups as initialGroups,
   currentUser,
