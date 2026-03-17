@@ -14,12 +14,21 @@ export interface Comment {
   createdAt: string;
 }
 
+export type GroupMemberRole = "owner" | "member" | "invited";
+
+export interface GroupMember {
+  user: User;
+  role: GroupMemberRole;
+}
+
 export interface Group {
   id: string;
   name: string;
   emoji: string;
   description?: string;
   members: User[];
+  memberRoles: GroupMember[];
+  ownerId: string;
   activeQuests: number;
   createdAt: string;
 }
