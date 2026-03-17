@@ -86,43 +86,102 @@ const Boards = () => {
               />
             </div>
 
-            {/* Pending invitations */}
-            {pendingInvitations.length > 0 && (
+            {/* Pending invitations - hidden during search */}
+            {pendingInvitations.length > 0 && !search && (
               <div className="space-y-2 mb-4">
-                {pendingInvitations.map((inv) => (
-                  <motion.div
-                    key={inv.id}
-                    initial={{ opacity: 0, y: -8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="p-4 rounded-2xl border border-border/50 bg-card/60 opacity-80"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="text-2xl">{inv.group.emoji}</span>
-                        <div>
-                          <p className="font-bold text-foreground text-sm">{inv.group.name}</p>
-                          <p className="text-[10px] text-muted-foreground">
-                            Invited by {inv.invitedBy.name}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => acceptGroupInvitation(inv.id)}
-                          className="p-2 rounded-xl bg-secondary text-secondary-foreground"
-                        >
-                          <Check className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => declineGroupInvitation(inv.id)}
-                          className="p-2 rounded-xl bg-muted text-muted-foreground"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
+                {/* Always show first invitation */}
+                <motion.div
+                  key={pendingInvitations[0].id}
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="p-4 rounded-2xl border border-border/50 bg-card/60 opacity-80"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl">{pendingInvitations[0].group.emoji}</span>
+                      <div>
+                        <p className="font-bold text-foreground text-sm">{pendingInvitations[0].group.name}</p>
+                        <p className="text-[10px] text-muted-foreground">
+                          Invited by {pendingInvitations[0].invitedBy.name}
+                        </p>
                       </div>
                     </div>
-                  </motion.div>
-                ))}
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => acceptGroupInvitation(pendingInvitations[0].id)}
+                        className="p-2 rounded-xl bg-secondary text-secondary-foreground"
+                      >
+                        <Check className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => declineGroupInvitation(pendingInvitations[0].id)}
+                        className="p-2 rounded-xl bg-muted text-muted-foreground"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* View All / collapse for 2+ invitations */}
+                {pendingInvitations.length > 1 && (
+                  <>
+                    {!showAllInvites ? (
+                      <button
+                        onClick={() => setShowAllInvites(true)}
+                        className="w-full text-center text-xs font-semibold text-primary py-2"
+                      >
+                        View all ({pendingInvitations.length} invites)
+                      </button>
+                    ) : (
+                      <>
+                        <AnimatePresence>
+                          {pendingInvitations.slice(1).map((inv) => (
+                            <motion.div
+                              key={inv.id}
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: "auto" }}
+                              exit={{ opacity: 0, height: 0 }}
+                              className="p-4 rounded-2xl border border-border/50 bg-card/60 opacity-80"
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-2xl">{inv.group.emoji}</span>
+                                  <div>
+                                    <p className="font-bold text-foreground text-sm">{inv.group.name}</p>
+                                    <p className="text-[10px] text-muted-foreground">
+                                      Invited by {inv.invitedBy.name}
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    onClick={() => acceptGroupInvitation(inv.id)}
+                                    className="p-2 rounded-xl bg-secondary text-secondary-foreground"
+                                  >
+                                    <Check className="w-4 h-4" />
+                                  </button>
+                                  <button
+                                    onClick={() => declineGroupInvitation(inv.id)}
+                                    className="p-2 rounded-xl bg-muted text-muted-foreground"
+                                  >
+                                    <X className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              </div>
+                            </motion.div>
+                          ))}
+                        </AnimatePresence>
+                        <button
+                          onClick={() => setShowAllInvites(false)}
+                          className="w-full text-center text-xs font-semibold text-primary py-2"
+                        >
+                          Hide
+                        </button>
+                      </>
+                    )}
+                  </>
+                )}
               </div>
             )}
 
