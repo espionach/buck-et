@@ -18,6 +18,7 @@ const Boards = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [editName, setEditName] = useState("");
   const [editEmoji, setEditEmoji] = useState("");
+  const [showAllInvites, setShowAllInvites] = useState(false);
 
   useEffect(() => {
     if (openGroup) setSelectedGroup(openGroup);

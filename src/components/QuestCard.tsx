@@ -79,7 +79,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEdit, disableJoin = f
             }`}
           >
             <HandMetal className="w-3.5 h-3.5" />
-            {isIn ? "I'm In" : "Join"}
+            I'm In
           </button>
         )}
       </div>
