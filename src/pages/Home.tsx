@@ -44,18 +44,12 @@ const Boards = () => {
   const selectedGroupData = groups.find((g) => g.id === selectedGroup);
 
   const handleOpenSettings = () => {
-    if (selectedGroupData) {
-      setEditName(selectedGroupData.name);
-      setEditEmoji(selectedGroupData.emoji);
-      setShowSettings(true);
-    }
+    setShowSettings(true);
   };
 
-  const handleSaveSettings = () => {
-    if (selectedGroup && editName.trim()) {
-      updateGroup(selectedGroup, { name: editName.trim(), emoji: editEmoji });
-      setShowSettings(false);
-    }
+  const handleViewProfile = (user: User) => {
+    setViewingProfile(user);
+    setShowSettings(false);
   };
 
   const pendingInvitations = groupInvitations.filter((i) => i.status === "pending");
