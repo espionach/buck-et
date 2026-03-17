@@ -9,7 +9,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
 const Boards = () => {
-  const { groups, quests, groupInvitations, acceptGroupInvitation, declineGroupInvitation, updateGroup } = useAppStore();
+  const { groups, quests, groupInvitations, acceptGroupInvitation, declineGroupInvitation } = useAppStore();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const openGroup = searchParams.get("open");
@@ -17,9 +17,8 @@ const Boards = () => {
   const [selectedGroup, setSelectedGroup] = useState<string | null>(openGroup);
   const [search, setSearch] = useState("");
   const [showSettings, setShowSettings] = useState(false);
-  const [editName, setEditName] = useState("");
-  const [editEmoji, setEditEmoji] = useState("");
   const [showAllInvites, setShowAllInvites] = useState(false);
+  const [viewingProfile, setViewingProfile] = useState<User | null>(null);
 
   useEffect(() => {
     if (openGroup) setSelectedGroup(openGroup);
