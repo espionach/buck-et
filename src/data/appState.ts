@@ -82,6 +82,37 @@ export const useAppStore = create<AppState>((set) => ({
       groups: s.groups.map((g) => (g.id === groupId ? { ...g, ...updates } : g)),
     })),
 
+  removeMemberFromGroup: (groupId, userId) =>
+    set((s) => ({
+      groups: s.groups.map((g) =>
+        g.id === groupId
+          ? {
+              ...g,
+              members: g.members.filter((m) => m.id !== userId),
+              memberRoles: g.memberRoles.filter((mr) => mr.user.id !== userId),
+            }
+          : g
+      ),
+    })),
+
+  leaveGroup: (groupId) =>
+    set((s) => ({
+      groups: s.groups.filter((g) => g.id !== groupId),
+    })),
+
+  inviteToGroup: (groupId, user) =>
+    set((s) => ({
+      groups: s.groups.map((g) =>
+        g.id === groupId
+          ? {
+              ...g,
+              members: [...g.members, user],
+              memberRoles: [...g.memberRoles, { user, role: "member" as const }],
+            }
+          : g
+      ),
+    })),
+
   acceptGroupInvitation: (invitationId) =>
     set((s) => {
       const invitation = s.groupInvitations.find((i) => i.id === invitationId);
