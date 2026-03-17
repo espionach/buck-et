@@ -238,45 +238,18 @@ const Boards = () => {
               </button>
             </div>
 
-            {/* Settings modal */}
+            {/* Settings panel */}
             <AnimatePresence>
-              {showSettings && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="overflow-hidden mb-4"
-                >
-                  <div className="p-4 rounded-2xl bg-card border border-border space-y-3">
-                    <h3 className="font-bold text-foreground text-sm">Edit Board</h3>
-                    <div className="flex gap-2">
-                      <input
-                        value={editEmoji}
-                        onChange={(e) => setEditEmoji(e.target.value)}
-                        className="w-14 px-2 py-2.5 rounded-xl bg-muted border border-border text-center text-xl focus:outline-none focus:ring-2 focus:ring-primary/30"
-                      />
-                      <input
-                        value={editName}
-                        onChange={(e) => setEditName(e.target.value)}
-                        className="flex-1 px-3 py-2.5 rounded-xl bg-muted border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-                      />
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={handleSaveSettings}
-                        className="flex-1 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm"
-                      >
-                        Save
-                      </button>
-                      <button
-                        onClick={() => setShowSettings(false)}
-                        className="px-4 py-2.5 rounded-xl bg-muted text-muted-foreground font-semibold text-sm"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
+              {showSettings && selectedGroupData && (
+                <GroupSettings
+                  group={selectedGroupData}
+                  onClose={() => setShowSettings(false)}
+                  onLeave={() => {
+                    setSelectedGroup(null);
+                    setShowSettings(false);
+                  }}
+                  onViewProfile={handleViewProfile}
+                />
               )}
             </AnimatePresence>
 
