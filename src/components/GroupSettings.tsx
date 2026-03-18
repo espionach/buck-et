@@ -24,6 +24,7 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
     if (editName.trim()) {
       updateGroup(group.id, { name: editName.trim(), emoji: editEmoji });
     }
+    setIsEditingName(false);
   };
 
   const handleLeave = () => {
