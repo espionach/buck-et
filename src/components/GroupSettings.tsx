@@ -15,6 +15,7 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
   const { updateGroup, removeMemberFromGroup, leaveGroup, inviteToGroup, following } = useAppStore();
   const [editName, setEditName] = useState(group.name);
   const [editEmoji, setEditEmoji] = useState(group.emoji);
+  const [isEditingName, setIsEditingName] = useState(false);
   const [showAddMembers, setShowAddMembers] = useState(false);
 
   const isOwner = group.ownerId === currentUser.id;
