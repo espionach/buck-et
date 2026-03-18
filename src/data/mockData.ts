@@ -224,6 +224,44 @@ export const quests: Quest[] = [
     createdAt: "2026-03-09",
     comments: [],
   },
+  // Quests created by currentUser (Alex Chen) for testing edit feature
+  {
+    id: "q8",
+    title: "Kayak the river at dawn",
+    description: "Rentals open at 6am — let's be first!",
+    createdBy: currentUser,
+    groupId: "g1",
+    isFollowerOnly: false,
+    participants: [currentUser, friends[0], friends[1]],
+    isDone: false,
+    createdAt: "2026-03-15",
+    comments: [],
+  },
+  {
+    id: "q9",
+    title: "Weekend movie marathon",
+    description: "All Studio Ghibli, snacks required 🍿",
+    createdBy: currentUser,
+    groupId: "g3",
+    isFollowerOnly: false,
+    participants: [currentUser, friends[2], friends[4]],
+    isDone: false,
+    createdAt: "2026-03-16",
+    comments: [
+      { id: "c6", userId: "u4", user: friends[2], text: "I'll bring the popcorn!", createdAt: "2026-03-16" },
+    ],
+  },
+  {
+    id: "q10",
+    title: "Sunrise yoga in the park",
+    createdBy: currentUser,
+    isFollowerOnly: true,
+    participants: [currentUser, friends[3]],
+    isDone: false,
+    createdAt: "2026-03-17",
+    comments: [],
+  },
+  // Past quests
   {
     id: "q6",
     title: "Beach bonfire last Friday",
@@ -235,6 +273,7 @@ export const quests: Quest[] = [
     isDone: true,
     createdAt: "2026-03-07",
     completedAt: "2026-03-08",
+    photos: ["/mock-photos/bonfire1.jpg", "/mock-photos/bonfire2.jpg"],
     notes: "Best bonfire yet — Jake brought the guitar!",
     comments: [
       { id: "c5", userId: "u1", user: currentUser, text: "Legendary night 🔥", createdAt: "2026-03-08" },
@@ -250,6 +289,7 @@ export const quests: Quest[] = [
     isDone: true,
     createdAt: "2026-03-05",
     completedAt: "2026-03-06",
+    photos: ["/mock-photos/hike1.jpg"],
     comments: [],
   },
 ];

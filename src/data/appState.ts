@@ -38,6 +38,7 @@ interface AppState {
   declineFollowRequest: (requestId: string) => void;
   addComment: (questId: string, comment: Comment) => void;
   updateQuest: (questId: string, updates: Partial<Quest>) => void;
+  deleteQuest: (questId: string) => void;
   updateProfile: (updates: Partial<User>) => void;
 }
 
@@ -153,6 +154,11 @@ export const useAppStore = create<AppState>((set) => ({
   updateQuest: (questId, updates) =>
     set((s) => ({
       quests: s.quests.map((q) => (q.id === questId ? { ...q, ...updates } : q)),
+    })),
+
+  deleteQuest: (questId) =>
+    set((s) => ({
+      quests: s.quests.filter((q) => q.id !== questId),
     })),
 
   updateProfile: (updates) =>

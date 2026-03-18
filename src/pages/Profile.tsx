@@ -1,7 +1,7 @@
 import { useAppStore } from "@/data/appState";
 import QuestCard from "@/components/QuestCard";
-import { Settings, Edit, X, Check, Users as UsersIcon, UserPlus } from "lucide-react";
-import { useState } from "react";
+import { Settings, Edit, X, Check, Users as UsersIcon, UserPlus, Trash2, ImagePlus } from "lucide-react";
+import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Quest } from "@/data/mockData";
 
@@ -16,6 +16,7 @@ const Profile = () => {
     declineFollowRequest,
     updateProfile,
     updateQuest,
+    deleteQuest,
   } = useAppStore();
   const [tab, setTab] = useState<"current" | "past">("current");
   const [showEditProfile, setShowEditProfile] = useState(false);
@@ -24,8 +25,17 @@ const Profile = () => {
   const [showFollowers, setShowFollowers] = useState(false);
   const [showFollowing, setShowFollowing] = useState(false);
   const [showRequests, setShowRequests] = useState(false);
-  const [editingQuest, setEditingQuest] = useState<Quest | null>(null);
+
+  // Current quest editing state
+  const [editingCurrentQuest, setEditingCurrentQuest] = useState<Quest | null>(null);
+  const [editQuestTitle, setEditQuestTitle] = useState("");
+  const [editQuestDescription, setEditQuestDescription] = useState("");
+
+  // Past quest editing state
+  const [editingPastQuest, setEditingPastQuest] = useState<Quest | null>(null);
   const [questNotes, setQuestNotes] = useState("");
+  const [questPhotos, setQuestPhotos] = useState<string[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const myQuests = quests.filter(
     (q) =>
@@ -33,12 +43,10 @@ const Profile = () => {
       q.participants.some((p) => p.id === currentUser.id)
   );
 
-  // Current: sorted by date (soonest first)
   const current = myQuests
     .filter((q) => !q.isDone)
     .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 
-  // Past: sorted by completion date (most recent first)
   const past = myQuests
     .filter((q) => q.isDone)
     .sort((a, b) => {
@@ -54,16 +62,64 @@ const Profile = () => {
     setShowEditProfile(false);
   };
 
-  const handleOpenEditor = (quest: Quest) => {
-    setEditingQuest(quest);
-    setQuestNotes(quest.notes || "");
+  // Current quest handlers
+  const handleOpenCurrentEditor = (quest: Quest) => {
+    setEditingCurrentQuest(quest);
+    setEditQuestTitle(quest.title);
+    setEditQuestDescription(quest.description || "");
   };
 
-  const handleSaveQuestEdit = () => {
-    if (editingQuest) {
-      updateQuest(editingQuest.id, { notes: questNotes.trim() || undefined });
-      setEditingQuest(null);
+  const handleSaveCurrentQuest = () => {
+    if (editingCurrentQuest) {
+      updateQuest(editingCurrentQuest.id, {
+        title: editQuestTitle.trim(),
+        description: editQuestDescription.trim() || undefined,
+      });
+      setEditingCurrentQuest(null);
     }
+  };
+
+  const handleDeleteQuest = () => {
+    if (editingCurrentQuest) {
+      deleteQuest(editingCurrentQuest.id);
+      setEditingCurrentQuest(null);
+    }
+  };
+
+  // Past quest handlers
+  const handleOpenPastEditor = (quest: Quest) => {
+    setEditingPastQuest(quest);
+    setQuestNotes(quest.notes || "");
+    setQuestPhotos(quest.photos || []);
+  };
+
+  const handleSavePastQuest = () => {
+    if (editingPastQuest) {
+      updateQuest(editingPastQuest.id, {
+        notes: questNotes.trim() || undefined,
+        photos: questPhotos.length > 0 ? questPhotos : undefined,
+      });
+      setEditingPastQuest(null);
+    }
+  };
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    Array.from(files).forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        if (ev.target?.result) {
+          setQuestPhotos((prev) => [...prev, ev.target!.result as string]);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+    e.target.value = "";
+  };
+
+  const removePhoto = (index: number) => {
+    setQuestPhotos((prev) => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -303,43 +359,126 @@ const Profile = () => {
               quest={q}
               index={i}
               showGroup
-              onEdit={handleOpenEditor}
+              onEditCurrent={tab === "current" ? handleOpenCurrentEditor : undefined}
+              onEditPast={tab === "past" ? handleOpenPastEditor : undefined}
             />
           ))
         )}
       </motion.div>
 
-      {/* Quest Editor Modal */}
+      {/* Current Quest Editor Modal (centered) */}
       <AnimatePresence>
-        {editingQuest && (
+        {editingCurrentQuest && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-foreground/40 flex items-end justify-center"
-            onClick={() => setEditingQuest(null)}
+            className="fixed inset-0 z-50 bg-foreground/40 flex items-center justify-center p-5"
+            onClick={() => setEditingCurrentQuest(null)}
           >
             <motion.div
-              initial={{ y: 200 }}
-              animate={{ y: 0 }}
-              exit={{ y: 200 }}
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-md bg-card rounded-t-3xl p-5 pb-8 space-y-4"
+              className="w-full max-w-md bg-card rounded-2xl p-5 space-y-4 shadow-lg"
             >
               <div className="flex items-center justify-between">
                 <h3 className="font-bold text-foreground">Edit Quest</h3>
-                <button onClick={() => setEditingQuest(null)}>
+                <button onClick={() => setEditingCurrentQuest(null)}>
                   <X className="w-5 h-5 text-muted-foreground" />
                 </button>
               </div>
+
               <div>
-                <p className="font-bold text-foreground mb-1">{editingQuest.title}</p>
-                {editingQuest.description && (
-                  <p className="text-sm text-muted-foreground">{editingQuest.description}</p>
+                <label className="text-sm font-semibold text-foreground mb-1.5 block">Quest Name</label>
+                <input
+                  value={editQuestTitle}
+                  onChange={(e) => setEditQuestTitle(e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-xl bg-muted border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1.5 block">Details</label>
+                <textarea
+                  value={editQuestDescription}
+                  onChange={(e) => setEditQuestDescription(e.target.value)}
+                  placeholder="Add details..."
+                  rows={3}
+                  className="w-full px-3 py-2.5 rounded-xl bg-muted border border-border text-sm text-foreground resize-none focus:outline-none focus:ring-2 focus:ring-primary/30"
+                />
+              </div>
+
+              {/* Participants */}
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1.5 block">Participants</label>
+                <div className="space-y-1.5">
+                  {editingCurrentQuest.participants.map((p) => (
+                    <div key={p.id} className="flex items-center gap-2 py-1">
+                      <span className="text-sm">{p.avatar}</span>
+                      <span className="text-sm text-foreground">{p.name}</span>
+                      {p.id === editingCurrentQuest.createdBy.id && (
+                        <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">Owner</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  onClick={handleSaveCurrentQuest}
+                  disabled={!editQuestTitle.trim()}
+                  className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm disabled:opacity-40"
+                >
+                  Save Changes
+                </button>
+                <button
+                  onClick={handleDeleteQuest}
+                  className="p-3 rounded-xl bg-destructive/10 text-destructive"
+                >
+                  <Trash2 className="w-5 h-5" />
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Past Quest Editor Modal (centered) */}
+      <AnimatePresence>
+        {editingPastQuest && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-foreground/40 flex items-center justify-center p-5"
+            onClick={() => setEditingPastQuest(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-md bg-card rounded-2xl p-5 space-y-4 shadow-lg max-h-[85vh] overflow-y-auto"
+            >
+              <div className="flex items-center justify-between">
+                <h3 className="font-bold text-foreground">Quest Memories</h3>
+                <button onClick={() => setEditingPastQuest(null)}>
+                  <X className="w-5 h-5 text-muted-foreground" />
+                </button>
+              </div>
+
+              <div>
+                <p className="font-bold text-foreground mb-1">{editingPastQuest.title}</p>
+                {editingPastQuest.description && (
+                  <p className="text-sm text-muted-foreground">{editingPastQuest.description}</p>
                 )}
               </div>
+
               <div>
-                <label className="text-sm font-semibold text-foreground mb-2 block">Notes & reflections</label>
+                <label className="text-sm font-semibold text-foreground mb-1.5 block">Notes & Reflections</label>
                 <textarea
                   value={questNotes}
                   onChange={(e) => setQuestNotes(e.target.value)}
@@ -348,8 +487,45 @@ const Profile = () => {
                   className="w-full px-3 py-2.5 rounded-xl bg-muted border border-border text-sm text-foreground resize-none focus:outline-none focus:ring-2 focus:ring-primary/30"
                 />
               </div>
+
+              {/* Photo upload */}
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1.5 block">Photos</label>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handlePhotoUpload}
+                  className="hidden"
+                />
+                <div className="flex flex-wrap gap-2">
+                  {questPhotos.map((photo, i) => (
+                    <div key={i} className="relative group">
+                      <img
+                        src={photo}
+                        alt={`Photo ${i + 1}`}
+                        className="w-20 h-20 rounded-xl object-cover border border-border/30"
+                      />
+                      <button
+                        onClick={() => removePhoto(i)}
+                        className="absolute -top-1.5 -right-1.5 p-0.5 rounded-full bg-destructive text-destructive-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-20 h-20 rounded-xl border-2 border-dashed border-border flex items-center justify-center text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+                  >
+                    <ImagePlus className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
               <button
-                onClick={handleSaveQuestEdit}
+                onClick={handleSavePastQuest}
                 className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm"
               >
                 Save Changes

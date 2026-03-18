@@ -1,23 +1,25 @@
 import { Quest, currentUser, Comment } from "@/data/mockData";
 import { useAppStore } from "@/data/appState";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, HandMetal, Users, MessageCircle, ChevronDown, ChevronUp, Send } from "lucide-react";
+import { Check, HandMetal, MessageCircle, ChevronDown, ChevronUp, Send, Pencil, Plus } from "lucide-react";
 import { useState } from "react";
 
 interface QuestCardProps {
   quest: Quest;
   index?: number;
   showGroup?: boolean;
-  onEdit?: (quest: Quest) => void;
+  onEditCurrent?: (quest: Quest) => void;
+  onEditPast?: (quest: Quest) => void;
   disableJoin?: boolean;
 }
 
-const QuestCard = ({ quest, index = 0, showGroup = true, onEdit, disableJoin = false }: QuestCardProps) => {
+const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPast, disableJoin = false }: QuestCardProps) => {
   const { toggleImIn, markDone, groups, addComment } = useAppStore();
   const isIn = quest.participants.some((p) => p.id === currentUser.id);
   const group = quest.groupId ? groups.find((g) => g.id === quest.groupId) : null;
   const userInGroup = group ? group.members.some((m) => m.id === currentUser.id) : true;
   const canJoin = !disableJoin && userInGroup;
+  const isOwner = quest.createdBy.id === currentUser.id;
 
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
@@ -40,9 +42,34 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEdit, disableJoin = f
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.06 }}
-      className={`p-4 rounded-2xl border border-border/50 bg-card ${quest.isDone ? "opacity-60" : ""}`}
-      onClick={() => onEdit?.(quest)}
+      className={`relative p-4 rounded-2xl border border-border/50 bg-card ${quest.isDone ? "opacity-60" : ""}`}
     >
+      {/* Pencil icon for owned current quests */}
+      {!quest.isDone && isOwner && onEditCurrent && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onEditCurrent(quest);
+          }}
+          className="absolute top-3 right-3 p-1.5 rounded-lg bg-muted text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <Pencil className="w-3.5 h-3.5" />
+        </button>
+      )}
+
+      {/* Plus icon for past quests */}
+      {quest.isDone && onEditPast && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onEditPast(quest);
+          }}
+          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 p-1.5 rounded-full bg-primary text-primary-foreground shadow-md hover:scale-110 transition-transform"
+        >
+          <Plus className="w-3.5 h-3.5" />
+        </button>
+      )}
+
       {/* Header: Creator name + group */}
       <div className="mb-2">
         <div className="flex items-center gap-2">
@@ -89,6 +116,20 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEdit, disableJoin = f
         <p className="text-[10px] text-muted-foreground mt-1">
           Completed {quest.completedAt}
         </p>
+      )}
+
+      {/* Photos for past quests */}
+      {quest.isDone && quest.photos && quest.photos.length > 0 && (
+        <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
+          {quest.photos.map((photo, i) => (
+            <img
+              key={i}
+              src={photo}
+              alt={`Quest photo ${i + 1}`}
+              className="w-20 h-20 rounded-xl object-cover shrink-0 border border-border/30"
+            />
+          ))}
+        </div>
       )}
 
       {/* Social proof + actions */}
