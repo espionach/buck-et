@@ -70,33 +70,38 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
       className="overflow-hidden mb-4"
     >
       <div className="p-4 rounded-2xl bg-card border border-border space-y-4">
+        {/* Header with close */}
+        <div className="flex items-center justify-between">
+          <h3 className="font-bold text-foreground text-sm">Edit Board</h3>
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
         {/* Edit name/emoji */}
-        <div>
-          <h3 className="font-bold text-foreground text-sm mb-2">Edit Board</h3>
-          <div className="flex gap-2">
-            <input
-              value={editEmoji}
-              onChange={(e) => setEditEmoji(e.target.value)}
-              className="w-14 px-2 py-2.5 rounded-xl bg-muted border border-border text-center text-xl focus:outline-none focus:ring-2 focus:ring-primary/30"
-            />
+        <div className="flex gap-2">
+          <input
+            value={editEmoji}
+            onChange={(e) => setEditEmoji(e.target.value)}
+            className="w-14 px-2 py-2.5 rounded-xl bg-muted border border-border text-center text-xl focus:outline-none focus:ring-2 focus:ring-primary/30"
+          />
+          <div className="flex-1 flex items-center gap-1.5">
             <input
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
-              className="flex-1 px-3 py-2.5 rounded-xl bg-muted border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+              disabled={!isEditingName}
+              className={`flex-1 px-3 py-2.5 rounded-xl border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 ${
+                isEditingName ? "bg-muted border-border" : "bg-transparent border-transparent"
+              }`}
             />
-          </div>
-          <div className="flex gap-2 mt-2">
             <button
-              onClick={handleSave}
-              className="flex-1 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm"
+              onClick={() => isEditingName ? handleSave() : setIsEditingName(true)}
+              className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
             >
-              Save
-            </button>
-            <button
-              onClick={onClose}
-              className="px-4 py-2.5 rounded-xl bg-muted text-muted-foreground font-semibold text-sm"
-            >
-              Cancel
+              {isEditingName ? <Check className="w-4 h-4 text-primary" /> : <Pencil className="w-4 h-4" />}
             </button>
           </div>
         </div>
