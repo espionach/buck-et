@@ -156,6 +156,11 @@ export const useAppStore = create<AppState>((set) => ({
       quests: s.quests.map((q) => (q.id === questId ? { ...q, ...updates } : q)),
     })),
 
+  deleteQuest: (questId) =>
+    set((s) => ({
+      quests: s.quests.filter((q) => q.id !== questId),
+    })),
+
   updateProfile: (updates) =>
     set((s) => ({ currentUser: { ...s.currentUser, ...updates } })),
 }));
