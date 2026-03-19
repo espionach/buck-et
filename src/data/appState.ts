@@ -40,6 +40,8 @@ interface AppState {
   updateQuest: (questId: string, updates: Partial<Quest>) => void;
   deleteQuest: (questId: string) => void;
   updateProfile: (updates: Partial<User>) => void;
+  removeParticipant: (questId: string, userId: string) => void;
+  cleanupEmptyQuests: () => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -57,12 +59,12 @@ export const useAppStore = create<AppState>((set) => ({
     set((s) => ({
       quests: s.quests.map((q) => {
         if (q.id !== questId) return q;
-        const isIn = q.participants.some((p) => p.id === currentUser.id);
+        const isIn = q.participants.some((p) => p.id === s.currentUser.id);
         return {
           ...q,
           participants: isIn
-            ? q.participants.filter((p) => p.id !== currentUser.id)
-            : [...q.participants, currentUser],
+            ? q.participants.filter((p) => p.id !== s.currentUser.id)
+            : [...q.participants, s.currentUser],
         };
       }),
     })),
@@ -120,7 +122,7 @@ export const useAppStore = create<AppState>((set) => ({
       if (!invitation) return s;
       return {
         groupInvitations: s.groupInvitations.filter((i) => i.id !== invitationId),
-        groups: [...s.groups, { ...invitation.group, members: [...invitation.group.members, currentUser] }],
+        groups: [...s.groups, { ...invitation.group, members: [...invitation.group.members, s.currentUser] }],
       };
     }),
 
@@ -163,4 +165,18 @@ export const useAppStore = create<AppState>((set) => ({
 
   updateProfile: (updates) =>
     set((s) => ({ currentUser: { ...s.currentUser, ...updates } })),
+
+  removeParticipant: (questId, userId) =>
+    set((s) => ({
+      quests: s.quests.map((q) =>
+        q.id === questId
+          ? { ...q, participants: q.participants.filter((p) => p.id !== userId) }
+          : q
+      ),
+    })),
+
+  cleanupEmptyQuests: () =>
+    set((s) => ({
+      quests: s.quests.filter((q) => q.isDone || q.participants.length > 0 || q.createdBy.id === s.currentUser.id),
+    })),
 }));

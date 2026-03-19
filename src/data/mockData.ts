@@ -68,19 +68,20 @@ export const currentUser: User = {
   name: "Alex Chen",
   avatar: "🧑‍🚀",
   bio: "always down for spontaneous adventures ✨",
+  profilePicture: "/profile-photos/alex.jpg",
 };
 
 export const friends: User[] = [
-  { id: "u2", name: "Maya Johnson", avatar: "🎨", bio: "creative soul" },
-  { id: "u3", name: "Jake Williams", avatar: "🏄", bio: "surf & turf" },
-  { id: "u4", name: "Priya Patel", avatar: "📸", bio: "moment collector" },
-  { id: "u5", name: "Sam Kim", avatar: "🎸", bio: "indie everything" },
-  { id: "u6", name: "Luna Martinez", avatar: "🌙", bio: "night owl vibes" },
+  { id: "u2", name: "Maya Johnson", avatar: "🎨", bio: "creative soul", profilePicture: "/profile-photos/maya.jpg" },
+  { id: "u3", name: "Jake Williams", avatar: "🏄", bio: "surf & turf", profilePicture: "/profile-photos/jake.jpg" },
+  { id: "u4", name: "Priya Patel", avatar: "📸", bio: "moment collector", profilePicture: "/profile-photos/priya.jpg" },
+  { id: "u5", name: "Sam Kim", avatar: "🎸", bio: "indie everything", profilePicture: "/profile-photos/sam.jpg" },
+  { id: "u6", name: "Luna Martinez", avatar: "🌙", bio: "night owl vibes", profilePicture: "/profile-photos/luna.jpg" },
 ];
 
 export const nonFollowedUsers: User[] = [
-  { id: "u7", name: "Kai Nakamura", avatar: "🎿", bio: "mountain life" },
-  { id: "u8", name: "Zoe Thompson", avatar: "🧁", bio: "baking adventures" },
+  { id: "u7", name: "Kai Nakamura", avatar: "🎿", bio: "mountain life", profilePicture: "/profile-photos/kai.jpg" },
+  { id: "u8", name: "Zoe Thompson", avatar: "🧁", bio: "baking adventures", profilePicture: "/profile-photos/zoe.jpg" },
 ];
 
 export const groups: Group[] = [
@@ -224,7 +225,6 @@ export const quests: Quest[] = [
     createdAt: "2026-03-09",
     comments: [],
   },
-  // Quests created by currentUser (Alex Chen) for testing edit feature
   {
     id: "q8",
     title: "Kayak the river at dawn",
@@ -261,7 +261,6 @@ export const quests: Quest[] = [
     createdAt: "2026-03-17",
     comments: [],
   },
-  // Past quests
   {
     id: "q6",
     title: "Beach bonfire last Friday",
