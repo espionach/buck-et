@@ -1,5 +1,6 @@
 import { useAppStore } from "@/data/appState";
 import { currentUser, Group, User } from "@/data/mockData";
+import UserAvatar from "@/components/UserAvatar";
 import { X, UserPlus, LogOut, Crown, Clock, Trash2, Pencil, Check } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -142,9 +143,7 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
                         onClick={() => handleInvite(user)}
                         className="w-full flex items-center gap-2 p-2 rounded-xl bg-muted/50 border border-border/50 text-left active:scale-[0.98] transition-transform"
                       >
-                        <span className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-sm">
-                          {user.avatar}
-                        </span>
+                        <UserAvatar user={user} size="sm" />
                         <span className="text-sm font-medium text-foreground flex-1">
                           {user.name}
                         </span>
@@ -172,9 +171,7 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
                     className="flex items-center gap-2 flex-1 text-left"
                     disabled={isCurrentUser}
                   >
-                    <span className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-sm">
-                      {mr.user.avatar}
-                    </span>
+                    <UserAvatar user={mr.user} size="sm" />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-foreground truncate">
                         {mr.user.name}

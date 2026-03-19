@@ -3,15 +3,17 @@ import { currentUser, User } from "@/data/mockData";
 import GroupCard from "@/components/GroupCard";
 import QuestCard from "@/components/QuestCard";
 import GroupSettings from "@/components/GroupSettings";
+import UserAvatar from "@/components/UserAvatar";
 import { Plus, Search, Check, X, Settings, ArrowLeft } from "lucide-react";
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
 const Boards = () => {
-  const { groups, quests, groupInvitations, acceptGroupInvitation, declineGroupInvitation } = useAppStore();
+  const { groups, quests, groupInvitations, acceptGroupInvitation, declineGroupInvitation, cleanupEmptyQuests } = useAppStore();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const location = useLocation();
   const openGroup = searchParams.get("open");
 
   const [selectedGroup, setSelectedGroup] = useState<string | null>(openGroup);
@@ -23,6 +25,10 @@ const Boards = () => {
   useEffect(() => {
     if (openGroup) setSelectedGroup(openGroup);
   }, [openGroup]);
+
+  useEffect(() => {
+    cleanupEmptyQuests();
+  }, [location.pathname]);
 
   // Sort groups by date created (newest first)
   const sortedGroups = [...groups].sort(
@@ -77,9 +83,7 @@ const Boards = () => {
         </button>
 
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-2xl">
-            {viewingProfile.avatar}
-          </div>
+          <UserAvatar user={viewingProfile} size="lg" />
           <div>
             <h2 className="text-lg font-bold text-foreground">{viewingProfile.name}</h2>
             <p className="text-sm text-muted-foreground">{viewingProfile.bio}</p>

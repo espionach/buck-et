@@ -1,4 +1,5 @@
 import { Group } from "@/data/mockData";
+import UserAvatar from "@/components/UserAvatar";
 import { motion } from "framer-motion";
 import { Users, Zap } from "lucide-react";
 
@@ -37,12 +38,12 @@ const GroupCard = ({ group, onClick, index }: GroupCardProps) => {
       </div>
       <div className="flex -space-x-1.5 mt-3">
         {group.members.slice(0, 4).map((m) => (
-          <span
+          <UserAvatar
             key={m.id}
-            className="w-7 h-7 rounded-full bg-card flex items-center justify-center text-sm border-2 border-card"
-          >
-            {m.avatar}
-          </span>
+            user={m}
+            size="xs"
+            className="border-2 border-card w-7 h-7"
+          />
         ))}
         {group.members.length > 4 && (
           <span className="w-7 h-7 rounded-full bg-muted flex items-center justify-center text-[10px] font-semibold text-muted-foreground border-2 border-card">
