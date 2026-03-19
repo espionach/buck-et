@@ -10,9 +10,10 @@ import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
 const Boards = () => {
-  const { groups, quests, groupInvitations, acceptGroupInvitation, declineGroupInvitation } = useAppStore();
+  const { groups, quests, groupInvitations, acceptGroupInvitation, declineGroupInvitation, cleanupEmptyQuests } = useAppStore();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const location = useLocation();
   const openGroup = searchParams.get("open");
 
   const [selectedGroup, setSelectedGroup] = useState<string | null>(openGroup);
@@ -24,6 +25,10 @@ const Boards = () => {
   useEffect(() => {
     if (openGroup) setSelectedGroup(openGroup);
   }, [openGroup]);
+
+  useEffect(() => {
+    cleanupEmptyQuests();
+  }, [location.pathname]);
 
   // Sort groups by date created (newest first)
   const sortedGroups = [...groups].sort(
