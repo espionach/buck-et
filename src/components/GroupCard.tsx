@@ -1,4 +1,5 @@
 import { Group } from "@/data/mockData";
+import UserAvatar from "@/components/UserAvatar";
 import { motion } from "framer-motion";
 import { Users, Zap } from "lucide-react";
 
