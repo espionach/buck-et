@@ -143,9 +143,7 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
                         onClick={() => handleInvite(user)}
                         className="w-full flex items-center gap-2 p-2 rounded-xl bg-muted/50 border border-border/50 text-left active:scale-[0.98] transition-transform"
                       >
-                        <span className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-sm">
-                          {user.avatar}
-                        </span>
+                        <UserAvatar user={user} size="sm" />
                         <span className="text-sm font-medium text-foreground flex-1">
                           {user.name}
                         </span>
