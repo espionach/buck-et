@@ -1,9 +1,11 @@
 import { useAppStore } from "@/data/appState";
 import QuestCard from "@/components/QuestCard";
-import { Settings, Edit, X, Check, Users as UsersIcon, UserPlus, Trash2, ImagePlus } from "lucide-react";
-import { useState, useRef } from "react";
+import UserAvatar from "@/components/UserAvatar";
+import { Edit, X, Check, Users as UsersIcon, UserPlus, Trash2, ImagePlus, Camera } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Quest } from "@/data/mockData";
+import { Quest, User } from "@/data/mockData";
+import { useLocation } from "react-router-dom";
 
 const Profile = () => {
   const {
@@ -17,7 +19,10 @@ const Profile = () => {
     updateProfile,
     updateQuest,
     deleteQuest,
+    removeParticipant,
+    cleanupEmptyQuests,
   } = useAppStore();
+  const location = useLocation();
   const [tab, setTab] = useState<"current" | "past">("current");
   const [showEditProfile, setShowEditProfile] = useState(false);
   const [editName, setEditName] = useState(currentUser.name);
@@ -25,17 +30,28 @@ const Profile = () => {
   const [showFollowers, setShowFollowers] = useState(false);
   const [showFollowing, setShowFollowing] = useState(false);
   const [showRequests, setShowRequests] = useState(false);
+  const [viewingUser, setViewingUser] = useState<User | null>(null);
+
+  // Profile picture upload
+  const profilePicRef = useRef<HTMLInputElement>(null);
+  const [editProfilePic, setEditProfilePic] = useState(currentUser.profilePicture || "");
 
   // Current quest editing state
   const [editingCurrentQuest, setEditingCurrentQuest] = useState<Quest | null>(null);
   const [editQuestTitle, setEditQuestTitle] = useState("");
   const [editQuestDescription, setEditQuestDescription] = useState("");
+  const [editQuestParticipants, setEditQuestParticipants] = useState<User[]>([]);
 
   // Past quest editing state
   const [editingPastQuest, setEditingPastQuest] = useState<Quest | null>(null);
   const [questNotes, setQuestNotes] = useState("");
   const [questPhotos, setQuestPhotos] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Cleanup empty quests on mount
+  useEffect(() => {
+    cleanupEmptyQuests();
+  }, [location.pathname]);
 
   const myQuests = quests.filter(
     (q) =>
@@ -58,8 +74,25 @@ const Profile = () => {
   const active = tab === "current" ? current : past;
 
   const handleSaveProfile = () => {
-    updateProfile({ name: editName.trim(), bio: editBio.trim() });
+    updateProfile({
+      name: editName.trim(),
+      bio: editBio.trim(),
+      profilePicture: editProfilePic || undefined,
+    });
     setShowEditProfile(false);
+  };
+
+  const handleProfilePicUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      if (ev.target?.result) {
+        setEditProfilePic(ev.target.result as string);
+      }
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
   };
 
   // Current quest handlers
@@ -67,16 +100,27 @@ const Profile = () => {
     setEditingCurrentQuest(quest);
     setEditQuestTitle(quest.title);
     setEditQuestDescription(quest.description || "");
+    setEditQuestParticipants([...quest.participants]);
   };
 
   const handleSaveCurrentQuest = () => {
     if (editingCurrentQuest) {
+      // Remove participants that were deleted
+      const removedUsers = editingCurrentQuest.participants.filter(
+        (p) => !editQuestParticipants.some((ep) => ep.id === p.id)
+      );
+      removedUsers.forEach((u) => removeParticipant(editingCurrentQuest.id, u.id));
+
       updateQuest(editingCurrentQuest.id, {
         title: editQuestTitle.trim(),
         description: editQuestDescription.trim() || undefined,
       });
       setEditingCurrentQuest(null);
     }
+  };
+
+  const handleRemoveParticipantFromEditor = (userId: string) => {
+    setEditQuestParticipants((prev) => prev.filter((p) => p.id !== userId));
   };
 
   const handleDeleteQuest = () => {
@@ -122,21 +166,73 @@ const Profile = () => {
     setQuestPhotos((prev) => prev.filter((_, i) => i !== index));
   };
 
+  // Viewing another user's profile from followers/following list
+  const isFollowingUser = (user: User) => following.some((f) => f.id === user.id);
+
+  if (viewingUser) {
+    const profileQuests = quests.filter(
+      (q) =>
+        q.createdBy.id === viewingUser.id ||
+        q.participants.some((p) => p.id === viewingUser.id)
+    );
+    const isFollowed = isFollowingUser(viewingUser);
+
+    return (
+      <div className="min-h-screen pb-24 px-5 pt-14">
+        <button
+          onClick={() => setViewingUser(null)}
+          className="text-sm text-primary font-semibold mb-4"
+        >
+          ← Back to Profile
+        </button>
+
+        <div className="flex items-center gap-4 mb-6">
+          <UserAvatar user={viewingUser} size="lg" />
+          <div>
+            <h2 className="text-lg font-bold text-foreground">{viewingUser.name}</h2>
+            <p className="text-sm text-muted-foreground">{viewingUser.bio}</p>
+          </div>
+        </div>
+
+        {!isFollowed ? (
+          <div className="text-center py-16">
+            <p className="font-bold text-foreground mb-1">Private Account</p>
+            <p className="text-sm text-muted-foreground mb-4">Follow to see their quests</p>
+            <button className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm mx-auto">
+              Request to Follow
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {profileQuests.length === 0 ? (
+              <p className="text-center text-sm text-muted-foreground py-8">No quests to show</p>
+            ) : (
+              profileQuests.map((q, i) => <QuestCard key={q.id} quest={q} index={i} showGroup />)
+            )}
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen pb-24 px-5 pt-14">
       {/* Profile Header */}
       <div className="flex items-start justify-between mb-6">
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-3xl">
-            {currentUser.avatar}
-          </div>
+          <UserAvatar user={currentUser} size="xl" />
           <div>
             <h1 className="text-xl font-bold text-foreground">{currentUser.name}</h1>
             <p className="text-sm text-muted-foreground">{currentUser.bio}</p>
           </div>
         </div>
         <button
-          onClick={() => setShowEditProfile(true)}
+          onClick={() => {
+            setEditName(currentUser.name);
+            setEditBio(currentUser.bio);
+            setEditProfilePic(currentUser.profilePicture || "");
+            setShowEditProfile(true);
+          }}
           className="p-2 rounded-xl bg-muted text-muted-foreground"
         >
           <Edit className="w-5 h-5" />
@@ -154,6 +250,34 @@ const Profile = () => {
           >
             <div className="p-4 rounded-2xl bg-card border border-border space-y-3">
               <h3 className="font-bold text-foreground text-sm">Edit Profile</h3>
+
+              {/* Profile picture */}
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  {editProfilePic ? (
+                    <img src={editProfilePic} alt="Profile" className="w-16 h-16 rounded-full object-cover" />
+                  ) : (
+                    <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-3xl">
+                      {currentUser.avatar}
+                    </div>
+                  )}
+                  <button
+                    onClick={() => profilePicRef.current?.click()}
+                    className="absolute -bottom-1 -right-1 p-1.5 rounded-full bg-primary text-primary-foreground"
+                  >
+                    <Camera className="w-3 h-3" />
+                  </button>
+                  <input
+                    ref={profilePicRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleProfilePicUpload}
+                    className="hidden"
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">Tap camera to change photo</p>
+              </div>
+
               <input
                 value={editName}
                 onChange={(e) => setEditName(e.target.value)}
@@ -245,7 +369,7 @@ const Profile = () => {
               {followRequests.map((req) => (
                 <div key={req.id} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="text-lg">{req.from.avatar}</span>
+                    <UserAvatar user={req.from} size="sm" />
                     <span className="text-sm font-semibold text-foreground">{req.from.name}</span>
                   </div>
                   <div className="flex gap-1.5">
@@ -269,7 +393,7 @@ const Profile = () => {
         )}
       </AnimatePresence>
 
-      {/* Followers Popup */}
+      {/* Followers Popup — clickable */}
       <AnimatePresence>
         {showFollowers && (
           <motion.div
@@ -286,17 +410,24 @@ const Profile = () => {
                 </button>
               </div>
               {followers.map((u) => (
-                <div key={u.id} className="flex items-center gap-2 py-1.5">
-                  <span className="text-lg">{u.avatar}</span>
+                <button
+                  key={u.id}
+                  onClick={() => {
+                    setViewingUser(u);
+                    setShowFollowers(false);
+                  }}
+                  className="w-full flex items-center gap-2 py-1.5 text-left hover:bg-muted/50 rounded-lg px-1 transition-colors"
+                >
+                  <UserAvatar user={u} size="sm" />
                   <span className="text-sm text-foreground">{u.name}</span>
-                </div>
+                </button>
               ))}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Following Popup */}
+      {/* Following Popup — clickable */}
       <AnimatePresence>
         {showFollowing && (
           <motion.div
@@ -313,10 +444,17 @@ const Profile = () => {
                 </button>
               </div>
               {following.map((u) => (
-                <div key={u.id} className="flex items-center gap-2 py-1.5">
-                  <span className="text-lg">{u.avatar}</span>
+                <button
+                  key={u.id}
+                  onClick={() => {
+                    setViewingUser(u);
+                    setShowFollowing(false);
+                  }}
+                  className="w-full flex items-center gap-2 py-1.5 text-left hover:bg-muted/50 rounded-lg px-1 transition-colors"
+                >
+                  <UserAvatar user={u} size="sm" />
                   <span className="text-sm text-foreground">{u.name}</span>
-                </div>
+                </button>
               ))}
             </div>
           </motion.div>
@@ -381,7 +519,7 @@ const Profile = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-md bg-card rounded-2xl p-5 space-y-4 shadow-lg"
+              className="w-full max-w-md bg-card rounded-2xl p-5 space-y-4 shadow-lg max-h-[85vh] overflow-y-auto"
             >
               <div className="flex items-center justify-between">
                 <h3 className="font-bold text-foreground">Edit Quest</h3>
@@ -410,16 +548,26 @@ const Profile = () => {
                 />
               </div>
 
-              {/* Participants */}
+              {/* Participants with remove */}
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1.5 block">Participants</label>
                 <div className="space-y-1.5">
-                  {editingCurrentQuest.participants.map((p) => (
-                    <div key={p.id} className="flex items-center gap-2 py-1">
-                      <span className="text-sm">{p.avatar}</span>
-                      <span className="text-sm text-foreground">{p.name}</span>
-                      {p.id === editingCurrentQuest.createdBy.id && (
-                        <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">Owner</span>
+                  {editQuestParticipants.map((p) => (
+                    <div key={p.id} className="flex items-center justify-between py-1">
+                      <div className="flex items-center gap-2">
+                        <UserAvatar user={p} size="xs" />
+                        <span className="text-sm text-foreground">{p.name}</span>
+                        {p.id === editingCurrentQuest.createdBy.id && (
+                          <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">Owner</span>
+                        )}
+                      </div>
+                      {p.id !== editingCurrentQuest.createdBy.id && (
+                        <button
+                          onClick={() => handleRemoveParticipantFromEditor(p.id)}
+                          className="p-1 rounded-lg text-destructive hover:bg-destructive/10 transition-colors"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
                       )}
                     </div>
                   ))}

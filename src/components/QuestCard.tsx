@@ -1,5 +1,6 @@
 import { Quest, currentUser, Comment } from "@/data/mockData";
 import { useAppStore } from "@/data/appState";
+import UserAvatar from "@/components/UserAvatar";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, HandMetal, MessageCircle, ChevronDown, ChevronUp, Send, Pencil, Plus } from "lucide-react";
 import { useState } from "react";
@@ -57,14 +58,14 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
         </button>
       )}
 
-      {/* Plus icon for past quests */}
+      {/* Plus icon for past quests — right side, inside card */}
       {quest.isDone && onEditPast && (
         <button
           onClick={(e) => {
             e.stopPropagation();
             onEditPast(quest);
           }}
-          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 p-1.5 rounded-full bg-primary text-primary-foreground shadow-md hover:scale-110 transition-transform"
+          className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-primary text-primary-foreground shadow-md hover:scale-110 transition-transform"
         >
           <Plus className="w-3.5 h-3.5" />
         </button>
@@ -73,10 +74,10 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
       {/* Header: Creator name + group */}
       <div className="mb-2">
         <div className="flex items-center gap-2">
-          <span className="text-sm">{quest.createdBy.avatar}</span>
+          <UserAvatar user={quest.createdBy} size="xs" />
           <span className="text-sm font-bold text-foreground">{quest.createdBy.name}</span>
         </div>
-        <p className="text-[11px] text-muted-foreground ml-7">
+        <p className="text-[11px] text-muted-foreground ml-8">
           {group ? `${group.emoji} ${group.name}` : "🌍 Followers only"}
         </p>
       </div>
@@ -138,12 +139,12 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
         <div className="flex items-center gap-1">
           <div className="flex -space-x-1.5">
             {quest.participants.slice(0, 3).map((p) => (
-              <span
+              <UserAvatar
                 key={p.id}
-                className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs border-2 border-card"
-              >
-                {p.avatar}
-              </span>
+                user={p}
+                size="xs"
+                className="border-2 border-card"
+              />
             ))}
           </div>
           {quest.participants.length > 3 && (
@@ -202,7 +203,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
               )}
               {quest.comments.map((c) => (
                 <div key={c.id} className="flex items-start gap-2">
-                  <span className="text-xs">{c.user.avatar}</span>
+                  <UserAvatar user={c.user} size="xs" />
                   <div>
                     <span className="text-xs font-semibold text-foreground">{c.user.name}</span>
                     <p className="text-xs text-muted-foreground">{c.text}</p>

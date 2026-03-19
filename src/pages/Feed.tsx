@@ -1,22 +1,29 @@
 import { useAppStore } from "@/data/appState";
 import { currentUser, friends, nonFollowedUsers, User } from "@/data/mockData";
 import QuestCard from "@/components/QuestCard";
+import UserAvatar from "@/components/UserAvatar";
 import { Search, Lock, UserPlus } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useLocation } from "react-router-dom";
 
 const Feed = () => {
-  const { quests, following } = useAppStore();
+  const { quests, following, cleanupEmptyQuests } = useAppStore();
   const [search, setSearch] = useState("");
   const [searchTab, setSearchTab] = useState<"quests" | "people">("quests");
   const [selectedProfile, setSelectedProfile] = useState<User | null>(null);
+  const location = useLocation();
+
+  // Cleanup empty quests on mount / route change
+  useEffect(() => {
+    cleanupEmptyQuests();
+  }, [location.pathname]);
 
   const followerQuests = quests.filter((q) => q.isFollowerOnly && !q.isDone);
 
   const allSearchableUsers = [...friends, ...nonFollowedUsers];
   const isFollowing = (user: User) => following.some((f) => f.id === user.id);
 
-  // Quests search
   const filteredQuests = search
     ? followerQuests.filter(
         (q) =>
@@ -26,14 +33,12 @@ const Feed = () => {
       )
     : followerQuests;
 
-  // People search
   const filteredPeople = search
     ? allSearchableUsers.filter((u) =>
         u.name.toLowerCase().includes(search.toLowerCase())
       )
     : allSearchableUsers;
 
-  // Profile view quests
   const profileQuests = selectedProfile
     ? quests.filter(
         (q) =>
@@ -54,9 +59,7 @@ const Feed = () => {
         </button>
 
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-2xl">
-            {selectedProfile.avatar}
-          </div>
+          <UserAvatar user={selectedProfile} size="lg" />
           <div>
             <h2 className="text-lg font-bold text-foreground">{selectedProfile.name}</h2>
             <p className="text-sm text-muted-foreground">{selectedProfile.bio}</p>
@@ -99,29 +102,31 @@ const Feed = () => {
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder={searchTab === "quests" ? "Search quests or people..." : "Search for people..."}
+          placeholder="Search quests or people..."
           className="w-full pl-10 pr-4 py-3 rounded-xl bg-card border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
         />
       </div>
 
-      {/* Search tabs */}
-      <div className="flex bg-muted rounded-xl p-1 mb-5">
-        {(["quests", "people"] as const).map((t) => (
-          <button
-            key={t}
-            onClick={() => setSearchTab(t)}
-            className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
-              searchTab === t ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
-            }`}
-          >
-            {t === "quests" ? "Quests" : "People"}
-          </button>
-        ))}
-      </div>
+      {/* Search tabs — only show when there's a search query */}
+      {search && (
+        <div className="flex bg-muted rounded-xl p-1 mb-5">
+          {(["quests", "people"] as const).map((t) => (
+            <button
+              key={t}
+              onClick={() => setSearchTab(t)}
+              className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
+                searchTab === t ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
+              }`}
+            >
+              {t === "quests" ? "Quests" : "People"}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Content */}
-      <motion.div key={searchTab} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-        {searchTab === "quests" ? (
+      <motion.div key={search ? searchTab : "quests"} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+        {(!search || searchTab === "quests") ? (
           <div className="space-y-3">
             {filteredQuests.length === 0 ? (
               <div className="text-center py-16 text-muted-foreground">
@@ -147,9 +152,7 @@ const Feed = () => {
                   onClick={() => setSelectedProfile(user)}
                   className="w-full flex items-center gap-3 p-3 rounded-xl bg-card border border-border/50 text-left active:scale-[0.98] transition-transform"
                 >
-                  <span className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-lg">
-                    {user.avatar}
-                  </span>
+                  <UserAvatar user={user} size="md" />
                   <div className="flex-1">
                     <p className="font-semibold text-foreground text-sm">{user.name}</p>
                     <p className="text-xs text-muted-foreground">{user.bio}</p>
