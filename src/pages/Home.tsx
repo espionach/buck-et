@@ -83,9 +83,7 @@ const Boards = () => {
         </button>
 
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-2xl">
-            {viewingProfile.avatar}
-          </div>
+          <UserAvatar user={viewingProfile} size="lg" />
           <div>
             <h2 className="text-lg font-bold text-foreground">{viewingProfile.name}</h2>
             <p className="text-sm text-muted-foreground">{viewingProfile.bio}</p>
