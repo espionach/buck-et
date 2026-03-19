@@ -3,9 +3,10 @@ import { currentUser, User } from "@/data/mockData";
 import GroupCard from "@/components/GroupCard";
 import QuestCard from "@/components/QuestCard";
 import GroupSettings from "@/components/GroupSettings";
+import UserAvatar from "@/components/UserAvatar";
 import { Plus, Search, Check, X, Settings, ArrowLeft } from "lucide-react";
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
 const Boards = () => {
