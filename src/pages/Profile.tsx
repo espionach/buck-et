@@ -55,6 +55,13 @@ const Profile = () => {
   const [questCompletedAt, setQuestCompletedAt] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Sync tab from URL params
+  useEffect(() => {
+    const urlTab = new URLSearchParams(location.search).get("tab");
+    if (urlTab === "past") setTab("past");
+    else if (urlTab === "current") setTab("current");
+  }, [location.search]);
+
   // Cleanup empty quests on mount
   useEffect(() => {
     cleanupEmptyQuests();
