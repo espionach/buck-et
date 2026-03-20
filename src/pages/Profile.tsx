@@ -146,6 +146,7 @@ const Profile = () => {
     setEditingPastQuest(quest);
     setQuestNotes(quest.notes || "");
     setQuestPhotos(quest.photos || []);
+    setQuestCompletedAt(quest.completedAt || "");
   };
 
   const handleSavePastQuest = () => {
