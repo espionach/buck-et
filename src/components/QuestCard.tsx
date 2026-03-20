@@ -203,6 +203,19 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
                 Done
               </button>
             )}
+
+            {quest.isDone && isIn && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleMarkUndone();
+                }}
+                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground font-semibold transition-colors"
+              >
+                <Undo2 className="w-3.5 h-3.5" />
+                Undone
+              </button>
+            )}
           </div>
         </div>
 
