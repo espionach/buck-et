@@ -1,6 +1,7 @@
 import { useAppStore } from "@/data/appState";
 import { currentUser, Group, User } from "@/data/mockData";
 import UserAvatar from "@/components/UserAvatar";
+import OwnerLeaveDialog from "@/components/OwnerLeaveDialog";
 import { X, UserPlus, LogOut, Crown, Clock, Trash2, Pencil, Check } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -13,11 +14,12 @@ interface GroupSettingsProps {
 }
 
 const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettingsProps) => {
-  const { updateGroup, removeMemberFromGroup, leaveGroup, inviteToGroup, following } = useAppStore();
+  const { updateGroup, removeMemberFromGroup, leaveGroup, inviteToGroup, following, transferGroupOwnership, deleteGroup } = useAppStore();
   const [editName, setEditName] = useState(group.name);
   const [editEmoji, setEditEmoji] = useState(group.emoji);
   const [isEditingName, setIsEditingName] = useState(false);
   const [showAddMembers, setShowAddMembers] = useState(false);
+  const [showOwnerLeave, setShowOwnerLeave] = useState(false);
 
   const isOwner = group.ownerId === currentUser.id;
 
@@ -29,6 +31,10 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
   };
 
   const handleLeave = () => {
+    if (isOwner) {
+      setShowOwnerLeave(true);
+      return;
+    }
     leaveGroup(group.id);
     onLeave();
   };
@@ -64,154 +70,178 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
   };
 
   return (
-    <motion.div
-      initial={{ height: 0, opacity: 0 }}
-      animate={{ height: "auto", opacity: 1 }}
-      exit={{ height: 0, opacity: 0 }}
-      className="overflow-hidden mb-4"
-    >
-      <div className="p-4 rounded-2xl bg-card border border-border space-y-4">
-        {/* Header with close */}
-        <div className="flex items-center justify-between">
-          <h3 className="font-bold text-foreground text-sm">Edit Board</h3>
+    <>
+      <motion.div
+        initial={{ height: 0, opacity: 0 }}
+        animate={{ height: "auto", opacity: 1 }}
+        exit={{ height: 0, opacity: 0 }}
+        className="overflow-hidden mb-4"
+      >
+        <div className="p-4 rounded-2xl bg-card border border-border space-y-4">
+          {/* Header with close */}
+          <div className="flex items-center justify-between">
+            <h3 className="font-bold text-foreground text-sm">Edit Board</h3>
+            <button
+              onClick={onClose}
+              className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Edit name/emoji */}
+          <div className="flex gap-2">
+            <input
+              value={editEmoji}
+              onChange={(e) => setEditEmoji(e.target.value)}
+              className="w-14 px-2 py-2.5 rounded-xl bg-muted border border-border text-center text-xl focus:outline-none focus:ring-2 focus:ring-primary/30"
+            />
+            <div className="flex-1 flex items-center gap-1.5">
+              <input
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                disabled={!isEditingName}
+                className={`flex-1 px-3 py-2.5 rounded-xl border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 ${
+                  isEditingName ? "bg-muted border-border" : "bg-transparent border-transparent"
+                }`}
+              />
+              <button
+                onClick={() => isEditingName ? handleSave() : setIsEditingName(true)}
+                className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              >
+                {isEditingName ? <Check className="w-4 h-4 text-primary" /> : <Pencil className="w-4 h-4" />}
+              </button>
+            </div>
+          </div>
+
+          {/* Members list */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="font-bold text-foreground text-sm">
+                Members ({group.members.length})
+              </h3>
+              <button
+                onClick={() => setShowAddMembers(!showAddMembers)}
+                className="flex items-center gap-1 text-xs font-semibold text-primary"
+              >
+                <UserPlus className="w-3.5 h-3.5" />
+                Add
+              </button>
+            </div>
+
+            {/* Add members panel */}
+            <AnimatePresence>
+              {showAddMembers && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="overflow-hidden mb-2"
+                >
+                  {availableToInvite.length === 0 ? (
+                    <p className="text-xs text-muted-foreground py-2">
+                      All your friends are already in this group
+                    </p>
+                  ) : (
+                    <div className="space-y-1 pb-2">
+                      {availableToInvite.map((user) => (
+                        <button
+                          key={user.id}
+                          onClick={() => handleInvite(user)}
+                          className="w-full flex items-center gap-2 p-2 rounded-xl bg-muted/50 border border-border/50 text-left active:scale-[0.98] transition-transform"
+                        >
+                          <UserAvatar user={user} size="sm" />
+                          <span className="text-sm font-medium text-foreground flex-1">
+                            {user.name}
+                          </span>
+                          <UserPlus className="w-4 h-4 text-primary" />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Member rows */}
+            <div className="space-y-1">
+              {group.memberRoles.map((mr) => {
+                const role = mr.role;
+                const isCurrentUser = mr.user.id === currentUser.id;
+                return (
+                  <div
+                    key={mr.user.id}
+                    className="flex items-center gap-2 p-2 rounded-xl hover:bg-muted/50 transition-colors group"
+                  >
+                    <button
+                      onClick={() => !isCurrentUser && onViewProfile(mr.user)}
+                      className="flex items-center gap-2 flex-1 text-left"
+                      disabled={isCurrentUser}
+                    >
+                      <UserAvatar user={mr.user} size="sm" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground truncate">
+                          {mr.user.name}
+                          {isCurrentUser && (
+                            <span className="text-muted-foreground"> (you)</span>
+                          )}
+                        </p>
+                      </div>
+                    </button>
+                    <span
+                      className={`text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1 ${getRoleBadgeClass(role)}`}
+                    >
+                      {getRoleIcon(role)}
+                      {role}
+                    </span>
+                    {isOwner && !isCurrentUser && (
+                      <button
+                        onClick={() => handleRemove(mr.user.id)}
+                        className="p-1.5 rounded-lg text-destructive/60 hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-opacity"
+                        title="Remove member"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Leave group */}
           <button
-            onClick={onClose}
-            className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            onClick={handleLeave}
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-destructive/30 text-destructive text-sm font-semibold hover:bg-destructive/5 transition-colors"
           >
-            <X className="w-4 h-4" />
+            <LogOut className="w-4 h-4" />
+            Leave Group
           </button>
         </div>
+      </motion.div>
 
-        {/* Edit name/emoji */}
-        <div className="flex gap-2">
-          <input
-            value={editEmoji}
-            onChange={(e) => setEditEmoji(e.target.value)}
-            className="w-14 px-2 py-2.5 rounded-xl bg-muted border border-border text-center text-xl focus:outline-none focus:ring-2 focus:ring-primary/30"
+      {/* Owner leave dialog */}
+      <AnimatePresence>
+        {showOwnerLeave && (
+          <OwnerLeaveDialog
+            type="group"
+            members={group.members}
+            ownerId={currentUser.id}
+            onDelete={() => {
+              deleteGroup(group.id);
+              setShowOwnerLeave(false);
+              onLeave();
+            }}
+            onTransfer={(newOwnerId) => {
+              transferGroupOwnership(group.id, newOwnerId);
+              setShowOwnerLeave(false);
+              onLeave();
+            }}
+            onCancel={() => setShowOwnerLeave(false)}
           />
-          <div className="flex-1 flex items-center gap-1.5">
-            <input
-              value={editName}
-              onChange={(e) => setEditName(e.target.value)}
-              disabled={!isEditingName}
-              className={`flex-1 px-3 py-2.5 rounded-xl border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 ${
-                isEditingName ? "bg-muted border-border" : "bg-transparent border-transparent"
-              }`}
-            />
-            <button
-              onClick={() => isEditingName ? handleSave() : setIsEditingName(true)}
-              className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-            >
-              {isEditingName ? <Check className="w-4 h-4 text-primary" /> : <Pencil className="w-4 h-4" />}
-            </button>
-          </div>
-        </div>
-
-        {/* Members list */}
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="font-bold text-foreground text-sm">
-              Members ({group.members.length})
-            </h3>
-            <button
-              onClick={() => setShowAddMembers(!showAddMembers)}
-              className="flex items-center gap-1 text-xs font-semibold text-primary"
-            >
-              <UserPlus className="w-3.5 h-3.5" />
-              Add
-            </button>
-          </div>
-
-          {/* Add members panel */}
-          <AnimatePresence>
-            {showAddMembers && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                className="overflow-hidden mb-2"
-              >
-                {availableToInvite.length === 0 ? (
-                  <p className="text-xs text-muted-foreground py-2">
-                    All your friends are already in this group
-                  </p>
-                ) : (
-                  <div className="space-y-1 pb-2">
-                    {availableToInvite.map((user) => (
-                      <button
-                        key={user.id}
-                        onClick={() => handleInvite(user)}
-                        className="w-full flex items-center gap-2 p-2 rounded-xl bg-muted/50 border border-border/50 text-left active:scale-[0.98] transition-transform"
-                      >
-                        <UserAvatar user={user} size="sm" />
-                        <span className="text-sm font-medium text-foreground flex-1">
-                          {user.name}
-                        </span>
-                        <UserPlus className="w-4 h-4 text-primary" />
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Member rows */}
-          <div className="space-y-1">
-            {group.memberRoles.map((mr) => {
-              const role = mr.role;
-              const isCurrentUser = mr.user.id === currentUser.id;
-              return (
-                <div
-                  key={mr.user.id}
-                  className="flex items-center gap-2 p-2 rounded-xl hover:bg-muted/50 transition-colors group"
-                >
-                  <button
-                    onClick={() => !isCurrentUser && onViewProfile(mr.user)}
-                    className="flex items-center gap-2 flex-1 text-left"
-                    disabled={isCurrentUser}
-                  >
-                    <UserAvatar user={mr.user} size="sm" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">
-                        {mr.user.name}
-                        {isCurrentUser && (
-                          <span className="text-muted-foreground"> (you)</span>
-                        )}
-                      </p>
-                    </div>
-                  </button>
-                  <span
-                    className={`text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1 ${getRoleBadgeClass(role)}`}
-                  >
-                    {getRoleIcon(role)}
-                    {role}
-                  </span>
-                  {isOwner && !isCurrentUser && (
-                    <button
-                      onClick={() => handleRemove(mr.user.id)}
-                      className="p-1.5 rounded-lg text-destructive/60 hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-opacity"
-                      title="Remove member"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Leave group */}
-        <button
-          onClick={handleLeave}
-          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-destructive/30 text-destructive text-sm font-semibold hover:bg-destructive/5 transition-colors"
-        >
-          <LogOut className="w-4 h-4" />
-          Leave Group
-        </button>
-      </div>
-    </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 
