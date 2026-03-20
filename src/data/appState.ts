@@ -26,6 +26,7 @@ interface AppState {
 
   addQuest: (quest: Quest) => void;
   toggleImIn: (questId: string) => void;
+  markUndone: (questId: string) => void;
   markDone: (questId: string) => void;
   addGroup: (group: Group) => void;
   updateGroup: (groupId: string, updates: Partial<Group>) => void;
@@ -77,6 +78,15 @@ export const useAppStore = create<AppState>((set) => ({
       quests: s.quests.map((q) =>
         q.id === questId
           ? { ...q, isDone: true, completedAt: new Date().toISOString().split("T")[0] }
+          : q
+      ),
+    })),
+
+  markUndone: (questId) =>
+    set((s) => ({
+      quests: s.quests.map((q) =>
+        q.id === questId
+          ? { ...q, isDone: false, completedAt: undefined }
           : q
       ),
     })),

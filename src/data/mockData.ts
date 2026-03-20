@@ -60,6 +60,7 @@ export interface Quest {
   completedAt?: string;
   photos?: string[];
   notes?: string;
+  links?: string[];
   comments: Comment[];
 }
 

@@ -3,7 +3,7 @@ import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
 import OwnerLeaveDialog from "@/components/OwnerLeaveDialog";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, HandMetal, MessageCircle, ChevronDown, ChevronUp, Send, Pencil, Plus } from "lucide-react";
+import { Check, HandMetal, MessageCircle, ChevronDown, ChevronUp, Send, Pencil, Plus, Undo2 } from "lucide-react";
 import { useState } from "react";
 
 interface QuestCardProps {
@@ -14,10 +14,11 @@ interface QuestCardProps {
   onEditPast?: (quest: Quest) => void;
   disableJoin?: boolean;
   onMarkDone?: () => void;
+  onMarkUndone?: () => void;
 }
 
-const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPast, disableJoin = false, onMarkDone }: QuestCardProps) => {
-  const { toggleImIn, markDone, groups, addComment, deleteQuest, transferQuestOwnership } = useAppStore();
+const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPast, disableJoin = false, onMarkDone, onMarkUndone }: QuestCardProps) => {
+  const { toggleImIn, markDone, markUndone, groups, addComment, deleteQuest, transferQuestOwnership } = useAppStore();
   const isIn = quest.participants.some((p) => p.id === currentUser.id);
   const group = quest.groupId ? groups.find((g) => g.id === quest.groupId) : null;
   const userInGroup = group ? group.members.some((m) => m.id === currentUser.id) : true;
@@ -54,6 +55,11 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
   const handleMarkDone = () => {
     markDone(quest.id);
     onMarkDone?.();
+  };
+
+  const handleMarkUndone = () => {
+    markUndone(quest.id);
+    onMarkUndone?.();
   };
 
   return (
@@ -195,6 +201,19 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
               >
                 <Check className="w-3.5 h-3.5" />
                 Done
+              </button>
+            )}
+
+            {quest.isDone && isIn && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleMarkUndone();
+                }}
+                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground font-semibold transition-colors"
+              >
+                <Undo2 className="w-3.5 h-3.5" />
+                Undone
               </button>
             )}
           </div>

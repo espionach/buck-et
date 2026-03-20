@@ -1,7 +1,7 @@
 import { useAppStore } from "@/data/appState";
 import QuestCard from "@/components/QuestCard";
 import UserAvatar from "@/components/UserAvatar";
-import { Edit, X, Check, Users as UsersIcon, UserPlus, Trash2, ImagePlus, Camera } from "lucide-react";
+import { Edit, X, Check, Users as UsersIcon, UserPlus, Trash2, ImagePlus, Camera, Link as LinkIcon, Plus } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Quest, User } from "@/data/mockData";
@@ -43,12 +43,24 @@ const Profile = () => {
   const [editQuestTitle, setEditQuestTitle] = useState("");
   const [editQuestDescription, setEditQuestDescription] = useState("");
   const [editQuestParticipants, setEditQuestParticipants] = useState<User[]>([]);
+  const [editQuestLinks, setEditQuestLinks] = useState<string[]>([]);
+  const [editQuestPhotos, setEditQuestPhotos] = useState<string[]>([]);
+  const [newLink, setNewLink] = useState("");
+  const currentPhotoRef = useRef<HTMLInputElement>(null);
 
   // Past quest editing state
   const [editingPastQuest, setEditingPastQuest] = useState<Quest | null>(null);
   const [questNotes, setQuestNotes] = useState("");
   const [questPhotos, setQuestPhotos] = useState<string[]>([]);
+  const [questCompletedAt, setQuestCompletedAt] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Sync tab from URL params
+  useEffect(() => {
+    const urlTab = new URLSearchParams(location.search).get("tab");
+    if (urlTab === "past") setTab("past");
+    else if (urlTab === "current") setTab("current");
+  }, [location.search]);
 
   // Cleanup empty quests on mount
   useEffect(() => {
@@ -103,11 +115,13 @@ const Profile = () => {
     setEditQuestTitle(quest.title);
     setEditQuestDescription(quest.description || "");
     setEditQuestParticipants([...quest.participants]);
+    setEditQuestLinks(quest.links || []);
+    setEditQuestPhotos(quest.photos || []);
+    setNewLink("");
   };
 
   const handleSaveCurrentQuest = () => {
     if (editingCurrentQuest) {
-      // Remove participants that were deleted
       const removedUsers = editingCurrentQuest.participants.filter(
         (p) => !editQuestParticipants.some((ep) => ep.id === p.id)
       );
@@ -116,6 +130,8 @@ const Profile = () => {
       updateQuest(editingCurrentQuest.id, {
         title: editQuestTitle.trim(),
         description: editQuestDescription.trim() || undefined,
+        links: editQuestLinks.length > 0 ? editQuestLinks : undefined,
+        photos: editQuestPhotos.length > 0 ? editQuestPhotos : undefined,
       });
       setEditingCurrentQuest(null);
     }
@@ -137,6 +153,7 @@ const Profile = () => {
     setEditingPastQuest(quest);
     setQuestNotes(quest.notes || "");
     setQuestPhotos(quest.photos || []);
+    setQuestCompletedAt(quest.completedAt || "");
   };
 
   const handleSavePastQuest = () => {
@@ -144,9 +161,31 @@ const Profile = () => {
       updateQuest(editingPastQuest.id, {
         notes: questNotes.trim() || undefined,
         photos: questPhotos.length > 0 ? questPhotos : undefined,
+        completedAt: questCompletedAt || undefined,
       });
       setEditingPastQuest(null);
     }
+  };
+
+  const handleAddLink = () => {
+    if (!newLink.trim()) return;
+    setEditQuestLinks((prev) => [...prev, newLink.trim()]);
+    setNewLink("");
+  };
+
+  const handleCurrentPhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    Array.from(files).forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        if (ev.target?.result) {
+          setEditQuestPhotos((prev) => [...prev, ev.target!.result as string]);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+    e.target.value = "";
   };
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -502,6 +541,7 @@ const Profile = () => {
               onEditCurrent={tab === "current" ? handleOpenCurrentEditor : undefined}
               onEditPast={tab === "past" ? handleOpenPastEditor : undefined}
               onMarkDone={() => setTab("past")}
+              onMarkUndone={() => setTab("current")}
             />
           ))
         )}
@@ -577,6 +617,73 @@ const Profile = () => {
                 </div>
               </div>
 
+              {/* Links */}
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1.5 block">Links (optional)</label>
+                <div className="space-y-1.5">
+                  {editQuestLinks.map((link, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <LinkIcon className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                      <span className="text-xs text-primary truncate flex-1">{link}</span>
+                      <button
+                        onClick={() => setEditQuestLinks((prev) => prev.filter((_, idx) => idx !== i))}
+                        className="p-0.5 rounded text-destructive hover:bg-destructive/10"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                  <div className="flex gap-2">
+                    <input
+                      value={newLink}
+                      onChange={(e) => setNewLink(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && handleAddLink()}
+                      placeholder="Add a link..."
+                      className="flex-1 px-3 py-2 rounded-xl bg-muted border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    />
+                    <button
+                      onClick={handleAddLink}
+                      disabled={!newLink.trim()}
+                      className="px-3 py-2 rounded-xl bg-muted text-muted-foreground hover:text-foreground disabled:opacity-40 transition-colors"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Photos */}
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1.5 block">Photos (optional)</label>
+                <input
+                  ref={currentPhotoRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleCurrentPhotoUpload}
+                  className="hidden"
+                />
+                <div className="flex flex-wrap gap-2">
+                  {editQuestPhotos.map((photo, i) => (
+                    <div key={i} className="relative group">
+                      <img src={photo} alt={`Photo ${i + 1}`} className="w-16 h-16 rounded-xl object-cover border border-border/30" />
+                      <button
+                        onClick={() => setEditQuestPhotos((prev) => prev.filter((_, idx) => idx !== i))}
+                        className="absolute -top-1.5 -right-1.5 p-0.5 rounded-full bg-destructive text-destructive-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    onClick={() => currentPhotoRef.current?.click()}
+                    className="w-16 h-16 rounded-xl border-2 border-dashed border-border flex items-center justify-center text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+                  >
+                    <ImagePlus className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
               <div className="flex gap-2">
                 <button
                   onClick={handleSaveCurrentQuest}
@@ -626,6 +733,17 @@ const Profile = () => {
                 {editingPastQuest.description && (
                   <p className="text-sm text-muted-foreground">{editingPastQuest.description}</p>
                 )}
+              </div>
+
+              {/* Completion date */}
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1.5 block">Completion Date</label>
+                <input
+                  type="date"
+                  value={questCompletedAt}
+                  onChange={(e) => setQuestCompletedAt(e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-xl bg-muted border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                />
               </div>
 
               <div>
