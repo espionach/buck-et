@@ -5,7 +5,7 @@ import UserAvatar from "@/components/UserAvatar";
 import { Search, Lock, UserPlus } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const Feed = () => {
   const { quests, following, cleanupEmptyQuests } = useAppStore();
@@ -13,6 +13,7 @@ const Feed = () => {
   const [searchTab, setSearchTab] = useState<"quests" | "people">("quests");
   const [selectedProfile, setSelectedProfile] = useState<User | null>(null);
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Cleanup empty quests on mount / route change
   useEffect(() => {
@@ -135,7 +136,7 @@ const Feed = () => {
                 <p className="text-sm">Follow more friends to see their side quests!</p>
               </div>
             ) : (
-              filteredQuests.map((q, i) => <QuestCard key={q.id} quest={q} index={i} />)
+              filteredQuests.map((q, i) => <QuestCard key={q.id} quest={q} index={i} onMarkDone={() => navigate("/profile?tab=past")} />)
             )}
           </div>
         ) : (

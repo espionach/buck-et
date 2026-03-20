@@ -42,6 +42,9 @@ interface AppState {
   updateProfile: (updates: Partial<User>) => void;
   removeParticipant: (questId: string, userId: string) => void;
   cleanupEmptyQuests: () => void;
+  transferQuestOwnership: (questId: string, newOwnerId: string) => void;
+  transferGroupOwnership: (groupId: string, newOwnerId: string) => void;
+  deleteGroup: (groupId: string) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -178,5 +181,48 @@ export const useAppStore = create<AppState>((set) => ({
   cleanupEmptyQuests: () =>
     set((s) => ({
       quests: s.quests.filter((q) => q.isDone || q.participants.length > 0 || q.createdBy.id === s.currentUser.id),
+    })),
+
+  transferQuestOwnership: (questId, newOwnerId) =>
+    set((s) => {
+      const quest = s.quests.find((q) => q.id === questId);
+      if (!quest) return s;
+      const newOwner = quest.participants.find((p) => p.id === newOwnerId);
+      if (!newOwner) return s;
+      return {
+        quests: s.quests.map((q) =>
+          q.id === questId
+            ? {
+                ...q,
+                createdBy: newOwner,
+                participants: q.participants.filter((p) => p.id !== s.currentUser.id),
+              }
+            : q
+        ),
+      };
+    }),
+
+  transferGroupOwnership: (groupId, newOwnerId) =>
+    set((s) => ({
+      groups: s.groups.map((g) =>
+        g.id === groupId
+          ? {
+              ...g,
+              ownerId: newOwnerId,
+              members: g.members.filter((m) => m.id !== s.currentUser.id),
+              memberRoles: g.memberRoles
+                .filter((mr) => mr.user.id !== s.currentUser.id)
+                .map((mr) =>
+                  mr.user.id === newOwnerId ? { ...mr, role: "owner" as const } : mr
+                ),
+            }
+          : g
+      ),
+    })),
+
+  deleteGroup: (groupId) =>
+    set((s) => ({
+      groups: s.groups.filter((g) => g.id !== groupId),
+      quests: s.quests.filter((q) => q.groupId !== groupId),
     })),
 }));

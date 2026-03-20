@@ -23,7 +23,9 @@ const Profile = () => {
     cleanupEmptyQuests,
   } = useAppStore();
   const location = useLocation();
-  const [tab, setTab] = useState<"current" | "past">("current");
+  const [tab, setTab] = useState<"current" | "past">(
+    new URLSearchParams(location.search).get("tab") === "past" ? "past" : "current"
+  );
   const [showEditProfile, setShowEditProfile] = useState(false);
   const [editName, setEditName] = useState(currentUser.name);
   const [editBio, setEditBio] = useState(currentUser.bio);
@@ -499,6 +501,7 @@ const Profile = () => {
               showGroup
               onEditCurrent={tab === "current" ? handleOpenCurrentEditor : undefined}
               onEditPast={tab === "past" ? handleOpenPastEditor : undefined}
+              onMarkDone={() => setTab("past")}
             />
           ))
         )}
