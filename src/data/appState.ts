@@ -26,6 +26,7 @@ interface AppState {
 
   addQuest: (quest: Quest) => void;
   toggleImIn: (questId: string) => void;
+  markUndone: (questId: string) => void;
   markDone: (questId: string) => void;
   addGroup: (group: Group) => void;
   updateGroup: (groupId: string, updates: Partial<Group>) => void;
