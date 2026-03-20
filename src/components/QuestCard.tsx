@@ -57,6 +57,11 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
     onMarkDone?.();
   };
 
+  const handleMarkUndone = () => {
+    markUndone(quest.id);
+    onMarkUndone?.();
+  };
+
   return (
     <>
       <motion.div
