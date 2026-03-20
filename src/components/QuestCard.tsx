@@ -3,7 +3,7 @@ import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
 import OwnerLeaveDialog from "@/components/OwnerLeaveDialog";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, HandMetal, MessageCircle, ChevronDown, ChevronUp, Send, Pencil, Plus } from "lucide-react";
+import { Check, HandMetal, MessageCircle, ChevronDown, ChevronUp, Send, Pencil, Plus, Undo2 } from "lucide-react";
 import { useState } from "react";
 
 interface QuestCardProps {
