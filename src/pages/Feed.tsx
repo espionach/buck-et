@@ -13,6 +13,7 @@ const Feed = () => {
   const [searchTab, setSearchTab] = useState<"quests" | "people">("quests");
   const [selectedProfile, setSelectedProfile] = useState<User | null>(null);
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Cleanup empty quests on mount / route change
   useEffect(() => {
