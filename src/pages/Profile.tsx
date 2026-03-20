@@ -108,6 +108,9 @@ const Profile = () => {
     setEditQuestTitle(quest.title);
     setEditQuestDescription(quest.description || "");
     setEditQuestParticipants([...quest.participants]);
+    setEditQuestLinks(quest.links || []);
+    setEditQuestPhotos(quest.photos || []);
+    setNewLink("");
   };
 
   const handleSaveCurrentQuest = () => {
