@@ -14,6 +14,7 @@ interface QuestCardProps {
   onEditPast?: (quest: Quest) => void;
   disableJoin?: boolean;
   onMarkDone?: () => void;
+  onMarkUndone?: () => void;
 }
 
 const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPast, disableJoin = false, onMarkDone }: QuestCardProps) => {
