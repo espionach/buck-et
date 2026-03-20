@@ -115,7 +115,6 @@ const Profile = () => {
 
   const handleSaveCurrentQuest = () => {
     if (editingCurrentQuest) {
-      // Remove participants that were deleted
       const removedUsers = editingCurrentQuest.participants.filter(
         (p) => !editQuestParticipants.some((ep) => ep.id === p.id)
       );
@@ -124,6 +123,8 @@ const Profile = () => {
       updateQuest(editingCurrentQuest.id, {
         title: editQuestTitle.trim(),
         description: editQuestDescription.trim() || undefined,
+        links: editQuestLinks.length > 0 ? editQuestLinks : undefined,
+        photos: editQuestPhotos.length > 0 ? editQuestPhotos : undefined,
       });
       setEditingCurrentQuest(null);
     }
