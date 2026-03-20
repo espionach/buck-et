@@ -43,11 +43,16 @@ const Profile = () => {
   const [editQuestTitle, setEditQuestTitle] = useState("");
   const [editQuestDescription, setEditQuestDescription] = useState("");
   const [editQuestParticipants, setEditQuestParticipants] = useState<User[]>([]);
+  const [editQuestLinks, setEditQuestLinks] = useState<string[]>([]);
+  const [editQuestPhotos, setEditQuestPhotos] = useState<string[]>([]);
+  const [newLink, setNewLink] = useState("");
+  const currentPhotoRef = useRef<HTMLInputElement>(null);
 
   // Past quest editing state
   const [editingPastQuest, setEditingPastQuest] = useState<Quest | null>(null);
   const [questNotes, setQuestNotes] = useState("");
   const [questPhotos, setQuestPhotos] = useState<string[]>([]);
+  const [questCompletedAt, setQuestCompletedAt] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Cleanup empty quests on mount
