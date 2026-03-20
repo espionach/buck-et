@@ -17,8 +17,8 @@ interface QuestCardProps {
   onMarkUndone?: () => void;
 }
 
-const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPast, disableJoin = false, onMarkDone }: QuestCardProps) => {
-  const { toggleImIn, markDone, groups, addComment, deleteQuest, transferQuestOwnership } = useAppStore();
+const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPast, disableJoin = false, onMarkDone, onMarkUndone }: QuestCardProps) => {
+  const { toggleImIn, markDone, markUndone, groups, addComment, deleteQuest, transferQuestOwnership } = useAppStore();
   const isIn = quest.participants.some((p) => p.id === currentUser.id);
   const group = quest.groupId ? groups.find((g) => g.id === quest.groupId) : null;
   const userInGroup = group ? group.members.some((m) => m.id === currentUser.id) : true;
