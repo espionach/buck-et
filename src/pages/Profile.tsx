@@ -154,9 +154,31 @@ const Profile = () => {
       updateQuest(editingPastQuest.id, {
         notes: questNotes.trim() || undefined,
         photos: questPhotos.length > 0 ? questPhotos : undefined,
+        completedAt: questCompletedAt || undefined,
       });
       setEditingPastQuest(null);
     }
+  };
+
+  const handleAddLink = () => {
+    if (!newLink.trim()) return;
+    setEditQuestLinks((prev) => [...prev, newLink.trim()]);
+    setNewLink("");
+  };
+
+  const handleCurrentPhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    Array.from(files).forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        if (ev.target?.result) {
+          setEditQuestPhotos((prev) => [...prev, ev.target!.result as string]);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+    e.target.value = "";
   };
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
