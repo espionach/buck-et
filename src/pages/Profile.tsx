@@ -610,6 +610,73 @@ const Profile = () => {
                 </div>
               </div>
 
+              {/* Links */}
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1.5 block">Links (optional)</label>
+                <div className="space-y-1.5">
+                  {editQuestLinks.map((link, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <LinkIcon className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                      <span className="text-xs text-primary truncate flex-1">{link}</span>
+                      <button
+                        onClick={() => setEditQuestLinks((prev) => prev.filter((_, idx) => idx !== i))}
+                        className="p-0.5 rounded text-destructive hover:bg-destructive/10"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                  <div className="flex gap-2">
+                    <input
+                      value={newLink}
+                      onChange={(e) => setNewLink(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && handleAddLink()}
+                      placeholder="Add a link..."
+                      className="flex-1 px-3 py-2 rounded-xl bg-muted border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    />
+                    <button
+                      onClick={handleAddLink}
+                      disabled={!newLink.trim()}
+                      className="px-3 py-2 rounded-xl bg-muted text-muted-foreground hover:text-foreground disabled:opacity-40 transition-colors"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Photos */}
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1.5 block">Photos (optional)</label>
+                <input
+                  ref={currentPhotoRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleCurrentPhotoUpload}
+                  className="hidden"
+                />
+                <div className="flex flex-wrap gap-2">
+                  {editQuestPhotos.map((photo, i) => (
+                    <div key={i} className="relative group">
+                      <img src={photo} alt={`Photo ${i + 1}`} className="w-16 h-16 rounded-xl object-cover border border-border/30" />
+                      <button
+                        onClick={() => setEditQuestPhotos((prev) => prev.filter((_, idx) => idx !== i))}
+                        className="absolute -top-1.5 -right-1.5 p-0.5 rounded-full bg-destructive text-destructive-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    onClick={() => currentPhotoRef.current?.click()}
+                    className="w-16 h-16 rounded-xl border-2 border-dashed border-border flex items-center justify-center text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+                  >
+                    <ImagePlus className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
               <div className="flex gap-2">
                 <button
                   onClick={handleSaveCurrentQuest}
