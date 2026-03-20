@@ -82,6 +82,15 @@ export const useAppStore = create<AppState>((set) => ({
       ),
     })),
 
+  markUndone: (questId) =>
+    set((s) => ({
+      quests: s.quests.map((q) =>
+        q.id === questId
+          ? { ...q, isDone: false, completedAt: undefined }
+          : q
+      ),
+    })),
+
   addGroup: (group) => set((s) => ({ groups: [...s.groups, group] })),
 
   updateGroup: (groupId, updates) =>
