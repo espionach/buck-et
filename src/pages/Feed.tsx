@@ -5,7 +5,7 @@ import UserAvatar from "@/components/UserAvatar";
 import { Search, Lock, UserPlus } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const Feed = () => {
   const { quests, following, cleanupEmptyQuests } = useAppStore();
