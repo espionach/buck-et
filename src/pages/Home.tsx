@@ -327,7 +327,7 @@ const Boards = () => {
                   <p className="text-sm">Start one for the crew! 🚀</p>
                 </div>
               ) : (
-                groupQuests.map((q, i) => <QuestCard key={q.id} quest={q} index={i} />)
+                groupQuests.map((q, i) => <QuestCard key={q.id} quest={q} index={i} onMarkDone={() => navigate("/profile?tab=past")} />)
               )}
             </div>
           </motion.div>
