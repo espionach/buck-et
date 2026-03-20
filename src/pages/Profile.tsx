@@ -501,6 +501,7 @@ const Profile = () => {
               showGroup
               onEditCurrent={tab === "current" ? handleOpenCurrentEditor : undefined}
               onEditPast={tab === "past" ? handleOpenPastEditor : undefined}
+              onMarkDone={() => setTab("past")}
             />
           ))
         )}
