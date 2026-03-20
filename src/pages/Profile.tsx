@@ -728,6 +728,17 @@ const Profile = () => {
                 )}
               </div>
 
+              {/* Completion date */}
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1.5 block">Completion Date</label>
+                <input
+                  type="date"
+                  value={questCompletedAt}
+                  onChange={(e) => setQuestCompletedAt(e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-xl bg-muted border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                />
+              </div>
+
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1.5 block">Notes & Reflections</label>
                 <textarea
