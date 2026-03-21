@@ -20,6 +20,7 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
   const [isEditingName, setIsEditingName] = useState(false);
   const [showAddMembers, setShowAddMembers] = useState(false);
   const [showOwnerLeave, setShowOwnerLeave] = useState(false);
+  const [confirmRemoveUser, setConfirmRemoveUser] = useState<{ userId: string; userName: string } | null>(null);
 
   const isOwner = group.ownerId === currentUser.id;
 

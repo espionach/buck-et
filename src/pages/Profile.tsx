@@ -137,8 +137,22 @@ const Profile = () => {
     }
   };
 
+  const [confirmRemoveUser, setConfirmRemoveUser] = useState<{ userId: string; userName: string; context: string } | null>(null);
+
   const handleRemoveParticipantFromEditor = (userId: string) => {
-    setEditQuestParticipants((prev) => prev.filter((p) => p.id !== userId));
+    const user = editQuestParticipants.find((p) => p.id === userId);
+    setConfirmRemoveUser({
+      userId,
+      userName: user?.name || "this user",
+      context: editingCurrentQuest?.title || "this quest",
+    });
+  };
+
+  const confirmRemoveParticipant = () => {
+    if (confirmRemoveUser) {
+      setEditQuestParticipants((prev) => prev.filter((p) => p.id !== confirmRemoveUser.userId));
+      setConfirmRemoveUser(null);
+    }
   };
 
   const handleDeleteQuest = () => {
