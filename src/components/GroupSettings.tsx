@@ -20,6 +20,7 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
   const [isEditingName, setIsEditingName] = useState(false);
   const [showAddMembers, setShowAddMembers] = useState(false);
   const [showOwnerLeave, setShowOwnerLeave] = useState(false);
+  const [confirmRemoveUser, setConfirmRemoveUser] = useState<{ userId: string; userName: string } | null>(null);
 
   const isOwner = group.ownerId === currentUser.id;
 
@@ -40,7 +41,15 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
   };
 
   const handleRemove = (userId: string) => {
-    removeMemberFromGroup(group.id, userId);
+    const user = group.members.find((m) => m.id === userId);
+    setConfirmRemoveUser({ userId, userName: user?.name || "this user" });
+  };
+
+  const confirmRemove = () => {
+    if (confirmRemoveUser) {
+      removeMemberFromGroup(group.id, confirmRemoveUser.userId);
+      setConfirmRemoveUser(null);
+    }
   };
 
   const handleInvite = (user: User) => {
@@ -239,6 +248,47 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
             }}
             onCancel={() => setShowOwnerLeave(false)}
           />
+        )}
+      </AnimatePresence>
+
+      {/* Confirm remove member dialog */}
+      <AnimatePresence>
+        {confirmRemoveUser && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[70] bg-foreground/40 flex items-center justify-center p-5"
+            onClick={() => setConfirmRemoveUser(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-xs bg-card rounded-2xl p-5 space-y-4 shadow-lg text-center"
+            >
+              <p className="text-sm font-semibold text-foreground">
+                Remove <span className="text-primary">{confirmRemoveUser.userName}</span> from{" "}
+                <span className="text-primary">{group.name}</span>?
+              </p>
+              <p className="text-xs text-muted-foreground">They will no longer have access to this board.</p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setConfirmRemoveUser(null)}
+                  className="flex-1 py-2.5 rounded-xl bg-muted text-muted-foreground font-semibold text-sm"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmRemove}
+                  className="flex-1 py-2.5 rounded-xl bg-destructive text-destructive-foreground font-semibold text-sm"
+                >
+                  Remove
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
     </>

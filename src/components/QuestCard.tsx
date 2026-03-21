@@ -144,8 +144,8 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
           </p>
         )}
 
-        {/* Photos for past quests */}
-        {quest.isDone && quest.photos && quest.photos.length > 0 && (
+        {/* Photos */}
+        {quest.photos && quest.photos.length > 0 && (
           <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
             {quest.photos.map((photo, i) => (
               <img
@@ -213,7 +213,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
                 className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground font-semibold transition-colors"
               >
                 <Undo2 className="w-3.5 h-3.5" />
-                Undone
+                Resume
               </button>
             )}
           </div>

@@ -137,8 +137,22 @@ const Profile = () => {
     }
   };
 
+  const [confirmRemoveUser, setConfirmRemoveUser] = useState<{ userId: string; userName: string; context: string } | null>(null);
+
   const handleRemoveParticipantFromEditor = (userId: string) => {
-    setEditQuestParticipants((prev) => prev.filter((p) => p.id !== userId));
+    const user = editQuestParticipants.find((p) => p.id === userId);
+    setConfirmRemoveUser({
+      userId,
+      userName: user?.name || "this user",
+      context: editingCurrentQuest?.title || "this quest",
+    });
+  };
+
+  const confirmRemoveParticipant = () => {
+    if (confirmRemoveUser) {
+      setEditQuestParticipants((prev) => prev.filter((p) => p.id !== confirmRemoveUser.userId));
+      setConfirmRemoveUser(null);
+    }
   };
 
   const handleDeleteQuest = () => {
@@ -697,6 +711,47 @@ const Profile = () => {
                   className="p-3 rounded-xl bg-destructive/10 text-destructive"
                 >
                   <Trash2 className="w-5 h-5" />
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Confirm remove participant dialog */}
+      <AnimatePresence>
+        {confirmRemoveUser && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] bg-foreground/40 flex items-center justify-center p-5"
+            onClick={() => setConfirmRemoveUser(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-xs bg-card rounded-2xl p-5 space-y-4 shadow-lg text-center"
+            >
+              <p className="text-sm font-semibold text-foreground">
+                Remove <span className="text-primary">{confirmRemoveUser.userName}</span> from{" "}
+                <span className="text-primary">{confirmRemoveUser.context}</span>?
+              </p>
+              <p className="text-xs text-muted-foreground">They'll be removed from this quest but can rejoin later.</p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setConfirmRemoveUser(null)}
+                  className="flex-1 py-2.5 rounded-xl bg-muted text-muted-foreground font-semibold text-sm"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmRemoveParticipant}
+                  className="flex-1 py-2.5 rounded-xl bg-destructive text-destructive-foreground font-semibold text-sm"
+                >
+                  Remove
                 </button>
               </div>
             </motion.div>
