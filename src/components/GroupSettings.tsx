@@ -41,7 +41,15 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
   };
 
   const handleRemove = (userId: string) => {
-    removeMemberFromGroup(group.id, userId);
+    const user = group.members.find((m) => m.id === userId);
+    setConfirmRemoveUser({ userId, userName: user?.name || "this user" });
+  };
+
+  const confirmRemove = () => {
+    if (confirmRemoveUser) {
+      removeMemberFromGroup(group.id, confirmRemoveUser.userId);
+      setConfirmRemoveUser(null);
+    }
   };
 
   const handleInvite = (user: User) => {
