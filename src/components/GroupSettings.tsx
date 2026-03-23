@@ -242,7 +242,7 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
               onLeave();
             }}
             onTransfer={(newOwnerId) => {
-              transferGroupOwnership(group.id, newOwnerId);
+              requestGroupTransfer(group.id, newOwnerId);
               setShowOwnerLeave(false);
               onLeave();
             }}
