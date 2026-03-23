@@ -30,12 +30,14 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
   const handleNotificationClick = (notification: typeof notifications[0]) => {
     markNotificationRead(notification.id);
 
-    if (notification.type === "transfer_quest" && notification.groupId) {
+    if (notification.type === "new_comment" && notification.groupId) {
+      const params = new URLSearchParams({ open: notification.groupId, highlightQuest: notification.entityId });
+      if (notification.commentId) params.set("commentId", notification.commentId);
+      navigate(`/boards?${params.toString()}`);
+    } else if (notification.type === "transfer_quest" && notification.groupId) {
       navigate(`/boards?open=${notification.groupId}`);
     } else if (notification.type === "transfer_group") {
       navigate("/boards");
-    } else if (notification.type === "new_comment" && notification.groupId) {
-      navigate(`/boards?open=${notification.groupId}`);
     } else if (notification.type === "new_participant" && notification.groupId) {
       navigate(`/boards?open=${notification.groupId}`);
     } else {

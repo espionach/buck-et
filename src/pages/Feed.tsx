@@ -9,7 +9,7 @@ import { motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const Feed = () => {
-  const { quests, following, cleanupEmptyQuests, notifications } = useAppStore();
+  const { quests, groups, following, cleanupEmptyQuests, notifications } = useAppStore();
   const [search, setSearch] = useState("");
   const [searchTab, setSearchTab] = useState<"quests" | "people">("quests");
   const [selectedProfile, setSelectedProfile] = useState<User | null>(null);
@@ -23,19 +23,23 @@ const Feed = () => {
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
-  const followerQuests = quests.filter((q) => q.isFollowerOnly && !q.isDone);
+  // Show followers-only quests AND group quests where user is a member
+  const userGroupIds = groups.map((g) => g.id);
+  const feedQuests = quests.filter(
+    (q) => !q.isDone && (q.isFollowerOnly || (q.groupId && userGroupIds.includes(q.groupId)))
+  );
 
   const allSearchableUsers = [...friends, ...nonFollowedUsers];
   const isFollowing = (user: User) => following.some((f) => f.id === user.id);
 
   const filteredQuests = search
-    ? followerQuests.filter(
+    ? feedQuests.filter(
         (q) =>
           q.title.toLowerCase().includes(search.toLowerCase()) ||
           q.createdBy.name.toLowerCase().includes(search.toLowerCase()) ||
           q.participants.some((p) => p.name.toLowerCase().includes(search.toLowerCase()))
       )
-    : followerQuests;
+    : feedQuests;
 
   const filteredPeople = search
     ? allSearchableUsers.filter((u) =>

@@ -15,9 +15,11 @@ interface QuestCardProps {
   disableJoin?: boolean;
   onMarkDone?: () => void;
   onMarkUndone?: () => void;
+  autoOpenComments?: boolean;
+  highlightCommentId?: string;
 }
 
-const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPast, disableJoin = false, onMarkDone, onMarkUndone }: QuestCardProps) => {
+const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPast, disableJoin = false, onMarkDone, onMarkUndone, autoOpenComments = false, highlightCommentId }: QuestCardProps) => {
   const { toggleImIn, markDone, markUndone, groups, addComment, deleteQuest, transferQuestOwnership, requestQuestTransfer, transferRequests, acceptTransfer, declineTransfer } = useAppStore();
   const isIn = quest.participants.some((p) => p.id === currentUser.id);
   const group = quest.groupId ? groups.find((g) => g.id === quest.groupId) : null;
@@ -26,7 +28,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
   const isOwner = quest.createdBy.id === currentUser.id;
   const isFollowersOnly = quest.isFollowerOnly;
 
-  const [showComments, setShowComments] = useState(false);
+  const [showComments, setShowComments] = useState(autoOpenComments);
   const [newComment, setNewComment] = useState("");
   const [showOwnerLeave, setShowOwnerLeave] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -291,7 +293,12 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
                   <p className="text-xs text-muted-foreground text-center py-2">No comments yet</p>
                 )}
                 {quest.comments.map((c) => (
-                  <div key={c.id} className="flex items-start gap-2">
+                  <div
+                    key={c.id}
+                    className={`flex items-start gap-2 p-1.5 rounded-lg transition-colors ${
+                      highlightCommentId === c.id ? "bg-primary/10 ring-1 ring-primary/30" : ""
+                    }`}
+                  >
                     <UserAvatar user={c.user} size="xs" />
                     <div>
                       <span className="text-xs font-semibold text-foreground">{c.user.name}</span>

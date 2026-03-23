@@ -15,16 +15,24 @@ const Boards = () => {
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const openGroup = searchParams.get("open");
+  const highlightQuestId = searchParams.get("highlightQuest");
+  const highlightCommentId = searchParams.get("commentId");
 
   const [selectedGroup, setSelectedGroup] = useState<string | null>(openGroup);
   const [search, setSearch] = useState("");
   const [showSettings, setShowSettings] = useState(false);
   const [showAllInvites, setShowAllInvites] = useState(false);
   const [viewingProfile, setViewingProfile] = useState<User | null>(null);
+  const [activeHighlight, setActiveHighlight] = useState<string | null>(highlightQuestId);
+  const [activeCommentId, setActiveCommentId] = useState<string | null>(highlightCommentId);
 
   useEffect(() => {
-    if (openGroup) setSelectedGroup(openGroup);
-  }, [openGroup]);
+    if (openGroup) {
+      setSelectedGroup(openGroup);
+      setActiveHighlight(highlightQuestId);
+      setActiveCommentId(highlightCommentId);
+    }
+  }, [openGroup, highlightQuestId, highlightCommentId]);
 
   useEffect(() => {
     cleanupEmptyQuests();
@@ -43,9 +51,18 @@ const Boards = () => {
       )
     : sortedGroups;
 
-  const groupQuests = selectedGroup
+  const groupQuestsUnsorted = selectedGroup
     ? quests.filter((q) => q.groupId === selectedGroup && !q.isDone)
     : [];
+
+  // Sort highlighted quest to the top, rest chronological
+  const groupQuests = activeHighlight
+    ? [...groupQuestsUnsorted].sort((a, b) => {
+        if (a.id === activeHighlight) return -1;
+        if (b.id === activeHighlight) return 1;
+        return 0;
+      })
+    : groupQuestsUnsorted;
 
   const selectedGroupData = groups.find((g) => g.id === selectedGroup);
 
@@ -270,6 +287,8 @@ const Boards = () => {
               onClick={() => {
                 setSelectedGroup(null);
                 setShowSettings(false);
+                setActiveHighlight(null);
+                setActiveCommentId(null);
               }}
               className="text-sm text-primary font-semibold mb-4 flex items-center gap-1"
             >
@@ -327,7 +346,17 @@ const Boards = () => {
                   <p className="text-sm">Start one for the crew! 🚀</p>
                 </div>
               ) : (
-                groupQuests.map((q, i) => <QuestCard key={q.id} quest={q} index={i} onMarkDone={() => navigate("/profile?tab=past")} onMarkUndone={() => navigate("/profile?tab=current")} />)
+                groupQuests.map((q, i) => (
+                  <QuestCard
+                    key={q.id}
+                    quest={q}
+                    index={i}
+                    onMarkDone={() => navigate("/profile?tab=past")}
+                    onMarkUndone={() => navigate("/profile?tab=current")}
+                    autoOpenComments={q.id === activeHighlight && !!activeCommentId}
+                    highlightCommentId={q.id === activeHighlight ? (activeCommentId || undefined) : undefined}
+                  />
+                ))
               )}
             </div>
           </motion.div>
