@@ -293,7 +293,12 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
                   <p className="text-xs text-muted-foreground text-center py-2">No comments yet</p>
                 )}
                 {quest.comments.map((c) => (
-                  <div key={c.id} className="flex items-start gap-2">
+                  <div
+                    key={c.id}
+                    className={`flex items-start gap-2 p-1.5 rounded-lg transition-colors ${
+                      highlightCommentId === c.id ? "bg-primary/10 ring-1 ring-primary/30" : ""
+                    }`}
+                  >
                     <UserAvatar user={c.user} size="xs" />
                     <div>
                       <span className="text-xs font-semibold text-foreground">{c.user.name}</span>
