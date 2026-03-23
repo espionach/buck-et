@@ -249,6 +249,7 @@ export const quests: Quest[] = [
     participants: [currentUser, friends[2], friends[4]],
     isDone: false,
     createdAt: "2026-03-16",
+    photos: ["/mock-photos/ghibli1.jpg", "/mock-photos/ghibli2.jpg"],
     comments: [
       { id: "c6", userId: "u4", user: friends[2], text: "I'll bring the popcorn!", createdAt: "2026-03-16" },
     ],
