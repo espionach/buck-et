@@ -23,7 +23,11 @@ const Feed = () => {
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
-  const followerQuests = quests.filter((q) => q.isFollowerOnly && !q.isDone);
+  // Show followers-only quests AND group quests where user is a member
+  const userGroupIds = groups.map((g) => g.id);
+  const feedQuests = quests.filter(
+    (q) => !q.isDone && (q.isFollowerOnly || (q.groupId && userGroupIds.includes(q.groupId)))
+  );
 
   const allSearchableUsers = [...friends, ...nonFollowedUsers];
   const isFollowing = (user: User) => following.some((f) => f.id === user.id);
