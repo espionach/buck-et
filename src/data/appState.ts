@@ -7,12 +7,16 @@ import {
   GroupInvitation,
   FollowRequest,
   GroupMember,
+  TransferRequest,
+  AppNotification,
   quests as initialQuests,
   groups as initialGroups,
   currentUser,
   friends,
   pendingGroupInvitations as initialInvitations,
   pendingFollowRequests as initialFollowRequests,
+  pendingTransferRequests as initialTransfers,
+  initialNotifications,
 } from "./mockData";
 
 interface AppState {
@@ -22,6 +26,8 @@ interface AppState {
   followers: User[];
   groupInvitations: GroupInvitation[];
   followRequests: FollowRequest[];
+  transferRequests: TransferRequest[];
+  notifications: AppNotification[];
   currentUser: User;
 
   addQuest: (quest: Quest) => void;
@@ -46,6 +52,18 @@ interface AppState {
   transferQuestOwnership: (questId: string, newOwnerId: string) => void;
   transferGroupOwnership: (groupId: string, newOwnerId: string) => void;
   deleteGroup: (groupId: string) => void;
+
+  // Transfer requests
+  requestQuestTransfer: (questId: string, newOwnerId: string) => void;
+  requestGroupTransfer: (groupId: string, newOwnerId: string) => void;
+  acceptTransfer: (transferId: string) => void;
+  declineTransfer: (transferId: string) => void;
+
+  // Notifications
+  addNotification: (notification: AppNotification) => void;
+  markNotificationRead: (notificationId: string) => void;
+  markAllNotificationsRead: () => void;
+  clearNotification: (notificationId: string) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -55,6 +73,8 @@ export const useAppStore = create<AppState>((set) => ({
   followers: [...friends.slice(0, 4)],
   groupInvitations: initialInvitations,
   followRequests: initialFollowRequests,
+  transferRequests: initialTransfers,
+  notifications: initialNotifications,
   currentUser: currentUser,
 
   addQuest: (quest) => set((s) => ({ quests: [quest, ...s.quests] })),
@@ -174,6 +194,7 @@ export const useAppStore = create<AppState>((set) => ({
   deleteQuest: (questId) =>
     set((s) => ({
       quests: s.quests.filter((q) => q.id !== questId),
+      transferRequests: s.transferRequests.filter((tr) => !(tr.type === "quest" && tr.entityId === questId)),
     })),
 
   updateProfile: (updates) =>
@@ -234,5 +255,150 @@ export const useAppStore = create<AppState>((set) => ({
     set((s) => ({
       groups: s.groups.filter((g) => g.id !== groupId),
       quests: s.quests.filter((q) => q.groupId !== groupId),
+      transferRequests: s.transferRequests.filter((tr) => !(tr.type === "group" && tr.entityId === groupId)),
+    })),
+
+  // Transfer requests
+  requestQuestTransfer: (questId, newOwnerId) =>
+    set((s) => {
+      const quest = s.quests.find((q) => q.id === questId);
+      if (!quest) return s;
+      const newOwner = quest.participants.find((p) => p.id === newOwnerId);
+      if (!newOwner) return s;
+      const transferId = `tr${Date.now()}`;
+      const transfer: TransferRequest = {
+        id: transferId,
+        type: "quest",
+        entityId: questId,
+        fromUser: s.currentUser,
+        toUserId: newOwnerId,
+      };
+      const notification: AppNotification = {
+        id: `n${Date.now()}`,
+        type: "transfer_quest",
+        message: `${s.currentUser.name} wants to transfer '${quest.title}' to you`,
+        entityId: questId,
+        groupId: quest.groupId,
+        fromUser: s.currentUser,
+        read: false,
+        createdAt: new Date().toISOString().split("T")[0],
+      };
+      return {
+        transferRequests: [...s.transferRequests, transfer],
+        notifications: [notification, ...s.notifications],
+      };
+    }),
+
+  requestGroupTransfer: (groupId, newOwnerId) =>
+    set((s) => {
+      const group = s.groups.find((g) => g.id === groupId);
+      if (!group) return s;
+      const newOwner = group.members.find((m) => m.id === newOwnerId);
+      if (!newOwner) return s;
+      const transfer: TransferRequest = {
+        id: `tr${Date.now()}`,
+        type: "group",
+        entityId: groupId,
+        fromUser: s.currentUser,
+        toUserId: newOwnerId,
+      };
+      const notification: AppNotification = {
+        id: `n${Date.now()}`,
+        type: "transfer_group",
+        message: `${s.currentUser.name} wants to transfer '${group.name}' board to you`,
+        entityId: groupId,
+        fromUser: s.currentUser,
+        read: false,
+        createdAt: new Date().toISOString().split("T")[0],
+      };
+      return {
+        transferRequests: [...s.transferRequests, transfer],
+        notifications: [notification, ...s.notifications],
+      };
+    }),
+
+  acceptTransfer: (transferId) =>
+    set((s) => {
+      const transfer = s.transferRequests.find((tr) => tr.id === transferId);
+      if (!transfer) return s;
+
+      if (transfer.type === "quest") {
+        const quest = s.quests.find((q) => q.id === transfer.entityId);
+        if (!quest) return s;
+        return {
+          transferRequests: s.transferRequests.filter((tr) => tr.id !== transferId),
+          notifications: s.notifications.filter(
+            (n) => !(n.type === "transfer_quest" && n.entityId === transfer.entityId)
+          ),
+          quests: s.quests.map((q) =>
+            q.id === transfer.entityId
+              ? {
+                  ...q,
+                  createdBy: s.currentUser,
+                  participants: q.participants.some((p) => p.id === transfer.fromUser.id)
+                    ? q.participants.filter((p) => p.id !== transfer.fromUser.id)
+                    : q.participants,
+                }
+              : q
+          ),
+        };
+      } else {
+        return {
+          transferRequests: s.transferRequests.filter((tr) => tr.id !== transferId),
+          notifications: s.notifications.filter(
+            (n) => !(n.type === "transfer_group" && n.entityId === transfer.entityId)
+          ),
+          groups: s.groups.map((g) =>
+            g.id === transfer.entityId
+              ? {
+                  ...g,
+                  ownerId: s.currentUser.id,
+                  members: g.members.filter((m) => m.id !== transfer.fromUser.id),
+                  memberRoles: g.memberRoles
+                    .filter((mr) => mr.user.id !== transfer.fromUser.id)
+                    .map((mr) =>
+                      mr.user.id === s.currentUser.id ? { ...mr, role: "owner" as const } : mr
+                    ),
+                }
+              : g
+          ),
+        };
+      }
+    }),
+
+  declineTransfer: (transferId) =>
+    set((s) => {
+      const transfer = s.transferRequests.find((tr) => tr.id === transferId);
+      return {
+        transferRequests: s.transferRequests.filter((tr) => tr.id !== transferId),
+        notifications: transfer
+          ? s.notifications.filter(
+              (n) => !(n.type === (`transfer_${transfer.type}` as any) && n.entityId === transfer.entityId)
+            )
+          : s.notifications,
+      };
+    }),
+
+  // Notifications
+  addNotification: (notification) =>
+    set((s) => ({
+      notifications: [notification, ...s.notifications],
+    })),
+
+  markNotificationRead: (notificationId) =>
+    set((s) => ({
+      notifications: s.notifications.map((n) =>
+        n.id === notificationId ? { ...n, read: true } : n
+      ),
+    })),
+
+  markAllNotificationsRead: () =>
+    set((s) => ({
+      notifications: s.notifications.map((n) => ({ ...n, read: true })),
+    })),
+
+  clearNotification: (notificationId) =>
+    set((s) => ({
+      notifications: s.notifications.filter((n) => n.id !== notificationId),
     })),
 }));

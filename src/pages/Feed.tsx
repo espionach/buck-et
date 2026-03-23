@@ -2,23 +2,26 @@ import { useAppStore } from "@/data/appState";
 import { currentUser, friends, nonFollowedUsers, User } from "@/data/mockData";
 import QuestCard from "@/components/QuestCard";
 import UserAvatar from "@/components/UserAvatar";
-import { Search, Lock, UserPlus } from "lucide-react";
+import NotificationPanel from "@/components/NotificationPanel";
+import { Search, Lock, UserPlus, Mail } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const Feed = () => {
-  const { quests, following, cleanupEmptyQuests } = useAppStore();
+  const { quests, following, cleanupEmptyQuests, notifications } = useAppStore();
   const [search, setSearch] = useState("");
   const [searchTab, setSearchTab] = useState<"quests" | "people">("quests");
   const [selectedProfile, setSelectedProfile] = useState<User | null>(null);
+  const [showNotifications, setShowNotifications] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Cleanup empty quests on mount / route change
   useEffect(() => {
     cleanupEmptyQuests();
   }, [location.pathname]);
+
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   const followerQuests = quests.filter((q) => q.isFollowerOnly && !q.isDone);
 
@@ -94,7 +97,20 @@ const Feed = () => {
 
   return (
     <div className="min-h-screen pb-24 px-5 pt-14">
-      <h1 className="text-2xl font-bold text-foreground mb-1">Home</h1>
+      <div className="flex items-center justify-between mb-1">
+        <h1 className="text-2xl font-bold text-foreground">Home</h1>
+        <button
+          onClick={() => setShowNotifications(true)}
+          className="relative p-2 rounded-xl bg-muted text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <Mail className="w-5 h-5" />
+          {unreadCount > 0 && (
+            <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center">
+              {unreadCount}
+            </span>
+          )}
+        </button>
+      </div>
       <p className="text-sm text-muted-foreground mb-5">See what your friends are up to</p>
 
       {/* Search */}
@@ -173,6 +189,8 @@ const Feed = () => {
           </div>
         )}
       </motion.div>
+
+      <NotificationPanel open={showNotifications} onClose={() => setShowNotifications(false)} />
     </div>
   );
 };
