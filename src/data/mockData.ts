@@ -296,3 +296,81 @@ export const quests: Quest[] = [
     comments: [],
   },
 ];
+
+export interface TransferRequest {
+  id: string;
+  type: "quest" | "group";
+  entityId: string;
+  fromUser: User;
+  toUserId: string;
+}
+
+export interface AppNotification {
+  id: string;
+  type: "transfer_quest" | "transfer_group" | "new_comment" | "new_participant";
+  message: string;
+  entityId: string;
+  groupId?: string;
+  fromUser: User;
+  read: boolean;
+  createdAt: string;
+}
+
+export const pendingTransferRequests: TransferRequest[] = [
+  {
+    id: "tr1",
+    type: "quest",
+    entityId: "q1",
+    fromUser: friends[1],
+    toUserId: currentUser.id,
+  },
+  {
+    id: "tr2",
+    type: "group",
+    entityId: "g2",
+    fromUser: friends[3],
+    toUserId: currentUser.id,
+  },
+];
+
+export const initialNotifications: AppNotification[] = [
+  {
+    id: "n1",
+    type: "transfer_quest",
+    message: "Jake Williams wants to transfer 'Watch sunrise from the pier' to you",
+    entityId: "q1",
+    groupId: "g1",
+    fromUser: friends[1],
+    read: false,
+    createdAt: "2026-03-18",
+  },
+  {
+    id: "n2",
+    type: "transfer_group",
+    message: "Sam Kim wants to transfer 'Foodie Gang' board to you",
+    entityId: "g2",
+    fromUser: friends[3],
+    read: false,
+    createdAt: "2026-03-18",
+  },
+  {
+    id: "n3",
+    type: "new_comment",
+    message: "Priya Patel commented on 'Kayak the river at dawn'",
+    entityId: "q8",
+    groupId: "g1",
+    fromUser: friends[2],
+    read: false,
+    createdAt: "2026-03-17",
+  },
+  {
+    id: "n4",
+    type: "new_participant",
+    message: "Maya Johnson joined 'Weekend movie marathon'",
+    entityId: "q9",
+    groupId: "g3",
+    fromUser: friends[0],
+    read: false,
+    createdAt: "2026-03-17",
+  },
+];
