@@ -311,6 +311,7 @@ export interface AppNotification {
   message: string;
   entityId: string;
   groupId?: string;
+  commentId?: string;
   fromUser: User;
   read: boolean;
   createdAt: string;
