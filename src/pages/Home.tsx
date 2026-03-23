@@ -27,8 +27,12 @@ const Boards = () => {
   const [activeCommentId, setActiveCommentId] = useState<string | null>(highlightCommentId);
 
   useEffect(() => {
-    if (openGroup) setSelectedGroup(openGroup);
-  }, [openGroup]);
+    if (openGroup) {
+      setSelectedGroup(openGroup);
+      setActiveHighlight(highlightQuestId);
+      setActiveCommentId(highlightCommentId);
+    }
+  }, [openGroup, highlightQuestId, highlightCommentId]);
 
   useEffect(() => {
     cleanupEmptyQuests();
