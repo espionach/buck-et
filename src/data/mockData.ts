@@ -360,6 +360,7 @@ export const initialNotifications: AppNotification[] = [
     message: "Priya Patel commented on 'Kayak the river at dawn'",
     entityId: "q8",
     groupId: "g1",
+    commentId: "c6",
     fromUser: friends[2],
     read: false,
     createdAt: "2026-03-17",

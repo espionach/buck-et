@@ -33,13 +33,13 @@ const Feed = () => {
   const isFollowing = (user: User) => following.some((f) => f.id === user.id);
 
   const filteredQuests = search
-    ? followerQuests.filter(
+    ? feedQuests.filter(
         (q) =>
           q.title.toLowerCase().includes(search.toLowerCase()) ||
           q.createdBy.name.toLowerCase().includes(search.toLowerCase()) ||
           q.participants.some((p) => p.name.toLowerCase().includes(search.toLowerCase()))
       )
-    : followerQuests;
+    : feedQuests;
 
   const filteredPeople = search
     ? allSearchableUsers.filter((u) =>
