@@ -28,7 +28,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
   const isOwner = quest.createdBy.id === currentUser.id;
   const isFollowersOnly = quest.isFollowerOnly;
 
-  const [showComments, setShowComments] = useState(false);
+  const [showComments, setShowComments] = useState(autoOpenComments);
   const [newComment, setNewComment] = useState("");
   const [showOwnerLeave, setShowOwnerLeave] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
