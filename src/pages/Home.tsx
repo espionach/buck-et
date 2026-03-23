@@ -346,7 +346,17 @@ const Boards = () => {
                   <p className="text-sm">Start one for the crew! 🚀</p>
                 </div>
               ) : (
-                groupQuests.map((q, i) => <QuestCard key={q.id} quest={q} index={i} onMarkDone={() => navigate("/profile?tab=past")} onMarkUndone={() => navigate("/profile?tab=current")} />)
+                groupQuests.map((q, i) => (
+                  <QuestCard
+                    key={q.id}
+                    quest={q}
+                    index={i}
+                    onMarkDone={() => navigate("/profile?tab=past")}
+                    onMarkUndone={() => navigate("/profile?tab=current")}
+                    autoOpenComments={q.id === activeHighlight && !!activeCommentId}
+                    highlightCommentId={q.id === activeHighlight ? (activeCommentId || undefined) : undefined}
+                  />
+                ))
               )}
             </div>
           </motion.div>
