@@ -15,6 +15,8 @@ interface QuestCardProps {
   disableJoin?: boolean;
   onMarkDone?: () => void;
   onMarkUndone?: () => void;
+  autoOpenComments?: boolean;
+  highlightCommentId?: string;
 }
 
 const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPast, disableJoin = false, onMarkDone, onMarkUndone }: QuestCardProps) => {
