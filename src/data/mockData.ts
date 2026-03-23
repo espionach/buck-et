@@ -236,6 +236,7 @@ export const quests: Quest[] = [
     participants: [currentUser, friends[0], friends[1]],
     isDone: false,
     createdAt: "2026-03-15",
+    links: ["https://www.kayakrentals.com/dawn-tours"],
     comments: [],
   },
   {
