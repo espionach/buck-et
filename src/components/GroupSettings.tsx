@@ -14,7 +14,7 @@ interface GroupSettingsProps {
 }
 
 const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettingsProps) => {
-  const { updateGroup, removeMemberFromGroup, leaveGroup, inviteToGroup, following, transferGroupOwnership, deleteGroup } = useAppStore();
+  const { updateGroup, removeMemberFromGroup, leaveGroup, inviteToGroup, following, requestGroupTransfer, deleteGroup } = useAppStore();
   const [editName, setEditName] = useState(group.name);
   const [editEmoji, setEditEmoji] = useState(group.emoji);
   const [isEditingName, setIsEditingName] = useState(false);
