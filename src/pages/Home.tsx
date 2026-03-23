@@ -287,6 +287,8 @@ const Boards = () => {
               onClick={() => {
                 setSelectedGroup(null);
                 setShowSettings(false);
+                setActiveHighlight(null);
+                setActiveCommentId(null);
               }}
               className="text-sm text-primary font-semibold mb-4 flex items-center gap-1"
             >
