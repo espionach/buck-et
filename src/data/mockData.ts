@@ -262,6 +262,7 @@ export const quests: Quest[] = [
     participants: [currentUser, friends[3]],
     isDone: false,
     createdAt: "2026-03-17",
+    links: ["https://yogawithadriene.com/morning-flow", "https://maps.google.com/park-location"],
     comments: [],
   },
   {
