@@ -3,7 +3,7 @@ import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
 import OwnerLeaveDialog from "@/components/OwnerLeaveDialog";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, HandMetal, MessageCircle, ChevronDown, ChevronUp, Send, Pencil, Plus, Undo2 } from "lucide-react";
+import { Check, HandMetal, MessageCircle, ChevronDown, ChevronUp, Send, Pencil, Plus, Undo2, ExternalLink, X } from "lucide-react";
 import { useState } from "react";
 
 interface QuestCardProps {
@@ -18,16 +18,23 @@ interface QuestCardProps {
 }
 
 const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPast, disableJoin = false, onMarkDone, onMarkUndone }: QuestCardProps) => {
-  const { toggleImIn, markDone, markUndone, groups, addComment, deleteQuest, transferQuestOwnership } = useAppStore();
+  const { toggleImIn, markDone, markUndone, groups, addComment, deleteQuest, transferQuestOwnership, requestQuestTransfer, transferRequests, acceptTransfer, declineTransfer } = useAppStore();
   const isIn = quest.participants.some((p) => p.id === currentUser.id);
   const group = quest.groupId ? groups.find((g) => g.id === quest.groupId) : null;
   const userInGroup = group ? group.members.some((m) => m.id === currentUser.id) : true;
   const canJoin = !disableJoin && userInGroup;
   const isOwner = quest.createdBy.id === currentUser.id;
+  const isFollowersOnly = quest.isFollowerOnly;
 
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [showOwnerLeave, setShowOwnerLeave] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  // Check for pending transfer request for this quest targeting current user
+  const pendingTransfer = transferRequests.find(
+    (tr) => tr.type === "quest" && tr.entityId === quest.id && tr.toUserId === currentUser.id
+  );
 
   const handleAddComment = () => {
     if (!newComment.trim()) return;
@@ -44,9 +51,12 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
 
   const handleToggleImIn = () => {
     if (!canJoin) return;
-    // If owner is trying to unjoin, show confirmation
     if (isOwner && isIn) {
-      setShowOwnerLeave(true);
+      if (isFollowersOnly) {
+        setShowDeleteConfirm(true);
+      } else {
+        setShowOwnerLeave(true);
+      }
       return;
     }
     toggleImIn(quest.id);
@@ -70,6 +80,35 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
         transition={{ delay: index * 0.06 }}
         className={`relative p-4 rounded-2xl border border-border/50 bg-card ${quest.isDone ? "opacity-60" : ""}`}
       >
+        {/* Transfer request banner */}
+        {pendingTransfer && (
+          <div className="mb-3 p-3 rounded-xl bg-primary/10 border border-primary/20">
+            <p className="text-xs text-foreground font-medium mb-2">
+              {pendingTransfer.fromUser.name} wants to transfer this quest to you
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  acceptTransfer(pendingTransfer.id);
+                }}
+                className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-secondary text-secondary-foreground text-xs font-semibold"
+              >
+                <Check className="w-3.5 h-3.5" /> Accept
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  declineTransfer(pendingTransfer.id);
+                }}
+                className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-muted text-muted-foreground text-xs font-semibold"
+              >
+                <X className="w-3.5 h-3.5" /> Decline
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Pencil icon for owned current quests */}
         {!quest.isDone && isOwner && onEditCurrent && (
           <button
@@ -136,6 +175,25 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
             </button>
           )}
         </div>
+
+        {/* Links */}
+        {quest.links && quest.links.length > 0 && (
+          <div className="mt-2 space-y-1">
+            {quest.links.map((link, i) => (
+              <a
+                key={i}
+                href={link}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="flex items-center gap-1.5 text-xs text-primary hover:underline truncate"
+              >
+                <ExternalLink className="w-3 h-3 shrink-0" />
+                <span className="truncate">{link}</span>
+              </a>
+            ))}
+          </div>
+        )}
 
         {/* Completed timestamp */}
         {quest.isDone && quest.completedAt && (
@@ -266,7 +324,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
         </AnimatePresence>
       </motion.div>
 
-      {/* Owner leave dialog */}
+      {/* Owner leave dialog — for group quests */}
       <AnimatePresence>
         {showOwnerLeave && (
           <OwnerLeaveDialog
@@ -278,11 +336,54 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
               setShowOwnerLeave(false);
             }}
             onTransfer={(newOwnerId) => {
-              transferQuestOwnership(quest.id, newOwnerId);
+              requestQuestTransfer(quest.id, newOwnerId);
               setShowOwnerLeave(false);
             }}
             onCancel={() => setShowOwnerLeave(false)}
           />
+        )}
+      </AnimatePresence>
+
+      {/* Followers-only delete confirmation */}
+      <AnimatePresence>
+        {showDeleteConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] bg-foreground/40 flex items-center justify-center p-5"
+            onClick={() => setShowDeleteConfirm(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-xs bg-card rounded-2xl p-5 space-y-4 shadow-lg text-center"
+            >
+              <p className="text-sm font-bold text-foreground">Are you sure?</p>
+              <p className="text-xs text-muted-foreground">
+                This quest will be permanently deleted for everyone.
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="flex-1 py-2.5 rounded-xl bg-muted text-muted-foreground font-semibold text-sm"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    deleteQuest(quest.id);
+                    setShowDeleteConfirm(false);
+                  }}
+                  className="flex-1 py-2.5 rounded-xl bg-destructive text-destructive-foreground font-semibold text-sm"
+                >
+                  Delete
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
     </>
