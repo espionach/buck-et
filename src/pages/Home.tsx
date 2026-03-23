@@ -15,12 +15,16 @@ const Boards = () => {
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const openGroup = searchParams.get("open");
+  const highlightQuestId = searchParams.get("highlightQuest");
+  const highlightCommentId = searchParams.get("commentId");
 
   const [selectedGroup, setSelectedGroup] = useState<string | null>(openGroup);
   const [search, setSearch] = useState("");
   const [showSettings, setShowSettings] = useState(false);
   const [showAllInvites, setShowAllInvites] = useState(false);
   const [viewingProfile, setViewingProfile] = useState<User | null>(null);
+  const [activeHighlight, setActiveHighlight] = useState<string | null>(highlightQuestId);
+  const [activeCommentId, setActiveCommentId] = useState<string | null>(highlightCommentId);
 
   useEffect(() => {
     if (openGroup) setSelectedGroup(openGroup);
