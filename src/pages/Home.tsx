@@ -51,9 +51,18 @@ const Boards = () => {
       )
     : sortedGroups;
 
-  const groupQuests = selectedGroup
+  const groupQuestsUnsorted = selectedGroup
     ? quests.filter((q) => q.groupId === selectedGroup && !q.isDone)
     : [];
+
+  // Sort highlighted quest to the top, rest chronological
+  const groupQuests = activeHighlight
+    ? [...groupQuestsUnsorted].sort((a, b) => {
+        if (a.id === activeHighlight) return -1;
+        if (b.id === activeHighlight) return 1;
+        return 0;
+      })
+    : groupQuestsUnsorted;
 
   const selectedGroupData = groups.find((g) => g.id === selectedGroup);
 
