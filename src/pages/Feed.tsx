@@ -14,6 +14,7 @@ const Feed = () => {
   const [searchTab, setSearchTab] = useState<"quests" | "people">("quests");
   const [selectedProfile, setSelectedProfile] = useState<User | null>(null);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [feedFilter, setFeedFilter] = useState<"all" | "followers" | string>("all");
   const location = useLocation();
   const navigate = useNavigate();
 
