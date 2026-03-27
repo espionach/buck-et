@@ -540,7 +540,7 @@ const Profile = () => {
               tab === t ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
             }`}
           >
-            {t === "current" ? "Current" : "Past"}
+            {t === "current" ? "Upcoming" : "Past"}
           </button>
         ))}
       </div>
@@ -556,7 +556,7 @@ const Profile = () => {
           <div className="text-center py-12 text-muted-foreground">
             <p className="text-4xl mb-2">{tab === "current" ? "🗺️" : "📜"}</p>
             <p className="text-sm">
-              {tab === "current" ? "No active quests — go start one!" : "No completed quests yet"}
+              {tab === "current" ? "No upcoming quests — go start one!" : "No completed quests yet"}
             </p>
           </div>
         ) : (
