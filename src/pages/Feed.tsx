@@ -4,7 +4,7 @@ import QuestCard from "@/components/QuestCard";
 import UserAvatar from "@/components/UserAvatar";
 import NotificationPanel from "@/components/NotificationPanel";
 import { Search, Lock, UserPlus, Mail } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
 
