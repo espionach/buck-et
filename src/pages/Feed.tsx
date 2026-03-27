@@ -151,7 +151,25 @@ const Feed = () => {
         />
       </div>
 
-      {/* Search tabs — only show when there's a search query */}
+      {/* Filter tabs — hidden during search */}
+      {!search && (
+        <div className="flex gap-2 mb-4 overflow-x-auto pb-1 scrollbar-hide">
+          {filterOptions.map((opt) => (
+            <button
+              key={opt.key}
+              onClick={() => setFeedFilter(opt.key)}
+              className={`whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                feedFilter === opt.key
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      )}
+
       {search && (
         <div className="flex bg-muted rounded-xl p-1 mb-5">
           {(["quests", "people"] as const).map((t) => (
