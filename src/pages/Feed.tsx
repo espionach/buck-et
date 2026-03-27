@@ -30,17 +30,39 @@ const Feed = () => {
     (q) => !q.isDone && (q.isFollowerOnly || (q.groupId && userGroupIds.includes(q.groupId)))
   );
 
+  // Apply filter
+  const filterOptions = [
+    { key: "all", label: "All" },
+    { key: "followers", label: "Following" },
+    ...groups.map((g) => ({ key: g.id, label: `${g.emoji} ${g.name}` })),
+  ];
+
+  const filteredByTab = feedQuests.filter((q) => {
+    if (feedFilter === "all") return true;
+    if (feedFilter === "followers") return q.isFollowerOnly;
+    return q.groupId === feedFilter;
+  });
+
   const allSearchableUsers = [...friends, ...nonFollowedUsers];
   const isFollowing = (user: User) => following.some((f) => f.id === user.id);
 
+  // Sort: unjoined quests first, then joined
+  const sortedQuests = [...filteredByTab].sort((a, b) => {
+    const aJoined = a.participants.some((p) => p.id === currentUser.id) || a.createdBy.id === currentUser.id;
+    const bJoined = b.participants.some((p) => p.id === currentUser.id) || b.createdBy.id === currentUser.id;
+    if (aJoined && !bJoined) return 1;
+    if (!aJoined && bJoined) return -1;
+    return 0;
+  });
+
   const filteredQuests = search
-    ? feedQuests.filter(
+    ? sortedQuests.filter(
         (q) =>
           q.title.toLowerCase().includes(search.toLowerCase()) ||
           q.createdBy.name.toLowerCase().includes(search.toLowerCase()) ||
           q.participants.some((p) => p.name.toLowerCase().includes(search.toLowerCase()))
       )
-    : feedQuests;
+    : sortedQuests;
 
   const filteredPeople = search
     ? allSearchableUsers.filter((u) =>
