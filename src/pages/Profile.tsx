@@ -70,12 +70,26 @@ const Profile = () => {
   const myQuests = quests.filter(
     (q) =>
       q.createdBy.id === currentUser.id ||
-      q.participants.some((p) => p.id === currentUser.id)
+      q.participants.some((p) => p.id === currentUser.id) ||
+      snapshotQuestIds.includes(q.id)
   );
 
   const current = myQuests
     .filter((q) => !q.isDone)
     .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+
+  // Snapshot current quest IDs so unjoined quests stay visible until navigation
+  useEffect(() => {
+    const currentIds = quests
+      .filter(
+        (q) =>
+          !q.isDone &&
+          (q.createdBy.id === currentUser.id ||
+            q.participants.some((p) => p.id === currentUser.id))
+      )
+      .map((q) => q.id);
+    setSnapshotQuestIds(currentIds);
+  }, [location.pathname]);
 
   const past = myQuests
     .filter((q) => q.isDone)
