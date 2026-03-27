@@ -33,7 +33,7 @@ const Profile = () => {
   const [showFollowing, setShowFollowing] = useState(false);
   const [showRequests, setShowRequests] = useState(false);
   const [viewingUser, setViewingUser] = useState<User | null>(null);
-
+  const [snapshotQuestIds, setSnapshotQuestIds] = useState<string[]>([]);
   // Profile picture upload
   const profilePicRef = useRef<HTMLInputElement>(null);
   const [editProfilePic, setEditProfilePic] = useState(currentUser.profilePicture || "");
