@@ -46,10 +46,22 @@ const Feed = () => {
   const allSearchableUsers = [...friends, ...nonFollowedUsers];
   const isFollowing = (user: User) => following.some((f) => f.id === user.id);
 
-  // Sort: unjoined quests first, then joined
+  // Snapshot which quests were joined at page load so order stays stable
+  const [joinedSnapshot, setJoinedSnapshot] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    const joinedIds = new Set(
+      feedQuests
+        .filter((q) => q.participants.some((p) => p.id === currentUser.id) || q.createdBy.id === currentUser.id)
+        .map((q) => q.id)
+    );
+    setJoinedSnapshot(joinedIds);
+  }, [location.pathname]);
+
+  // Sort: unjoined quests first (using snapshot), then joined
   const sortedQuests = [...filteredByTab].sort((a, b) => {
-    const aJoined = a.participants.some((p) => p.id === currentUser.id) || a.createdBy.id === currentUser.id;
-    const bJoined = b.participants.some((p) => p.id === currentUser.id) || b.createdBy.id === currentUser.id;
+    const aJoined = joinedSnapshot.has(a.id);
+    const bJoined = joinedSnapshot.has(b.id);
     if (aJoined && !bJoined) return 1;
     if (!aJoined && bJoined) return -1;
     return 0;
