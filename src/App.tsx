@@ -8,6 +8,7 @@ import Home from "./pages/Feed";
 import Profile from "./pages/Profile";
 import CreateQuest from "./pages/CreateQuest";
 import CreateGroup from "./pages/CreateGroup";
+import QuestDetail from "./pages/QuestDetail";
 import NotFound from "./pages/NotFound";
 import BottomNav from "./components/BottomNav";
 
@@ -15,7 +16,7 @@ const queryClient = new QueryClient();
 
 const AppLayout = () => {
   const location = useLocation();
-  const hideNav = location.pathname === "/create" || location.pathname === "/create-group";
+  const hideNav = location.pathname === "/create" || location.pathname === "/create-group" || location.pathname.startsWith("/quest/");
 
   return (
     <div className="max-w-md mx-auto min-h-screen relative">
@@ -25,6 +26,7 @@ const AppLayout = () => {
         <Route path="/profile" element={<Profile />} />
         <Route path="/create" element={<CreateQuest />} />
         <Route path="/create-group" element={<CreateGroup />} />
+        <Route path="/quest/:questId" element={<QuestDetail />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       {!hideNav && <BottomNav />}
