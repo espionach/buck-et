@@ -21,6 +21,7 @@ interface QuestCardProps {
 }
 
 const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPast, disableJoin = false, onMarkDone, onMarkUndone, autoOpenComments = false, highlightCommentId }: QuestCardProps) => {
+  const navigate = useNavigate();
   const { toggleImIn, markDone, markUndone, groups, addComment, deleteQuest, transferQuestOwnership, requestQuestTransfer, transferRequests, acceptTransfer, declineTransfer } = useAppStore();
   const isIn = quest.participants.some((p) => p.id === currentUser.id);
   const group = quest.groupId ? groups.find((g) => g.id === quest.groupId) : null;
@@ -28,6 +29,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
   const canJoin = !disableJoin && userInGroup;
   const isOwner = quest.createdBy.id === currentUser.id;
   const isFollowersOnly = quest.isFollowerOnly;
+  const canNavigateToDetail = isIn && !quest.isDone;
 
   const [showComments, setShowComments] = useState(autoOpenComments);
   const [newComment, setNewComment] = useState("");
