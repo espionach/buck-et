@@ -5,6 +5,7 @@ import OwnerLeaveDialog from "@/components/OwnerLeaveDialog";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, HandMetal, MessageCircle, ChevronDown, ChevronUp, Send, Pencil, Plus, Undo2, ExternalLink, X } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface QuestCardProps {
   quest: Quest;
