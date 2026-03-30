@@ -5,6 +5,7 @@ import OwnerLeaveDialog from "@/components/OwnerLeaveDialog";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, HandMetal, MessageCircle, ChevronDown, ChevronUp, Send, Pencil, Plus, Undo2, ExternalLink, X } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface QuestCardProps {
   quest: Quest;
@@ -20,6 +21,7 @@ interface QuestCardProps {
 }
 
 const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPast, disableJoin = false, onMarkDone, onMarkUndone, autoOpenComments = false, highlightCommentId }: QuestCardProps) => {
+  const navigate = useNavigate();
   const { toggleImIn, markDone, markUndone, groups, addComment, deleteQuest, transferQuestOwnership, requestQuestTransfer, transferRequests, acceptTransfer, declineTransfer } = useAppStore();
   const isIn = quest.participants.some((p) => p.id === currentUser.id);
   const group = quest.groupId ? groups.find((g) => g.id === quest.groupId) : null;
@@ -27,6 +29,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
   const canJoin = !disableJoin && userInGroup;
   const isOwner = quest.createdBy.id === currentUser.id;
   const isFollowersOnly = quest.isFollowerOnly;
+  const canNavigateToDetail = isIn && !quest.isDone;
 
   const [showComments, setShowComments] = useState(autoOpenComments);
   const [newComment, setNewComment] = useState("");
@@ -80,7 +83,8 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: index * 0.06 }}
-        className={`relative p-4 rounded-2xl border border-border/50 bg-card ${quest.isDone ? "opacity-60" : ""}`}
+        onClick={() => canNavigateToDetail && navigate(`/quest/${quest.id}`)}
+        className={`relative p-4 rounded-2xl border border-border/50 bg-card ${quest.isDone ? "opacity-60" : ""} ${canNavigateToDetail ? "cursor-pointer active:scale-[0.99] transition-transform" : ""}`}
       >
         {/* Transfer request banner */}
         {pendingTransfer && (

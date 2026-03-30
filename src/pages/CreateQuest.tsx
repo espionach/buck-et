@@ -1,6 +1,6 @@
 import { useAppStore } from "@/data/appState";
 import { currentUser, Quest } from "@/data/mockData";
-import { ArrowLeft, Sparkles } from "lucide-react";
+import { ArrowLeft, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -18,6 +18,16 @@ const CreateQuest = () => {
   const [selectedGroup, setSelectedGroup] = useState<string | null>(preselectedGroup);
   const [isFollowerOnly, setIsFollowerOnly] = useState(false);
 
+  // Logistics fields
+  const [showLogistics, setShowLogistics] = useState(false);
+  const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
+  const [location, setLocation] = useState("");
+  const [meetupSpot, setMeetupSpot] = useState("");
+  const [transportation, setTransportation] = useState<string>("");
+  const [carpoolSlots, setCarpoolSlots] = useState("");
+  const [customNotes, setCustomNotes] = useState("");
+
   const handleCreate = () => {
     if (!title.trim()) return;
     const quest: Quest = {
@@ -31,16 +41,102 @@ const CreateQuest = () => {
       isDone: false,
       createdAt: new Date().toISOString().split("T")[0],
       comments: [],
+      logistics: (date || time || location || meetupSpot || transportation || customNotes) ? {
+        date: date || undefined,
+        time: time || undefined,
+        location: location || undefined,
+        meetupSpot: meetupSpot || undefined,
+        transportation: (transportation as any) || undefined,
+        carpoolSlots: carpoolSlots ? parseInt(carpoolSlots) : undefined,
+        volunteers: [],
+        customNotes: customNotes || undefined,
+      } : undefined,
     };
     addQuest(quest);
 
-    // Post-creation redirection
     if (selectedGroup) {
       navigate(`/boards?open=${selectedGroup}`, { replace: true });
     } else {
       navigate("/profile", { replace: true });
     }
   };
+
+  const logisticsSection = (
+    <div className="space-y-3">
+      <button
+        type="button"
+        onClick={() => setShowLogistics(!showLogistics)}
+        className="flex items-center justify-between w-full text-sm font-semibold text-foreground"
+      >
+        <span>📋 Quest Details (optional)</span>
+        {showLogistics ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+      </button>
+
+      {showLogistics && (
+        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="space-y-3 overflow-hidden">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-[11px] text-muted-foreground mb-1 block">Date</label>
+              <input type="date" value={date} onChange={(e) => setDate(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+            </div>
+            <div>
+              <label className="text-[11px] text-muted-foreground mb-1 block">Time</label>
+              <input type="text" value={time} onChange={(e) => setTime(e.target.value)} placeholder="e.g. 6:00 PM"
+                className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+            </div>
+          </div>
+
+          <div>
+            <label className="text-[11px] text-muted-foreground mb-1 block">Location</label>
+            <input type="text" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Where's this happening?"
+              className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+          </div>
+
+          <div>
+            <label className="text-[11px] text-muted-foreground mb-1 block">Meetup Spot</label>
+            <input type="text" value={meetupSpot} onChange={(e) => setMeetupSpot(e.target.value)} placeholder="Where should everyone meet?"
+              className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+          </div>
+
+          <div>
+            <label className="text-[11px] text-muted-foreground mb-1 block">Transportation</label>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { id: "car", label: "🚗 Car" },
+                { id: "bike", label: "🚲 Bike" },
+                { id: "transit", label: "🚇 Transit" },
+                { id: "walk", label: "🚶 Walk" },
+              ].map((t) => (
+                <button key={t.id} type="button"
+                  onClick={() => setTransportation(transportation === t.id ? "" : t.id)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                    transportation === t.id ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                  }`}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {transportation === "car" && (
+            <div>
+              <label className="text-[11px] text-muted-foreground mb-1 block">Carpool Seats Available</label>
+              <input type="number" value={carpoolSlots} onChange={(e) => setCarpoolSlots(e.target.value)} placeholder="e.g. 4"
+                className="w-24 px-3 py-2.5 rounded-xl bg-card border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+            </div>
+          )}
+
+          <div>
+            <label className="text-[11px] text-muted-foreground mb-1 block">Additional Notes</label>
+            <textarea value={customNotes} onChange={(e) => setCustomNotes(e.target.value)} placeholder="Anything else everyone should know?"
+              rows={2} className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none" />
+          </div>
+        </motion.div>
+      )}
+    </div>
+  );
 
   return (
     <div className="min-h-screen px-5 pt-14 pb-10">
@@ -95,6 +191,8 @@ const CreateQuest = () => {
                 className="w-full px-4 py-3.5 rounded-xl bg-card border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm resize-none"
               />
             </div>
+
+            {logisticsSection}
 
             {isInBoardCreation ? (
               <button

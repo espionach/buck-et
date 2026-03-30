@@ -47,6 +47,23 @@ export interface FollowRequest {
   status: "pending" | "accepted" | "declined";
 }
 
+export interface QuestVolunteer {
+  userId: string;
+  user: User;
+  role: string; // e.g. "driver", "navigator", "snack_provider"
+}
+
+export interface QuestLogistics {
+  date?: string;
+  time?: string;
+  location?: string;
+  meetupSpot?: string;
+  transportation?: "car" | "bike" | "walk" | "transit" | "other";
+  carpoolSlots?: number;
+  volunteers: QuestVolunteer[];
+  customNotes?: string;
+}
+
 export interface Quest {
   id: string;
   title: string;
@@ -62,6 +79,7 @@ export interface Quest {
   notes?: string;
   links?: string[];
   comments: Comment[];
+  logistics?: QuestLogistics;
 }
 
 export const currentUser: User = {
@@ -173,6 +191,18 @@ export const quests: Quest[] = [
     participants: [currentUser, friends[1], friends[2]],
     isDone: false,
     createdAt: "2026-03-12",
+    logistics: {
+      date: "2026-04-05",
+      time: "5:30 AM",
+      location: "Ocean Beach Pier",
+      meetupSpot: "Parking lot by the pier entrance",
+      transportation: "car",
+      carpoolSlots: 3,
+      volunteers: [
+        { userId: "u3", user: friends[1], role: "driver" },
+      ],
+      customNotes: "Bring warm layers — it's chilly before sunrise!",
+    },
     comments: [
       { id: "c1", userId: "u3", user: friends[1], text: "I'll bring the blankets!", createdAt: "2026-03-12" },
       { id: "c2", userId: "u4", user: friends[2], text: "Can we make it 6am? 😅", createdAt: "2026-03-13" },
@@ -188,6 +218,14 @@ export const quests: Quest[] = [
     participants: [currentUser, friends[3]],
     isDone: false,
     createdAt: "2026-03-11",
+    logistics: {
+      date: "2026-04-02",
+      time: "6:00 PM",
+      location: "Ichiraku Ramen, 5th & Main",
+      transportation: "transit",
+      volunteers: [],
+      customNotes: "They don't take reservations — first come first served",
+    },
     comments: [
       { id: "c3", userId: "u5", user: friends[3], text: "Reservation for 6pm?", createdAt: "2026-03-11" },
     ],
@@ -237,6 +275,19 @@ export const quests: Quest[] = [
     isDone: false,
     createdAt: "2026-03-15",
     links: ["https://www.kayakrentals.com/dawn-tours"],
+    logistics: {
+      date: "2026-04-12",
+      time: "6:00 AM",
+      location: "River Bend Kayak Rentals",
+      meetupSpot: "Main parking lot",
+      transportation: "car",
+      carpoolSlots: 4,
+      volunteers: [
+        { userId: "u1", user: currentUser, role: "driver" },
+        { userId: "u2", user: friends[0], role: "snack_provider" },
+      ],
+      customNotes: "Bring sunscreen and a change of clothes",
+    },
     comments: [],
   },
   {
@@ -250,6 +301,16 @@ export const quests: Quest[] = [
     isDone: false,
     createdAt: "2026-03-16",
     photos: ["/mock-photos/ghibli1.jpg", "/mock-photos/ghibli2.jpg"],
+    logistics: {
+      date: "2026-04-08",
+      time: "2:00 PM",
+      location: "Alex's apartment",
+      transportation: "walk",
+      volunteers: [
+        { userId: "u4", user: friends[2], role: "snack_provider" },
+      ],
+      customNotes: "Starting with Spirited Away, then Princess Mononoke",
+    },
     comments: [
       { id: "c6", userId: "u4", user: friends[2], text: "I'll bring the popcorn!", createdAt: "2026-03-16" },
     ],
