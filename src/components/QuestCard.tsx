@@ -273,7 +273,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
                 className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground font-semibold transition-colors"
               >
                 <Undo2 className="w-3.5 h-3.5" />
-                Resume
+                Move to Upcoming
               </button>
             )}
           </div>
