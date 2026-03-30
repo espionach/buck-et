@@ -9,6 +9,8 @@ import {
   GroupMember,
   TransferRequest,
   AppNotification,
+  QuestLogistics,
+  QuestVolunteer,
   quests as initialQuests,
   groups as initialGroups,
   currentUser,
