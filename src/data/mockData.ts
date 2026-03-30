@@ -218,6 +218,14 @@ export const quests: Quest[] = [
     participants: [currentUser, friends[3]],
     isDone: false,
     createdAt: "2026-03-11",
+    logistics: {
+      date: "2026-04-02",
+      time: "6:00 PM",
+      location: "Ichiraku Ramen, 5th & Main",
+      transportation: "transit",
+      volunteers: [],
+      customNotes: "They don't take reservations — first come first served",
+    },
     comments: [
       { id: "c3", userId: "u5", user: friends[3], text: "Reservation for 6pm?", createdAt: "2026-03-11" },
     ],
