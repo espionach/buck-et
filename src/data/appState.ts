@@ -386,6 +386,50 @@ export const useAppStore = create<AppState>((set) => ({
       };
     }),
 
+  // Volunteer actions
+  volunteerForQuest: (questId, role) =>
+    set((s) => ({
+      quests: s.quests.map((q) => {
+        if (q.id !== questId) return q;
+        const logistics = q.logistics || { volunteers: [] };
+        const already = logistics.volunteers.some((v) => v.userId === s.currentUser.id);
+        if (already) return q;
+        return {
+          ...q,
+          logistics: {
+            ...logistics,
+            volunteers: [...logistics.volunteers, { userId: s.currentUser.id, user: s.currentUser, role }],
+          },
+        };
+      }),
+    })),
+
+  unvolunteerFromQuest: (questId) =>
+    set((s) => ({
+      quests: s.quests.map((q) => {
+        if (q.id !== questId) return q;
+        const logistics = q.logistics || { volunteers: [] };
+        return {
+          ...q,
+          logistics: {
+            ...logistics,
+            volunteers: logistics.volunteers.filter((v) => v.userId !== s.currentUser.id),
+          },
+        };
+      }),
+    })),
+
+  updateQuestLogistics: (questId, logisticsUpdates) =>
+    set((s) => ({
+      quests: s.quests.map((q) => {
+        if (q.id !== questId) return q;
+        return {
+          ...q,
+          logistics: { ...(q.logistics || { volunteers: [] }), ...logisticsUpdates },
+        };
+      }),
+    })),
+
   // Notifications
   addNotification: (notification) =>
     set((s) => ({
