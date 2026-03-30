@@ -275,6 +275,19 @@ export const quests: Quest[] = [
     isDone: false,
     createdAt: "2026-03-15",
     links: ["https://www.kayakrentals.com/dawn-tours"],
+    logistics: {
+      date: "2026-04-12",
+      time: "6:00 AM",
+      location: "River Bend Kayak Rentals",
+      meetupSpot: "Main parking lot",
+      transportation: "car",
+      carpoolSlots: 4,
+      volunteers: [
+        { userId: "u1", user: currentUser, role: "driver" },
+        { userId: "u2", user: friends[0], role: "snack_provider" },
+      ],
+      customNotes: "Bring sunscreen and a change of clothes",
+    },
     comments: [],
   },
   {
