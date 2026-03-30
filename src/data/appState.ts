@@ -61,6 +61,11 @@ interface AppState {
   acceptTransfer: (transferId: string) => void;
   declineTransfer: (transferId: string) => void;
 
+  // Volunteer actions
+  volunteerForQuest: (questId: string, role: string) => void;
+  unvolunteerFromQuest: (questId: string) => void;
+  updateQuestLogistics: (questId: string, logistics: Partial<QuestLogistics>) => void;
+
   // Notifications
   addNotification: (notification: AppNotification) => void;
   markNotificationRead: (notificationId: string) => void;
