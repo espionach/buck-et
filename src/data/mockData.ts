@@ -301,6 +301,16 @@ export const quests: Quest[] = [
     isDone: false,
     createdAt: "2026-03-16",
     photos: ["/mock-photos/ghibli1.jpg", "/mock-photos/ghibli2.jpg"],
+    logistics: {
+      date: "2026-04-08",
+      time: "2:00 PM",
+      location: "Alex's apartment",
+      transportation: "walk",
+      volunteers: [
+        { userId: "u4", user: friends[2], role: "snack_provider" },
+      ],
+      customNotes: "Starting with Spirited Away, then Princess Mononoke",
+    },
     comments: [
       { id: "c6", userId: "u4", user: friends[2], text: "I'll bring the popcorn!", createdAt: "2026-03-16" },
     ],
