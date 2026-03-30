@@ -191,6 +191,18 @@ export const quests: Quest[] = [
     participants: [currentUser, friends[1], friends[2]],
     isDone: false,
     createdAt: "2026-03-12",
+    logistics: {
+      date: "2026-04-05",
+      time: "5:30 AM",
+      location: "Ocean Beach Pier",
+      meetupSpot: "Parking lot by the pier entrance",
+      transportation: "car",
+      carpoolSlots: 3,
+      volunteers: [
+        { userId: "u3", user: friends[1], role: "driver" },
+      ],
+      customNotes: "Bring warm layers — it's chilly before sunrise!",
+    },
     comments: [
       { id: "c1", userId: "u3", user: friends[1], text: "I'll bring the blankets!", createdAt: "2026-03-12" },
       { id: "c2", userId: "u4", user: friends[2], text: "Can we make it 6am? 😅", createdAt: "2026-03-13" },
