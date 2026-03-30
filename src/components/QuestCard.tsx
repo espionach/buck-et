@@ -83,7 +83,8 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: index * 0.06 }}
-        className={`relative p-4 rounded-2xl border border-border/50 bg-card ${quest.isDone ? "opacity-60" : ""}`}
+        onClick={() => canNavigateToDetail && navigate(`/quest/${quest.id}`)}
+        className={`relative p-4 rounded-2xl border border-border/50 bg-card ${quest.isDone ? "opacity-60" : ""} ${canNavigateToDetail ? "cursor-pointer active:scale-[0.99] transition-transform" : ""}`}
       >
         {/* Transfer request banner */}
         {pendingTransfer && (
