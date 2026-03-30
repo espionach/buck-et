@@ -47,6 +47,23 @@ export interface FollowRequest {
   status: "pending" | "accepted" | "declined";
 }
 
+export interface QuestVolunteer {
+  userId: string;
+  user: User;
+  role: string; // e.g. "driver", "navigator", "snack_provider"
+}
+
+export interface QuestLogistics {
+  date?: string;
+  time?: string;
+  location?: string;
+  meetupSpot?: string;
+  transportation?: "car" | "bike" | "walk" | "transit" | "other";
+  carpoolSlots?: number;
+  volunteers: QuestVolunteer[];
+  customNotes?: string;
+}
+
 export interface Quest {
   id: string;
   title: string;
@@ -62,6 +79,7 @@ export interface Quest {
   notes?: string;
   links?: string[];
   comments: Comment[];
+  logistics?: QuestLogistics;
 }
 
 export const currentUser: User = {
