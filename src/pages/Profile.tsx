@@ -443,13 +443,19 @@ const Profile = () => {
                   </div>
                   <div className="flex gap-1.5">
                     <button
-                      onClick={() => acceptFollowRequest(req.id)}
+                      onClick={() => {
+                        acceptFollowRequest(req.id);
+                        if (followRequests.length <= 1) setShowRequests(false);
+                      }}
                       className="p-1.5 rounded-lg bg-secondary text-secondary-foreground"
                     >
                       <Check className="w-3.5 h-3.5" />
                     </button>
                     <button
-                      onClick={() => declineFollowRequest(req.id)}
+                      onClick={() => {
+                        declineFollowRequest(req.id);
+                        if (followRequests.length <= 1) setShowRequests(false);
+                      }}
                       className="p-1.5 rounded-lg bg-muted text-muted-foreground"
                     >
                       <X className="w-3.5 h-3.5" />
