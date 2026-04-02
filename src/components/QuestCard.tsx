@@ -143,8 +143,8 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
 
         {/* Header: Creator name + group */}
         <div className="mb-2">
-          <div className="flex items-center gap-2">
-            <UserAvatar user={quest.createdBy} size="xs" />
+          <div className="flex items-start gap-2">
+            <UserAvatar user={quest.createdBy} size="xs" className="mt-0.5" />
             <span className="text-sm font-bold text-foreground">{quest.createdBy.name}</span>
           </div>
           <p className="text-[11px] text-muted-foreground ml-8">
