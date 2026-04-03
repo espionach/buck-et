@@ -3,9 +3,10 @@ import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
 import OwnerLeaveDialog from "@/components/OwnerLeaveDialog";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, HandMetal, MessageCircle, ChevronDown, ChevronUp, Send, Pencil, Plus, Undo2, ExternalLink, X } from "lucide-react";
+import { Check, HandMetal, MessageCircle, ChevronDown, ChevronUp, Send, Pencil, Plus, Undo2, ExternalLink, X, Calendar } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { format, parseISO } from "date-fns";
 
 interface QuestCardProps {
   quest: Quest;
@@ -181,6 +182,14 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
             </button>
           )}
         </div>
+
+        {/* Date */}
+        {!quest.isDone && quest.logistics?.date && (
+          <div className="flex items-center gap-1.5 mt-2 text-xs text-muted-foreground">
+            <Calendar className="w-3.5 h-3.5" />
+            <span>{format(parseISO(quest.logistics.date), "MMM d, yyyy")}</span>
+          </div>
+        )}
 
         {/* Links */}
         {quest.links && quest.links.length > 0 && (
