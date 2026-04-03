@@ -53,6 +53,19 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
         </div>
       </div>
 
+      {/* Unfollow button for followed users */}
+      {isFollowed && (
+        <div className="mb-4">
+          <button
+            onClick={() => unfollowUser(user.id)}
+            className="px-4 py-2 rounded-xl bg-muted text-muted-foreground font-semibold text-sm flex items-center gap-2"
+          >
+            <UserMinus className="w-4 h-4" />
+            Unfollow
+          </button>
+        </div>
+      )}
+
       {/* Follower/Following row */}
       <div className="flex items-center gap-3 mb-4">
         <button
