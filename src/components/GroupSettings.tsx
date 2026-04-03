@@ -250,7 +250,7 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-xs bg-card rounded-2xl p-5 space-y-4 shadow-lg text-center"
+              className="w-full max-w-xs bg-card rounded-xl p-5 space-y-4 shadow-lg text-center"
             >
               <p className="text-sm font-semibold text-foreground">
                 Remove <span className="text-primary">{confirmRemoveUser.userName}</span> from{" "}

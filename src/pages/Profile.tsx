@@ -404,7 +404,7 @@ const Profile = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-sm bg-card rounded-2xl p-5 shadow-lg max-h-[60vh] overflow-y-auto space-y-2"
+              className="w-full max-w-sm bg-card rounded-xl p-5 shadow-lg max-h-[60vh] overflow-y-auto space-y-2"
             >
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-bold text-foreground text-sm">Follow Requests</h3>
@@ -460,7 +460,7 @@ const Profile = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-sm bg-card rounded-2xl p-5 shadow-lg max-h-[60vh] overflow-y-auto"
+              className="w-full max-w-sm bg-card rounded-xl p-5 shadow-lg max-h-[60vh] overflow-y-auto"
             >
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-bold text-foreground text-sm">Followers</h3>
@@ -501,7 +501,7 @@ const Profile = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-sm bg-card rounded-2xl p-5 shadow-lg max-h-[60vh] overflow-y-auto"
+              className="w-full max-w-sm bg-card rounded-xl p-5 shadow-lg max-h-[60vh] overflow-y-auto"
             >
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-bold text-foreground text-sm">Following</h3>
@@ -590,7 +590,7 @@ const Profile = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-md bg-card rounded-2xl p-5 space-y-4 shadow-lg max-h-[85vh] overflow-y-auto"
+              className="w-full max-w-md bg-card rounded-xl p-5 space-y-4 shadow-lg max-h-[85vh] overflow-y-auto"
             >
               <div className="flex items-center justify-between">
                 <h3 className="font-bold text-foreground">Edit Quest</h3>
@@ -747,7 +747,7 @@ const Profile = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-xs bg-card rounded-2xl p-5 space-y-4 shadow-lg text-center"
+              className="w-full max-w-xs bg-card rounded-xl p-5 space-y-4 shadow-lg text-center"
             >
               <p className="text-sm font-semibold text-foreground">
                 Remove <span className="text-primary">{confirmRemoveUser.userName}</span> from{" "}
@@ -788,7 +788,7 @@ const Profile = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-md bg-card rounded-2xl p-5 space-y-4 shadow-lg max-h-[85vh] overflow-y-auto"
+              className="w-full max-w-md bg-card rounded-xl p-5 space-y-4 shadow-lg max-h-[85vh] overflow-y-auto"
             >
               <div className="flex items-center justify-between">
                 <h3 className="font-bold text-foreground">Quest Memories</h3>

@@ -62,7 +62,7 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -12, scale: 0.97 }}
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-sm bg-card rounded-2xl shadow-xl border border-border overflow-hidden"
+            className="w-full max-w-sm bg-card rounded-xl shadow-xl border border-border overflow-hidden"
           >
             <div className="flex items-center justify-between p-4 border-b border-border/50">
               <h3 className="font-bold text-foreground text-sm">Notifications</h3>

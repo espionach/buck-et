@@ -117,7 +117,7 @@ const QuestDetail = () => {
 
       <div className="px-5 space-y-4 mt-2">
         {/* Quest Card — Expanded */}
-        <div className="p-4 rounded-2xl border border-border/50 bg-card space-y-4">
+        <div className="p-4 rounded-xl border border-border/50 bg-card space-y-4">
           {/* Creator */}
           <div className="flex items-center gap-2">
             <UserAvatar user={quest.createdBy} size="sm" />
@@ -170,7 +170,7 @@ const QuestDetail = () => {
         </div>
 
         {/* Logistics Section */}
-        <div className="p-4 rounded-2xl border border-border/50 bg-card space-y-3">
+        <div className="p-4 rounded-xl border border-border/50 bg-card space-y-3">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-bold text-foreground">Quest Details</h3>
             {isOwner && !editingLogistics && (
@@ -266,7 +266,7 @@ const QuestDetail = () => {
 
         {/* Volunteer Section */}
         {logistics.transportation === "car" && (
-          <div className="p-4 rounded-2xl border border-border/50 bg-card space-y-3">
+          <div className="p-4 rounded-xl border border-border/50 bg-card space-y-3">
             <h3 className="text-sm font-bold text-foreground">Carpool & Contributions</h3>
             
             {/* Current volunteers */}
@@ -318,7 +318,7 @@ const QuestDetail = () => {
 
         {/* General volunteer section for non-car quests */}
         {logistics.transportation !== "car" && (
-          <div className="p-4 rounded-2xl border border-border/50 bg-card space-y-3">
+          <div className="p-4 rounded-xl border border-border/50 bg-card space-y-3">
             <h3 className="text-sm font-bold text-foreground">Contributions</h3>
             
             {logistics.volunteers.length > 0 && (
@@ -367,7 +367,7 @@ const QuestDetail = () => {
         )}
 
         {/* Comments Section */}
-        <div className="p-4 rounded-2xl border border-border/50 bg-card space-y-3">
+        <div className="p-4 rounded-xl border border-border/50 bg-card space-y-3">
           <h3 className="text-sm font-bold text-foreground">
             Comments {quest.comments.length > 0 && `(${quest.comments.length})`}
           </h3>
