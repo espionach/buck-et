@@ -579,6 +579,9 @@ const Profile = () => {
               onEditPast={tab === "past" ? handleOpenPastEditor : undefined}
               onMarkDone={() => setTab("past")}
               onMarkUndone={() => setTab("current")}
+              onViewProfile={(user) => {
+                if (user.id !== currentUser.id) setViewingUser(user);
+              }}
             />
           ))
         )}
