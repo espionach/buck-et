@@ -414,10 +414,16 @@ const Profile = () => {
               </div>
               {followRequests.map((req) => (
                 <div key={req.id} className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
+                  <button
+                    className="flex items-center gap-2"
+                    onClick={() => {
+                      setShowRequests(false);
+                      setViewingUser(req.from);
+                    }}
+                  >
                     <UserAvatar user={req.from} size="sm" />
                     <span className="text-sm font-semibold text-foreground">{req.from.name}</span>
-                  </div>
+                  </button>
                   <div className="flex gap-1.5">
                     <button
                       onClick={() => {
