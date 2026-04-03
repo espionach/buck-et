@@ -255,7 +255,7 @@ const Boards = () => {
             )}
 
             {/* Group Grid */}
-            <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="grid grid-cols-2 gap-3 mb-4 items-stretch">
               {filteredGroups.map((group, i) => (
                 <GroupCard
                   key={group.id}
