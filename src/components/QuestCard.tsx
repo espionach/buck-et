@@ -148,7 +148,15 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
         <div className="mb-2">
           <div className="flex items-center gap-2">
             <UserAvatar user={quest.createdBy} size="sm" />
-            <span className="text-sm font-bold text-foreground">{quest.createdBy.name}</span>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onViewProfile) onViewProfile(quest.createdBy);
+              }}
+              className="text-sm font-bold text-foreground hover:underline"
+            >
+              {quest.createdBy.name}
+            </button>
           </div>
           <p className="text-[11px] text-muted-foreground ml-8">
             {group ? `${group.emoji} ${group.name}` : "🌍 Followers only"}
