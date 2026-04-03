@@ -235,7 +235,7 @@ const Boards = () => {
                   key={group.id}
                   group={group}
                   index={i}
-                  onClick={() => setSelectedGroup(group.id)}
+                  onClick={() => { setSelectedGroup(group.id); setBoardTab("active"); }}
                 />
               ))}
             </div>
