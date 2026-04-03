@@ -4,6 +4,7 @@ import GroupCard from "@/components/GroupCard";
 import QuestCard from "@/components/QuestCard";
 import GroupSettings from "@/components/GroupSettings";
 import UserAvatar from "@/components/UserAvatar";
+import UserProfileView from "@/components/UserProfileView";
 import { Plus, Search, Check, X, Settings, ArrowLeft } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
