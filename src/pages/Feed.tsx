@@ -252,7 +252,7 @@ const Feed = () => {
                           }
                           setSelectedProfile(user);
                         }}
-                        className="w-full flex items-center gap-3 p-3 rounded-xl bg-card border border-border/50 text-left active:scale-[0.98] transition-transform"
+                        className="w-full flex items-center gap-3 py-3 text-left active:scale-[0.98] transition-transform"
                       >
                         <UserAvatar user={user} size="md" />
                         <div className="flex-1">
