@@ -70,7 +70,7 @@ const GroupCard = ({ group, onClick, index }: GroupCardProps) => {
             <span className="text-xs font-semibold text-foreground">{group.activeQuests}</span>
           </div>
         </div>
-        <h3 className="font-display font-bold text-lg text-foreground mb-1">{group.name}</h3>
+        <h3 className="font-display font-bold text-sm text-foreground mb-1 line-clamp-1">{group.name}</h3>
         <div className="flex items-center gap-1.5 text-muted-foreground">
           <Users className="w-3.5 h-3.5" />
           <span className="text-xs">{group.members.length} members</span>
