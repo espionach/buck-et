@@ -31,7 +31,7 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
     markNotificationRead(notification.id);
 
     if (notification.type === "new_comment" && notification.groupId) {
-      const params = new URLSearchParams({ open: notification.groupId, highlightQuest: notification.entityId });
+      const params = new URLSearchParams({ open: notification.groupId, highlightQuest: notification.entityId || "" });
       if (notification.commentId) params.set("commentId", notification.commentId);
       navigate(`/boards?${params.toString()}`);
     } else if (notification.type === "transfer_quest" && notification.groupId) {
