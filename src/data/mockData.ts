@@ -356,6 +356,22 @@ export const quests: Quest[] = [
     photos: ["/mock-photos/hike1.jpg"],
     comments: [],
   },
+  {
+    id: "q11",
+    title: "Dim sum crawl in Chinatown",
+    description: "Hit every spot on the list 🥟",
+    createdBy: friends[3],
+    groupId: "g2",
+    isFollowerOnly: false,
+    participants: [currentUser, friends[3], friends[4]],
+    isDone: true,
+    createdAt: "2026-02-25",
+    completedAt: "2026-03-01",
+    notes: "Best har gow was at Dragon Gate!",
+    comments: [
+      { id: "c7", userId: "u5", user: friends[3], text: "That was legendary", createdAt: "2026-03-01" },
+    ],
+  },
 ];
 
 export interface TransferRequest {
