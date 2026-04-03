@@ -16,7 +16,9 @@ const Feed = () => {
   const [selectedProfile, setSelectedProfile] = useState<User | null>(null);
   const [showNotifications, setShowNotifications] = useState(false);
   const [feedFilter, setFeedFilter] = useState<"all" | "followers" | string>("all");
-  const [searchFocused, setSearchFocused] = useState(false);
+  const [searchMode, setSearchMode] = useState(false);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -125,16 +127,24 @@ const Feed = () => {
       <div className="relative mb-3">
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <input
+          ref={searchInputRef}
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          onFocus={() => setSearchFocused(true)}
-          onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            if (!searchMode) setSearchMode(true);
+          }}
+          onFocus={() => {
+            if (!searchMode) setSearchMode(true);
+          }}
           placeholder="Search quests or people..."
           className="w-full pl-10 pr-10 py-3 rounded-xl bg-card border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
         />
-        {search && (
+        {(search || searchMode) && (
           <button
-            onClick={() => setSearch("")}
+            onClick={() => {
+              setSearch("");
+              setSearchMode(false);
+            }}
             className="absolute right-3.5 top-1/2 -translate-y-1/2"
           >
             <X className="w-4 h-4 text-destructive" />
@@ -142,10 +152,11 @@ const Feed = () => {
         )}
       </div>
 
-      {/* Search recommendations when focused but no query */}
-      {searchFocused && !search && (
-        <div className="mb-3">
-          <div className="flex bg-muted rounded-xl p-1 mb-3">
+      {/* Search mode page */}
+      {searchMode ? (
+        <div>
+          {/* Toggle */}
+          <div className="flex bg-muted rounded-xl p-1 mb-4">
             {(["quests", "people"] as const).map((t) => (
               <button
                 key={t}
@@ -158,124 +169,128 @@ const Feed = () => {
               </button>
             ))}
           </div>
-          <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold mb-2 px-1">
-            {searchTab === "quests" ? "Recent Quests" : "Suggested People"}
-          </p>
-          {searchTab === "quests" ? (
-            <div className="space-y-1">
-              {sortedQuests.slice(0, 4).map((q) => (
-                <button
-                  key={q.id}
-                  onMouseDown={(e) => e.preventDefault()}
-                  onClick={() => setSearch(q.title)}
-                  className="w-full flex items-center gap-2 p-2.5 rounded-xl bg-card border border-border/50 text-left active:scale-[0.98] transition-transform"
-                >
-                  <Search className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                  <span className="text-sm text-foreground truncate">{q.title}</span>
-                </button>
-              ))}
+
+          {!search ? (
+            /* No query — show recent searches */
+            <div>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold mb-2 px-1">
+                Recent Searches
+              </p>
+              {recentSearches.length === 0 ? (
+                <div className="text-center py-12 text-muted-foreground">
+                  <p className="text-4xl mb-2">🔍</p>
+                  <p className="text-sm">No recent searches</p>
+                </div>
+              ) : (
+                <div className="space-y-1">
+                  {recentSearches.map((term, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setSearch(term)}
+                      className="w-full flex items-center gap-2 p-2.5 rounded-xl bg-card border border-border/50 text-left active:scale-[0.98] transition-transform"
+                    >
+                      <Search className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                      <span className="text-sm text-foreground truncate">{term}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           ) : (
-            <div className="space-y-1">
-              {allSearchableUsers.slice(0, 4).map((user) => (
-                <button
-                  key={user.id}
-                  onMouseDown={(e) => e.preventDefault()}
-                  onClick={() => setSelectedProfile(user)}
-                  className="w-full flex items-center gap-2 p-2.5 rounded-xl bg-card border border-border/50 text-left active:scale-[0.98] transition-transform"
-                >
-                  <UserAvatar user={user} size="xs" />
-                  <span className="text-sm text-foreground">{user.name}</span>
-                </button>
-              ))}
-            </div>
+            /* Has query — show results */
+            <motion.div key={searchTab} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+              {searchTab === "quests" ? (
+                <div className="space-y-3">
+                  {filteredQuests.length === 0 ? (
+                    <div className="text-center py-16 text-muted-foreground">
+                      <p className="text-4xl mb-3">🔭</p>
+                      <p className="font-semibold">No quests found</p>
+                    </div>
+                  ) : (
+                    filteredQuests.map((q, i) => <QuestCard key={q.id} quest={q} index={i} onMarkDone={() => navigate("/profile?tab=past")} onMarkUndone={() => navigate("/profile?tab=current")} onViewProfile={(user) => {
+                      if (search.trim()) {
+                        setRecentSearches((prev) => [search.trim(), ...prev.filter((s) => s !== search.trim())].slice(0, 10));
+                      }
+                      setSelectedProfile(user);
+                    }} />)
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {filteredPeople.length === 0 ? (
+                    <div className="text-center py-16 text-muted-foreground">
+                      <p className="text-4xl mb-3">👤</p>
+                      <p className="font-semibold">No people found</p>
+                    </div>
+                  ) : (
+                    filteredPeople.map((user) => (
+                      <button
+                        key={user.id}
+                        onClick={() => {
+                          if (search.trim()) {
+                            setRecentSearches((prev) => [search.trim(), ...prev.filter((s) => s !== search.trim())].slice(0, 10));
+                          }
+                          setSelectedProfile(user);
+                        }}
+                        className="w-full flex items-center gap-3 p-3 rounded-xl bg-card border border-border/50 text-left active:scale-[0.98] transition-transform"
+                      >
+                        <UserAvatar user={user} size="md" />
+                        <div className="flex-1">
+                          <p className="font-semibold text-foreground text-sm">{user.name}</p>
+                          <p className="text-xs text-muted-foreground">{user.bio}</p>
+                        </div>
+                        {isFollowing(user) ? (
+                          <span className="text-[10px] font-semibold text-secondary px-2 py-1 rounded-full bg-secondary/10">
+                            Following
+                          </span>
+                        ) : (
+                          <span className="text-[10px] font-semibold text-muted-foreground px-2 py-1 rounded-full bg-muted">
+                            Not following
+                          </span>
+                        )}
+                      </button>
+                    ))
+                  )}
+                </div>
+              )}
+            </motion.div>
           )}
         </div>
-      )}
-
-      {/* Filter tabs — hidden during search */}
-      {!search && (
-        <div className="flex gap-2 mb-4 overflow-x-auto pb-1 scrollbar-hide">
-          {filterOptions.map((opt) => (
-            <button
-              key={opt.key}
-              onClick={() => setFeedFilter(opt.key)}
-              className={`whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
-                feedFilter === opt.key
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {search && (
-        <div className="flex bg-muted rounded-xl p-1 mb-5">
-          {(["quests", "people"] as const).map((t) => (
-            <button
-              key={t}
-              onClick={() => setSearchTab(t)}
-              className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
-                searchTab === t ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
-              }`}
-            >
-              {t === "quests" ? "Quests" : "People"}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Content */}
-      <motion.div key={search ? searchTab : "quests"} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-        {(!search || searchTab === "quests") ? (
-          <div className="space-y-3">
-            {filteredQuests.length === 0 ? (
-              <div className="text-center py-16 text-muted-foreground">
-                <p className="text-4xl mb-3">🔭</p>
-                <p className="font-semibold">No quests to show</p>
-                <p className="text-sm">Follow more friends to see their side quests!</p>
-              </div>
-            ) : (
-              filteredQuests.map((q, i) => <QuestCard key={q.id} quest={q} index={i} onMarkDone={() => navigate("/profile?tab=past")} onMarkUndone={() => navigate("/profile?tab=current")} onViewProfile={(user) => setSelectedProfile(user)} />)
-            )}
+      ) : (
+        <>
+          {/* Filter tabs */}
+          <div className="flex gap-2 mb-4 overflow-x-auto pb-1 scrollbar-hide">
+            {filterOptions.map((opt) => (
+              <button
+                key={opt.key}
+                onClick={() => setFeedFilter(opt.key)}
+                className={`whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                  feedFilter === opt.key
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
           </div>
-        ) : (
-          <div className="space-y-2">
-            {filteredPeople.length === 0 ? (
-              <div className="text-center py-16 text-muted-foreground">
-                <p className="text-4xl mb-3">👤</p>
-                <p className="font-semibold">No people found</p>
-              </div>
-            ) : (
-              filteredPeople.map((user) => (
-                <button
-                  key={user.id}
-                  onClick={() => setSelectedProfile(user)}
-                  className="w-full flex items-center gap-3 p-3 rounded-xl bg-card border border-border/50 text-left active:scale-[0.98] transition-transform"
-                >
-                  <UserAvatar user={user} size="md" />
-                  <div className="flex-1">
-                    <p className="font-semibold text-foreground text-sm">{user.name}</p>
-                    <p className="text-xs text-muted-foreground">{user.bio}</p>
-                  </div>
-                  {isFollowing(user) ? (
-                    <span className="text-[10px] font-semibold text-secondary px-2 py-1 rounded-full bg-secondary/10">
-                      Following
-                    </span>
-                  ) : (
-                    <span className="text-[10px] font-semibold text-muted-foreground px-2 py-1 rounded-full bg-muted">
-                      Not following
-                    </span>
-                  )}
-                </button>
-              ))
-            )}
-          </div>
-        )}
-      </motion.div>
+
+          {/* Content */}
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+            <div className="space-y-3">
+              {filteredQuests.length === 0 ? (
+                <div className="text-center py-16 text-muted-foreground">
+                  <p className="text-4xl mb-3">🔭</p>
+                  <p className="font-semibold">No quests to show</p>
+                  <p className="text-sm">Follow more friends to see their side quests!</p>
+                </div>
+              ) : (
+                filteredQuests.map((q, i) => <QuestCard key={q.id} quest={q} index={i} onMarkDone={() => navigate("/profile?tab=past")} onMarkUndone={() => navigate("/profile?tab=current")} onViewProfile={(user) => setSelectedProfile(user)} />)
+              )}
+            </div>
+          </motion.div>
+        </>
+      )}
 
       <NotificationPanel open={showNotifications} onClose={() => setShowNotifications(false)} />
     </div>
