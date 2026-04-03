@@ -349,7 +349,7 @@ const Boards = () => {
                   <p className="text-sm">Start one for the crew! 🚀</p>
                 </div>
               ) : (
-                groupQuests.map((q, i) => (
+                 groupQuests.map((q, i) => (
                   <QuestCard
                     key={q.id}
                     quest={q}
@@ -358,6 +358,7 @@ const Boards = () => {
                     onMarkUndone={() => navigate("/profile?tab=current")}
                     autoOpenComments={q.id === activeHighlight && !!activeCommentId}
                     highlightCommentId={q.id === activeHighlight ? (activeCommentId || undefined) : undefined}
+                    onViewProfile={(user) => setViewingProfile(user)}
                   />
                 ))
               )}

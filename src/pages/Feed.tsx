@@ -274,7 +274,7 @@ const Feed = () => {
                 <p className="text-sm">Follow more friends to see their side quests!</p>
               </div>
             ) : (
-              filteredQuests.map((q, i) => <QuestCard key={q.id} quest={q} index={i} onMarkDone={() => navigate("/profile?tab=past")} onMarkUndone={() => navigate("/profile?tab=current")} />)
+              filteredQuests.map((q, i) => <QuestCard key={q.id} quest={q} index={i} onMarkDone={() => navigate("/profile?tab=past")} onMarkUndone={() => navigate("/profile?tab=current")} onViewProfile={(user) => setSelectedProfile(user)} />)
             )}
           </div>
         ) : (
