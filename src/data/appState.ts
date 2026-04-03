@@ -189,6 +189,31 @@ export const useAppStore = create<AppState>((set) => ({
       followRequests: s.followRequests.filter((r) => r.id !== requestId),
     })),
 
+  sendFollowRequest: (toUser) =>
+    set((s) => {
+      if (s.sentFollowRequests.includes(toUser.id)) return s;
+      // Since this is a mock, we simulate the other user receiving a follow request
+      // by adding it to followRequests (as if we are the "other user" receiving it)
+      // For demo purposes, we add the request to the store
+      const newRequest: FollowRequest = {
+        id: `fr${Date.now()}`,
+        from: s.currentUser,
+        status: "pending",
+      };
+      const notification: AppNotification = {
+        id: `n${Date.now()}`,
+        type: "follow_request",
+        message: `${s.currentUser.name} requested to follow ${toUser.name}`,
+        fromUser: s.currentUser,
+        read: false,
+        createdAt: new Date().toISOString().split("T")[0],
+      };
+      return {
+        sentFollowRequests: [...s.sentFollowRequests, toUser.id],
+        notifications: [notification, ...s.notifications],
+      };
+    }),
+
   addComment: (questId, comment) =>
     set((s) => ({
       quests: s.quests.map((q) =>
