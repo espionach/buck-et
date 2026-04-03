@@ -2,7 +2,7 @@ import { Group, currentUser } from "@/data/mockData";
 import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
 import { motion } from "framer-motion";
-import { Users, Zap, Check, X } from "lucide-react";
+import { Users, Check, X } from "lucide-react";
 
 interface GroupCardProps {
   group: Group;
