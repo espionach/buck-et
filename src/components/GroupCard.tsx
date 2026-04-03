@@ -2,7 +2,7 @@ import { Group, currentUser } from "@/data/mockData";
 import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
 import { motion } from "framer-motion";
-import { Users, Zap, Check, X } from "lucide-react";
+import { Users, Check, X } from "lucide-react";
 
 interface GroupCardProps {
   group: Group;
@@ -36,13 +36,9 @@ const GroupCard = ({ group, onClick, index }: GroupCardProps) => {
       >
         <div className="flex items-start justify-between mb-3">
           <span className="text-3xl">{group.emoji}</span>
-          <div className="flex items-center gap-1 bg-card/80 rounded-full px-2.5 py-1">
-            <Zap className="w-3.5 h-3.5 text-primary" />
-            <span className="text-xs font-semibold text-foreground">{group.activeQuests}</span>
-          </div>
         </div>
         <h3 className="font-display font-bold text-sm text-foreground mb-1 line-clamp-1">{group.name}</h3>
-        <div className="flex items-center gap-1.5 text-muted-foreground">
+        <div className="flex items-center gap-1.5 text-muted-foreground ml-0">
           <Users className="w-3.5 h-3.5" />
           <span className="text-xs">{group.members.length} members</span>
         </div>

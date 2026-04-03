@@ -1,7 +1,7 @@
 import { useAppStore } from "@/data/appState";
 import QuestCard from "@/components/QuestCard";
 import UserAvatar from "@/components/UserAvatar";
-import { Edit, X, Check, Users as UsersIcon, UserPlus, Trash2, ImagePlus, Camera, Link as LinkIcon, Plus } from "lucide-react";
+import { Edit, X, Check, Users as UsersIcon, UserPlus, Trash2, ImagePlus, Camera, Link as LinkIcon, Plus, ArrowLeft } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Quest, User } from "@/data/mockData";
@@ -33,6 +33,9 @@ const Profile = () => {
   const [showFollowing, setShowFollowing] = useState(false);
   const [showRequests, setShowRequests] = useState(false);
   const [viewingUser, setViewingUser] = useState<User | null>(null);
+  const [viewingUserTab, setViewingUserTab] = useState<"current" | "past">("current");
+  const [viewingUserFollowers, setViewingUserFollowers] = useState(false);
+  const [viewingUserFollowing, setViewingUserFollowing] = useState(false);
   const [snapshotQuestIds, setSnapshotQuestIds] = useState<string[]>([]);
   // Profile picture upload
   const profilePicRef = useRef<HTMLInputElement>(null);
@@ -245,23 +248,133 @@ const Profile = () => {
         q.participants.some((p) => p.id === viewingUser.id)
     );
     const isFollowed = isFollowingUser(viewingUser);
+    const viewingActive = profileQuests.filter((q) => !q.isDone);
+    const viewingCompleted = profileQuests.filter((q) => q.isDone);
+    const viewingShown = viewingUserTab === "current" ? viewingActive : viewingCompleted;
+
+    // Mock follower/following data for other users (use their friends list from mock)
+    const viewingUserFollowersList = followers.filter((f) => f.id !== viewingUser.id).slice(0, 3);
+    const viewingUserFollowingList = following.filter((f) => f.id !== viewingUser.id).slice(0, 4);
 
     return (
       <div className="min-h-screen pb-24 px-5 pt-14">
         <button
-          onClick={() => setViewingUser(null)}
-          className="text-sm text-primary font-semibold mb-4"
+          onClick={() => { setViewingUser(null); setViewingUserTab("current"); }}
+          className="text-sm text-primary font-semibold mb-4 flex items-center gap-1"
         >
-          ← Back to Profile
+          <ArrowLeft className="w-4 h-4" />
+          Back to Profile
         </button>
 
-        <div className="flex items-center gap-4 mb-6">
+        <div className="flex items-center gap-4 mb-4">
           <UserAvatar user={viewingUser} size="lg" />
           <div>
             <h2 className="text-lg font-bold text-foreground">{viewingUser.name}</h2>
             <p className="text-sm text-muted-foreground">{viewingUser.bio}</p>
           </div>
         </div>
+
+        {/* Follower/Following row */}
+        <div className="flex items-center gap-3 mb-4">
+          <button
+            onClick={() => setViewingUserFollowers(true)}
+            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-card border border-border/50 text-sm font-semibold text-foreground"
+          >
+            <UsersIcon className="w-4 h-4" />
+            {viewingUserFollowersList.length} Followers
+          </button>
+          <button
+            onClick={() => setViewingUserFollowing(true)}
+            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-card border border-border/50 text-sm font-semibold text-foreground"
+          >
+            <UsersIcon className="w-4 h-4" />
+            {viewingUserFollowingList.length} Following
+          </button>
+        </div>
+
+        {/* Viewing user followers modal */}
+        <AnimatePresence>
+          {viewingUserFollowers && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 bg-foreground/40 flex items-center justify-center p-5"
+              onClick={() => setViewingUserFollowers(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                onClick={(e) => e.stopPropagation()}
+                className="w-full max-w-sm bg-card rounded-2xl p-5 shadow-lg max-h-[60vh] overflow-y-auto"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-bold text-foreground text-sm">Followers</h3>
+                  <button onClick={() => setViewingUserFollowers(false)}>
+                    <X className="w-4 h-4 text-muted-foreground" />
+                  </button>
+                </div>
+                {viewingUserFollowersList.map((u) => (
+                  <button
+                    key={u.id}
+                    onClick={() => {
+                      setViewingUserFollowers(false);
+                      if (u.id === currentUser.id) { setViewingUser(null); }
+                      else { setViewingUser(u); setViewingUserTab("current"); }
+                    }}
+                    className="w-full flex items-center gap-2 py-1.5 text-left hover:bg-muted/50 rounded-lg px-1 transition-colors"
+                  >
+                    <UserAvatar user={u} size="sm" />
+                    <span className="text-sm text-foreground">{u.name}</span>
+                  </button>
+                ))}
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Viewing user following modal */}
+        <AnimatePresence>
+          {viewingUserFollowing && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 bg-foreground/40 flex items-center justify-center p-5"
+              onClick={() => setViewingUserFollowing(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                onClick={(e) => e.stopPropagation()}
+                className="w-full max-w-sm bg-card rounded-2xl p-5 shadow-lg max-h-[60vh] overflow-y-auto"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-bold text-foreground text-sm">Following</h3>
+                  <button onClick={() => setViewingUserFollowing(false)}>
+                    <X className="w-4 h-4 text-muted-foreground" />
+                  </button>
+                </div>
+                {viewingUserFollowingList.map((u) => (
+                  <button
+                    key={u.id}
+                    onClick={() => {
+                      setViewingUserFollowing(false);
+                      if (u.id === currentUser.id) { setViewingUser(null); }
+                      else { setViewingUser(u); setViewingUserTab("current"); }
+                    }}
+                    className="w-full flex items-center gap-2 py-1.5 text-left hover:bg-muted/50 rounded-lg px-1 transition-colors"
+                  >
+                    <UserAvatar user={u} size="sm" />
+                    <span className="text-sm text-foreground">{u.name}</span>
+                  </button>
+                ))}
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {!isFollowed ? (
           <div className="text-center py-16">
@@ -272,17 +385,120 @@ const Profile = () => {
             </button>
           </div>
         ) : (
-          <div className="space-y-3">
-            {profileQuests.length === 0 ? (
-              <p className="text-center text-sm text-muted-foreground py-8">No quests to show</p>
-            ) : (
-              profileQuests.map((q, i) => <QuestCard key={q.id} quest={q} index={i} showGroup hideActions onViewProfile={(user) => {
-                if (user.id === viewingUser.id) return;
-                setViewingUser(user);
-              }} />)
-            )}
-          </div>
+          <>
+            {/* Tabs */}
+            <div className="flex bg-muted rounded-xl p-1 mb-5">
+              {(["current", "past"] as const).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setViewingUserTab(t)}
+                  className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all relative ${
+                    viewingUserTab === t ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
+                  }`}
+                >
+                  {t === "current" ? `Active (${viewingActive.length})` : `Completed (${viewingCompleted.length})`}
+                </button>
+              ))}
+            </div>
+
+            <div className="space-y-3">
+              {viewingShown.length === 0 ? (
+                <p className="text-center text-sm text-muted-foreground py-8">
+                  {viewingUserTab === "current" ? "No active quests" : "No completed quests"}
+                </p>
+              ) : (
+                viewingShown.map((q, i) => <QuestCard key={q.id} quest={q} index={i} showGroup hideActions onViewProfile={(user) => {
+                  if (user.id === viewingUser.id) return;
+                  if (user.id === currentUser.id) { setViewingUser(null); return; }
+                  setViewingUser(user);
+                  setViewingUserTab("current");
+                }} />)
+              )}
+            </div>
+          </>
         )}
+      </div>
+    );
+  }
+
+  // Edit profile full-page view
+  if (showEditProfile) {
+    return (
+      <div className="min-h-screen pb-24 px-5 pt-14">
+        <button
+          onClick={() => setShowEditProfile(false)}
+          className="text-sm text-primary font-semibold mb-4 flex items-center gap-1"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Profile
+        </button>
+
+        <h1 className="text-xl font-bold text-foreground mb-6">Edit Profile</h1>
+
+        <div className="space-y-4">
+          {/* Profile picture */}
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              {editProfilePic ? (
+                <img src={editProfilePic} alt="Profile" className="w-20 h-20 rounded-full object-cover" />
+              ) : (
+                <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-4xl">
+                  {currentUser.avatar}
+                </div>
+              )}
+              <button
+                onClick={() => profilePicRef.current?.click()}
+                className="absolute -bottom-1 -right-1 p-1.5 rounded-full bg-primary text-primary-foreground"
+              >
+                <Camera className="w-4 h-4" />
+              </button>
+              <input
+                ref={profilePicRef}
+                type="file"
+                accept="image/*"
+                onChange={handleProfilePicUpload}
+                className="hidden"
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">Tap camera to change photo</p>
+          </div>
+
+          <div>
+            <label className="text-sm font-semibold text-foreground mb-1.5 block">Name</label>
+            <input
+              value={editName}
+              onChange={(e) => setEditName(e.target.value)}
+              placeholder="Name"
+              className="w-full px-3 py-2.5 rounded-xl bg-muted border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+            />
+          </div>
+
+          <div>
+            <label className="text-sm font-semibold text-foreground mb-1.5 block">Bio</label>
+            <textarea
+              value={editBio}
+              onChange={(e) => setEditBio(e.target.value)}
+              placeholder="Bio"
+              rows={3}
+              className="w-full px-3 py-2.5 rounded-xl bg-muted border border-border text-sm text-foreground resize-none focus:outline-none focus:ring-2 focus:ring-primary/30"
+            />
+          </div>
+
+          <div className="flex gap-2 pt-2">
+            <button
+              onClick={handleSaveProfile}
+              className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm"
+            >
+              Save Changes
+            </button>
+            <button
+              onClick={() => setShowEditProfile(false)}
+              className="px-6 py-3 rounded-xl bg-muted text-muted-foreground font-semibold text-sm"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
@@ -311,76 +527,6 @@ const Profile = () => {
         </button>
       </div>
 
-      {/* Edit Profile Modal */}
-      <AnimatePresence>
-        {showEditProfile && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden mb-4"
-          >
-            <div className="p-4 rounded-2xl bg-card border border-border space-y-3">
-              <h3 className="font-bold text-foreground text-sm">Edit Profile</h3>
-
-              {/* Profile picture */}
-              <div className="flex items-center gap-4">
-                <div className="relative">
-                  {editProfilePic ? (
-                    <img src={editProfilePic} alt="Profile" className="w-16 h-16 rounded-full object-cover" />
-                  ) : (
-                    <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-3xl">
-                      {currentUser.avatar}
-                    </div>
-                  )}
-                  <button
-                    onClick={() => profilePicRef.current?.click()}
-                    className="absolute -bottom-1 -right-1 p-1.5 rounded-full bg-primary text-primary-foreground"
-                  >
-                    <Camera className="w-3 h-3" />
-                  </button>
-                  <input
-                    ref={profilePicRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleProfilePicUpload}
-                    className="hidden"
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground">Tap camera to change photo</p>
-              </div>
-
-              <input
-                value={editName}
-                onChange={(e) => setEditName(e.target.value)}
-                placeholder="Name"
-                className="w-full px-3 py-2.5 rounded-xl bg-muted border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-              />
-              <textarea
-                value={editBio}
-                onChange={(e) => setEditBio(e.target.value)}
-                placeholder="Bio"
-                rows={2}
-                className="w-full px-3 py-2.5 rounded-xl bg-muted border border-border text-sm text-foreground resize-none focus:outline-none focus:ring-2 focus:ring-primary/30"
-              />
-              <div className="flex gap-2">
-                <button
-                  onClick={handleSaveProfile}
-                  className="flex-1 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm"
-                >
-                  Save
-                </button>
-                <button
-                  onClick={() => setShowEditProfile(false)}
-                  className="px-4 py-2.5 rounded-xl bg-muted text-muted-foreground font-semibold text-sm"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Followers / Following row */}
       <div className="flex items-center gap-3 mb-4">
@@ -411,16 +557,23 @@ const Profile = () => {
         )}
       </div>
 
-      {/* Follow Requests Popup */}
+      {/* Follow Requests Modal Popup */}
       <AnimatePresence>
         {showRequests && (
           <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden mb-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-foreground/40 flex items-center justify-center p-5"
+            onClick={() => setShowRequests(false)}
           >
-            <div className="p-4 rounded-2xl bg-card border border-border space-y-2">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-sm bg-card rounded-2xl p-5 shadow-lg max-h-[60vh] overflow-y-auto space-y-2"
+            >
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-bold text-foreground text-sm">Follow Requests</h3>
                 <button onClick={() => setShowRequests(false)}>
@@ -455,21 +608,28 @@ const Profile = () => {
                   </div>
                 </div>
               ))}
-            </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Followers Popup — clickable */}
+      {/* Followers Modal Popup */}
       <AnimatePresence>
         {showFollowers && (
           <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden mb-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-foreground/40 flex items-center justify-center p-5"
+            onClick={() => setShowFollowers(false)}
           >
-            <div className="p-4 rounded-2xl bg-card border border-border">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-sm bg-card rounded-2xl p-5 shadow-lg max-h-[60vh] overflow-y-auto"
+            >
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-bold text-foreground text-sm">Followers</h3>
                 <button onClick={() => setShowFollowers(false)}>
@@ -489,21 +649,28 @@ const Profile = () => {
                   <span className="text-sm text-foreground">{u.name}</span>
                 </button>
               ))}
-            </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Following Popup — clickable */}
+      {/* Following Modal Popup */}
       <AnimatePresence>
         {showFollowing && (
           <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden mb-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-foreground/40 flex items-center justify-center p-5"
+            onClick={() => setShowFollowing(false)}
           >
-            <div className="p-4 rounded-2xl bg-card border border-border">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-sm bg-card rounded-2xl p-5 shadow-lg max-h-[60vh] overflow-y-auto"
+            >
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-bold text-foreground text-sm">Following</h3>
                 <button onClick={() => setShowFollowing(false)}>
@@ -523,7 +690,7 @@ const Profile = () => {
                   <span className="text-sm text-foreground">{u.name}</span>
                 </button>
               ))}
-            </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

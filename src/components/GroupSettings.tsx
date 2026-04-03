@@ -80,23 +80,8 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
 
   return (
     <>
-      <motion.div
-        initial={{ height: 0, opacity: 0 }}
-        animate={{ height: "auto", opacity: 1 }}
-        exit={{ height: 0, opacity: 0 }}
-        className="overflow-hidden mb-4"
-      >
-        <div className="p-4 rounded-2xl bg-card border border-border space-y-4">
-          {/* Header with close */}
-          <div className="flex items-center justify-between">
-            <h3 className="font-bold text-foreground text-sm">Edit Board</h3>
-            <button
-              onClick={onClose}
-              className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
+      <div className="space-y-4">
+        <h2 className="text-xl font-bold text-foreground">Edit Board</h2>
 
           {/* Edit name/emoji */}
           <div className="flex gap-2">
@@ -226,8 +211,7 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
             <LogOut className="w-4 h-4" />
             Leave Group
           </button>
-        </div>
-      </motion.div>
+      </div>
 
       {/* Owner leave dialog */}
       <AnimatePresence>

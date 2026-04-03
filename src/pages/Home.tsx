@@ -317,9 +317,16 @@ const Boards = () => {
               </button>
             </div>
 
-            {/* Settings panel */}
-            <AnimatePresence>
-              {showSettings && selectedGroupData && (
+            {/* Settings - full page */}
+            {showSettings && selectedGroupData && (
+              <div className="fixed inset-0 z-40 bg-background min-h-screen pb-24 px-5 pt-14 overflow-y-auto">
+                <button
+                  onClick={() => setShowSettings(false)}
+                  className="text-sm text-primary font-semibold mb-4 flex items-center gap-1"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  Back to Board
+                </button>
                 <GroupSettings
                   group={selectedGroupData}
                   onClose={() => setShowSettings(false)}
@@ -329,8 +336,8 @@ const Boards = () => {
                   }}
                   onViewProfile={handleViewProfile}
                 />
-              )}
-            </AnimatePresence>
+              </div>
+            )}
 
             {/* In-board new quest button */}
             <button
