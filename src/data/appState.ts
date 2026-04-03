@@ -217,6 +217,12 @@ export const useAppStore = create<AppState>((set) => ({
       };
     }),
 
+  unfollowUser: (userId) =>
+    set((s) => ({
+      following: s.following.filter((f) => f.id !== userId),
+      followers: s.followers.filter((f) => f.id !== userId),
+    })),
+
   addComment: (questId, comment) =>
     set((s) => ({
       quests: s.quests.map((q) =>
