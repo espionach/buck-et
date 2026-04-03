@@ -105,8 +105,8 @@ const Feed = () => {
 
   return (
     <div className="min-h-screen pb-24 px-5 pt-14">
-      <div className="flex items-center justify-between mb-1">
-        <h1 className="text-2xl font-bold text-foreground">Home</h1>
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-3xl font-bold text-foreground">Home</h1>
         <button
           onClick={() => setShowNotifications(true)}
           className="relative p-2 rounded-xl bg-muted text-muted-foreground hover:text-foreground transition-colors"
