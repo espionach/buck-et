@@ -484,18 +484,18 @@ const Profile = () => {
             />
           </div>
 
-          <div className="flex gap-2 pt-2">
-            <button
-              onClick={handleSaveProfile}
-              className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm"
-            >
-              Save Changes
-            </button>
+          <div className="flex justify-end gap-2 pt-2">
             <button
               onClick={() => setShowEditProfile(false)}
-              className="px-6 py-3 rounded-xl bg-muted text-muted-foreground font-semibold text-sm"
+              className="px-5 py-2.5 rounded-xl bg-muted text-muted-foreground font-semibold text-sm"
             >
               Cancel
+            </button>
+            <button
+              onClick={handleSaveProfile}
+              className="px-5 py-2.5 rounded-xl bg-primary text-primary-foreground font-bold text-sm"
+            >
+              Save
             </button>
           </div>
         </div>
