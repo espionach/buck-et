@@ -24,6 +24,7 @@ const Profile = () => {
     cleanupEmptyQuests,
   } = useAppStore();
   const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [tab, setTab] = useState<"current" | "past">(
     new URLSearchParams(location.search).get("tab") === "past" ? "past" : "current"
   );
