@@ -538,7 +538,7 @@ const Profile = () => {
               tab === t ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
             }`}
           >
-            {t === "current" ? "Upcoming" : "Past"}
+            {t === "current" ? `Active (${current.length})` : `Completed (${past.length})`}
           </button>
         ))}
       </div>
