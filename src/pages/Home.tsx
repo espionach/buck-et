@@ -151,13 +151,13 @@ const Boards = () => {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => acceptGroupInvitation(pendingInvitations[0].id)}
-                        className="p-2 rounded-xl bg-secondary text-secondary-foreground"
+                        className="p-2 rounded-full bg-secondary text-secondary-foreground"
                       >
                         <Check className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => declineGroupInvitation(pendingInvitations[0].id)}
-                        className="p-2 rounded-xl bg-muted text-muted-foreground"
+                        className="p-2 rounded-full bg-muted text-muted-foreground"
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -199,13 +199,13 @@ const Boards = () => {
                                 <div className="flex items-center gap-2">
                                   <button
                                     onClick={() => acceptGroupInvitation(inv.id)}
-                                    className="p-2 rounded-xl bg-secondary text-secondary-foreground"
+                                    className="p-2 rounded-full bg-secondary text-secondary-foreground"
                                   >
                                     <Check className="w-4 h-4" />
                                   </button>
                                   <button
                                     onClick={() => declineGroupInvitation(inv.id)}
-                                    className="p-2 rounded-xl bg-muted text-muted-foreground"
+                                    className="p-2 rounded-full bg-muted text-muted-foreground"
                                   >
                                     <X className="w-4 h-4" />
                                   </button>
@@ -281,7 +281,7 @@ const Boards = () => {
               </div>
               <button
                 onClick={handleOpenSettings}
-                className="p-2 rounded-xl bg-muted text-muted-foreground"
+                className="p-2 rounded-full bg-muted text-muted-foreground"
               >
                 <Settings className="w-5 h-5" />
               </button>
