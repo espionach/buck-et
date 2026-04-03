@@ -1,7 +1,7 @@
 import { useAppStore } from "@/data/appState";
 import QuestCard from "@/components/QuestCard";
 import UserAvatar from "@/components/UserAvatar";
-import { ArrowLeft, X, Users as UsersIcon, Lock, UserPlus, Clock } from "lucide-react";
+import { ArrowLeft, X, Users as UsersIcon, Lock, UserPlus, Clock, UserMinus } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { User } from "@/data/mockData";
