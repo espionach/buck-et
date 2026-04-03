@@ -211,8 +211,7 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
             <LogOut className="w-4 h-4" />
             Leave Group
           </button>
-        </div>
-      </motion.div>
+      </div>
 
       {/* Owner leave dialog */}
       <AnimatePresence>
