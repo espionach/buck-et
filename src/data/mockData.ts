@@ -384,9 +384,9 @@ export interface TransferRequest {
 
 export interface AppNotification {
   id: string;
-  type: "transfer_quest" | "transfer_group" | "new_comment" | "new_participant";
+  type: "transfer_quest" | "transfer_group" | "new_comment" | "new_participant" | "follow_request";
   message: string;
-  entityId: string;
+  entityId?: string;
   groupId?: string;
   commentId?: string;
   fromUser: User;

@@ -160,10 +160,23 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
           <Lock className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
           <p className="font-bold text-foreground mb-1">Private Account</p>
           <p className="text-sm text-muted-foreground mb-4">Follow to see their quests</p>
-          <button className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm flex items-center gap-2 mx-auto">
-            <UserPlus className="w-4 h-4" />
-            Request to Follow
-          </button>
+          {hasRequested ? (
+            <button
+              disabled
+              className="px-6 py-2.5 rounded-xl bg-muted text-muted-foreground font-semibold text-sm flex items-center gap-2 mx-auto cursor-default"
+            >
+              <Clock className="w-4 h-4" />
+              Request Sent
+            </button>
+          ) : (
+            <button
+              onClick={() => sendFollowRequest(user)}
+              className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm flex items-center gap-2 mx-auto"
+            >
+              <UserPlus className="w-4 h-4" />
+              Request to Follow
+            </button>
+          )}
         </div>
       ) : (
         <>
