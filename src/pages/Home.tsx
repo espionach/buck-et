@@ -310,21 +310,45 @@ const Boards = () => {
               </div>
             )}
 
+            {/* Active / Completed tabs */}
+            <div className="flex bg-muted rounded-xl p-1 mb-4">
+              {(["active", "completed"] as const).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setBoardTab(t)}
+                  className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all relative ${
+                    boardTab === t ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
+                  }`}
+                >
+                  {t === "active" ? `Active (${activeGroupQuests.length})` : `Completed (${completedGroupQuests.length})`}
+                </button>
+              ))}
+            </div>
+
             {/* In-board new quest button */}
-            <button
-              onClick={() => navigate(`/create?groupId=${selectedGroup}`)}
-              className="w-full flex items-center justify-center gap-2 py-3 mb-4 rounded-xl bg-primary/10 text-primary font-semibold text-sm active:scale-[0.98] transition-transform"
-            >
-              <Plus className="w-4 h-4" />
-              New Quest for this board
-            </button>
+            {boardTab === "active" && (
+              <button
+                onClick={() => navigate(`/create?groupId=${selectedGroup}`)}
+                className="w-full flex items-center justify-center gap-2 py-3 mb-4 rounded-xl bg-primary/10 text-primary font-semibold text-sm active:scale-[0.98] transition-transform"
+              >
+                <Plus className="w-4 h-4" />
+                New Quest for this board
+              </button>
+            )}
 
             {/* Quest list */}
-            <div className="space-y-3">
+            <motion.div
+              key={boardTab}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-3"
+            >
               {groupQuests.length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
-                  <p className="text-lg mb-1">No active quests yet</p>
-                  <p className="text-sm">Start one for the crew! 🚀</p>
+                  <p className="text-4xl mb-2">{boardTab === "active" ? "🗺️" : "📜"}</p>
+                  <p className="text-sm">
+                    {boardTab === "active" ? "No active quests yet — start one! 🚀" : "No completed quests yet"}
+                  </p>
                 </div>
               ) : (
                  groupQuests.map((q, i) => (
@@ -332,15 +356,16 @@ const Boards = () => {
                     key={q.id}
                     quest={q}
                     index={i}
-                    onMarkDone={() => navigate("/profile?tab=past")}
-                    onMarkUndone={() => navigate("/profile?tab=current")}
+                    hideActions={selectedGroupData?.ownerId !== currentUser.id}
+                    onMarkDone={selectedGroupData?.ownerId === currentUser.id ? () => setBoardTab("completed") : undefined}
+                    onMarkUndone={selectedGroupData?.ownerId === currentUser.id ? () => setBoardTab("active") : undefined}
                     autoOpenComments={q.id === activeHighlight && !!activeCommentId}
                     highlightCommentId={q.id === activeHighlight ? (activeCommentId || undefined) : undefined}
                     onViewProfile={(user) => setViewingProfile(user)}
                   />
                 ))
               )}
-            </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
