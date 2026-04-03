@@ -5,8 +5,8 @@ import { Edit, X, Check, Users as UsersIcon, UserPlus, Trash2, ImagePlus, Camera
 import UserProfileView from "@/components/UserProfileView";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Quest, User } from "@/data/mockData";
-import { useLocation } from "react-router-dom";
+import { Quest, User, friends, nonFollowedUsers } from "@/data/mockData";
+import { useLocation, useSearchParams } from "react-router-dom";
 
 const Profile = () => {
   const {
