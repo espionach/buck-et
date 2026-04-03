@@ -30,38 +30,9 @@ const GroupCard = ({ group, onClick, index }: GroupCardProps) => {
       transition={{ delay: index * 0.08 }}
       className="w-full h-full"
     >
-      {/* Transfer request banner */}
-      {pendingTransfer && (
-        <div className="mb-1 p-2.5 rounded-t-2xl bg-primary/10 border border-primary/20 border-b-0">
-          <p className="text-[10px] text-foreground font-medium mb-1.5">
-            {pendingTransfer.fromUser.name} wants to transfer this board to you
-          </p>
-          <div className="flex gap-1.5">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                acceptTransfer(pendingTransfer.id);
-              }}
-              className="flex items-center gap-1 px-2 py-1 rounded-lg bg-secondary text-secondary-foreground text-[10px] font-semibold"
-            >
-              <Check className="w-3 h-3" /> Accept
-            </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                declineTransfer(pendingTransfer.id);
-              }}
-              className="flex items-center gap-1 px-2 py-1 rounded-lg bg-muted text-muted-foreground text-[10px] font-semibold"
-            >
-              <X className="w-3 h-3" /> Decline
-            </button>
-          </div>
-        </div>
-      )}
-
       <button
         onClick={onClick}
-        className={`w-full h-full text-left p-5 ${pendingTransfer ? "rounded-b-2xl rounded-t-none" : "rounded-2xl"} bg-gradient-to-br ${gradients[index % gradients.length]} border border-border/50 active:scale-[0.98] transition-transform flex flex-col`}
+        className={`w-full h-full text-left p-5 ${pendingTransfer ? "rounded-t-2xl rounded-b-none" : "rounded-2xl"} bg-gradient-to-br ${gradients[index % gradients.length]} border border-border/50 active:scale-[0.98] transition-transform flex flex-col`}
       >
         <div className="flex items-start justify-between mb-3">
           <span className="text-3xl">{group.emoji}</span>
@@ -91,6 +62,35 @@ const GroupCard = ({ group, onClick, index }: GroupCardProps) => {
           )}
         </div>
       </button>
+
+      {/* Transfer request banner - below card */}
+      {pendingTransfer && (
+        <div className="p-2.5 rounded-b-2xl bg-primary/10 border border-primary/20 border-t-0">
+          <p className="text-[10px] text-foreground font-medium mb-1.5">
+            {pendingTransfer.fromUser.name} wants to transfer this board to you
+          </p>
+          <div className="flex gap-1.5">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                acceptTransfer(pendingTransfer.id);
+              }}
+              className="flex items-center gap-1 px-2 py-1 rounded-lg bg-secondary text-secondary-foreground text-[10px] font-semibold"
+            >
+              <Check className="w-3 h-3" /> Accept
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                declineTransfer(pendingTransfer.id);
+              }}
+              className="flex items-center gap-1 px-2 py-1 rounded-lg bg-muted text-muted-foreground text-[10px] font-semibold"
+            >
+              <X className="w-3 h-3" /> Decline
+            </button>
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 };
