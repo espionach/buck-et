@@ -1,4 +1,4 @@
-import { Quest, currentUser, Comment } from "@/data/mockData";
+import { Quest, currentUser, Comment, User } from "@/data/mockData";
 import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
 import OwnerLeaveDialog from "@/components/OwnerLeaveDialog";
