@@ -67,6 +67,22 @@ const Profile = () => {
     else if (urlTab === "current") setTab("current");
   }, [location.search]);
 
+  // Handle viewUser query param from QuestDetail
+  useEffect(() => {
+    const viewUserId = searchParams.get("viewUser");
+    if (viewUserId && viewUserId !== currentUser.id) {
+      const allUsers = [...friends, ...nonFollowedUsers];
+      const found = allUsers.find((u) => u.id === viewUserId);
+      if (found) {
+        setViewingUser(found);
+        // Clean up the param
+        const newParams = new URLSearchParams(searchParams);
+        newParams.delete("viewUser");
+        setSearchParams(newParams, { replace: true });
+      }
+    }
+  }, [searchParams]);
+
   // Cleanup empty quests on mount
   useEffect(() => {
     cleanupEmptyQuests();
