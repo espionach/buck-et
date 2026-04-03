@@ -694,31 +694,6 @@ const Profile = () => {
           </motion.div>
         )}
       </AnimatePresence>
-          >
-            <div className="p-4 rounded-2xl bg-card border border-border">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-bold text-foreground text-sm">Following</h3>
-                <button onClick={() => setShowFollowing(false)}>
-                  <X className="w-4 h-4 text-muted-foreground" />
-                </button>
-              </div>
-              {following.map((u) => (
-                <button
-                  key={u.id}
-                  onClick={() => {
-                    setViewingUser(u);
-                    setShowFollowing(false);
-                  }}
-                  className="w-full flex items-center gap-2 py-1.5 text-left hover:bg-muted/50 rounded-lg px-1 transition-colors"
-                >
-                  <UserAvatar user={u} size="sm" />
-                  <span className="text-sm text-foreground">{u.name}</span>
-                </button>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Tabs */}
       <div className="flex bg-muted rounded-xl p-1 mb-5">
