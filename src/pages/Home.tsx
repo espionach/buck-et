@@ -26,6 +26,7 @@ const Boards = () => {
   const [viewingProfile, setViewingProfile] = useState<User | null>(null);
   const [activeHighlight, setActiveHighlight] = useState<string | null>(highlightQuestId);
   const [activeCommentId, setActiveCommentId] = useState<string | null>(highlightCommentId);
+  const [boardTab, setBoardTab] = useState<"active" | "completed">("active");
 
   useEffect(() => {
     if (openGroup) {
