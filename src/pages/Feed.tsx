@@ -156,7 +156,7 @@ const Feed = () => {
       {searchMode ? (
         <div>
           {/* Toggle */}
-          <div className="flex bg-muted rounded-xl p-1 mb-4">
+          <div className="flex bg-muted rounded-2xl p-1 mb-4">
             {(["quests", "people"] as const).map((t) => (
               <button
                 key={t}

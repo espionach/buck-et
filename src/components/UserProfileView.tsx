@@ -167,7 +167,7 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
       ) : (
         <>
           {/* Tabs */}
-          <div className="flex bg-muted rounded-xl p-1 mb-5">
+          <div className="flex bg-muted rounded-2xl p-1 mb-5">
             {(["current", "past"] as const).map((t) => (
               <button
                 key={t}
