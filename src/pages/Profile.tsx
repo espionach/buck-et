@@ -276,7 +276,10 @@ const Profile = () => {
             {profileQuests.length === 0 ? (
               <p className="text-center text-sm text-muted-foreground py-8">No quests to show</p>
             ) : (
-              profileQuests.map((q, i) => <QuestCard key={q.id} quest={q} index={i} showGroup />)
+              profileQuests.map((q, i) => <QuestCard key={q.id} quest={q} index={i} showGroup hideActions onViewProfile={(user) => {
+                if (user.id === viewingUser.id) return;
+                setViewingUser(user);
+              }} />)
             )}
           </div>
         )}
