@@ -20,6 +20,7 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
   const [showFollowing, setShowFollowing] = useState(false);
 
   const isFollowed = following.some((f) => f.id === user.id);
+  const hasRequested = sentFollowRequests.includes(user.id);
 
   const profileQuests = quests.filter(
     (q) =>
