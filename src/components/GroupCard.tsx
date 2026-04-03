@@ -28,11 +28,11 @@ const GroupCard = ({ group, onClick, index }: GroupCardProps) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.08 }}
-      className="w-full h-full"
+      className="w-full"
     >
       <button
         onClick={onClick}
-        className={`w-full h-full text-left p-5 ${pendingTransfer ? "rounded-t-2xl rounded-b-none" : "rounded-2xl"} bg-gradient-to-br ${gradients[index % gradients.length]} border border-border/50 active:scale-[0.98] transition-transform flex flex-col`}
+        className={`w-full text-left p-5 ${pendingTransfer ? "rounded-t-2xl rounded-b-none" : "rounded-2xl"} bg-gradient-to-br ${gradients[index % gradients.length]} border border-border/50 active:scale-[0.98] transition-transform flex flex-col`}
       >
         <div className="flex items-start justify-between mb-3">
           <span className="text-3xl">{group.emoji}</span>
