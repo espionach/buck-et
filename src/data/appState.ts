@@ -46,6 +46,7 @@ interface AppState {
   declineGroupInvitation: (invitationId: string) => void;
   acceptFollowRequest: (requestId: string) => void;
   declineFollowRequest: (requestId: string) => void;
+  sendFollowRequest: (toUser: User) => void;
   addComment: (questId: string, comment: Comment) => void;
   updateQuest: (questId: string, updates: Partial<Quest>) => void;
   deleteQuest: (questId: string) => void;
