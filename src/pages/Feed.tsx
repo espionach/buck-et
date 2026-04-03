@@ -119,7 +119,7 @@ const Feed = () => {
           )}
         </button>
       </div>
-      <p className="text-sm text-muted-foreground mb-5">See what your friends are up to</p>
+      
 
       {/* Search */}
       <div className="relative mb-3">

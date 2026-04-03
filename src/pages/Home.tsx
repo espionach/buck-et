@@ -106,7 +106,6 @@ const Boards = () => {
     <div className="min-h-screen pb-24 px-5 pt-14">
       {/* Header */}
       <div className="mb-6">
-        <p className="text-sm text-muted-foreground">Hey, {currentUser.name.split(" ")[0]} 👋</p>
         <h1 className="text-2xl font-bold text-foreground">Your Boards</h1>
       </div>
 
