@@ -28,6 +28,7 @@ interface AppState {
   followers: User[];
   groupInvitations: GroupInvitation[];
   followRequests: FollowRequest[];
+  sentFollowRequests: string[]; // user IDs we've sent requests to
   transferRequests: TransferRequest[];
   notifications: AppNotification[];
   currentUser: User;
@@ -45,6 +46,7 @@ interface AppState {
   declineGroupInvitation: (invitationId: string) => void;
   acceptFollowRequest: (requestId: string) => void;
   declineFollowRequest: (requestId: string) => void;
+  sendFollowRequest: (toUser: User) => void;
   addComment: (questId: string, comment: Comment) => void;
   updateQuest: (questId: string, updates: Partial<Quest>) => void;
   deleteQuest: (questId: string) => void;
@@ -80,6 +82,7 @@ export const useAppStore = create<AppState>((set) => ({
   followers: [...friends.slice(0, 4)],
   groupInvitations: initialInvitations,
   followRequests: initialFollowRequests,
+  sentFollowRequests: [],
   transferRequests: initialTransfers,
   notifications: initialNotifications,
   currentUser: currentUser,
@@ -185,6 +188,31 @@ export const useAppStore = create<AppState>((set) => ({
     set((s) => ({
       followRequests: s.followRequests.filter((r) => r.id !== requestId),
     })),
+
+  sendFollowRequest: (toUser) =>
+    set((s) => {
+      if (s.sentFollowRequests.includes(toUser.id)) return s;
+      // Since this is a mock, we simulate the other user receiving a follow request
+      // by adding it to followRequests (as if we are the "other user" receiving it)
+      // For demo purposes, we add the request to the store
+      const newRequest: FollowRequest = {
+        id: `fr${Date.now()}`,
+        from: s.currentUser,
+        status: "pending",
+      };
+      const notification: AppNotification = {
+        id: `n${Date.now()}`,
+        type: "follow_request",
+        message: `${s.currentUser.name} requested to follow ${toUser.name}`,
+        fromUser: s.currentUser,
+        read: false,
+        createdAt: new Date().toISOString().split("T")[0],
+      };
+      return {
+        sentFollowRequests: [...s.sentFollowRequests, toUser.id],
+        notifications: [notification, ...s.notifications],
+      };
+    }),
 
   addComment: (questId, comment) =>
     set((s) => ({

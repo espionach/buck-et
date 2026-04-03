@@ -1,7 +1,7 @@
 import { useAppStore } from "@/data/appState";
 import QuestCard from "@/components/QuestCard";
 import UserAvatar from "@/components/UserAvatar";
-import { ArrowLeft, X, Users as UsersIcon, Lock, UserPlus } from "lucide-react";
+import { ArrowLeft, X, Users as UsersIcon, Lock, UserPlus, Clock } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { User } from "@/data/mockData";
@@ -14,12 +14,13 @@ interface UserProfileViewProps {
 }
 
 const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfileViewProps) => {
-  const { quests, following, followers, currentUser } = useAppStore();
+  const { quests, following, followers, currentUser, sentFollowRequests, sendFollowRequest } = useAppStore();
   const [tab, setTab] = useState<"current" | "past">("current");
   const [showFollowers, setShowFollowers] = useState(false);
   const [showFollowing, setShowFollowing] = useState(false);
 
   const isFollowed = following.some((f) => f.id === user.id);
+  const hasRequested = sentFollowRequests.includes(user.id);
 
   const profileQuests = quests.filter(
     (q) =>
@@ -159,10 +160,23 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
           <Lock className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
           <p className="font-bold text-foreground mb-1">Private Account</p>
           <p className="text-sm text-muted-foreground mb-4">Follow to see their quests</p>
-          <button className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm flex items-center gap-2 mx-auto">
-            <UserPlus className="w-4 h-4" />
-            Request to Follow
-          </button>
+          {hasRequested ? (
+            <button
+              disabled
+              className="px-6 py-2.5 rounded-xl bg-muted text-muted-foreground font-semibold text-sm flex items-center gap-2 mx-auto cursor-default"
+            >
+              <Clock className="w-4 h-4" />
+              Request Sent
+            </button>
+          ) : (
+            <button
+              onClick={() => sendFollowRequest(user)}
+              className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm flex items-center gap-2 mx-auto"
+            >
+              <UserPlus className="w-4 h-4" />
+              Request to Follow
+            </button>
+          )}
         </div>
       ) : (
         <>
