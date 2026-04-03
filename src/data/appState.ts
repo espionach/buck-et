@@ -47,6 +47,7 @@ interface AppState {
   acceptFollowRequest: (requestId: string) => void;
   declineFollowRequest: (requestId: string) => void;
   sendFollowRequest: (toUser: User) => void;
+  unfollowUser: (userId: string) => void;
   addComment: (questId: string, comment: Comment) => void;
   updateQuest: (questId: string, updates: Partial<Quest>) => void;
   deleteQuest: (questId: string) => void;
@@ -215,6 +216,12 @@ export const useAppStore = create<AppState>((set) => ({
         notifications: [notification, ...s.notifications],
       };
     }),
+
+  unfollowUser: (userId) =>
+    set((s) => ({
+      following: s.following.filter((f) => f.id !== userId),
+      followers: s.followers.filter((f) => f.id !== userId),
+    })),
 
   addComment: (questId, comment) =>
     set((s) => ({

@@ -1,7 +1,7 @@
 import { useAppStore } from "@/data/appState";
 import QuestCard from "@/components/QuestCard";
 import UserAvatar from "@/components/UserAvatar";
-import { ArrowLeft, X, Users as UsersIcon, Lock, UserPlus, Clock } from "lucide-react";
+import { ArrowLeft, X, Users as UsersIcon, Lock, UserPlus, Clock, UserMinus } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { User } from "@/data/mockData";
@@ -14,7 +14,7 @@ interface UserProfileViewProps {
 }
 
 const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfileViewProps) => {
-  const { quests, following, followers, currentUser, sentFollowRequests, sendFollowRequest } = useAppStore();
+  const { quests, following, followers, currentUser, sentFollowRequests, sendFollowRequest, unfollowUser } = useAppStore();
   const [tab, setTab] = useState<"current" | "past">("current");
   const [showFollowers, setShowFollowers] = useState(false);
   const [showFollowing, setShowFollowing] = useState(false);
@@ -52,6 +52,19 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
           <p className="text-sm text-muted-foreground">{user.bio}</p>
         </div>
       </div>
+
+      {/* Unfollow button for followed users */}
+      {isFollowed && (
+        <div className="mb-4">
+          <button
+            onClick={() => unfollowUser(user.id)}
+            className="px-4 py-2 rounded-xl bg-muted text-muted-foreground font-semibold text-sm flex items-center gap-2"
+          >
+            <UserMinus className="w-4 h-4" />
+            Unfollow
+          </button>
+        </div>
+      )}
 
       {/* Follower/Following row */}
       <div className="flex items-center gap-3 mb-4">
