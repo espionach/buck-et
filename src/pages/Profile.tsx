@@ -382,27 +382,7 @@ const Profile = () => {
         )}
       </AnimatePresence>
 
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-3 mb-4">
-        {[
-          { label: "Active", value: current.length, onClick: undefined },
-          { label: "Completed", value: past.length, onClick: undefined },
-          { label: "Following", value: following.length, onClick: () => setShowFollowing(true) },
-        ].map((stat) => (
-          <button
-            key={stat.label}
-            onClick={stat.onClick}
-            className="bg-card rounded-xl p-3 text-center border border-border/50"
-          >
-            <p className="text-lg font-bold text-foreground">{stat.value}</p>
-            <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
-              {stat.label}
-            </p>
-          </button>
-        ))}
-      </div>
-
-      {/* Followers row */}
+      {/* Followers / Following row */}
       <div className="flex items-center gap-3 mb-4">
         <button
           onClick={() => setShowFollowers(true)}
@@ -411,13 +391,22 @@ const Profile = () => {
           <UsersIcon className="w-4 h-4" />
           {followers.length} Followers
         </button>
+        <button
+          onClick={() => setShowFollowing(true)}
+          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-card border border-border/50 text-sm font-semibold text-foreground"
+        >
+          <UsersIcon className="w-4 h-4" />
+          {following.length} Following
+        </button>
         {followRequests.length > 0 && (
           <button
             onClick={() => setShowRequests(true)}
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-primary/10 text-primary text-sm font-semibold"
+            className="relative p-2.5 rounded-xl bg-primary/10 text-primary"
           >
             <UserPlus className="w-4 h-4" />
-            {followRequests.length} Requests
+            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
+              {followRequests.length}
+            </span>
           </button>
         )}
       </div>
@@ -549,7 +538,7 @@ const Profile = () => {
               tab === t ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
             }`}
           >
-            {t === "current" ? "Upcoming" : "Past"}
+            {t === "current" ? `Active (${current.length})` : `Completed (${past.length})`}
           </button>
         ))}
       </div>
@@ -565,7 +554,7 @@ const Profile = () => {
           <div className="text-center py-12 text-muted-foreground">
             <p className="text-4xl mb-2">{tab === "current" ? "🗺️" : "📜"}</p>
             <p className="text-sm">
-              {tab === "current" ? "No upcoming quests — go start one!" : "No completed quests yet"}
+              {tab === "current" ? "No active quests — go start one!" : "No completed quests yet"}
             </p>
           </div>
         ) : (
