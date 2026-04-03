@@ -276,7 +276,7 @@ const Boards = () => {
                 <div>
                   <h2 className="text-xl font-bold text-foreground">{selectedGroupData?.name}</h2>
                   <p className="text-sm text-muted-foreground">
-                    {selectedGroupData?.members.length} members • {groupQuests.length} active
+                    {selectedGroupData?.members.length} members
                   </p>
                 </div>
               </div>
