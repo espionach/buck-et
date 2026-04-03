@@ -14,13 +14,17 @@ const BottomNav = () => {
 
   return (
     <>
-      {/* Floating Action Button */}
-      <button
-        onClick={() => navigate("/create")}
-        className="fixed bottom-20 right-4 z-50 flex items-center justify-center w-14 h-14 rounded-full bg-primary shadow-lg shadow-primary/30 active:scale-95 transition-transform"
-      >
-        <Plus className="w-7 h-7 text-primary-foreground" />
-      </button>
+      {/* Floating Action Button — right-aligned within max-w-md container */}
+      <div className="fixed bottom-20 z-50 w-full max-w-md left-1/2 -translate-x-1/2 px-5 pointer-events-none">
+        <div className="flex justify-end">
+          <button
+            onClick={() => navigate("/create")}
+            className="pointer-events-auto flex items-center justify-center w-14 h-14 rounded-full bg-primary shadow-lg shadow-primary/30 active:scale-95 transition-transform"
+          >
+            <Plus className="w-7 h-7 text-primary-foreground" />
+          </button>
+        </div>
+      </div>
 
       <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-xl border-t border-border safe-bottom">
         <div className="flex items-center justify-around h-16 max-w-md mx-auto px-2">
