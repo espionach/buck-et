@@ -2,6 +2,7 @@ import { useAppStore } from "@/data/appState";
 import QuestCard from "@/components/QuestCard";
 import UserAvatar from "@/components/UserAvatar";
 import { Edit, X, Check, Users as UsersIcon, UserPlus, Trash2, ImagePlus, Camera, Link as LinkIcon, Plus, ArrowLeft } from "lucide-react";
+import UserProfileView from "@/components/UserProfileView";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Quest, User } from "@/data/mockData";
@@ -242,182 +243,13 @@ const Profile = () => {
   const isFollowingUser = (user: User) => following.some((f) => f.id === user.id);
 
   if (viewingUser) {
-    const profileQuests = quests.filter(
-      (q) =>
-        q.createdBy.id === viewingUser.id ||
-        q.participants.some((p) => p.id === viewingUser.id)
-    );
-    const isFollowed = isFollowingUser(viewingUser);
-    const viewingActive = profileQuests.filter((q) => !q.isDone);
-    const viewingCompleted = profileQuests.filter((q) => q.isDone);
-    const viewingShown = viewingUserTab === "current" ? viewingActive : viewingCompleted;
-
-    // Mock follower/following data for other users (use their friends list from mock)
-    const viewingUserFollowersList = followers.filter((f) => f.id !== viewingUser.id).slice(0, 3);
-    const viewingUserFollowingList = following.filter((f) => f.id !== viewingUser.id).slice(0, 4);
-
     return (
-      <div className="min-h-screen pb-24 px-5 pt-14">
-        <button
-          onClick={() => { setViewingUser(null); setViewingUserTab("current"); }}
-          className="text-sm text-primary font-semibold mb-4 flex items-center gap-1"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Profile
-        </button>
-
-        <div className="flex items-center gap-4 mb-4">
-          <UserAvatar user={viewingUser} size="lg" />
-          <div>
-            <h2 className="text-lg font-bold text-foreground">{viewingUser.name}</h2>
-            <p className="text-sm text-muted-foreground">{viewingUser.bio}</p>
-          </div>
-        </div>
-
-        {/* Follower/Following row */}
-        <div className="flex items-center gap-3 mb-4">
-          <button
-            onClick={() => setViewingUserFollowers(true)}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-card border border-border/50 text-sm font-semibold text-foreground"
-          >
-            <UsersIcon className="w-4 h-4" />
-            {viewingUserFollowersList.length} Followers
-          </button>
-          <button
-            onClick={() => setViewingUserFollowing(true)}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-card border border-border/50 text-sm font-semibold text-foreground"
-          >
-            <UsersIcon className="w-4 h-4" />
-            {viewingUserFollowingList.length} Following
-          </button>
-        </div>
-
-        {/* Viewing user followers modal */}
-        <AnimatePresence>
-          {viewingUserFollowers && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 bg-foreground/40 flex items-center justify-center p-5"
-              onClick={() => setViewingUserFollowers(false)}
-            >
-              <motion.div
-                initial={{ scale: 0.95, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.95, opacity: 0 }}
-                onClick={(e) => e.stopPropagation()}
-                className="w-full max-w-sm bg-card rounded-2xl p-5 shadow-lg max-h-[60vh] overflow-y-auto"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-bold text-foreground text-sm">Followers</h3>
-                  <button onClick={() => setViewingUserFollowers(false)}>
-                    <X className="w-4 h-4 text-muted-foreground" />
-                  </button>
-                </div>
-                {viewingUserFollowersList.map((u) => (
-                  <button
-                    key={u.id}
-                    onClick={() => {
-                      setViewingUserFollowers(false);
-                      if (u.id === currentUser.id) { setViewingUser(null); }
-                      else { setViewingUser(u); setViewingUserTab("current"); }
-                    }}
-                    className="w-full flex items-center gap-2 py-1.5 text-left hover:bg-muted/50 rounded-lg px-1 transition-colors"
-                  >
-                    <UserAvatar user={u} size="sm" />
-                    <span className="text-sm text-foreground">{u.name}</span>
-                  </button>
-                ))}
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Viewing user following modal */}
-        <AnimatePresence>
-          {viewingUserFollowing && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 bg-foreground/40 flex items-center justify-center p-5"
-              onClick={() => setViewingUserFollowing(false)}
-            >
-              <motion.div
-                initial={{ scale: 0.95, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.95, opacity: 0 }}
-                onClick={(e) => e.stopPropagation()}
-                className="w-full max-w-sm bg-card rounded-2xl p-5 shadow-lg max-h-[60vh] overflow-y-auto"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-bold text-foreground text-sm">Following</h3>
-                  <button onClick={() => setViewingUserFollowing(false)}>
-                    <X className="w-4 h-4 text-muted-foreground" />
-                  </button>
-                </div>
-                {viewingUserFollowingList.map((u) => (
-                  <button
-                    key={u.id}
-                    onClick={() => {
-                      setViewingUserFollowing(false);
-                      if (u.id === currentUser.id) { setViewingUser(null); }
-                      else { setViewingUser(u); setViewingUserTab("current"); }
-                    }}
-                    className="w-full flex items-center gap-2 py-1.5 text-left hover:bg-muted/50 rounded-lg px-1 transition-colors"
-                  >
-                    <UserAvatar user={u} size="sm" />
-                    <span className="text-sm text-foreground">{u.name}</span>
-                  </button>
-                ))}
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {!isFollowed ? (
-          <div className="text-center py-16">
-            <p className="font-bold text-foreground mb-1">Private Account</p>
-            <p className="text-sm text-muted-foreground mb-4">Follow to see their quests</p>
-            <button className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm mx-auto">
-              Request to Follow
-            </button>
-          </div>
-        ) : (
-          <>
-            {/* Tabs */}
-            <div className="flex bg-muted rounded-xl p-1 mb-5">
-              {(["current", "past"] as const).map((t) => (
-                <button
-                  key={t}
-                  onClick={() => setViewingUserTab(t)}
-                  className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all relative ${
-                    viewingUserTab === t ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
-                  }`}
-                >
-                  {t === "current" ? `Active (${viewingActive.length})` : `Completed (${viewingCompleted.length})`}
-                </button>
-              ))}
-            </div>
-
-            <div className="space-y-3">
-              {viewingShown.length === 0 ? (
-                <p className="text-center text-sm text-muted-foreground py-8">
-                  {viewingUserTab === "current" ? "No active quests" : "No completed quests"}
-                </p>
-              ) : (
-                viewingShown.map((q, i) => <QuestCard key={q.id} quest={q} index={i} showGroup hideActions onViewProfile={(user) => {
-                  if (user.id === viewingUser.id) return;
-                  if (user.id === currentUser.id) { setViewingUser(null); return; }
-                  setViewingUser(user);
-                  setViewingUserTab("current");
-                }} />)
-              )}
-            </div>
-          </>
-        )}
-      </div>
+      <UserProfileView
+        user={viewingUser}
+        backLabel="Back to Profile"
+        onBack={() => { setViewingUser(null); setViewingUserTab("current"); }}
+        onViewProfile={(user) => { setViewingUser(user); setViewingUserTab("current"); }}
+      />
     );
   }
 
