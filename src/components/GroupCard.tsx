@@ -106,7 +106,7 @@ const GroupCard = ({ group, onClick, index }: GroupCardProps) => {
                     declineTransfer(pendingTransfer.id);
                     setShowTransferPopup(false);
                   }}
-                  className="flex-1 py-2.5 rounded-xl bg-muted text-muted-foreground font-semibold text-sm"
+                  className="flex-1 py-2.5 rounded-2xl bg-muted text-muted-foreground font-semibold text-sm"
                 >
                   Decline
                 </button>
