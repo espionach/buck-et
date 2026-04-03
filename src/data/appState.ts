@@ -178,9 +178,11 @@ export const useAppStore = create<AppState>((set) => ({
     set((s) => {
       const req = s.followRequests.find((r) => r.id === requestId);
       if (!req) return s;
+      const alreadyFollowing = s.following.some((f) => f.id === req.from.id);
       return {
         followRequests: s.followRequests.filter((r) => r.id !== requestId),
         followers: [...s.followers, req.from],
+        following: alreadyFollowing ? s.following : [...s.following, req.from],
       };
     }),
 
