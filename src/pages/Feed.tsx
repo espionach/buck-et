@@ -121,15 +121,18 @@ const Feed = () => {
             </button>
           </div>
         ) : (
-          <div className="space-y-3">
-            {profileQuests.length === 0 ? (
-              <p className="text-center text-sm text-muted-foreground py-8">No quests to show</p>
-            ) : (
-              profileQuests.map((q, i) => (
-                <QuestCard key={q.id} quest={q} index={i} showGroup />
-              ))
-            )}
-          </div>
+           <div className="space-y-3">
+             {profileQuests.length === 0 ? (
+               <p className="text-center text-sm text-muted-foreground py-8">No quests to show</p>
+             ) : (
+               profileQuests.map((q, i) => (
+                 <QuestCard key={q.id} quest={q} index={i} showGroup hideActions onViewProfile={(user) => {
+                   if (user.id === selectedProfile.id) return;
+                   setSelectedProfile(user);
+                 }} />
+               ))
+             )}
+           </div>
         )}
       </div>
     );
