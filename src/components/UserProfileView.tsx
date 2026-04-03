@@ -85,7 +85,7 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-sm bg-card rounded-2xl p-5 shadow-lg max-h-[60vh] overflow-y-auto"
+              className="w-full max-w-sm bg-card rounded-xl p-5 shadow-lg max-h-[60vh] overflow-y-auto"
             >
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-bold text-foreground text-sm">Followers</h3>
@@ -127,7 +127,7 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-sm bg-card rounded-2xl p-5 shadow-lg max-h-[60vh] overflow-y-auto"
+              className="w-full max-w-sm bg-card rounded-xl p-5 shadow-lg max-h-[60vh] overflow-y-auto"
             >
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-bold text-foreground text-sm">Following</h3>

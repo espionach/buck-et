@@ -30,7 +30,7 @@ const OwnerLeaveDialog = ({ type, members, ownerId, onDelete, onTransfer, onCanc
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-sm bg-card rounded-2xl p-5 space-y-4 shadow-lg"
+        className="w-full max-w-sm bg-card rounded-xl p-5 space-y-4 shadow-lg"
       >
         <AnimatePresence mode="wait">
           {step === "choose" ? (

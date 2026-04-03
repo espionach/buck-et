@@ -222,7 +222,7 @@ const CreateQuest = () => {
                 setIsFollowerOnly(true);
                 setSelectedGroup(null);
               }}
-              className={`w-full text-left p-4 rounded-2xl border-2 transition-all ${
+              className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
                 isFollowerOnly
                   ? "border-primary bg-primary/5"
                   : "border-border bg-card"
@@ -241,7 +241,7 @@ const CreateQuest = () => {
                   setSelectedGroup(g.id);
                   setIsFollowerOnly(false);
                 }}
-                className={`w-full text-left p-4 rounded-2xl border-2 transition-all ${
+                className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
                   selectedGroup === g.id
                     ? "border-primary bg-primary/5"
                     : "border-border bg-card"

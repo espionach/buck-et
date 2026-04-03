@@ -136,7 +136,7 @@ const Boards = () => {
                   key={pendingInvitations[0].id}
                   initial={{ opacity: 0, y: -8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="p-4 rounded-2xl border border-border/50 bg-card/60 opacity-80"
+                  className="p-4 rounded-xl border border-border/50 bg-card/60 opacity-80"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -184,7 +184,7 @@ const Boards = () => {
                               initial={{ opacity: 0, height: 0 }}
                               animate={{ opacity: 1, height: "auto" }}
                               exit={{ opacity: 0, height: 0 }}
-                              className="p-4 rounded-2xl border border-border/50 bg-card/60 opacity-80"
+                              className="p-4 rounded-xl border border-border/50 bg-card/60 opacity-80"
                             >
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
@@ -242,7 +242,7 @@ const Boards = () => {
             {/* New Group Button */}
             <button
               onClick={() => navigate("/create-group")}
-              className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl border-2 border-dashed border-border text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+              className="w-full flex items-center justify-center gap-2 py-4 rounded-xl border-2 border-dashed border-border text-muted-foreground hover:border-primary hover:text-primary transition-colors"
             >
               <Plus className="w-5 h-5" />
               <span className="font-semibold text-sm">New Group</span>
