@@ -236,7 +236,7 @@ const Feed = () => {
                   )}
                 </div>
               ) : (
-                <div className="space-y-2">
+                <div className="divide-y divide-border/50">
                   {filteredPeople.length === 0 ? (
                     <div className="text-center py-16 text-muted-foreground">
                       <p className="text-4xl mb-3">👤</p>
