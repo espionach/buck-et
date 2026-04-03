@@ -160,10 +160,20 @@ const QuestDetail = () => {
             <p className="text-xs font-semibold text-foreground mb-2">Who's In ({quest.participants.length})</p>
             <div className="flex flex-wrap gap-2">
               {quest.participants.map((p) => (
-                <div key={p.id} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-muted text-xs">
+                <button
+                  key={p.id}
+                  onClick={() => {
+                    if (p.id === currentUser.id) {
+                      navigate("/profile");
+                    } else {
+                      navigate(`/profile?viewUser=${p.id}`);
+                    }
+                  }}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-muted text-xs hover:bg-muted/80 transition-colors"
+                >
                   <UserAvatar user={p} size="xs" />
                   <span className="text-foreground font-medium">{p.name}</span>
-                </div>
+                </button>
               ))}
             </div>
           </div>

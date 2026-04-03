@@ -5,8 +5,8 @@ import { Edit, X, Check, Users as UsersIcon, UserPlus, Trash2, ImagePlus, Camera
 import UserProfileView from "@/components/UserProfileView";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Quest, User } from "@/data/mockData";
-import { useLocation } from "react-router-dom";
+import { Quest, User, friends, nonFollowedUsers } from "@/data/mockData";
+import { useLocation, useSearchParams } from "react-router-dom";
 
 const Profile = () => {
   const {
@@ -24,6 +24,7 @@ const Profile = () => {
     cleanupEmptyQuests,
   } = useAppStore();
   const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [tab, setTab] = useState<"current" | "past">(
     new URLSearchParams(location.search).get("tab") === "past" ? "past" : "current"
   );
@@ -65,6 +66,22 @@ const Profile = () => {
     if (urlTab === "past") setTab("past");
     else if (urlTab === "current") setTab("current");
   }, [location.search]);
+
+  // Handle viewUser query param from QuestDetail
+  useEffect(() => {
+    const viewUserId = searchParams.get("viewUser");
+    if (viewUserId && viewUserId !== currentUser.id) {
+      const allUsers = [...friends, ...nonFollowedUsers];
+      const found = allUsers.find((u) => u.id === viewUserId);
+      if (found) {
+        setViewingUser(found);
+        // Clean up the param
+        const newParams = new URLSearchParams(searchParams);
+        newParams.delete("viewUser");
+        setSearchParams(newParams, { replace: true });
+      }
+    }
+  }, [searchParams]);
 
   // Cleanup empty quests on mount
   useEffect(() => {
@@ -414,10 +431,16 @@ const Profile = () => {
               </div>
               {followRequests.map((req) => (
                 <div key={req.id} className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
+                  <button
+                    className="flex items-center gap-2"
+                    onClick={() => {
+                      setShowRequests(false);
+                      setViewingUser(req.from);
+                    }}
+                  >
                     <UserAvatar user={req.from} size="sm" />
                     <span className="text-sm font-semibold text-foreground">{req.from.name}</span>
-                  </div>
+                  </button>
                   <div className="flex gap-1.5">
                     <button
                       onClick={() => {
