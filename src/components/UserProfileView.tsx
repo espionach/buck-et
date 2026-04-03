@@ -14,7 +14,7 @@ interface UserProfileViewProps {
 }
 
 const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfileViewProps) => {
-  const { quests, following, followers, currentUser, sentFollowRequests, sendFollowRequest } = useAppStore();
+  const { quests, following, followers, currentUser, sentFollowRequests, sendFollowRequest, unfollowUser } = useAppStore();
   const [tab, setTab] = useState<"current" | "past">("current");
   const [showFollowers, setShowFollowers] = useState(false);
   const [showFollowing, setShowFollowing] = useState(false);
