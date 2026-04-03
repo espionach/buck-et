@@ -173,9 +173,19 @@ const Feed = () => {
           {!search ? (
             /* No query — show recent searches */
             <div>
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold mb-2 px-1">
-                Recent Searches
-              </p>
+              <div className="flex items-center justify-between mb-2 px-1">
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">
+                  Recent Searches
+                </p>
+                {recentSearches.length > 0 && (
+                  <button
+                    onClick={() => setRecentSearches([])}
+                    className="text-[10px] font-semibold text-destructive"
+                  >
+                    Clear all
+                  </button>
+                )}
+              </div>
               {recentSearches.length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
                   <Search className="w-10 h-10 mx-auto mb-2 text-muted-foreground" />
@@ -184,14 +194,24 @@ const Feed = () => {
               ) : (
                 <div className="space-y-1">
                   {recentSearches.map((term, i) => (
-                    <button
+                    <div
                       key={i}
-                      onClick={() => setSearch(term)}
-                      className="w-full flex items-center gap-2 p-2.5 rounded-xl bg-card border border-border/50 text-left active:scale-[0.98] transition-transform"
+                      className="flex items-center gap-2 p-2.5 rounded-xl bg-card border border-border/50 active:scale-[0.98] transition-transform"
                     >
-                      <Search className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                      <span className="text-sm text-foreground truncate">{term}</span>
-                    </button>
+                      <button
+                        onClick={() => setSearch(term)}
+                        className="flex items-center gap-2 flex-1 text-left"
+                      >
+                        <Search className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                        <span className="text-sm text-foreground truncate">{term}</span>
+                      </button>
+                      <button
+                        onClick={() => setRecentSearches((prev) => prev.filter((_, idx) => idx !== i))}
+                        className="shrink-0"
+                      >
+                        <X className="w-3.5 h-3.5 text-destructive" />
+                      </button>
+                    </div>
                   ))}
                 </div>
               )}
