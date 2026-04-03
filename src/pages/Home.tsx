@@ -120,7 +120,10 @@ const Boards = () => {
             {profileQuests.length === 0 ? (
               <p className="text-center text-sm text-muted-foreground py-8">No quests to show</p>
             ) : (
-              profileQuests.map((q, i) => <QuestCard key={q.id} quest={q} index={i} showGroup />)
+              profileQuests.map((q, i) => <QuestCard key={q.id} quest={q} index={i} showGroup hideActions onViewProfile={(user) => {
+                if (user.id === viewingProfile.id) return;
+                setViewingProfile(user);
+              }} />)
             )}
           </div>
         )}
@@ -346,7 +349,7 @@ const Boards = () => {
                   <p className="text-sm">Start one for the crew! 🚀</p>
                 </div>
               ) : (
-                groupQuests.map((q, i) => (
+                 groupQuests.map((q, i) => (
                   <QuestCard
                     key={q.id}
                     quest={q}
@@ -355,6 +358,7 @@ const Boards = () => {
                     onMarkUndone={() => navigate("/profile?tab=current")}
                     autoOpenComments={q.id === activeHighlight && !!activeCommentId}
                     highlightCommentId={q.id === activeHighlight ? (activeCommentId || undefined) : undefined}
+                    onViewProfile={(user) => setViewingProfile(user)}
                   />
                 ))
               )}

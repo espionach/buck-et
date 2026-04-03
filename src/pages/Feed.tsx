@@ -3,7 +3,7 @@ import { currentUser, friends, nonFollowedUsers, User } from "@/data/mockData";
 import QuestCard from "@/components/QuestCard";
 import UserAvatar from "@/components/UserAvatar";
 import NotificationPanel from "@/components/NotificationPanel";
-import { Search, Lock, UserPlus, Mail } from "lucide-react";
+import { Search, Lock, UserPlus, Mail, X } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -15,6 +15,7 @@ const Feed = () => {
   const [selectedProfile, setSelectedProfile] = useState<User | null>(null);
   const [showNotifications, setShowNotifications] = useState(false);
   const [feedFilter, setFeedFilter] = useState<"all" | "followers" | string>("all");
+  const [searchFocused, setSearchFocused] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -120,15 +121,18 @@ const Feed = () => {
             </button>
           </div>
         ) : (
-          <div className="space-y-3">
-            {profileQuests.length === 0 ? (
-              <p className="text-center text-sm text-muted-foreground py-8">No quests to show</p>
-            ) : (
-              profileQuests.map((q, i) => (
-                <QuestCard key={q.id} quest={q} index={i} showGroup />
-              ))
-            )}
-          </div>
+           <div className="space-y-3">
+             {profileQuests.length === 0 ? (
+               <p className="text-center text-sm text-muted-foreground py-8">No quests to show</p>
+             ) : (
+               profileQuests.map((q, i) => (
+                 <QuestCard key={q.id} quest={q} index={i} showGroup hideActions onViewProfile={(user) => {
+                   if (user.id === selectedProfile.id) return;
+                   setSelectedProfile(user);
+                 }} />
+               ))
+             )}
+           </div>
         )}
       </div>
     );
@@ -158,10 +162,71 @@ const Feed = () => {
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          onFocus={() => setSearchFocused(true)}
+          onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
           placeholder="Search quests or people..."
-          className="w-full pl-10 pr-4 py-3 rounded-xl bg-card border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+          className="w-full pl-10 pr-10 py-3 rounded-xl bg-card border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
         />
+        {search && (
+          <button
+            onClick={() => setSearch("")}
+            className="absolute right-3.5 top-1/2 -translate-y-1/2"
+          >
+            <X className="w-4 h-4 text-destructive" />
+          </button>
+        )}
       </div>
+
+      {/* Search recommendations when focused but no query */}
+      {searchFocused && !search && (
+        <div className="mb-3">
+          <div className="flex bg-muted rounded-xl p-1 mb-3">
+            {(["quests", "people"] as const).map((t) => (
+              <button
+                key={t}
+                onClick={() => setSearchTab(t)}
+                className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
+                  searchTab === t ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
+                }`}
+              >
+                {t === "quests" ? "Quests" : "People"}
+              </button>
+            ))}
+          </div>
+          <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold mb-2 px-1">
+            {searchTab === "quests" ? "Recent Quests" : "Suggested People"}
+          </p>
+          {searchTab === "quests" ? (
+            <div className="space-y-1">
+              {sortedQuests.slice(0, 4).map((q) => (
+                <button
+                  key={q.id}
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => setSearch(q.title)}
+                  className="w-full flex items-center gap-2 p-2.5 rounded-xl bg-card border border-border/50 text-left active:scale-[0.98] transition-transform"
+                >
+                  <Search className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                  <span className="text-sm text-foreground truncate">{q.title}</span>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-1">
+              {allSearchableUsers.slice(0, 4).map((user) => (
+                <button
+                  key={user.id}
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => setSelectedProfile(user)}
+                  className="w-full flex items-center gap-2 p-2.5 rounded-xl bg-card border border-border/50 text-left active:scale-[0.98] transition-transform"
+                >
+                  <UserAvatar user={user} size="xs" />
+                  <span className="text-sm text-foreground">{user.name}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Filter tabs — hidden during search */}
       {!search && (
@@ -209,7 +274,7 @@ const Feed = () => {
                 <p className="text-sm">Follow more friends to see their side quests!</p>
               </div>
             ) : (
-              filteredQuests.map((q, i) => <QuestCard key={q.id} quest={q} index={i} onMarkDone={() => navigate("/profile?tab=past")} onMarkUndone={() => navigate("/profile?tab=current")} />)
+              filteredQuests.map((q, i) => <QuestCard key={q.id} quest={q} index={i} onMarkDone={() => navigate("/profile?tab=past")} onMarkUndone={() => navigate("/profile?tab=current")} onViewProfile={(user) => setSelectedProfile(user)} />)
             )}
           </div>
         ) : (

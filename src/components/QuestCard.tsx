@@ -1,4 +1,4 @@
-import { Quest, currentUser, Comment } from "@/data/mockData";
+import { Quest, currentUser, Comment, User } from "@/data/mockData";
 import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
 import OwnerLeaveDialog from "@/components/OwnerLeaveDialog";
@@ -19,9 +19,11 @@ interface QuestCardProps {
   onMarkUndone?: () => void;
   autoOpenComments?: boolean;
   highlightCommentId?: string;
+  hideActions?: boolean;
+  onViewProfile?: (user: User) => void;
 }
 
-const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPast, disableJoin = false, onMarkDone, onMarkUndone, autoOpenComments = false, highlightCommentId }: QuestCardProps) => {
+const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPast, disableJoin = false, onMarkDone, onMarkUndone, autoOpenComments = false, highlightCommentId, hideActions = false, onViewProfile }: QuestCardProps) => {
   const navigate = useNavigate();
   const { toggleImIn, markDone, markUndone, groups, addComment, deleteQuest, transferQuestOwnership, requestQuestTransfer, transferRequests, acceptTransfer, declineTransfer } = useAppStore();
   const isIn = quest.participants.some((p) => p.id === currentUser.id);
@@ -146,7 +148,15 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
         <div className="mb-2">
           <div className="flex items-center gap-2">
             <UserAvatar user={quest.createdBy} size="sm" />
-            <span className="text-sm font-bold text-foreground">{quest.createdBy.name}</span>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onViewProfile) onViewProfile(quest.createdBy);
+              }}
+              className="text-sm font-bold text-foreground hover:underline"
+            >
+              {quest.createdBy.name}
+            </button>
           </div>
           <p className="text-[11px] text-muted-foreground ml-8">
             {group ? `${group.emoji} ${group.name}` : "🌍 Followers only"}
@@ -267,7 +277,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
               {showComments ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
             </button>
 
-            {!quest.isDone && isIn && (
+            {!quest.isDone && isIn && !hideActions && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -280,7 +290,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
               </button>
             )}
 
-            {quest.isDone && isIn && (
+            {quest.isDone && isIn && !hideActions && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
