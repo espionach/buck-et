@@ -105,8 +105,8 @@ const Boards = () => {
   return (
     <div className="min-h-screen pb-24 px-5 pt-14">
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-foreground">Your Boards</h1>
+      <div className="mb-4">
+        <h1 className="text-3xl font-bold text-foreground">Your Boards</h1>
       </div>
 
       <AnimatePresence mode="wait">
