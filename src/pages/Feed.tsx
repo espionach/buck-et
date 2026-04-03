@@ -277,52 +277,20 @@ const Feed = () => {
 
           {/* Content */}
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-        {(!search || searchTab === "quests") ? (
-          <div className="space-y-3">
-            {filteredQuests.length === 0 ? (
-              <div className="text-center py-16 text-muted-foreground">
-                <p className="text-4xl mb-3">🔭</p>
-                <p className="font-semibold">No quests to show</p>
-                <p className="text-sm">Follow more friends to see their side quests!</p>
-              </div>
-            ) : (
-              filteredQuests.map((q, i) => <QuestCard key={q.id} quest={q} index={i} onMarkDone={() => navigate("/profile?tab=past")} onMarkUndone={() => navigate("/profile?tab=current")} onViewProfile={(user) => setSelectedProfile(user)} />)
-            )}
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {filteredPeople.length === 0 ? (
-              <div className="text-center py-16 text-muted-foreground">
-                <p className="text-4xl mb-3">👤</p>
-                <p className="font-semibold">No people found</p>
-              </div>
-            ) : (
-              filteredPeople.map((user) => (
-                <button
-                  key={user.id}
-                  onClick={() => setSelectedProfile(user)}
-                  className="w-full flex items-center gap-3 p-3 rounded-xl bg-card border border-border/50 text-left active:scale-[0.98] transition-transform"
-                >
-                  <UserAvatar user={user} size="md" />
-                  <div className="flex-1">
-                    <p className="font-semibold text-foreground text-sm">{user.name}</p>
-                    <p className="text-xs text-muted-foreground">{user.bio}</p>
-                  </div>
-                  {isFollowing(user) ? (
-                    <span className="text-[10px] font-semibold text-secondary px-2 py-1 rounded-full bg-secondary/10">
-                      Following
-                    </span>
-                  ) : (
-                    <span className="text-[10px] font-semibold text-muted-foreground px-2 py-1 rounded-full bg-muted">
-                      Not following
-                    </span>
-                  )}
-                </button>
-              ))
-            )}
-          </div>
-        )}
-      </motion.div>
+            <div className="space-y-3">
+              {filteredQuests.length === 0 ? (
+                <div className="text-center py-16 text-muted-foreground">
+                  <p className="text-4xl mb-3">🔭</p>
+                  <p className="font-semibold">No quests to show</p>
+                  <p className="text-sm">Follow more friends to see their side quests!</p>
+                </div>
+              ) : (
+                filteredQuests.map((q, i) => <QuestCard key={q.id} quest={q} index={i} onMarkDone={() => navigate("/profile?tab=past")} onMarkUndone={() => navigate("/profile?tab=current")} onViewProfile={(user) => setSelectedProfile(user)} />)
+              )}
+            </div>
+          </motion.div>
+        </>
+      )}
 
       <NotificationPanel open={showNotifications} onClose={() => setShowNotifications(false)} />
     </div>
