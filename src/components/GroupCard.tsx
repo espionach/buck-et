@@ -28,7 +28,7 @@ const GroupCard = ({ group, onClick, index }: GroupCardProps) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.08 }}
-      className="w-full"
+      className="w-full h-full"
     >
       {/* Transfer request banner */}
       {pendingTransfer && (
