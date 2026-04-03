@@ -310,7 +310,7 @@ const Boards = () => {
             )}
 
             {/* Active / Completed tabs */}
-            <div className="flex bg-muted rounded-xl p-1 mb-4">
+            <div className="flex bg-muted rounded-2xl p-1 mb-4">
               {(["active", "completed"] as const).map((t) => (
                 <button
                   key={t}
