@@ -61,7 +61,7 @@ const GroupCard = ({ group, onClick, index }: GroupCardProps) => {
 
       <button
         onClick={onClick}
-        className={`w-full text-left p-5 ${pendingTransfer ? "rounded-b-2xl rounded-t-none" : "rounded-2xl"} bg-gradient-to-br ${gradients[index % gradients.length]} border border-border/50 active:scale-[0.98] transition-transform`}
+        className={`w-full h-full text-left p-5 ${pendingTransfer ? "rounded-b-2xl rounded-t-none" : "rounded-2xl"} bg-gradient-to-br ${gradients[index % gradients.length]} border border-border/50 active:scale-[0.98] transition-transform flex flex-col`}
       >
         <div className="flex items-start justify-between mb-3">
           <span className="text-3xl">{group.emoji}</span>
