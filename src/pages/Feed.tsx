@@ -93,49 +93,13 @@ const Feed = () => {
     : [];
 
   if (selectedProfile) {
-    const isFollowed = isFollowing(selectedProfile);
     return (
-      <div className="min-h-screen pb-24 px-5 pt-14">
-        <button
-          onClick={() => setSelectedProfile(null)}
-          className="text-sm text-primary font-semibold mb-4"
-        >
-          ← Back to Feed
-        </button>
-
-        <div className="flex items-center gap-4 mb-6">
-          <UserAvatar user={selectedProfile} size="lg" />
-          <div>
-            <h2 className="text-lg font-bold text-foreground">{selectedProfile.name}</h2>
-            <p className="text-sm text-muted-foreground">{selectedProfile.bio}</p>
-          </div>
-        </div>
-
-        {!isFollowed ? (
-          <div className="text-center py-16">
-            <Lock className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
-            <p className="font-bold text-foreground mb-1">Private Account</p>
-            <p className="text-sm text-muted-foreground mb-4">Follow to see their quests</p>
-            <button className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm flex items-center gap-2 mx-auto">
-              <UserPlus className="w-4 h-4" />
-              Request to Follow
-            </button>
-          </div>
-        ) : (
-           <div className="space-y-3">
-             {profileQuests.length === 0 ? (
-               <p className="text-center text-sm text-muted-foreground py-8">No quests to show</p>
-             ) : (
-               profileQuests.map((q, i) => (
-                 <QuestCard key={q.id} quest={q} index={i} showGroup hideActions onViewProfile={(user) => {
-                   if (user.id === selectedProfile.id) return;
-                   setSelectedProfile(user);
-                 }} />
-               ))
-             )}
-           </div>
-        )}
-      </div>
+      <UserProfileView
+        user={selectedProfile}
+        backLabel="Back to Feed"
+        onBack={() => setSelectedProfile(null)}
+        onViewProfile={(user) => setSelectedProfile(user)}
+      />
     );
   }
 
