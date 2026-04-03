@@ -178,7 +178,7 @@ const Feed = () => {
               </p>
               {recentSearches.length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
-                  <p className="text-4xl mb-2">🔍</p>
+                  <Search className="w-10 h-10 mx-auto mb-2 text-muted-foreground" />
                   <p className="text-sm">No recent searches</p>
                 </div>
               ) : (
