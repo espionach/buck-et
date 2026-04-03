@@ -53,9 +53,18 @@ const Boards = () => {
       )
     : sortedGroups;
 
-  const groupQuestsUnsorted = selectedGroup
-    ? quests.filter((q) => q.groupId === selectedGroup && !q.isDone)
+  const allGroupQuests = selectedGroup
+    ? quests.filter((q) => q.groupId === selectedGroup)
     : [];
+
+  const activeGroupQuests = allGroupQuests.filter((q) => !q.isDone);
+  const completedGroupQuests = allGroupQuests.filter((q) => q.isDone).sort((a, b) => {
+    const aDate = a.completedAt || a.createdAt;
+    const bDate = b.completedAt || b.createdAt;
+    return new Date(bDate).getTime() - new Date(aDate).getTime();
+  });
+
+  const groupQuestsUnsorted = boardTab === "active" ? activeGroupQuests : completedGroupQuests;
 
   // Sort highlighted quest to the top, rest chronological
   const groupQuests = activeHighlight
