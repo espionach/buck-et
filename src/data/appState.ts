@@ -28,6 +28,7 @@ interface AppState {
   followers: User[];
   groupInvitations: GroupInvitation[];
   followRequests: FollowRequest[];
+  sentFollowRequests: string[]; // user IDs we've sent requests to
   transferRequests: TransferRequest[];
   notifications: AppNotification[];
   currentUser: User;
