@@ -527,76 +527,6 @@ const Profile = () => {
         </button>
       </div>
 
-      {/* Edit Profile Modal */}
-      <AnimatePresence>
-        {showEditProfile && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden mb-4"
-          >
-            <div className="p-4 rounded-2xl bg-card border border-border space-y-3">
-              <h3 className="font-bold text-foreground text-sm">Edit Profile</h3>
-
-              {/* Profile picture */}
-              <div className="flex items-center gap-4">
-                <div className="relative">
-                  {editProfilePic ? (
-                    <img src={editProfilePic} alt="Profile" className="w-16 h-16 rounded-full object-cover" />
-                  ) : (
-                    <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-3xl">
-                      {currentUser.avatar}
-                    </div>
-                  )}
-                  <button
-                    onClick={() => profilePicRef.current?.click()}
-                    className="absolute -bottom-1 -right-1 p-1.5 rounded-full bg-primary text-primary-foreground"
-                  >
-                    <Camera className="w-3 h-3" />
-                  </button>
-                  <input
-                    ref={profilePicRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleProfilePicUpload}
-                    className="hidden"
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground">Tap camera to change photo</p>
-              </div>
-
-              <input
-                value={editName}
-                onChange={(e) => setEditName(e.target.value)}
-                placeholder="Name"
-                className="w-full px-3 py-2.5 rounded-xl bg-muted border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-              />
-              <textarea
-                value={editBio}
-                onChange={(e) => setEditBio(e.target.value)}
-                placeholder="Bio"
-                rows={2}
-                className="w-full px-3 py-2.5 rounded-xl bg-muted border border-border text-sm text-foreground resize-none focus:outline-none focus:ring-2 focus:ring-primary/30"
-              />
-              <div className="flex gap-2">
-                <button
-                  onClick={handleSaveProfile}
-                  className="flex-1 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm"
-                >
-                  Save
-                </button>
-                <button
-                  onClick={() => setShowEditProfile(false)}
-                  className="px-4 py-2.5 rounded-xl bg-muted text-muted-foreground font-semibold text-sm"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Followers / Following row */}
       <div className="flex items-center gap-3 mb-4">
@@ -627,16 +557,23 @@ const Profile = () => {
         )}
       </div>
 
-      {/* Follow Requests Popup */}
+      {/* Follow Requests Modal Popup */}
       <AnimatePresence>
         {showRequests && (
           <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden mb-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-foreground/40 flex items-center justify-center p-5"
+            onClick={() => setShowRequests(false)}
           >
-            <div className="p-4 rounded-2xl bg-card border border-border space-y-2">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-sm bg-card rounded-2xl p-5 shadow-lg max-h-[60vh] overflow-y-auto space-y-2"
+            >
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-bold text-foreground text-sm">Follow Requests</h3>
                 <button onClick={() => setShowRequests(false)}>
@@ -671,21 +608,28 @@ const Profile = () => {
                   </div>
                 </div>
               ))}
-            </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Followers Popup — clickable */}
+      {/* Followers Modal Popup */}
       <AnimatePresence>
         {showFollowers && (
           <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden mb-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-foreground/40 flex items-center justify-center p-5"
+            onClick={() => setShowFollowers(false)}
           >
-            <div className="p-4 rounded-2xl bg-card border border-border">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-sm bg-card rounded-2xl p-5 shadow-lg max-h-[60vh] overflow-y-auto"
+            >
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-bold text-foreground text-sm">Followers</h3>
                 <button onClick={() => setShowFollowers(false)}>
@@ -705,19 +649,51 @@ const Profile = () => {
                   <span className="text-sm text-foreground">{u.name}</span>
                 </button>
               ))}
-            </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Following Popup — clickable */}
+      {/* Following Modal Popup */}
       <AnimatePresence>
         {showFollowing && (
           <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden mb-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-foreground/40 flex items-center justify-center p-5"
+            onClick={() => setShowFollowing(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-sm bg-card rounded-2xl p-5 shadow-lg max-h-[60vh] overflow-y-auto"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-bold text-foreground text-sm">Following</h3>
+                <button onClick={() => setShowFollowing(false)}>
+                  <X className="w-4 h-4 text-muted-foreground" />
+                </button>
+              </div>
+              {following.map((u) => (
+                <button
+                  key={u.id}
+                  onClick={() => {
+                    setViewingUser(u);
+                    setShowFollowing(false);
+                  }}
+                  className="w-full flex items-center gap-2 py-1.5 text-left hover:bg-muted/50 rounded-lg px-1 transition-colors"
+                >
+                  <UserAvatar user={u} size="sm" />
+                  <span className="text-sm text-foreground">{u.name}</span>
+                </button>
+              ))}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
           >
             <div className="p-4 rounded-2xl bg-card border border-border">
               <div className="flex items-center justify-between mb-3">
