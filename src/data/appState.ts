@@ -82,6 +82,7 @@ export const useAppStore = create<AppState>((set) => ({
   followers: [...friends.slice(0, 4)],
   groupInvitations: initialInvitations,
   followRequests: initialFollowRequests,
+  sentFollowRequests: [],
   transferRequests: initialTransfers,
   notifications: initialNotifications,
   currentUser: currentUser,
