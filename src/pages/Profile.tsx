@@ -421,6 +421,88 @@ const Profile = () => {
     );
   }
 
+  // Edit profile full-page view
+  if (showEditProfile) {
+    return (
+      <div className="min-h-screen pb-24 px-5 pt-14">
+        <button
+          onClick={() => setShowEditProfile(false)}
+          className="text-sm text-primary font-semibold mb-4 flex items-center gap-1"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Profile
+        </button>
+
+        <h1 className="text-xl font-bold text-foreground mb-6">Edit Profile</h1>
+
+        <div className="space-y-4">
+          {/* Profile picture */}
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              {editProfilePic ? (
+                <img src={editProfilePic} alt="Profile" className="w-20 h-20 rounded-full object-cover" />
+              ) : (
+                <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-4xl">
+                  {currentUser.avatar}
+                </div>
+              )}
+              <button
+                onClick={() => profilePicRef.current?.click()}
+                className="absolute -bottom-1 -right-1 p-1.5 rounded-full bg-primary text-primary-foreground"
+              >
+                <Camera className="w-4 h-4" />
+              </button>
+              <input
+                ref={profilePicRef}
+                type="file"
+                accept="image/*"
+                onChange={handleProfilePicUpload}
+                className="hidden"
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">Tap camera to change photo</p>
+          </div>
+
+          <div>
+            <label className="text-sm font-semibold text-foreground mb-1.5 block">Name</label>
+            <input
+              value={editName}
+              onChange={(e) => setEditName(e.target.value)}
+              placeholder="Name"
+              className="w-full px-3 py-2.5 rounded-xl bg-muted border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+            />
+          </div>
+
+          <div>
+            <label className="text-sm font-semibold text-foreground mb-1.5 block">Bio</label>
+            <textarea
+              value={editBio}
+              onChange={(e) => setEditBio(e.target.value)}
+              placeholder="Bio"
+              rows={3}
+              className="w-full px-3 py-2.5 rounded-xl bg-muted border border-border text-sm text-foreground resize-none focus:outline-none focus:ring-2 focus:ring-primary/30"
+            />
+          </div>
+
+          <div className="flex gap-2 pt-2">
+            <button
+              onClick={handleSaveProfile}
+              className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm"
+            >
+              Save Changes
+            </button>
+            <button
+              onClick={() => setShowEditProfile(false)}
+              className="px-6 py-3 rounded-xl bg-muted text-muted-foreground font-semibold text-sm"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen pb-24 px-5 pt-14">
       {/* Profile Header */}
