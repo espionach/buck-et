@@ -37,7 +37,7 @@ const Feed = () => {
   // Apply filter
   const filterOptions = [
     { key: "all", label: "All" },
-    { key: "followers", label: "Following" },
+    { key: "followers", label: "Friends" },
     ...groups.map((g) => ({ key: g.id, label: `${g.emoji} ${g.name}` })),
   ];
 
