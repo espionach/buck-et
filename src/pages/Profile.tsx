@@ -30,13 +30,10 @@ const Profile = () => {
   const [showEditProfile, setShowEditProfile] = useState(false);
   const [editName, setEditName] = useState(currentUser.name);
   const [editBio, setEditBio] = useState(currentUser.bio);
-  const [showFollowers, setShowFollowers] = useState(false);
-  const [showFollowing, setShowFollowing] = useState(false);
+  const [showFriends, setShowFriends] = useState(false);
   const [showRequests, setShowRequests] = useState(false);
   const [viewingUser, setViewingUser] = useState<User | null>(null);
   const [viewingUserTab, setViewingUserTab] = useState<"current" | "past">("current");
-  const [viewingUserFollowers, setViewingUserFollowers] = useState(false);
-  const [viewingUserFollowing, setViewingUserFollowing] = useState(false);
   const [snapshotQuestIds, setSnapshotQuestIds] = useState<string[]>([]);
   // Profile picture upload
   const profilePicRef = useRef<HTMLInputElement>(null);
