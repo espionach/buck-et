@@ -24,11 +24,10 @@ import {
 interface AppState {
   quests: Quest[];
   groups: Group[];
-  following: User[];
-  followers: User[];
+  friends: User[];
   groupInvitations: GroupInvitation[];
-  followRequests: FollowRequest[];
-  sentFollowRequests: string[]; // user IDs we've sent requests to
+  friendRequests: FriendRequest[];
+  sentFriendRequests: string[]; // user IDs we've sent requests to
   transferRequests: TransferRequest[];
   notifications: AppNotification[];
   currentUser: User;
@@ -44,10 +43,10 @@ interface AppState {
   inviteToGroup: (groupId: string, user: User) => void;
   acceptGroupInvitation: (invitationId: string) => void;
   declineGroupInvitation: (invitationId: string) => void;
-  acceptFollowRequest: (requestId: string) => void;
-  declineFollowRequest: (requestId: string) => void;
-  sendFollowRequest: (toUser: User) => void;
-  unfollowUser: (userId: string) => void;
+  acceptFriendRequest: (requestId: string) => void;
+  declineFriendRequest: (requestId: string) => void;
+  sendFriendRequest: (toUser: User) => void;
+  unfriend: (userId: string) => void;
   addComment: (questId: string, comment: Comment) => void;
   updateQuest: (questId: string, updates: Partial<Quest>) => void;
   deleteQuest: (questId: string) => void;
