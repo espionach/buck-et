@@ -5,7 +5,7 @@ import {
   User,
   Comment,
   GroupInvitation,
-  FollowRequest,
+  FriendRequest,
   GroupMember,
   TransferRequest,
   AppNotification,
@@ -16,7 +16,7 @@ import {
   currentUser,
   friends,
   pendingGroupInvitations as initialInvitations,
-  pendingFollowRequests as initialFollowRequests,
+  pendingFriendRequests as initialFriendRequests,
   pendingTransferRequests as initialTransfers,
   initialNotifications,
 } from "./mockData";
