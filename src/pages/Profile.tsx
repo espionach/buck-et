@@ -252,8 +252,8 @@ const Profile = () => {
     setQuestPhotos((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Viewing another user's profile from followers/following list
-  const isFollowingUser = (user: User) => following.some((f) => f.id === user.id);
+  // Viewing another user's profile from friends list
+  const isFriendUser = (user: User) => friendsList.some((f) => f.id === user.id);
 
   if (viewingUser) {
     return (
