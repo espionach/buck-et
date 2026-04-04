@@ -41,11 +41,14 @@ export interface GroupInvitation {
   status: "pending" | "accepted" | "declined";
 }
 
-export interface FollowRequest {
+export interface FriendRequest {
   id: string;
   from: User;
   status: "pending" | "accepted" | "declined";
 }
+
+// Keep backward compat alias
+export type FollowRequest = FriendRequest;
 
 export interface QuestVolunteer {
   userId: string;
