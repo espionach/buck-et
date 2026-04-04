@@ -178,10 +178,13 @@ export const pendingGroupInvitations: GroupInvitation[] = [
   },
 ];
 
-export const pendingFollowRequests: FollowRequest[] = [
+export const pendingFriendRequests: FriendRequest[] = [
   { id: "fr1", from: nonFollowedUsers[0], status: "pending" },
   { id: "fr2", from: nonFollowedUsers[1], status: "pending" },
 ];
+
+// Keep backward compat alias
+export const pendingFollowRequests = pendingFriendRequests;
 
 export const quests: Quest[] = [
   {
