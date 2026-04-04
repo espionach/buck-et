@@ -259,13 +259,13 @@ const Feed = () => {
                           <p className="font-semibold text-foreground text-sm">{user.name}</p>
                           <p className="text-xs text-muted-foreground">{user.bio}</p>
                         </div>
-                        {isFollowing(user) ? (
+                        {isFriend(user) ? (
                           <span className="text-[10px] font-semibold text-secondary px-2 py-1 rounded-full bg-secondary/10">
-                            Following
+                            Friend
                           </span>
                         ) : (
                           <span className="text-[10px] font-semibold text-muted-foreground px-2 py-1 rounded-full bg-muted">
-                            Not following
+                            Not a friend
                           </span>
                         )}
                       </button>

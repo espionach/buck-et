@@ -93,7 +93,7 @@ const CreateGroup = () => {
             Add Members ({selectedMembers.length} selected)
           </label>
           <div className="space-y-2">
-            {following.map((user) => (
+            {friendsList.map((user) => (
               <button
                 key={user.id}
                 onClick={() => toggleMember(user.id)}
