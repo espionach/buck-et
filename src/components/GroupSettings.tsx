@@ -57,7 +57,7 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
     setShowAddMembers(false);
   };
 
-  const availableToInvite = following.filter(
+  const availableToInvite = friendsList.filter(
     (f) => !group.members.some((m) => m.id === f.id)
   );
 

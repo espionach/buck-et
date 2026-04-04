@@ -48,7 +48,7 @@ const Feed = () => {
   });
 
   const allSearchableUsers = [...friends, ...nonFollowedUsers];
-  const isFollowing = (user: User) => following.some((f) => f.id === user.id);
+  const isFriend = (user: User) => friendsList.some((f) => f.id === user.id);
 
   // Snapshot which quests were joined at page load so order stays stable
   const [joinedSnapshot, setJoinedSnapshot] = useState<Set<string>>(new Set());

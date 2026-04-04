@@ -88,8 +88,8 @@ const Boards = () => {
 
   const pendingInvitations = groupInvitations.filter((i) => i.status === "pending");
 
-  const { following } = useAppStore();
-  const isFollowing = (user: User) => following.some((f) => f.id === user.id);
+  const { friends: friendsList } = useAppStore();
+  const isFriend = (user: User) => friendsList.some((f) => f.id === user.id);
 
   if (viewingProfile) {
     return (

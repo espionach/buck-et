@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 
 const CreateGroup = () => {
   const navigate = useNavigate();
-  const { addGroup, following } = useAppStore();
+  const { addGroup, friends: friendsList } = useAppStore();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [emoji, setEmoji] = useState("🎯");
