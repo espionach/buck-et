@@ -27,7 +27,7 @@ const CreateGroup = () => {
     ];
     const memberRoles: GroupMember[] = [
       { user: currentUser, role: "owner" },
-      ...following
+      ...friendsList
         .filter((f) => selectedMembers.includes(f.id))
         .map((u) => ({ user: u, role: "invited" as const })),
     ];
