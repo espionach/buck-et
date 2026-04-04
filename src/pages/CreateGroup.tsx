@@ -23,7 +23,7 @@ const CreateGroup = () => {
     if (!name.trim()) return;
     const members = [
       currentUser,
-      ...following.filter((f) => selectedMembers.includes(f.id)),
+      ...friendsList.filter((f) => selectedMembers.includes(f.id)),
     ];
     const memberRoles: GroupMember[] = [
       { user: currentUser, role: "owner" },
