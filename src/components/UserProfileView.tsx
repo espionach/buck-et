@@ -68,20 +68,34 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
 
       {/* Follower/Following row */}
       <div className="flex items-center gap-3 mb-4">
-        <button
-          onClick={() => setShowFollowers(true)}
-          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-card border border-border/50 text-sm font-semibold text-foreground"
-        >
-          <UsersIcon className="w-4 h-4" />
-          {userFollowersList.length} Followers
-        </button>
-        <button
-          onClick={() => setShowFollowing(true)}
-          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-card border border-border/50 text-sm font-semibold text-foreground"
-        >
-          <UsersIcon className="w-4 h-4" />
-          {userFollowingList.length} Following
-        </button>
+        {isFollowed ? (
+          <button
+            onClick={() => setShowFollowers(true)}
+            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-card border border-border/50 text-sm font-semibold text-foreground"
+          >
+            <UsersIcon className="w-4 h-4" />
+            {userFollowersList.length} Followers
+          </button>
+        ) : (
+          <div className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-card border border-border/50 text-sm font-semibold text-muted-foreground">
+            <UsersIcon className="w-4 h-4" />
+            {userFollowersList.length} Followers
+          </div>
+        )}
+        {isFollowed ? (
+          <button
+            onClick={() => setShowFollowing(true)}
+            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-card border border-border/50 text-sm font-semibold text-foreground"
+          >
+            <UsersIcon className="w-4 h-4" />
+            {userFollowingList.length} Following
+          </button>
+        ) : (
+          <div className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-card border border-border/50 text-sm font-semibold text-muted-foreground">
+            <UsersIcon className="w-4 h-4" />
+            {userFollowingList.length} Following
+          </div>
+        )}
       </div>
 
       {/* Followers Modal */}
