@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 
 const CreateGroup = () => {
   const navigate = useNavigate();
-  const { addGroup, following } = useAppStore();
+  const { addGroup, friends: friendsList } = useAppStore();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [emoji, setEmoji] = useState("🎯");
@@ -23,11 +23,11 @@ const CreateGroup = () => {
     if (!name.trim()) return;
     const members = [
       currentUser,
-      ...following.filter((f) => selectedMembers.includes(f.id)),
+      ...friendsList.filter((f) => selectedMembers.includes(f.id)),
     ];
     const memberRoles: GroupMember[] = [
       { user: currentUser, role: "owner" },
-      ...following
+      ...friendsList
         .filter((f) => selectedMembers.includes(f.id))
         .map((u) => ({ user: u, role: "invited" as const })),
     ];
@@ -93,7 +93,7 @@ const CreateGroup = () => {
             Add Members ({selectedMembers.length} selected)
           </label>
           <div className="space-y-2">
-            {following.map((user) => (
+            {friendsList.map((user) => (
               <button
                 key={user.id}
                 onClick={() => toggleMember(user.id)}

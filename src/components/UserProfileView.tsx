@@ -14,13 +14,13 @@ interface UserProfileViewProps {
 }
 
 const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfileViewProps) => {
-  const { quests, following, followers, currentUser, sentFollowRequests, sendFollowRequest, unfollowUser } = useAppStore();
+  const { quests, friends, currentUser, sentFriendRequests, sendFriendRequest, unfriend } = useAppStore();
   const [tab, setTab] = useState<"current" | "past">("current");
-  const [showFollowers, setShowFollowers] = useState(false);
-  const [showFollowing, setShowFollowing] = useState(false);
+  const [showFriends, setShowFriends] = useState(false);
+  const [showUnfriendConfirm, setShowUnfriendConfirm] = useState(false);
 
-  const isFollowed = following.some((f) => f.id === user.id);
-  const hasRequested = sentFollowRequests.includes(user.id);
+  const isFriend = friends.some((f) => f.id === user.id);
+  const hasRequested = sentFriendRequests.includes(user.id);
 
   const profileQuests = quests.filter(
     (q) =>
@@ -31,9 +31,8 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
   const completedQuests = profileQuests.filter((q) => q.isDone);
   const shownQuests = tab === "current" ? activeQuests : completedQuests;
 
-  // Mock follower/following data for other users
-  const userFollowersList = followers.filter((f) => f.id !== user.id).slice(0, 3);
-  const userFollowingList = following.filter((f) => f.id !== user.id).slice(0, 4);
+  // Mock friend count for other users
+  const userFriendsList = friends.filter((f) => f.id !== user.id).slice(0, 3);
 
   return (
     <div className="min-h-screen pb-24 px-5 pt-14">
@@ -53,60 +52,86 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
         </div>
       </div>
 
-      {/* Unfollow button for followed users */}
-      {isFollowed && (
-        <div className="mb-4">
+      {/* Friends count + Unfriend button on same line */}
+      <div className="flex items-center justify-between mb-4">
+        {isFriend ? (
           <button
-            onClick={() => unfollowUser(user.id)}
+            onClick={() => setShowFriends(true)}
+            className="flex items-center gap-1.5 text-sm font-semibold text-foreground"
+          >
+            <UsersIcon className="w-4 h-4" />
+            {userFriendsList.length} Friends
+          </button>
+        ) : (
+          <div className="flex items-center gap-1.5 text-sm font-semibold text-muted-foreground">
+            <UsersIcon className="w-4 h-4" />
+            {userFriendsList.length} Friends
+          </div>
+        )}
+
+        {isFriend && (
+          <button
+            onClick={() => setShowUnfriendConfirm(true)}
             className="px-4 py-2 rounded-xl bg-muted text-muted-foreground font-semibold text-sm flex items-center gap-2"
           >
             <UserMinus className="w-4 h-4" />
-            Unfollow
+            Unfriend
           </button>
-        </div>
-      )}
-
-      {/* Follower/Following row */}
-      <div className="flex items-center gap-3 mb-4">
-        {isFollowed ? (
-          <button
-            onClick={() => setShowFollowers(true)}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-card border border-border/50 text-sm font-semibold text-foreground"
-          >
-            <UsersIcon className="w-4 h-4" />
-            {userFollowersList.length} Followers
-          </button>
-        ) : (
-          <div className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-card border border-border/50 text-sm font-semibold text-muted-foreground">
-            <UsersIcon className="w-4 h-4" />
-            {userFollowersList.length} Followers
-          </div>
-        )}
-        {isFollowed ? (
-          <button
-            onClick={() => setShowFollowing(true)}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-card border border-border/50 text-sm font-semibold text-foreground"
-          >
-            <UsersIcon className="w-4 h-4" />
-            {userFollowingList.length} Following
-          </button>
-        ) : (
-          <div className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-card border border-border/50 text-sm font-semibold text-muted-foreground">
-            <UsersIcon className="w-4 h-4" />
-            {userFollowingList.length} Following
-          </div>
         )}
       </div>
 
-      {/* Followers Modal */}
+      {/* Unfriend Confirmation Modal */}
       <AnimatePresence>
-        {showFollowers && (
+        {showUnfriendConfirm && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 bg-foreground/40 flex items-center justify-center p-5"
-            onClick={() => setShowFollowers(false)}
+            onClick={() => setShowUnfriendConfirm(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-sm bg-card rounded-xl p-5 shadow-lg"
+            >
+              <h3 className="font-bold text-foreground text-sm mb-2">Unfriend {user.name}?</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                You'll no longer be able to see each other's quests and profile.
+              </p>
+              <div className="flex gap-2 justify-end">
+                <button
+                  onClick={() => setShowUnfriendConfirm(false)}
+                  className="px-4 py-2 rounded-xl bg-muted text-muted-foreground font-semibold text-sm"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    unfriend(user.id);
+                    setShowUnfriendConfirm(false);
+                  }}
+                  className="px-4 py-2 rounded-xl bg-destructive text-destructive-foreground font-semibold text-sm"
+                >
+                  Unfriend
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Friends Modal */}
+      <AnimatePresence>
+        {showFriends && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-foreground/40 flex items-center justify-center p-5"
+            onClick={() => setShowFriends(false)}
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
@@ -116,16 +141,16 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
               className="w-full max-w-sm bg-card rounded-xl p-5 shadow-lg max-h-[60vh] overflow-y-auto"
             >
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-bold text-foreground text-sm">Followers</h3>
-                <button onClick={() => setShowFollowers(false)}>
+                <h3 className="font-bold text-foreground text-sm">Friends</h3>
+                <button onClick={() => setShowFriends(false)}>
                   <X className="w-4 h-4 text-muted-foreground" />
                 </button>
               </div>
-              {userFollowersList.map((u) => (
+              {userFriendsList.map((u) => (
                 <button
                   key={u.id}
                   onClick={() => {
-                    setShowFollowers(false);
+                    setShowFriends(false);
                     if (u.id === currentUser.id) onBack();
                     else onViewProfile(u);
                   }}
@@ -140,53 +165,11 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
         )}
       </AnimatePresence>
 
-      {/* Following Modal */}
-      <AnimatePresence>
-        {showFollowing && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-foreground/40 flex items-center justify-center p-5"
-            onClick={() => setShowFollowing(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-sm bg-card rounded-xl p-5 shadow-lg max-h-[60vh] overflow-y-auto"
-            >
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-bold text-foreground text-sm">Following</h3>
-                <button onClick={() => setShowFollowing(false)}>
-                  <X className="w-4 h-4 text-muted-foreground" />
-                </button>
-              </div>
-              {userFollowingList.map((u) => (
-                <button
-                  key={u.id}
-                  onClick={() => {
-                    setShowFollowing(false);
-                    if (u.id === currentUser.id) onBack();
-                    else onViewProfile(u);
-                  }}
-                  className="w-full flex items-center gap-2 py-1.5 text-left hover:bg-muted/50 rounded-lg px-1 transition-colors"
-                >
-                  <UserAvatar user={u} size="sm" />
-                  <span className="text-sm text-foreground">{u.name}</span>
-                </button>
-              ))}
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {!isFollowed ? (
+      {!isFriend ? (
         <div className="text-center py-16">
           <Lock className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
           <p className="font-bold text-foreground mb-1">Private Account</p>
-          <p className="text-sm text-muted-foreground mb-4">Follow to see their quests</p>
+          <p className="text-sm text-muted-foreground mb-4">Add as friend to see their quests</p>
           {hasRequested ? (
             <button
               disabled
@@ -197,11 +180,11 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
             </button>
           ) : (
             <button
-              onClick={() => sendFollowRequest(user)}
+              onClick={() => sendFriendRequest(user)}
               className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm flex items-center gap-2 mx-auto"
             >
               <UserPlus className="w-4 h-4" />
-              Request to Follow
+              Add Friend
             </button>
           )}
         </div>

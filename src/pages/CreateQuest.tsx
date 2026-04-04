@@ -228,9 +228,9 @@ const CreateQuest = () => {
                   : "border-border bg-card"
               }`}
             >
-              <p className="font-bold text-foreground">🌍 Followers Only</p>
+              <p className="font-bold text-foreground">🌍 Friends Only</p>
               <p className="text-sm text-muted-foreground mt-1">
-                Visible to all your approved followers
+                Visible to all your friends
               </p>
             </button>
 

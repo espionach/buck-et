@@ -10,7 +10,7 @@ import { motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const Feed = () => {
-  const { quests, groups, following, cleanupEmptyQuests, notifications } = useAppStore();
+  const { quests, groups, friends: friendsList, cleanupEmptyQuests, notifications } = useAppStore();
   const [search, setSearch] = useState("");
   const [searchTab, setSearchTab] = useState<"quests" | "people">("quests");
   const [selectedProfile, setSelectedProfile] = useState<User | null>(null);
@@ -37,7 +37,7 @@ const Feed = () => {
   // Apply filter
   const filterOptions = [
     { key: "all", label: "All" },
-    { key: "followers", label: "Following" },
+    { key: "followers", label: "Friends" },
     ...groups.map((g) => ({ key: g.id, label: `${g.emoji} ${g.name}` })),
   ];
 
@@ -48,7 +48,7 @@ const Feed = () => {
   });
 
   const allSearchableUsers = [...friends, ...nonFollowedUsers];
-  const isFollowing = (user: User) => following.some((f) => f.id === user.id);
+  const isFriend = (user: User) => friendsList.some((f) => f.id === user.id);
 
   // Snapshot which quests were joined at page load so order stays stable
   const [joinedSnapshot, setJoinedSnapshot] = useState<Set<string>>(new Set());
@@ -259,13 +259,13 @@ const Feed = () => {
                           <p className="font-semibold text-foreground text-sm">{user.name}</p>
                           <p className="text-xs text-muted-foreground">{user.bio}</p>
                         </div>
-                        {isFollowing(user) ? (
+                        {isFriend(user) ? (
                           <span className="text-[10px] font-semibold text-secondary px-2 py-1 rounded-full bg-secondary/10">
-                            Following
+                            Friend
                           </span>
                         ) : (
                           <span className="text-[10px] font-semibold text-muted-foreground px-2 py-1 rounded-full bg-muted">
-                            Not following
+                            Not a friend
                           </span>
                         )}
                       </button>

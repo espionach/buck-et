@@ -5,7 +5,7 @@ import {
   User,
   Comment,
   GroupInvitation,
-  FollowRequest,
+  FriendRequest,
   GroupMember,
   TransferRequest,
   AppNotification,
@@ -16,7 +16,7 @@ import {
   currentUser,
   friends,
   pendingGroupInvitations as initialInvitations,
-  pendingFollowRequests as initialFollowRequests,
+  pendingFriendRequests as initialFriendRequests,
   pendingTransferRequests as initialTransfers,
   initialNotifications,
 } from "./mockData";
@@ -24,11 +24,10 @@ import {
 interface AppState {
   quests: Quest[];
   groups: Group[];
-  following: User[];
-  followers: User[];
+  friends: User[];
   groupInvitations: GroupInvitation[];
-  followRequests: FollowRequest[];
-  sentFollowRequests: string[]; // user IDs we've sent requests to
+  friendRequests: FriendRequest[];
+  sentFriendRequests: string[]; // user IDs we've sent requests to
   transferRequests: TransferRequest[];
   notifications: AppNotification[];
   currentUser: User;
@@ -44,10 +43,10 @@ interface AppState {
   inviteToGroup: (groupId: string, user: User) => void;
   acceptGroupInvitation: (invitationId: string) => void;
   declineGroupInvitation: (invitationId: string) => void;
-  acceptFollowRequest: (requestId: string) => void;
-  declineFollowRequest: (requestId: string) => void;
-  sendFollowRequest: (toUser: User) => void;
-  unfollowUser: (userId: string) => void;
+  acceptFriendRequest: (requestId: string) => void;
+  declineFriendRequest: (requestId: string) => void;
+  sendFriendRequest: (toUser: User) => void;
+  unfriend: (userId: string) => void;
   addComment: (questId: string, comment: Comment) => void;
   updateQuest: (questId: string, updates: Partial<Quest>) => void;
   deleteQuest: (questId: string) => void;
@@ -79,11 +78,10 @@ interface AppState {
 export const useAppStore = create<AppState>((set) => ({
   quests: initialQuests,
   groups: initialGroups,
-  following: friends,
-  followers: [...friends.slice(0, 4)],
+  friends: friends,
   groupInvitations: initialInvitations,
-  followRequests: initialFollowRequests,
-  sentFollowRequests: [],
+  friendRequests: initialFriendRequests,
+  sentFriendRequests: [],
   transferRequests: initialTransfers,
   notifications: initialNotifications,
   currentUser: currentUser,
@@ -175,52 +173,42 @@ export const useAppStore = create<AppState>((set) => ({
       groupInvitations: s.groupInvitations.filter((i) => i.id !== invitationId),
     })),
 
-  acceptFollowRequest: (requestId) =>
+  acceptFriendRequest: (requestId) =>
     set((s) => {
-      const req = s.followRequests.find((r) => r.id === requestId);
+      const req = s.friendRequests.find((r) => r.id === requestId);
       if (!req) return s;
-      const alreadyFollowing = s.following.some((f) => f.id === req.from.id);
+      const alreadyFriend = s.friends.some((f) => f.id === req.from.id);
       return {
-        followRequests: s.followRequests.filter((r) => r.id !== requestId),
-        followers: [...s.followers, req.from],
-        following: alreadyFollowing ? s.following : [...s.following, req.from],
+        friendRequests: s.friendRequests.filter((r) => r.id !== requestId),
+        friends: alreadyFriend ? s.friends : [...s.friends, req.from],
       };
     }),
 
-  declineFollowRequest: (requestId) =>
+  declineFriendRequest: (requestId) =>
     set((s) => ({
-      followRequests: s.followRequests.filter((r) => r.id !== requestId),
+      friendRequests: s.friendRequests.filter((r) => r.id !== requestId),
     })),
 
-  sendFollowRequest: (toUser) =>
+  sendFriendRequest: (toUser) =>
     set((s) => {
-      if (s.sentFollowRequests.includes(toUser.id)) return s;
-      // Since this is a mock, we simulate the other user receiving a follow request
-      // by adding it to followRequests (as if we are the "other user" receiving it)
-      // For demo purposes, we add the request to the store
-      const newRequest: FollowRequest = {
-        id: `fr${Date.now()}`,
-        from: s.currentUser,
-        status: "pending",
-      };
+      if (s.sentFriendRequests.includes(toUser.id)) return s;
       const notification: AppNotification = {
         id: `n${Date.now()}`,
-        type: "follow_request",
-        message: `${s.currentUser.name} requested to follow ${toUser.name}`,
+        type: "friend_request",
+        message: `${s.currentUser.name} sent a friend request to ${toUser.name}`,
         fromUser: s.currentUser,
         read: false,
         createdAt: new Date().toISOString().split("T")[0],
       };
       return {
-        sentFollowRequests: [...s.sentFollowRequests, toUser.id],
+        sentFriendRequests: [...s.sentFriendRequests, toUser.id],
         notifications: [notification, ...s.notifications],
       };
     }),
 
-  unfollowUser: (userId) =>
+  unfriend: (userId) =>
     set((s) => ({
-      following: s.following.filter((f) => f.id !== userId),
-      followers: s.followers.filter((f) => f.id !== userId),
+      friends: s.friends.filter((f) => f.id !== userId),
     })),
 
   addComment: (questId, comment) =>

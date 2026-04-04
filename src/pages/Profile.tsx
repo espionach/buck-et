@@ -12,11 +12,10 @@ const Profile = () => {
   const {
     currentUser,
     quests,
-    following,
-    followers,
-    followRequests,
-    acceptFollowRequest,
-    declineFollowRequest,
+    friends: friendsList,
+    friendRequests,
+    acceptFriendRequest,
+    declineFriendRequest,
     updateProfile,
     updateQuest,
     deleteQuest,
@@ -31,13 +30,10 @@ const Profile = () => {
   const [showEditProfile, setShowEditProfile] = useState(false);
   const [editName, setEditName] = useState(currentUser.name);
   const [editBio, setEditBio] = useState(currentUser.bio);
-  const [showFollowers, setShowFollowers] = useState(false);
-  const [showFollowing, setShowFollowing] = useState(false);
+  const [showFriends, setShowFriends] = useState(false);
   const [showRequests, setShowRequests] = useState(false);
   const [viewingUser, setViewingUser] = useState<User | null>(null);
   const [viewingUserTab, setViewingUserTab] = useState<"current" | "past">("current");
-  const [viewingUserFollowers, setViewingUserFollowers] = useState(false);
-  const [viewingUserFollowing, setViewingUserFollowing] = useState(false);
   const [snapshotQuestIds, setSnapshotQuestIds] = useState<string[]>([]);
   // Profile picture upload
   const profilePicRef = useRef<HTMLInputElement>(null);
@@ -256,8 +252,8 @@ const Profile = () => {
     setQuestPhotos((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Viewing another user's profile from followers/following list
-  const isFollowingUser = (user: User) => following.some((f) => f.id === user.id);
+  // Viewing another user's profile from friends list
+  const isFriendUser = (user: User) => friendsList.some((f) => f.id === user.id);
 
   if (viewingUser) {
     return (
@@ -377,36 +373,30 @@ const Profile = () => {
       </div>
 
 
-      {/* Followers / Following row */}
-      <div className="flex items-center gap-3 mb-4">
+      {/* Friends count + Friend Requests on same line */}
+      <div className="flex items-center justify-between mb-4">
         <button
-          onClick={() => setShowFollowers(true)}
-          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-card border border-border/50 text-sm font-semibold text-foreground"
+          onClick={() => setShowFriends(true)}
+          className="flex items-center gap-1.5 text-sm font-semibold text-foreground"
         >
           <UsersIcon className="w-4 h-4" />
-          {followers.length} Followers
+          {friendsList.length} Friends
         </button>
-        <button
-          onClick={() => setShowFollowing(true)}
-          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-card border border-border/50 text-sm font-semibold text-foreground"
-        >
-          <UsersIcon className="w-4 h-4" />
-          {following.length} Following
-        </button>
-        {followRequests.length > 0 && (
+        {friendRequests.length > 0 && (
           <button
             onClick={() => setShowRequests(true)}
-            className="relative p-2.5 rounded-xl bg-primary/10 text-primary"
+            className="relative px-3 py-1.5 rounded-xl bg-primary/10 text-primary text-sm font-semibold flex items-center gap-1.5"
           >
             <UserPlus className="w-4 h-4" />
-            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
-              {followRequests.length}
+            Friend Requests
+            <span className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
+              {friendRequests.length}
             </span>
           </button>
         )}
       </div>
 
-      {/* Follow Requests Modal Popup */}
+      {/* Friend Requests Modal Popup */}
       <AnimatePresence>
         {showRequests && (
           <motion.div
@@ -424,12 +414,12 @@ const Profile = () => {
               className="w-full max-w-sm bg-card rounded-xl p-5 shadow-lg max-h-[60vh] overflow-y-auto space-y-2"
             >
               <div className="flex items-center justify-between mb-2">
-                <h3 className="font-bold text-foreground text-sm">Follow Requests</h3>
+                <h3 className="font-bold text-foreground text-sm">Friend Requests</h3>
                 <button onClick={() => setShowRequests(false)}>
                   <X className="w-4 h-4 text-muted-foreground" />
                 </button>
               </div>
-              {followRequests.map((req) => (
+              {friendRequests.map((req) => (
                 <div key={req.id} className="flex items-center justify-between">
                   <button
                     className="flex items-center gap-2"
@@ -444,8 +434,8 @@ const Profile = () => {
                   <div className="flex gap-1.5">
                     <button
                       onClick={() => {
-                        acceptFollowRequest(req.id);
-                        if (followRequests.length <= 1) setShowRequests(false);
+                        acceptFriendRequest(req.id);
+                        if (friendRequests.length <= 1) setShowRequests(false);
                       }}
                       className="p-1.5 rounded-lg bg-secondary text-secondary-foreground"
                     >
@@ -453,8 +443,8 @@ const Profile = () => {
                     </button>
                     <button
                       onClick={() => {
-                        declineFollowRequest(req.id);
-                        if (followRequests.length <= 1) setShowRequests(false);
+                        declineFriendRequest(req.id);
+                        if (friendRequests.length <= 1) setShowRequests(false);
                       }}
                       className="p-1.5 rounded-lg bg-muted text-muted-foreground"
                     >
@@ -468,15 +458,15 @@ const Profile = () => {
         )}
       </AnimatePresence>
 
-      {/* Followers Modal Popup */}
+      {/* Friends Modal Popup */}
       <AnimatePresence>
-        {showFollowers && (
+        {showFriends && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 bg-foreground/40 flex items-center justify-center p-5"
-            onClick={() => setShowFollowers(false)}
+            onClick={() => setShowFriends(false)}
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
@@ -486,58 +476,17 @@ const Profile = () => {
               className="w-full max-w-sm bg-card rounded-xl p-5 shadow-lg max-h-[60vh] overflow-y-auto"
             >
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-bold text-foreground text-sm">Followers</h3>
-                <button onClick={() => setShowFollowers(false)}>
+                <h3 className="font-bold text-foreground text-sm">Friends</h3>
+                <button onClick={() => setShowFriends(false)}>
                   <X className="w-4 h-4 text-muted-foreground" />
                 </button>
               </div>
-              {followers.map((u) => (
+              {friendsList.map((u) => (
                 <button
                   key={u.id}
                   onClick={() => {
                     setViewingUser(u);
-                    setShowFollowers(false);
-                  }}
-                  className="w-full flex items-center gap-2 py-1.5 text-left hover:bg-muted/50 rounded-lg px-1 transition-colors"
-                >
-                  <UserAvatar user={u} size="sm" />
-                  <span className="text-sm text-foreground">{u.name}</span>
-                </button>
-              ))}
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Following Modal Popup */}
-      <AnimatePresence>
-        {showFollowing && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-foreground/40 flex items-center justify-center p-5"
-            onClick={() => setShowFollowing(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-sm bg-card rounded-xl p-5 shadow-lg max-h-[60vh] overflow-y-auto"
-            >
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-bold text-foreground text-sm">Following</h3>
-                <button onClick={() => setShowFollowing(false)}>
-                  <X className="w-4 h-4 text-muted-foreground" />
-                </button>
-              </div>
-              {following.map((u) => (
-                <button
-                  key={u.id}
-                  onClick={() => {
-                    setViewingUser(u);
-                    setShowFollowing(false);
+                    setShowFriends(false);
                   }}
                   className="w-full flex items-center gap-2 py-1.5 text-left hover:bg-muted/50 rounded-lg px-1 transition-colors"
                 >

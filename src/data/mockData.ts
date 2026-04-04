@@ -41,11 +41,14 @@ export interface GroupInvitation {
   status: "pending" | "accepted" | "declined";
 }
 
-export interface FollowRequest {
+export interface FriendRequest {
   id: string;
   from: User;
   status: "pending" | "accepted" | "declined";
 }
+
+// Keep backward compat alias
+export type FollowRequest = FriendRequest;
 
 export interface QuestVolunteer {
   userId: string;
@@ -175,10 +178,13 @@ export const pendingGroupInvitations: GroupInvitation[] = [
   },
 ];
 
-export const pendingFollowRequests: FollowRequest[] = [
+export const pendingFriendRequests: FriendRequest[] = [
   { id: "fr1", from: nonFollowedUsers[0], status: "pending" },
   { id: "fr2", from: nonFollowedUsers[1], status: "pending" },
 ];
+
+// Keep backward compat alias
+export const pendingFollowRequests = pendingFriendRequests;
 
 export const quests: Quest[] = [
   {
@@ -384,7 +390,7 @@ export interface TransferRequest {
 
 export interface AppNotification {
   id: string;
-  type: "transfer_quest" | "transfer_group" | "new_comment" | "new_participant" | "follow_request";
+  type: "transfer_quest" | "transfer_group" | "new_comment" | "new_participant" | "follow_request" | "friend_request";
   message: string;
   entityId?: string;
   groupId?: string;
