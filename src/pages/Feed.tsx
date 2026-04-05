@@ -233,12 +233,17 @@ const Feed = () => {
                       <p className="font-semibold">No quests found</p>
                     </div>
                   ) : (
-                    filteredQuests.map((q, i) => <QuestCard key={q.id} quest={q} index={i} onMarkDone={() => navigate("/profile?tab=past")} onMarkUndone={() => navigate("/profile?tab=current")} onViewProfile={(user) => {
-                      if (search.trim()) {
-                        setRecentSearches((prev) => [search.trim(), ...prev.filter((s) => s !== search.trim())].slice(0, 10));
-                      }
-                      setSelectedProfile(user);
-                    }} />)
+                    <QuestList
+                      quests={filteredQuests}
+                      onMarkDone={() => navigate("/profile?tab=past")}
+                      onMarkUndone={() => navigate("/profile?tab=current")}
+                      onViewProfile={(user) => {
+                        if (search.trim()) {
+                          setRecentSearches((prev) => [search.trim(), ...prev.filter((s) => s !== search.trim())].slice(0, 10));
+                        }
+                        setSelectedProfile(user);
+                      }}
+                    />
                   )}
                 </div>
               ) : (
