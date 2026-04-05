@@ -224,7 +224,7 @@ const Boards = () => {
                         </AnimatePresence>
                         <button
                           onClick={() => setShowAllInvites(false)}
-                          className="w-full text-center text-xs font-semibold text-primary py-2"
+                          className="w-full text-center text-[10px] font-semibold text-primary py-1"
                         >
                           Hide
                         </button>
