@@ -51,6 +51,15 @@ const Profile = () => {
   const [newLink, setNewLink] = useState("");
   const currentPhotoRef = useRef<HTMLInputElement>(null);
 
+  // Logistics editing state
+  const [editDate, setEditDate] = useState("");
+  const [editTime, setEditTime] = useState("");
+  const [editLocation, setEditLocation] = useState("");
+  const [editMeetupSpot, setEditMeetupSpot] = useState("");
+  const [editTransportation, setEditTransportation] = useState("");
+  const [editCarpoolSlots, setEditCarpoolSlots] = useState("");
+  const [editCustomNotes, setEditCustomNotes] = useState("");
+
   // Past quest editing state
   const [editingPastQuest, setEditingPastQuest] = useState<Quest | null>(null);
   const [questNotes, setQuestNotes] = useState("");
