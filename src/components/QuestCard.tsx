@@ -187,12 +187,12 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
                 !canJoin
                   ? "bg-muted/50 text-muted-foreground/50 cursor-not-allowed"
                   : isIn
-                  ? "bg-secondary text-secondary-foreground"
+                  ? "bg-green-500 text-white"
                   : "bg-muted text-muted-foreground"
               }`}
             >
-              <HandMetal className="w-3.5 h-3.5" />
-              I'm In
+              {isIn ? <Check className="w-3.5 h-3.5" /> : <HandMetal className="w-3.5 h-3.5" />}
+              {isIn ? "I'm In" : "Join Quest"}
             </button>
           )}
         </div>
