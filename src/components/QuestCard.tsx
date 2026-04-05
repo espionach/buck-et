@@ -198,17 +198,6 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
           <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{quest.description}</p>
         )}
 
-        {/* Date */}
-        {!quest.isDone && quest.logistics?.date && (
-          <div className="flex items-center gap-1.5 mt-2 text-xs text-muted-foreground">
-            <Calendar className="w-3.5 h-3.5" />
-            <span>
-              {format(parseISO(quest.logistics.date), "MMM d, yyyy")}
-              {quest.logistics.time && ` · ${quest.logistics.time}`}
-            </span>
-          </div>
-        )}
-
         {/* Links */}
         {quest.links && quest.links.length > 0 && (
           <div className="mt-2 space-y-1">
@@ -245,6 +234,17 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
                 <img key={i} src={photo} alt={`Quest photo ${i + 1}`} className="w-20 h-20 rounded-xl object-cover shrink-0 border border-border/30" />
               )
             ))}
+          </div>
+        )}
+
+        {/* Date */}
+        {!quest.isDone && quest.logistics?.date && (
+          <div className="flex items-center gap-1.5 mt-2 text-xs text-muted-foreground">
+            <Calendar className="w-3.5 h-3.5" />
+            <span>
+              {format(parseISO(quest.logistics.date), "MMM d, yyyy")}
+              {quest.logistics.time && ` · ${quest.logistics.time}`}
+            </span>
           </div>
         )}
 
