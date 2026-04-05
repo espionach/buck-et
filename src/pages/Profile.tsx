@@ -177,6 +177,7 @@ const Profile = () => {
   };
 
   const [confirmRemoveUser, setConfirmRemoveUser] = useState<{ userId: string; userName: string; context: string } | null>(null);
+  usePopup(showFriends || !!confirmRemoveUser || !!editingCurrentQuest || !!editingPastQuest);
 
   const handleRemoveParticipantFromEditor = (userId: string) => {
     const user = editQuestParticipants.find((p) => p.id === userId);
