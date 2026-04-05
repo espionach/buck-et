@@ -10,7 +10,7 @@ interface NotificationPanelProps {
 }
 
 const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
-  const { notifications, markNotificationRead, markAllNotificationsRead, friendRequests, acceptFriendRequest, declineFriendRequest } = useAppStore();
+  const { notifications, markNotificationRead, markAllNotificationsRead, friendRequests, acceptFriendRequest, declineFriendRequest, groupInvitations, acceptGroupInvitation, declineGroupInvitation, clearNotification } = useAppStore();
   const navigate = useNavigate();
 
   const getIcon = (type: string) => {
