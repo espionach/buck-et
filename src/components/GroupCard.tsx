@@ -1,4 +1,5 @@
 import { Group } from "@/data/mockData";
+import { GroupIconDisplay } from "@/components/GroupIcon";
 import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
 import { motion, AnimatePresence } from "framer-motion";
