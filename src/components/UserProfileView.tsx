@@ -4,6 +4,7 @@ import UserAvatar from "@/components/UserAvatar";
 import { ArrowLeft, X, Users as UsersIcon, Lock, UserPlus, Clock, UserMinus, Check } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { usePopup } from "@/hooks/use-popup";
 import { User } from "@/data/mockData";
 
 interface UserProfileViewProps {

@@ -4,6 +4,7 @@ import UserAvatar from "@/components/UserAvatar";
 import { motion, AnimatePresence } from "framer-motion";
 import { Users, Check, X, ArrowRightLeft } from "lucide-react";
 import { useState } from "react";
+import { usePopup } from "@/hooks/use-popup";
 
 interface GroupCardProps {
   group: Group;
