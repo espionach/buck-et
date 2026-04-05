@@ -11,12 +11,10 @@ const CreateQuest = () => {
   const preselectedGroup = searchParams.get("groupId");
   const { groups, addQuest } = useAppStore();
 
-  const isInBoardCreation = !!preselectedGroup;
-  const [step, setStep] = useState(isInBoardCreation ? 1 : 1);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [selectedGroup, setSelectedGroup] = useState<string | null>(preselectedGroup);
-  const [isFollowerOnly, setIsFollowerOnly] = useState(false);
+  const [showGroupDropdown, setShowGroupDropdown] = useState(false);
 
   // Logistics fields
   const [showLogistics, setShowLogistics] = useState(false);
@@ -33,6 +31,8 @@ const CreateQuest = () => {
   const [links, setLinks] = useState<string[]>([]);
   const [newLink, setNewLink] = useState("");
   const photoInputRef = useRef<HTMLInputElement>(null);
+
+  const selectedGroupData = groups.find((g) => g.id === selectedGroup);
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -63,7 +63,7 @@ const CreateQuest = () => {
       description: description.trim() || undefined,
       createdBy: currentUser,
       groupId: selectedGroup || undefined,
-      isFollowerOnly: isInBoardCreation ? false : isFollowerOnly,
+      isFollowerOnly: !selectedGroup,
       participants: [currentUser],
       isDone: false,
       createdAt: new Date().toISOString().split("T")[0],
@@ -163,7 +163,7 @@ const CreateQuest = () => {
               rows={2} className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none" />
           </div>
 
-          {/* Photos */}
+          {/* Photos & Videos */}
           <div>
             <label className="text-[11px] text-muted-foreground mb-1 block">Photos & Videos</label>
             <div className="flex flex-wrap gap-2">
@@ -242,129 +242,104 @@ const CreateQuest = () => {
       {/* Header */}
       <div className="flex items-center gap-3 mb-8">
         <button
-          onClick={() => (step === 1 || isInBoardCreation ? navigate(-1) : setStep(1))}
+          onClick={() => navigate(-1)}
           className="p-2 rounded-xl bg-muted text-muted-foreground"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <div>
-          <h1 className="text-xl font-bold text-foreground">New Quest</h1>
-          {isInBoardCreation && (
-            <p className="text-xs text-muted-foreground">
-              For {groups.find((g) => g.id === preselectedGroup)?.emoji}{" "}
-              {groups.find((g) => g.id === preselectedGroup)?.name}
-            </p>
-          )}
-        </div>
+        <h1 className="text-xl font-bold text-foreground">New Quest</h1>
       </div>
 
-      <motion.div
-        key={step}
-        initial={{ opacity: 0, x: step === 1 ? -20 : 20 }}
-        animate={{ opacity: 1, x: 0 }}
-      >
-        {step === 1 ? (
-          <div className="space-y-5">
-            <div>
-              <label className="text-sm font-semibold text-foreground mb-2 block">
-                What's the quest?
-              </label>
-              <input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g. Road trip to the coast 🏖️"
-                className="w-full px-4 py-3.5 rounded-xl bg-card border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 text-base"
-                autoFocus
-              />
-            </div>
+      {/* Group selector dropdown */}
+      <div className="relative mb-5">
+        <button
+          type="button"
+          onClick={() => setShowGroupDropdown(!showGroupDropdown)}
+          className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-card border border-border text-sm"
+        >
+          <span className="text-foreground font-medium">
+            {selectedGroupData
+              ? `${selectedGroupData.emoji} ${selectedGroupData.name}`
+              : "🌍 Friends Only"}
+          </span>
+          <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${showGroupDropdown ? "rotate-180" : ""}`} />
+        </button>
 
-            <div>
-              <label className="text-sm font-semibold text-foreground mb-2 block">
-                Details (optional)
-              </label>
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Add notes, time, meetup spot..."
-                rows={3}
-                className="w-full px-4 py-3.5 rounded-xl bg-card border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm resize-none"
-              />
-            </div>
-
-            {logisticsSection}
-
-            {isInBoardCreation ? (
-              <button
-                onClick={handleCreate}
-                disabled={!title.trim()}
-                className="w-full py-4 rounded-xl bg-primary text-primary-foreground font-bold text-base flex items-center justify-center gap-2 disabled:opacity-40 active:scale-[0.98] transition-transform"
-              >
-                <Sparkles className="w-5 h-5" />
-                Launch Quest
-              </button>
-            ) : (
-              <button
-                onClick={() => title.trim() && setStep(2)}
-                disabled={!title.trim()}
-                className="w-full py-4 rounded-xl bg-primary text-primary-foreground font-bold text-base disabled:opacity-40 active:scale-[0.98] transition-transform"
-              >
-                Next — Choose Audience →
-              </button>
-            )}
-          </div>
-        ) : (
-          <div className="space-y-5">
-            <p className="text-sm text-muted-foreground">Who should see this quest?</p>
-
+        {showGroupDropdown && (
+          <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-lg overflow-hidden">
             <button
+              type="button"
               onClick={() => {
-                setIsFollowerOnly(true);
                 setSelectedGroup(null);
+                setShowGroupDropdown(false);
               }}
-              className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
-                isFollowerOnly
-                  ? "border-primary bg-primary/5"
-                  : "border-border bg-card"
+              className={`w-full text-left px-4 py-3 text-sm transition-colors ${
+                !selectedGroup ? "bg-primary/5 text-primary font-semibold" : "text-foreground hover:bg-muted"
               }`}
             >
-              <p className="font-bold text-foreground">🌍 Friends Only</p>
-              <p className="text-sm text-muted-foreground mt-1">
-                Visible to all your friends
-              </p>
+              🌍 Friends Only
             </button>
-
             {groups.map((g) => (
               <button
                 key={g.id}
+                type="button"
                 onClick={() => {
                   setSelectedGroup(g.id);
-                  setIsFollowerOnly(false);
+                  setShowGroupDropdown(false);
                 }}
-                className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
-                  selectedGroup === g.id
-                    ? "border-primary bg-primary/5"
-                    : "border-border bg-card"
+                className={`w-full text-left px-4 py-3 text-sm transition-colors ${
+                  selectedGroup === g.id ? "bg-primary/5 text-primary font-semibold" : "text-foreground hover:bg-muted"
                 }`}
               >
-                <p className="font-bold text-foreground">
-                  {g.emoji} {g.name}
-                </p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {g.members.length} members
-                </p>
+                {g.emoji} {g.name}
               </button>
             ))}
-
-            <button
-              onClick={handleCreate}
-              disabled={!isFollowerOnly && !selectedGroup}
-              className="w-full py-4 rounded-xl bg-primary text-primary-foreground font-bold text-base flex items-center justify-center gap-2 disabled:opacity-40 active:scale-[0.98] transition-transform"
-            >
-              <Sparkles className="w-5 h-5" />
-              Launch Quest
-            </button>
           </div>
         )}
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <div className="space-y-5">
+          <div>
+            <label className="text-sm font-semibold text-foreground mb-2 block">
+              What's the quest?
+            </label>
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="e.g. Road trip to the coast 🏖️"
+              className="w-full px-4 py-3.5 rounded-xl bg-card border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 text-base"
+              autoFocus
+            />
+          </div>
+
+          <div>
+            <label className="text-sm font-semibold text-foreground mb-2 block">
+              Details (optional)
+            </label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Add notes, time, meetup spot..."
+              rows={3}
+              className="w-full px-4 py-3.5 rounded-xl bg-card border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm resize-none"
+            />
+          </div>
+
+          {logisticsSection}
+
+          <button
+            onClick={handleCreate}
+            disabled={!title.trim()}
+            className="w-full py-4 rounded-xl bg-primary text-primary-foreground font-bold text-base flex items-center justify-center gap-2 disabled:opacity-40 active:scale-[0.98] transition-transform"
+          >
+            <Sparkles className="w-5 h-5" />
+            Launch Quest
+          </button>
+        </div>
       </motion.div>
     </div>
   );
