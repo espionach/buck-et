@@ -165,9 +165,9 @@ const Boards = () => {
                       </button>
                       <button
                         onClick={() => declineGroupInvitation(pendingInvitations[0].id)}
-                        className="p-2 rounded-full bg-muted text-muted-foreground"
+                        className="p-1.5 rounded-full bg-muted text-muted-foreground"
                       >
-                        <X className="w-4 h-4" />
+                        <X className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </div>
@@ -179,7 +179,7 @@ const Boards = () => {
                     {!showAllInvites ? (
                       <button
                         onClick={() => setShowAllInvites(true)}
-                        className="w-full text-center text-xs font-semibold text-primary py-2"
+                        className="w-full text-center text-[10px] font-semibold text-primary py-1"
                       >
                         View all ({pendingInvitations.length} invites)
                       </button>
