@@ -137,7 +137,7 @@ const Feed = () => {
             if (!searchMode) setSearchMode(true);
           }}
           placeholder="Search quests or people..."
-          className="w-full pl-10 pr-10 py-3 rounded-xl bg-card border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+          className="w-full pl-10 pr-10 py-3 rounded-xl bg-muted border-none text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
         />
         {(search || searchMode) && (
           <button
@@ -220,7 +220,7 @@ const Feed = () => {
             /* Has query — show results */
             <motion.div key={searchTab} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
               {searchTab === "quests" ? (
-                <div className="space-y-3">
+                <div className="divide-y divide-border">
                   {filteredQuests.length === 0 ? (
                     <div className="text-center py-16 text-muted-foreground">
                       <p className="text-4xl mb-3">🔭</p>
@@ -297,7 +297,7 @@ const Feed = () => {
 
           {/* Content */}
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-            <div className="space-y-3">
+            <div className="divide-y divide-border">
               {filteredQuests.length === 0 ? (
                 <div className="text-center py-16 text-muted-foreground">
                   <p className="text-4xl mb-3">🔭</p>
