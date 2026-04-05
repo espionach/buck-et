@@ -409,7 +409,7 @@ export interface TransferRequest {
 
 export interface AppNotification {
   id: string;
-  type: "transfer_quest" | "transfer_group" | "transfer_declined" | "new_comment" | "new_participant" | "follow_request" | "friend_request";
+  type: "transfer_quest" | "transfer_group" | "transfer_declined" | "new_comment" | "new_participant" | "follow_request" | "friend_request" | "board_invitation";
   message: string;
   entityId?: string;
   groupId?: string;
