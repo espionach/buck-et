@@ -14,7 +14,7 @@ interface UserProfileViewProps {
 }
 
 const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfileViewProps) => {
-  const { quests, friends, currentUser, sentFriendRequests, sendFriendRequest, unfriend } = useAppStore();
+  const { quests, friends, currentUser, sentFriendRequests, sendFriendRequest, unfriend, friendRequests, acceptFriendRequest } = useAppStore();
   const [tab, setTab] = useState<"current" | "past">("current");
   const [showFriends, setShowFriends] = useState(false);
   const [showUnfriendConfirm, setShowUnfriendConfirm] = useState(false);
