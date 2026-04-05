@@ -19,6 +19,7 @@ const Boards = () => {
   const openGroup = searchParams.get("open");
   const highlightQuestId = searchParams.get("highlightQuest");
   const highlightCommentId = searchParams.get("commentId");
+  const justAddedQuestId = (location.state as any)?.justAddedQuestId as string | undefined;
 
   const [selectedGroup, setSelectedGroup] = useState<string | null>(openGroup);
   const [search, setSearch] = useState("");
