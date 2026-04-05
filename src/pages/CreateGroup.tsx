@@ -1,5 +1,5 @@
 import { useAppStore } from "@/data/appState";
-import { currentUser, Group, GroupMember } from "@/data/mockData";
+import { Group, GroupMember } from "@/data/mockData";
 import { ArrowLeft, Plus } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -8,7 +8,7 @@ import UserAvatar from "@/components/UserAvatar";
 
 const CreateGroup = () => {
   const navigate = useNavigate();
-  const { addGroup, friends: friendsList } = useAppStore();
+  const { addGroup, friends: friendsList, currentUser } = useAppStore();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [emoji, setEmoji] = useState("🎯");

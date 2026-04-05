@@ -1,5 +1,5 @@
 import { useAppStore } from "@/data/appState";
-import { currentUser, Quest } from "@/data/mockData";
+import { Quest } from "@/data/mockData";
 import { ArrowLeft, Sparkles, ChevronDown, ChevronUp, ImagePlus, Link as LinkIcon, X } from "lucide-react";
 import { useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -9,7 +9,7 @@ const CreateQuest = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const preselectedGroup = searchParams.get("groupId");
-  const { groups, addQuest } = useAppStore();
+  const { groups, addQuest, currentUser } = useAppStore();
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");

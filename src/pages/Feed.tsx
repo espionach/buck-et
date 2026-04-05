@@ -1,5 +1,5 @@
 import { useAppStore } from "@/data/appState";
-import { currentUser, friends, nonFollowedUsers, User } from "@/data/mockData";
+import { friends, nonFollowedUsers, User } from "@/data/mockData";
 import QuestCard from "@/components/QuestCard";
 import UserAvatar from "@/components/UserAvatar";
 import NotificationPanel from "@/components/NotificationPanel";
@@ -10,7 +10,7 @@ import { motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const Feed = () => {
-  const { quests, groups, friends: friendsList, cleanupEmptyQuests, notifications, friendRequests } = useAppStore();
+  const { quests, groups, friends: friendsList, cleanupEmptyQuests, notifications, friendRequests, currentUser } = useAppStore();
   const [search, setSearch] = useState("");
   const [searchTab, setSearchTab] = useState<"quests" | "people">("quests");
   const [selectedProfile, setSelectedProfile] = useState<User | null>(null);

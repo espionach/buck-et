@@ -1,4 +1,4 @@
-import { Group, currentUser } from "@/data/mockData";
+import { Group } from "@/data/mockData";
 import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
 import { motion, AnimatePresence } from "framer-motion";
@@ -18,7 +18,7 @@ const gradients = [
 ];
 
 const GroupCard = ({ group, onClick, index }: GroupCardProps) => {
-  const { transferRequests, acceptTransfer, declineTransfer } = useAppStore();
+  const { transferRequests, acceptTransfer, declineTransfer, currentUser } = useAppStore();
   const [showTransferPopup, setShowTransferPopup] = useState(false);
 
   const pendingTransfer = transferRequests.find(

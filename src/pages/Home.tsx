@@ -1,5 +1,5 @@
 import { useAppStore } from "@/data/appState";
-import { currentUser, User } from "@/data/mockData";
+import { User } from "@/data/mockData";
 import GroupCard from "@/components/GroupCard";
 import QuestCard from "@/components/QuestCard";
 import GroupSettings from "@/components/GroupSettings";
@@ -11,7 +11,7 @@ import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
 const Boards = () => {
-  const { groups, quests, groupInvitations, acceptGroupInvitation, declineGroupInvitation, cleanupEmptyQuests, setHideGlobalFab } = useAppStore();
+  const { groups, quests, groupInvitations, acceptGroupInvitation, declineGroupInvitation, cleanupEmptyQuests, setHideGlobalFab, currentUser } = useAppStore();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const location = useLocation();
