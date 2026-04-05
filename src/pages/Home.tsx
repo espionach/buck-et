@@ -105,8 +105,14 @@ const Boards = () => {
   return (
     <div className="min-h-screen pb-24 px-5 pt-14">
       {/* Header */}
-      <div className="mb-4">
+      <div className="flex items-center justify-between mb-4">
         <h1 className="text-3xl font-bold text-foreground">Your Boards</h1>
+        <button
+          onClick={() => navigate("/create-group")}
+          className="p-2 rounded-xl bg-muted text-muted-foreground hover:text-primary transition-colors"
+        >
+          <Plus className="w-5 h-5" />
+        </button>
       </div>
 
       <AnimatePresence mode="wait">
