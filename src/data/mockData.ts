@@ -239,6 +239,22 @@ export const quests: Quest[] = [
     },
   },
   {
+    id: "q-overflow",
+    title: "Plan the ultimate cross-country road trip hitting every national park along the west coast and documenting everything",
+    description: "We need to map out all the stops, book campsites in advance, figure out who's driving which legs of the trip, and make sure we have enough snacks and playlists to last the entire journey without anyone losing their mind",
+    createdBy: currentUser,
+    groupId: "g3",
+    isFollowerOnly: false,
+    participants: [currentUser, friends[0], friends[2]],
+    isDone: false,
+    createdAt: "2026-03-19",
+    links: [
+      "https://www.nps.gov/subjects/nationalparksystem/national-parks-of-the-western-united-states.htm",
+      "https://www.recreation.gov/camping/campgrounds/reservations-and-availability-checker",
+    ],
+    comments: [],
+  },
+  {
     id: "q1",
     title: "Watch sunrise from the pier",
     description: "Meet at 5:30am, bring coffee ☕",
