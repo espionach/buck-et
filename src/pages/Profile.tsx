@@ -1,5 +1,5 @@
 import { useAppStore } from "@/data/appState";
-import QuestCard from "@/components/QuestCard";
+import QuestList from "@/components/QuestList";
 import UserAvatar from "@/components/UserAvatar";
 import { Edit, X, Check, Users as UsersIcon, UserPlus, Trash2, ImagePlus, Camera, Link as LinkIcon, Plus, ArrowLeft } from "lucide-react";
 import UserProfileView from "@/components/UserProfileView";
