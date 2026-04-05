@@ -168,7 +168,15 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
           <Lock className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
           <p className="font-bold text-foreground mb-1">Private Account</p>
           <p className="text-sm text-muted-foreground mb-4">Add as friend to see their quests</p>
-          {hasRequested ? (
+          {incomingRequest ? (
+            <button
+              onClick={() => acceptFriendRequest(incomingRequest.id)}
+              className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm flex items-center gap-2 mx-auto"
+            >
+              <Check className="w-4 h-4" />
+              Accept Friend Request
+            </button>
+          ) : hasRequested ? (
             <button
               disabled
               className="px-6 py-2.5 rounded-xl bg-muted text-muted-foreground font-semibold text-sm flex items-center gap-2 mx-auto cursor-default"
