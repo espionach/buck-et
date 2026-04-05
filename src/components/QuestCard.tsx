@@ -191,7 +191,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
                   : "bg-muted text-muted-foreground"
               }`}
             >
-              {isIn ? <Check className="w-3.5 h-3.5" /> : <HandMetal className="w-3.5 h-3.5" />}
+              {isIn && <Check className="w-3.5 h-3.5" />}
               {isIn ? "I'm In" : "Join Quest"}
             </button>
           )}
