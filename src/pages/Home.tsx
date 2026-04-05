@@ -109,7 +109,7 @@ const Boards = () => {
         <h1 className="text-3xl font-bold text-foreground">Your Boards</h1>
         <button
           onClick={() => navigate("/create-group")}
-          className="p-2 rounded-xl bg-muted text-muted-foreground hover:text-primary transition-colors"
+          className="p-2 text-muted-foreground hover:text-primary transition-colors"
         >
           <Plus className="w-5 h-5" />
         </button>
