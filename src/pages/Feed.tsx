@@ -220,7 +220,7 @@ const Feed = () => {
             /* Has query — show results */
             <motion.div key={searchTab} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
               {searchTab === "quests" ? (
-                <div className="space-y-3">
+                <div className="divide-y divide-border">
                   {filteredQuests.length === 0 ? (
                     <div className="text-center py-16 text-muted-foreground">
                       <p className="text-4xl mb-3">🔭</p>
