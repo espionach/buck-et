@@ -289,7 +289,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
                 className="flex items-center gap-1 text-xs text-secondary font-semibold"
               >
                 <Check className="w-3.5 h-3.5" />
-                Done
+                Quest Completed!
               </button>
             )}
 
