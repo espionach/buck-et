@@ -87,12 +87,8 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
         <h2 className="text-xl font-bold text-foreground">Edit Board</h2>
 
           {/* Edit name/emoji */}
-          <div className="flex gap-2">
-            <input
-              value={editEmoji}
-              onChange={(e) => setEditEmoji(e.target.value)}
-              className="w-14 px-2 py-2.5 rounded-xl bg-muted border border-border text-center text-xl focus:outline-none focus:ring-2 focus:ring-primary/30"
-            />
+          <div className="flex gap-2 items-end">
+            <GroupIconPicker value={editEmoji} onChange={setEditEmoji} size="md" />
             <div className="flex-1 flex items-center gap-1.5">
               <input
                 value={editName}

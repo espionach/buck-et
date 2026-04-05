@@ -276,7 +276,7 @@ const Boards = () => {
 
             <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-3">
-                <span className="text-4xl">{selectedGroupData?.emoji}</span>
+                <GroupIconDisplay icon={selectedGroupData?.emoji || "target"} size={32} />
                 <div>
                   <h2 className="text-xl font-bold text-foreground">{selectedGroupData?.name}</h2>
                   <p className="text-sm text-muted-foreground">

@@ -182,7 +182,7 @@ export const pendingGroupInvitations: GroupInvitation[] = [
     group: {
       id: "g-new2",
       name: "Book Worms",
-      emoji: "📚",
+      emoji: "book-open",
       members: [friends[1], friends[2]],
       memberRoles: [
         { user: friends[1], role: "owner" },
