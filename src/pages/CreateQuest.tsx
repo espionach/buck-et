@@ -88,9 +88,9 @@ const CreateQuest = () => {
     addQuest(quest);
 
     if (selectedGroup) {
-      navigate(`/boards?open=${selectedGroup}`, { replace: true });
+      navigate(`/boards?open=${selectedGroup}`, { replace: true, state: { justAddedQuestId: questId } });
     } else {
-      navigate("/profile", { replace: true, state: isUndated ? { justAddedQuestId: questId } : undefined });
+      navigate("/profile", { replace: true, state: { justAddedQuestId: questId } });
     }
   };
 
