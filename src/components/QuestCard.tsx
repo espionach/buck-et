@@ -127,7 +127,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
               e.stopPropagation();
               onEditCurrent(quest);
             }}
-            className="absolute top-3 right-3 p-1.5 rounded-full bg-muted text-muted-foreground hover:text-foreground transition-colors"
+            className="absolute top-3 right-3 p-1.5 text-muted-foreground hover:text-foreground transition-colors"
           >
             <Pencil className="w-3.5 h-3.5" />
           </button>

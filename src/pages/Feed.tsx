@@ -111,7 +111,7 @@ const Feed = () => {
         <h1 className="text-3xl font-bold text-foreground">Home</h1>
         <button
           onClick={() => setShowNotifications(true)}
-          className="relative p-2 rounded-xl bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          className="relative p-2 text-muted-foreground hover:text-foreground transition-colors"
         >
           <Mail className="w-5 h-5" />
           {unreadCount > 0 && (
