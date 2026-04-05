@@ -10,7 +10,7 @@ import { motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const Feed = () => {
-  const { quests, groups, friends: friendsList, cleanupEmptyQuests, notifications } = useAppStore();
+  const { quests, groups, friends: friendsList, cleanupEmptyQuests, notifications, friendRequests } = useAppStore();
   const [search, setSearch] = useState("");
   const [searchTab, setSearchTab] = useState<"quests" | "people">("quests");
   const [selectedProfile, setSelectedProfile] = useState<User | null>(null);
