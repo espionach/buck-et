@@ -180,7 +180,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
                 handleToggleImIn();
               }}
               disabled={!canJoin}
-              className={`shrink-0 flex items-center justify-center transition-all active:scale-95 mt-0.5 ${
+              className={`shrink-0 flex items-center justify-center transition-all active:scale-95 mt-[3px] ${
                 isIn
                   ? "w-8 h-8 rounded-full bg-secondary text-secondary-foreground"
                   : !canJoin
