@@ -126,7 +126,7 @@ export const groups: Group[] = [
   {
     id: "g2",
     name: "Foodie Gang",
-    emoji: "🍜",
+    emoji: "utensils",
     description: "Exploring every food spot in the city",
     members: [currentUser, friends[3], friends[4]],
     memberRoles: [
