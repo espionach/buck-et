@@ -1,6 +1,7 @@
 import { useAppStore } from "@/data/appState";
 import { User } from "@/data/mockData";
 import GroupCard from "@/components/GroupCard";
+import { GroupIconDisplay } from "@/components/GroupIcon";
 import QuestList from "@/components/QuestList";
 import GroupSettings from "@/components/GroupSettings";
 import UserAvatar from "@/components/UserAvatar";
