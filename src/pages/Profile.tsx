@@ -411,7 +411,7 @@ const Profile = () => {
               className="w-full max-w-sm bg-card rounded-xl p-5 shadow-lg max-h-[60vh] overflow-y-auto space-y-2"
             >
               <div className="flex items-center justify-between mb-2">
-                <h3 className="font-bold text-foreground text-sm">Friend Requests</h3>
+                <h3 className="font-bold text-foreground text-sm">Requests</h3>
                 <button onClick={() => setShowRequests(false)}>
                   <X className="w-4 h-4 text-muted-foreground" />
                 </button>
