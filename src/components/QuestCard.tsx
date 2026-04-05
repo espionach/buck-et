@@ -187,7 +187,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
                   : "px-3 py-1.5 rounded-full bg-muted text-muted-foreground text-xs font-semibold"
               }`}
             >
-              {isIn ? <Check className="w-4.5 h-4.5" strokeWidth={3} /> : "Join"}
+              {isIn ? <Check className="w-3.5 h-3.5" strokeWidth={2.5} /> : "Join"}
             </button>
           )}
         </div>
