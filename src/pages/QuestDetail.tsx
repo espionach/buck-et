@@ -36,6 +36,8 @@ const QuestDetail = () => {
   const { questId } = useParams<{ questId: string }>();
   const { quests, groups, addComment, volunteerForQuest, unvolunteerFromQuest, updateQuestLogistics, currentUser } = useAppStore();
 
+  useEffect(() => { window.scrollTo(0, 0); }, [questId]);
+
   const quest = quests.find((q) => q.id === questId);
   const [newComment, setNewComment] = useState("");
   const [editingLogistics, setEditingLogistics] = useState(false);
