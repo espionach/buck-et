@@ -1,6 +1,6 @@
 import { useAppStore } from "@/data/appState";
 import { friends, nonFollowedUsers, User } from "@/data/mockData";
-import QuestCard from "@/components/QuestCard";
+import QuestList from "@/components/QuestList";
 import UserAvatar from "@/components/UserAvatar";
 import NotificationPanel from "@/components/NotificationPanel";
 import { Search, Lock, UserPlus, Mail, X } from "lucide-react";
@@ -227,19 +227,19 @@ const Feed = () => {
             <motion.div key={searchTab} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
               {searchTab === "quests" ? (
                 <div className="divide-y divide-border">
-                  {filteredQuests.length === 0 ? (
-                    <div className="text-center py-16 text-muted-foreground">
-                      <p className="text-4xl mb-3">🔭</p>
-                      <p className="font-semibold">No quests found</p>
-                    </div>
-                  ) : (
-                    filteredQuests.map((q, i) => <QuestCard key={q.id} quest={q} index={i} onMarkDone={() => navigate("/profile?tab=past")} onMarkUndone={() => navigate("/profile?tab=current")} onViewProfile={(user) => {
+                  <QuestList
+                    quests={filteredQuests}
+                    emptyIcon="🔭"
+                    emptyText="No quests found"
+                    onMarkDone={() => navigate("/profile?tab=past")}
+                    onMarkUndone={() => navigate("/profile?tab=current")}
+                    onViewProfile={(user) => {
                       if (search.trim()) {
                         setRecentSearches((prev) => [search.trim(), ...prev.filter((s) => s !== search.trim())].slice(0, 10));
                       }
                       setSelectedProfile(user);
-                    }} />)
-                  )}
+                    }}
+                  />
                 </div>
               ) : (
                 <div className="divide-y divide-border/50">
@@ -304,15 +304,15 @@ const Feed = () => {
           {/* Content */}
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
             <div className="divide-y divide-border">
-              {filteredQuests.length === 0 ? (
-                <div className="text-center py-16 text-muted-foreground">
-                  <p className="text-4xl mb-3">🔭</p>
-                  <p className="font-semibold">No quests to show</p>
-                  <p className="text-sm">Follow more friends to see their side quests!</p>
-                </div>
-              ) : (
-                filteredQuests.map((q, i) => <QuestCard key={q.id} quest={q} index={i} onMarkDone={() => navigate("/profile?tab=past")} onMarkUndone={() => navigate("/profile?tab=current")} onViewProfile={(user) => setSelectedProfile(user)} />)
-              )}
+              <QuestList
+                quests={filteredQuests}
+                emptyIcon="🔭"
+                emptyText="No quests to show"
+                emptySubtext="Follow more friends to see their side quests!"
+                onMarkDone={() => navigate("/profile?tab=past")}
+                onMarkUndone={() => navigate("/profile?tab=current")}
+                onViewProfile={(user) => setSelectedProfile(user)}
+              />
             </div>
           </motion.div>
         </>

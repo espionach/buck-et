@@ -1,7 +1,7 @@
 import { useAppStore } from "@/data/appState";
 import { User } from "@/data/mockData";
 import GroupCard from "@/components/GroupCard";
-import QuestCard from "@/components/QuestCard";
+import QuestList from "@/components/QuestList";
 import GroupSettings from "@/components/GroupSettings";
 import UserAvatar from "@/components/UserAvatar";
 import UserProfileView from "@/components/UserProfileView";
@@ -344,19 +344,15 @@ const Boards = () => {
                   </p>
                 </div>
               ) : (
-                 groupQuests.map((q, i) => (
-                  <QuestCard
-                    key={q.id}
-                    quest={q}
-                    index={i}
-                    hideActions={selectedGroupData?.ownerId !== currentUser.id}
-                    onMarkDone={selectedGroupData?.ownerId === currentUser.id ? () => setBoardTab("completed") : undefined}
-                    onMarkUndone={selectedGroupData?.ownerId === currentUser.id ? () => setBoardTab("active") : undefined}
-                    autoOpenComments={q.id === activeHighlight && !!activeCommentId}
-                    highlightCommentId={q.id === activeHighlight ? (activeCommentId || undefined) : undefined}
-                    onViewProfile={(user) => setViewingProfile(user)}
-                  />
-                ))
+                <QuestList
+                  quests={groupQuests}
+                  hideActions={selectedGroupData?.ownerId !== currentUser.id}
+                  onMarkDone={selectedGroupData?.ownerId === currentUser.id ? () => setBoardTab("completed") : undefined}
+                  onMarkUndone={selectedGroupData?.ownerId === currentUser.id ? () => setBoardTab("active") : undefined}
+                  autoOpenCommentsId={activeHighlight && activeCommentId ? activeHighlight : undefined}
+                  highlightCommentId={activeCommentId || undefined}
+                  onViewProfile={(user) => setViewingProfile(user)}
+                />
               )}
             </motion.div>
           </motion.div>

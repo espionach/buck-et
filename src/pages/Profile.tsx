@@ -1,5 +1,5 @@
 import { useAppStore } from "@/data/appState";
-import QuestCard from "@/components/QuestCard";
+import QuestList from "@/components/QuestList";
 import UserAvatar from "@/components/UserAvatar";
 import { Edit, X, Check, Users as UsersIcon, UserPlus, Trash2, ImagePlus, Camera, Link as LinkIcon, Plus, ArrowLeft } from "lucide-react";
 import UserProfileView from "@/components/UserProfileView";
@@ -489,21 +489,17 @@ const Profile = () => {
             </p>
           </div>
         ) : (
-          active.map((q, i) => (
-            <QuestCard
-              key={q.id}
-              quest={q}
-              index={i}
-              showGroup
-              onEditCurrent={tab === "current" ? handleOpenCurrentEditor : undefined}
-              onEditPast={tab === "past" ? handleOpenPastEditor : undefined}
-              onMarkDone={() => setTab("past")}
-              onMarkUndone={() => setTab("current")}
-              onViewProfile={(user) => {
-                if (user.id !== currentUser.id) setViewingUser(user);
-              }}
-            />
-          ))
+          <QuestList
+            quests={active}
+            showGroup
+            onEditCurrent={tab === "current" ? handleOpenCurrentEditor : undefined}
+            onEditPast={tab === "past" ? handleOpenPastEditor : undefined}
+            onMarkDone={() => setTab("past")}
+            onMarkUndone={() => setTab("current")}
+            onViewProfile={(user) => {
+              if (user.id !== currentUser.id) setViewingUser(user);
+            }}
+          />
         )}
       </motion.div>
 
