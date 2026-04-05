@@ -58,8 +58,11 @@ const CreateQuest = () => {
 
   const handleCreate = () => {
     if (!title.trim()) return;
+    const questId = `q${Date.now()}`;
+    const hasDate = !!(date || time || location || meetupSpot || transportation || customNotes);
+    const isUndated = !date;
     const quest: Quest = {
-      id: `q${Date.now()}`,
+      id: questId,
       title: title.trim(),
       description: description.trim() || undefined,
       createdBy: currentUser,
@@ -71,7 +74,7 @@ const CreateQuest = () => {
       comments: [],
       photos: photos.length > 0 ? photos : undefined,
       links: links.length > 0 ? links : undefined,
-      logistics: (date || time || location || meetupSpot || transportation || customNotes) ? {
+      logistics: hasDate ? {
         date: date || undefined,
         time: time || undefined,
         location: location || undefined,
@@ -87,7 +90,7 @@ const CreateQuest = () => {
     if (selectedGroup) {
       navigate(`/boards?open=${selectedGroup}`, { replace: true });
     } else {
-      navigate("/profile", { replace: true });
+      navigate("/profile", { replace: true, state: isUndated ? { justAddedQuestId: questId } : undefined });
     }
   };
 

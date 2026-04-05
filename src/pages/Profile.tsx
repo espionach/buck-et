@@ -110,7 +110,17 @@ const Profile = () => {
 
   const current = myQuests
     .filter((q) => !q.isDone)
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    .sort((a, b) => {
+      const aDate = a.logistics?.date;
+      const bDate = b.logistics?.date;
+      // Both dated: sort by upcoming date (soonest first)
+      if (aDate && bDate) return new Date(aDate).getTime() - new Date(bDate).getTime();
+      // Dated before undated
+      if (aDate && !bDate) return -1;
+      if (!aDate && bDate) return 1;
+      // Both undated: newest created first
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
 
   // Snapshot current quest IDs so unjoined quests stay visible until navigation
   useEffect(() => {
