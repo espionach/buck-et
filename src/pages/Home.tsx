@@ -11,7 +11,7 @@ import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
 const Boards = () => {
-  const { groups, quests, groupInvitations, acceptGroupInvitation, declineGroupInvitation, cleanupEmptyQuests, setHideGlobalFab } = useAppStore();
+  const { groups, quests, groupInvitations, acceptGroupInvitation, declineGroupInvitation, cleanupEmptyQuests, setHideGlobalFab, currentUser } = useAppStore();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const location = useLocation();

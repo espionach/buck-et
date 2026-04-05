@@ -9,7 +9,7 @@ const CreateQuest = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const preselectedGroup = searchParams.get("groupId");
-  const { groups, addQuest } = useAppStore();
+  const { groups, addQuest, currentUser } = useAppStore();
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");

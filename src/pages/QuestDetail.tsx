@@ -33,7 +33,7 @@ const volunteerRoles = [
 const QuestDetail = () => {
   const navigate = useNavigate();
   const { questId } = useParams<{ questId: string }>();
-  const { quests, groups, addComment, volunteerForQuest, unvolunteerFromQuest, updateQuestLogistics } = useAppStore();
+  const { quests, groups, addComment, volunteerForQuest, unvolunteerFromQuest, updateQuestLogistics, currentUser } = useAppStore();
 
   const quest = quests.find((q) => q.id === questId);
   const [newComment, setNewComment] = useState("");

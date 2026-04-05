@@ -8,7 +8,7 @@ import UserAvatar from "@/components/UserAvatar";
 
 const CreateGroup = () => {
   const navigate = useNavigate();
-  const { addGroup, friends: friendsList } = useAppStore();
+  const { addGroup, friends: friendsList, currentUser } = useAppStore();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [emoji, setEmoji] = useState("🎯");
