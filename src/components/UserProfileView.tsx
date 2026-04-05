@@ -49,7 +49,7 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
         <div>
           <h2 className="text-lg font-bold text-foreground">{user.name}</h2>
           <p className="text-sm text-muted-foreground">{user.bio}</p>
-          <div className="flex items-center justify-between mt-1.5">
+          <div className="flex items-center justify-evenly mt-1.5">
             {isFriend ? (
               <button
                 onClick={() => setShowFriends(true)}
