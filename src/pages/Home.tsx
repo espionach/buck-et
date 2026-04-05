@@ -336,7 +336,7 @@ const Boards = () => {
               key={boardTab}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              className="space-y-3"
+              className="divide-y divide-border"
             >
               {groupQuests.length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">

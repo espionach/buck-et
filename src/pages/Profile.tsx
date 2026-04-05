@@ -514,7 +514,7 @@ const Profile = () => {
         key={tab}
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="space-y-3"
+        className="divide-y divide-border"
       >
         {active.length === 0 ? (
           <div className="text-center py-12 text-muted-foreground">
