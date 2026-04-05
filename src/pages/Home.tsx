@@ -148,20 +148,20 @@ const Boards = () => {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="text-2xl">{pendingInvitations[0].group.emoji}</span>
+                      <span className="text-lg">{pendingInvitations[0].group.emoji}</span>
                       <div>
-                        <p className="font-bold text-foreground text-sm">{pendingInvitations[0].group.name}</p>
+                        <p className="font-semibold text-foreground text-xs">{pendingInvitations[0].group.name}</p>
                         <p className="text-[10px] text-muted-foreground">
                           Invited by {pendingInvitations[0].invitedBy.name}
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
                       <button
                         onClick={() => acceptGroupInvitation(pendingInvitations[0].id)}
-                        className="p-2 rounded-full bg-secondary text-secondary-foreground"
+                        className="p-1.5 rounded-full bg-secondary text-secondary-foreground"
                       >
-                        <Check className="w-4 h-4" />
+                        <Check className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => declineGroupInvitation(pendingInvitations[0].id)}
