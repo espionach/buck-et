@@ -179,16 +179,15 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
                 handleToggleImIn();
               }}
               disabled={!canJoin}
-              className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all active:scale-95 ${
-                !canJoin
-                  ? "bg-muted/50 text-muted-foreground/50 cursor-not-allowed"
-                  : isIn
-                  ? "bg-secondary text-secondary-foreground"
-                  : "bg-muted text-muted-foreground"
+              className={`shrink-0 flex items-center justify-center transition-all active:scale-95 ${
+                isIn
+                  ? "w-8 h-8 rounded-full bg-secondary text-secondary-foreground"
+                  : !canJoin
+                  ? "px-3 py-1.5 rounded-full bg-muted/50 text-muted-foreground/50 cursor-not-allowed text-xs font-semibold"
+                  : "px-3 py-1.5 rounded-full bg-muted text-muted-foreground text-xs font-semibold"
               }`}
             >
-              {isIn && <Check className="w-3.5 h-3.5" />}
-              {isIn ? "I'm In" : "Join"}
+              {isIn ? <Check className="w-4.5 h-4.5" strokeWidth={3} /> : "Join"}
             </button>
           )}
         </div>
