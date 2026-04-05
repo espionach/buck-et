@@ -243,7 +243,47 @@ export const useAppStore = create<AppState>((set) => ({
     })),
 
   updateProfile: (updates) =>
-    set((s) => ({ currentUser: { ...s.currentUser, ...updates } })),
+    set((s) => {
+      const updatedUser = { ...s.currentUser, ...updates };
+      const uid = updatedUser.id;
+
+      const patchUser = (u: User) => (u.id === uid ? { ...u, ...updates } : u);
+
+      const quests = s.quests.map((q) => ({
+        ...q,
+        createdBy: patchUser(q.createdBy),
+        participants: q.participants.map(patchUser),
+        comments: q.comments?.map((c) => ({ ...c, user: patchUser(c.user) })),
+        logistics: q.logistics
+          ? { ...q.logistics, volunteers: q.logistics.volunteers?.map((v) => ({ ...v, user: patchUser(v.user) })) }
+          : undefined,
+      }));
+
+      const groups = s.groups.map((g) => ({
+        ...g,
+        members: g.members.map(patchUser),
+        memberRoles: g.memberRoles.map((mr) => ({ ...mr, user: patchUser(mr.user) })),
+      }));
+
+      const notifications = s.notifications.map((n) => ({
+        ...n,
+        fromUser: patchUser(n.fromUser),
+      }));
+
+      const friendRequests = s.friendRequests.map((fr) => ({
+        ...fr,
+        from: patchUser(fr.from),
+      }));
+
+      const transferRequests = s.transferRequests.map((tr) => ({
+        ...tr,
+        fromUser: patchUser(tr.fromUser),
+      }));
+
+      const friends = s.friends.map(patchUser);
+
+      return { currentUser: updatedUser, quests, groups, notifications, friendRequests, transferRequests, friends };
+    }),
 
   removeParticipant: (questId, userId) =>
     set((s) => ({
