@@ -104,16 +104,18 @@ const Boards = () => {
 
   return (
     <div className="min-h-screen pb-24 px-5 pt-14">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-3xl font-bold text-foreground">Your Boards</h1>
-        <button
-          onClick={() => navigate("/create-group")}
-          className="p-2 text-muted-foreground hover:text-primary transition-colors"
-        >
-          <Plus className="w-5 h-5" />
-        </button>
-      </div>
+      {/* Header - only show when no group is selected */}
+      {!selectedGroup && (
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-3xl font-bold text-foreground">Your Boards</h1>
+          <button
+            onClick={() => navigate("/create-group")}
+            className="p-2 text-muted-foreground hover:text-primary transition-colors"
+          >
+            <Plus className="w-5 h-5" />
+          </button>
+        </div>
+      )}
 
       <AnimatePresence mode="wait">
         {!selectedGroup ? (
