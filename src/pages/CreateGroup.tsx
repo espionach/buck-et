@@ -4,6 +4,7 @@ import { ArrowLeft, Plus } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import UserAvatar from "@/components/UserAvatar";
 
 const CreateGroup = () => {
   const navigate = useNavigate();
@@ -99,7 +100,7 @@ const CreateGroup = () => {
                 onClick={() => toggleMember(user.id)}
                 className="w-full flex items-center gap-3 px-4 py-3 transition-colors hover:bg-muted/30"
               >
-                <span className="text-lg">{user.avatar}</span>
+                <UserAvatar user={user} size="sm" />
                 <span className="text-sm font-semibold text-foreground flex-1 text-left">{user.name}</span>
                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
                   selectedMembers.includes(user.id)
