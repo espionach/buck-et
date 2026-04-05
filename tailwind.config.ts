@@ -95,11 +95,16 @@ export default {
           "0%, 100%": { opacity: "1" },
           "50%": { opacity: "0.7" },
         },
+        "just-added": {
+          "0%": { backgroundColor: "hsl(var(--primary) / 0.12)" },
+          "100%": { backgroundColor: "transparent" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "pulse-soft": "pulse-soft 2s ease-in-out infinite",
+        "just-added": "just-added 3s ease-out forwards",
       },
     },
   },
