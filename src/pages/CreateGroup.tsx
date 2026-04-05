@@ -12,7 +12,7 @@ const CreateGroup = () => {
   const { addGroup, friends: friendsList, currentUser } = useAppStore();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [emoji, setEmoji] = useState("🎯");
+  const [emoji, setEmoji] = useState("target");
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
 
   const toggleMember = (id: string) => {
