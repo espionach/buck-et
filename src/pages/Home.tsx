@@ -202,7 +202,7 @@ const Boards = () => {
                             >
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                  <span className="text-lg">{inv.group.emoji}</span>
+                                  <GroupIconDisplay icon={inv.group.emoji} size={20} />
                                   <div>
                                     <p className="font-semibold text-foreground text-xs">{inv.group.name}</p>
                                     <p className="text-[10px] text-muted-foreground">
