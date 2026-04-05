@@ -362,7 +362,7 @@ const Profile = () => {
                 setEditProfilePic(currentUser.profilePicture || "");
                 setShowEditProfile(true);
               }}
-              className="px-4 py-1 rounded-lg bg-muted text-muted-foreground text-sm font-semibold flex items-center gap-1.5"
+              className="px-4 py-0 h-7 rounded-lg bg-muted text-muted-foreground text-sm font-semibold flex items-center gap-1.5"
             >
               <Edit className="w-3.5 h-3.5" />
               Edit
