@@ -87,6 +87,8 @@ export const useAppStore = create<AppState>((set) => ({
   transferRequests: initialTransfers,
   notifications: initialNotifications,
   currentUser: currentUser,
+  hideGlobalFab: false,
+  setHideGlobalFab: (hide) => set({ hideGlobalFab: hide }),
 
   addQuest: (quest) => set((s) => ({ quests: [quest, ...s.quests] })),
 
