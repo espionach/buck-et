@@ -1,7 +1,7 @@
 import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Bell, MessageCircle, UserPlus, ArrowRightLeft, Check } from "lucide-react";
+import { X, Bell, MessageCircle, UserPlus, ArrowRightLeft, Check, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface NotificationPanelProps {
