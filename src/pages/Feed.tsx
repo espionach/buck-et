@@ -42,10 +42,10 @@ const Feed = () => {
   });
 
   // Apply filter
-  const filterOptions = [
+  const filterOptions: { key: string; label: React.ReactNode }[] = [
     { key: "all", label: "All" },
     { key: "followers", label: "Friends" },
-    ...groups.map((g) => ({ key: g.id, label: `${g.emoji} ${g.name}` })),
+    ...groups.map((g) => ({ key: g.id, label: <span className="flex items-center gap-1"><GroupIconDisplay icon={g.emoji} size={12} />{g.name}</span> })),
   ];
 
   const filteredByTab = feedQuests.filter((q) => {
