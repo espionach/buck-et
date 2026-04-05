@@ -170,7 +170,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
         </div>
 
         {/* Title + join button row */}
-        <div className="flex items-start justify-between gap-3">
+        <div className="flex items-baseline justify-between gap-3">
           <h4 className="font-display font-bold text-foreground leading-snug text-[15px] flex-1 min-w-0">{quest.title}</h4>
 
           {!quest.isDone && (
