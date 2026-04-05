@@ -12,7 +12,7 @@ const tabs = [
 const BottomNav = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const hideGlobalFab = useAppStore((s) => s.hideGlobalFab);
+  const hideGlobalFab = useAppStore((s) => s.hideGlobalFab || s.popupCount > 0);
 
   return (
     <>

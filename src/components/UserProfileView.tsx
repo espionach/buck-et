@@ -4,6 +4,7 @@ import UserAvatar from "@/components/UserAvatar";
 import { ArrowLeft, X, Users as UsersIcon, Lock, UserPlus, Clock, UserMinus, Check } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { usePopup } from "@/hooks/use-popup";
 import { User } from "@/data/mockData";
 
 interface UserProfileViewProps {
@@ -18,6 +19,7 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
   const [tab, setTab] = useState<"current" | "past">("current");
   const [showFriends, setShowFriends] = useState(false);
   const [showUnfriendConfirm, setShowUnfriendConfirm] = useState(false);
+  usePopup(showFriends || showUnfriendConfirm);
 
   const isFriend = friends.some((f) => f.id === user.id);
   const hasRequested = sentFriendRequests.includes(user.id);

@@ -4,6 +4,7 @@ import UserAvatar from "@/components/UserAvatar";
 import OwnerLeaveDialog from "@/components/OwnerLeaveDialog";
 import { X, UserPlus, LogOut, Crown, Clock, Trash2, Pencil, Check } from "lucide-react";
 import { useState } from "react";
+import { usePopup } from "@/hooks/use-popup";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface GroupSettingsProps {
@@ -21,6 +22,7 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
   const [showAddMembers, setShowAddMembers] = useState(false);
   const [showOwnerLeave, setShowOwnerLeave] = useState(false);
   const [confirmRemoveUser, setConfirmRemoveUser] = useState<{ userId: string; userName: string } | null>(null);
+  usePopup(showOwnerLeave || !!confirmRemoveUser);
 
   const isOwner = group.ownerId === currentUser.id;
 

@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Check, HandMetal, MessageCircle, ChevronDown, ChevronUp, Send, Pencil, Plus, Undo2, ExternalLink, X, Calendar } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { usePopup } from "@/hooks/use-popup";
 import { format, parseISO } from "date-fns";
 
 interface QuestCardProps {
@@ -40,6 +41,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
   const [newComment, setNewComment] = useState("");
   const [showOwnerLeave, setShowOwnerLeave] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  usePopup(showOwnerLeave || showDeleteConfirm);
 
   // Check for pending transfer request for this quest targeting current user
   const pendingTransfer = transferRequests.find(
