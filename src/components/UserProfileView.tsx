@@ -209,7 +209,7 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
             ))}
           </div>
 
-          <div className="space-y-3">
+          <div className="divide-y divide-border">
             {shownQuests.length === 0 ? (
               <p className="text-center text-sm text-muted-foreground py-8">
                 {tab === "current" ? "No active quests" : "No completed quests"}
