@@ -11,7 +11,7 @@ import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
 const Boards = () => {
-  const { groups, quests, groupInvitations, acceptGroupInvitation, declineGroupInvitation, cleanupEmptyQuests } = useAppStore();
+  const { groups, quests, groupInvitations, acceptGroupInvitation, declineGroupInvitation, cleanupEmptyQuests, setHideGlobalFab } = useAppStore();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const location = useLocation();
@@ -39,6 +39,12 @@ const Boards = () => {
   useEffect(() => {
     cleanupEmptyQuests();
   }, [location.pathname]);
+
+  // Hide global FAB during settings
+  useEffect(() => {
+    setHideGlobalFab(showSettings);
+    return () => setHideGlobalFab(false);
+  }, [showSettings]);
 
   // Sort groups by date created (newest first)
   const sortedGroups = [...groups].sort(

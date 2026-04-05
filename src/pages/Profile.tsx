@@ -21,6 +21,7 @@ const Profile = () => {
     deleteQuest,
     removeParticipant,
     cleanupEmptyQuests,
+    setHideGlobalFab,
   } = useAppStore();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -83,6 +84,12 @@ const Profile = () => {
   useEffect(() => {
     cleanupEmptyQuests();
   }, [location.pathname]);
+
+  // Hide global FAB during editing modes
+  useEffect(() => {
+    setHideGlobalFab(showEditProfile || !!editingCurrentQuest || !!editingPastQuest);
+    return () => setHideGlobalFab(false);
+  }, [showEditProfile, editingCurrentQuest, editingPastQuest]);
 
   const myQuests = quests.filter(
     (q) =>

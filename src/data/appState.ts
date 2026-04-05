@@ -31,6 +31,8 @@ interface AppState {
   transferRequests: TransferRequest[];
   notifications: AppNotification[];
   currentUser: User;
+  hideGlobalFab: boolean;
+  setHideGlobalFab: (hide: boolean) => void;
 
   addQuest: (quest: Quest) => void;
   toggleImIn: (questId: string) => void;
@@ -85,6 +87,8 @@ export const useAppStore = create<AppState>((set) => ({
   transferRequests: initialTransfers,
   notifications: initialNotifications,
   currentUser: currentUser,
+  hideGlobalFab: false,
+  setHideGlobalFab: (hide) => set({ hideGlobalFab: hide }),
 
   addQuest: (quest) => set((s) => ({ quests: [quest, ...s.quests] })),
 
