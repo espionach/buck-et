@@ -162,6 +162,72 @@ const CreateQuest = () => {
             <textarea value={customNotes} onChange={(e) => setCustomNotes(e.target.value)} placeholder="Anything else everyone should know?"
               rows={2} className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none" />
           </div>
+
+          {/* Photos */}
+          <div>
+            <label className="text-[11px] text-muted-foreground mb-1 block">Photos</label>
+            <div className="flex flex-wrap gap-2">
+              {photos.map((photo, i) => (
+                <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden">
+                  <img src={photo} alt="" className="w-full h-full object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => setPhotos((prev) => prev.filter((_, idx) => idx !== i))}
+                    className="absolute top-0.5 right-0.5 p-0.5 rounded-full bg-foreground/60 text-background"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => photoInputRef.current?.click()}
+                className="w-16 h-16 rounded-lg border border-dashed border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <ImagePlus className="w-5 h-5" />
+              </button>
+              <input
+                ref={photoInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handlePhotoUpload}
+                className="hidden"
+              />
+            </div>
+          </div>
+
+          {/* Links */}
+          <div>
+            <label className="text-[11px] text-muted-foreground mb-1 block">Links</label>
+            {links.map((link, i) => (
+              <div key={i} className="flex items-center gap-2 mb-1.5">
+                <LinkIcon className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                <span className="text-xs text-primary truncate flex-1">{link}</span>
+                <button type="button" onClick={() => setLinks((prev) => prev.filter((_, idx) => idx !== i))}>
+                  <X className="w-3.5 h-3.5 text-muted-foreground" />
+                </button>
+              </div>
+            ))}
+            <div className="flex gap-2">
+              <input
+                type="url"
+                value={newLink}
+                onChange={(e) => setNewLink(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleAddLink())}
+                placeholder="Paste a URL..."
+                className="flex-1 px-3 py-2 rounded-xl bg-muted border-none text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+              />
+              <button
+                type="button"
+                onClick={handleAddLink}
+                disabled={!newLink.trim()}
+                className="px-3 py-2 rounded-xl bg-primary/10 text-primary text-sm font-semibold disabled:opacity-40"
+              >
+                Add
+              </button>
+            </div>
+          </div>
         </motion.div>
       )}
     </div>
