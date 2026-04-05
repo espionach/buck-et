@@ -195,7 +195,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
 
         {/* Description */}
         {quest.description && (
-          <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{quest.description}</p>
+          <p className="text-sm text-muted-foreground mt-1 truncate">{quest.description}</p>
         )}
 
         {/* Links */}
