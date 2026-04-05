@@ -438,6 +438,24 @@ export const pendingTransferRequests: TransferRequest[] = [
 
 export const initialNotifications: AppNotification[] = [
   {
+    id: "n-inv1",
+    type: "board_invitation",
+    message: `${friends[0].name} invited you to join Film Club`,
+    entityId: "gi1",
+    fromUser: friends[0],
+    read: false,
+    createdAt: "2026-03-19",
+  },
+  {
+    id: "n-inv2",
+    type: "board_invitation",
+    message: `${friends[1].name} invited you to join Book Worms`,
+    entityId: "gi2",
+    fromUser: friends[1],
+    read: false,
+    createdAt: "2026-03-20",
+  },
+  {
     id: "n1",
     type: "transfer_quest",
     message: "Jake Williams wants to transfer 'Watch sunrise from the pier' to you",
