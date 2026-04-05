@@ -208,7 +208,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
-                className="flex items-center gap-1.5 text-xs text-primary hover:underline truncate"
+                className="flex items-center gap-1.5 text-xs text-primary hover:underline truncate pr-12"
               >
                 <ExternalLink className="w-3 h-3 shrink-0" />
                 <span className="truncate">{link}</span>
