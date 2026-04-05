@@ -49,35 +49,33 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
         <div>
           <h2 className="text-lg font-bold text-foreground">{user.name}</h2>
           <p className="text-sm text-muted-foreground">{user.bio}</p>
-        </div>
-      </div>
+          <div className="flex items-center justify-between mt-1.5">
+            {isFriend ? (
+              <button
+                onClick={() => setShowFriends(true)}
+                className="flex items-center gap-1.5 text-sm font-semibold text-foreground"
+              >
+                <UsersIcon className="w-4 h-4" />
+                {userFriendsList.length} Friends
+              </button>
+            ) : (
+              <div className="flex items-center gap-1.5 text-sm font-semibold text-muted-foreground">
+                <UsersIcon className="w-4 h-4" />
+                {userFriendsList.length} Friends
+              </div>
+            )}
 
-      {/* Friends count + Unfriend button on same line */}
-      <div className="flex items-center justify-between mb-4">
-        {isFriend ? (
-          <button
-            onClick={() => setShowFriends(true)}
-            className="flex items-center gap-1.5 text-sm font-semibold text-foreground"
-          >
-            <UsersIcon className="w-4 h-4" />
-            {userFriendsList.length} Friends
-          </button>
-        ) : (
-          <div className="flex items-center gap-1.5 text-sm font-semibold text-muted-foreground">
-            <UsersIcon className="w-4 h-4" />
-            {userFriendsList.length} Friends
+            {isFriend && (
+              <button
+                onClick={() => setShowUnfriendConfirm(true)}
+                className="px-4 py-2 rounded-xl bg-muted text-muted-foreground font-semibold text-sm flex items-center gap-2"
+              >
+                <UserMinus className="w-4 h-4" />
+                Unfriend
+              </button>
+            )}
           </div>
-        )}
-
-        {isFriend && (
-          <button
-            onClick={() => setShowUnfriendConfirm(true)}
-            className="px-4 py-2 rounded-xl bg-muted text-muted-foreground font-semibold text-sm flex items-center gap-2"
-          >
-            <UserMinus className="w-4 h-4" />
-            Unfriend
-          </button>
-        )}
+        </div>
       </div>
 
       {/* Unfriend Confirmation Modal */}
