@@ -108,7 +108,7 @@ const QuestDetail = () => {
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div className="flex-1 min-w-0">
-            <h1 className="text-lg font-bold text-foreground truncate">{quest.title}</h1>
+            <h1 className="text-lg font-bold text-foreground">{quest.title}</h1>
             <p className="text-xs text-muted-foreground">
               {group ? <span className="flex items-center gap-1"><GroupIconDisplay icon={group.emoji} size={12} className="text-muted-foreground" />{group.name}</span> : "🌍 Followers only"}
             </p>
