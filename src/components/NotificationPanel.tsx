@@ -3,6 +3,7 @@ import UserAvatar from "@/components/UserAvatar";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Bell, MessageCircle, UserPlus, ArrowRightLeft, Check, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { usePopup } from "@/hooks/use-popup";
 
 interface NotificationPanelProps {
   open: boolean;
