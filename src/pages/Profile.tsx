@@ -727,11 +727,11 @@ const Profile = () => {
 
               {/* Photo upload */}
               <div>
-                <label className="text-sm font-semibold text-foreground mb-1.5 block">Photos</label>
+                <label className="text-sm font-semibold text-foreground mb-1.5 block">Photos & Videos</label>
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept="image/*"
+                  accept="image/*,video/*"
                   multiple
                   onChange={handlePhotoUpload}
                   className="hidden"
