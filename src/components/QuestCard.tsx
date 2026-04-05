@@ -23,9 +23,10 @@ interface QuestCardProps {
   highlightCommentId?: string;
   hideActions?: boolean;
   onViewProfile?: (user: User) => void;
+  justAdded?: boolean;
 }
 
-const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPast, disableJoin = false, onMarkDone, onMarkUndone, autoOpenComments = false, highlightCommentId, hideActions = false, onViewProfile }: QuestCardProps) => {
+const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPast, disableJoin = false, onMarkDone, onMarkUndone, autoOpenComments = false, highlightCommentId, hideActions = false, onViewProfile, justAdded = false }: QuestCardProps) => {
   const navigate = useNavigate();
   const { toggleImIn, markDone, markUndone, groups, addComment, deleteQuest, transferQuestOwnership, requestQuestTransfer, transferRequests, acceptTransfer, declineTransfer, currentUser } = useAppStore();
   const isIn = quest.participants.some((p) => p.id === currentUser.id);
