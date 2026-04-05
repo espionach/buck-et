@@ -163,7 +163,7 @@ export const pendingGroupInvitations: GroupInvitation[] = [
     group: {
       id: "g-new",
       name: "Film Club",
-      emoji: "🎬",
+      emoji: "film",
       members: [friends[0], friends[4]],
       memberRoles: [
         { user: friends[0], role: "owner" },
