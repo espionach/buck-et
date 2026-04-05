@@ -517,6 +517,7 @@ const Profile = () => {
             onViewProfile={(user) => {
               if (user.id !== currentUser.id) setViewingUser(user);
             }}
+            scrollToQuestId={tab === "current" ? justAddedQuestId : undefined}
           />
         )}
       </motion.div>
