@@ -171,7 +171,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
 
         {/* Title + join button row */}
         <div className="flex items-center justify-between gap-3">
-          <h4 className="font-display font-bold text-foreground leading-tight text-[15px] flex-1 min-w-0 truncate">{quest.title}</h4>
+          <h4 className="font-display font-bold text-foreground leading-tight text-[15px] flex-1 min-w-0">{quest.title}</h4>
 
           {!quest.isDone && (
             <button
@@ -195,7 +195,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
 
         {/* Description */}
         {quest.description && (
-          <p className="text-sm text-muted-foreground mt-1 truncate">{quest.description}</p>
+          <p className="text-sm text-muted-foreground mt-1 truncate pr-12">{quest.description}</p>
         )}
 
         {/* Links */}
@@ -208,7 +208,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
-                className="flex items-center gap-1.5 text-xs text-primary hover:underline truncate"
+                className="flex items-center gap-1.5 text-xs text-primary hover:underline truncate pr-12"
               >
                 <ExternalLink className="w-3 h-3 shrink-0" />
                 <span className="truncate">{link}</span>
