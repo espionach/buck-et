@@ -168,14 +168,9 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
           </p>
         </div>
 
-        {/* Title + description */}
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex-1 min-w-0">
-            <h4 className="font-display font-bold text-foreground leading-tight text-[15px]">{quest.title}</h4>
-            {quest.description && (
-              <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{quest.description}</p>
-            )}
-          </div>
+        {/* Title + join button row */}
+        <div className="flex items-center justify-between gap-3">
+          <h4 className="font-display font-bold text-foreground leading-tight text-[15px] flex-1 min-w-0">{quest.title}</h4>
 
           {!quest.isDone && (
             <button
@@ -193,10 +188,15 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
               }`}
             >
               {isIn && <Check className="w-3.5 h-3.5" />}
-              {isIn ? "I'm In" : "Join Quest"}
+              {isIn ? "I'm In" : "Join"}
             </button>
           )}
         </div>
+
+        {/* Description */}
+        {quest.description && (
+          <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{quest.description}</p>
+        )}
 
         {/* Date */}
         {!quest.isDone && quest.logistics?.date && (
