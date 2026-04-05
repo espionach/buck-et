@@ -31,6 +31,8 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
   const userInGroup = group ? group.members.some((m) => m.id === currentUser.id) : true;
   const canJoin = !disableJoin && userInGroup;
   const isOwner = quest.createdBy.id === currentUser.id;
+  const groupOwner = group ? group.ownerId === currentUser.id : false;
+  const canToggleStatus = isOwner || groupOwner;
   const isFollowersOnly = quest.isFollowerOnly;
   const canNavigateToDetail = isIn && !quest.isDone;
 
@@ -277,7 +279,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
               {showComments ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
             </button>
 
-            {!quest.isDone && isIn && !hideActions && (
+            {!quest.isDone && isIn && !hideActions && canToggleStatus && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -290,7 +292,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
               </button>
             )}
 
-            {quest.isDone && isIn && !hideActions && (
+            {quest.isDone && isIn && !hideActions && canToggleStatus && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
