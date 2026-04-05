@@ -105,8 +105,14 @@ const Boards = () => {
   return (
     <div className="min-h-screen pb-24 px-5 pt-14">
       {/* Header */}
-      <div className="mb-4">
+      <div className="flex items-center justify-between mb-4">
         <h1 className="text-3xl font-bold text-foreground">Your Boards</h1>
+        <button
+          onClick={() => navigate("/create-group")}
+          className="p-2 rounded-xl bg-muted text-muted-foreground hover:text-primary transition-colors"
+        >
+          <Plus className="w-5 h-5" />
+        </button>
       </div>
 
       <AnimatePresence mode="wait">
@@ -239,14 +245,6 @@ const Boards = () => {
               ))}
             </div>
 
-            {/* New Group Button */}
-            <button
-              onClick={() => navigate("/create-group")}
-              className="w-full flex items-center justify-center gap-2 py-4 rounded-xl border-2 border-dashed border-border text-muted-foreground hover:border-primary hover:text-primary transition-colors"
-            >
-              <Plus className="w-5 h-5" />
-              <span className="font-semibold text-sm">New Group</span>
-            </button>
           </motion.div>
         ) : (
           <motion.div
