@@ -32,7 +32,10 @@ interface AppState {
   notifications: AppNotification[];
   currentUser: User;
   hideGlobalFab: boolean;
+  popupCount: number;
   setHideGlobalFab: (hide: boolean) => void;
+  pushPopup: () => void;
+  popPopup: () => void;
 
   addQuest: (quest: Quest) => void;
   toggleImIn: (questId: string) => void;
