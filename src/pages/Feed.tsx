@@ -309,23 +309,15 @@ const Feed = () => {
           {/* Content */}
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
             <div className="divide-y divide-border">
-              {filteredQuests.length === 0 ? (
-                <div className="text-center py-16 text-muted-foreground">
-                  <p className="text-4xl mb-3">🔭</p>
-                  <p className="font-semibold">No quests to show</p>
-                  <p className="text-sm">Follow more friends to see their side quests!</p>
-                </div>
-              ) : (
-                <QuestList
-                  quests={filteredQuests}
-                  emptyIcon="🔭"
-                  emptyText="No quests to show"
-                  emptySubtext="Follow more friends to see their side quests!"
-                  onMarkDone={() => navigate("/profile?tab=past")}
-                  onMarkUndone={() => navigate("/profile?tab=current")}
-                  onViewProfile={(user) => setSelectedProfile(user)}
-                />
-              )}
+              <QuestList
+                quests={filteredQuests}
+                emptyIcon="🔭"
+                emptyText="No quests to show"
+                emptySubtext="Follow more friends to see their side quests!"
+                onMarkDone={() => navigate("/profile?tab=past")}
+                onMarkUndone={() => navigate("/profile?tab=current")}
+                onViewProfile={(user) => setSelectedProfile(user)}
+              />
             </div>
           </motion.div>
         </>
