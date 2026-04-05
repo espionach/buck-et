@@ -141,7 +141,7 @@ export const groups: Group[] = [
   {
     id: "g3",
     name: "Weekend Warriors",
-    emoji: "⚔️",
+    emoji: "swords",
     members: [currentUser, friends[0], friends[2], friends[4], friends[1]],
     memberRoles: [
       { user: currentUser, role: "owner" },
