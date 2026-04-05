@@ -110,7 +110,7 @@ export const groups: Group[] = [
   {
     id: "g1",
     name: "Sunset Chasers",
-    emoji: "🌅",
+    emoji: "sun",
     description: "We chase sunsets every weekend",
     members: [currentUser, friends[0], friends[1], friends[2]],
     memberRoles: [
