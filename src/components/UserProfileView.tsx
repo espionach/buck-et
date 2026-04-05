@@ -1,7 +1,7 @@
 import { useAppStore } from "@/data/appState";
 import QuestCard from "@/components/QuestCard";
 import UserAvatar from "@/components/UserAvatar";
-import { ArrowLeft, X, Users as UsersIcon, Lock, UserPlus, Clock, UserMinus } from "lucide-react";
+import { ArrowLeft, X, Users as UsersIcon, Lock, UserPlus, Clock, UserMinus, Check } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { User } from "@/data/mockData";
@@ -14,13 +14,14 @@ interface UserProfileViewProps {
 }
 
 const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfileViewProps) => {
-  const { quests, friends, currentUser, sentFriendRequests, sendFriendRequest, unfriend } = useAppStore();
+  const { quests, friends, currentUser, sentFriendRequests, sendFriendRequest, unfriend, friendRequests, acceptFriendRequest } = useAppStore();
   const [tab, setTab] = useState<"current" | "past">("current");
   const [showFriends, setShowFriends] = useState(false);
   const [showUnfriendConfirm, setShowUnfriendConfirm] = useState(false);
 
   const isFriend = friends.some((f) => f.id === user.id);
   const hasRequested = sentFriendRequests.includes(user.id);
+  const incomingRequest = friendRequests.find((r) => r.from.id === user.id);
 
   const profileQuests = quests.filter(
     (q) =>
@@ -167,7 +168,15 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
           <Lock className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
           <p className="font-bold text-foreground mb-1">Private Account</p>
           <p className="text-sm text-muted-foreground mb-4">Add as friend to see their quests</p>
-          {hasRequested ? (
+          {incomingRequest ? (
+            <button
+              onClick={() => acceptFriendRequest(incomingRequest.id)}
+              className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm flex items-center gap-2 mx-auto"
+            >
+              <Check className="w-4 h-4" />
+              Accept Friend Request
+            </button>
+          ) : hasRequested ? (
             <button
               disabled
               className="px-6 py-2.5 rounded-xl bg-muted text-muted-foreground font-semibold text-sm flex items-center gap-2 mx-auto cursor-default"
