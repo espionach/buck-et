@@ -22,6 +22,7 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
   const [showAddMembers, setShowAddMembers] = useState(false);
   const [showOwnerLeave, setShowOwnerLeave] = useState(false);
   const [confirmRemoveUser, setConfirmRemoveUser] = useState<{ userId: string; userName: string } | null>(null);
+  usePopup(showOwnerLeave || !!confirmRemoveUser);
 
   const isOwner = group.ownerId === currentUser.id;
 
