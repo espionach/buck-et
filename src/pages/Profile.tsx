@@ -357,6 +357,27 @@ const Profile = () => {
           <div>
             <h1 className="text-xl font-bold text-foreground">{currentUser.name}</h1>
             <p className="text-sm text-muted-foreground">{currentUser.bio}</p>
+            <div className="flex items-center justify-between mt-1.5">
+              <button
+                onClick={() => setShowFriends(true)}
+                className="flex items-center gap-1.5 text-sm font-semibold text-foreground"
+              >
+                <UsersIcon className="w-4 h-4" />
+                {friendsList.length} Friends
+              </button>
+              {friendRequests.length > 0 && (
+                <button
+                  onClick={() => setShowRequests(true)}
+                  className="relative px-3 py-1.5 rounded-xl bg-primary/10 text-primary text-sm font-semibold flex items-center gap-1.5"
+                >
+                  <UserPlus className="w-4 h-4" />
+                  Requests
+                  <span className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
+                    {friendRequests.length}
+                  </span>
+                </button>
+              )}
+            </div>
           </div>
         </div>
         <button
@@ -370,30 +391,6 @@ const Profile = () => {
         >
           <Edit className="w-5 h-5" />
         </button>
-      </div>
-
-
-      {/* Friends count + Friend Requests on same line */}
-      <div className="flex items-center justify-between mb-4">
-        <button
-          onClick={() => setShowFriends(true)}
-          className="flex items-center gap-1.5 text-sm font-semibold text-foreground"
-        >
-          <UsersIcon className="w-4 h-4" />
-          {friendsList.length} Friends
-        </button>
-        {friendRequests.length > 0 && (
-          <button
-            onClick={() => setShowRequests(true)}
-            className="relative px-3 py-1.5 rounded-xl bg-primary/10 text-primary text-sm font-semibold flex items-center gap-1.5"
-          >
-            <UserPlus className="w-4 h-4" />
-            Friend Requests
-            <span className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
-              {friendRequests.length}
-            </span>
-          </button>
-        )}
       </div>
 
       {/* Friend Requests Modal Popup */}
@@ -414,7 +411,7 @@ const Profile = () => {
               className="w-full max-w-sm bg-card rounded-xl p-5 shadow-lg max-h-[60vh] overflow-y-auto space-y-2"
             >
               <div className="flex items-center justify-between mb-2">
-                <h3 className="font-bold text-foreground text-sm">Friend Requests</h3>
+                <h3 className="font-bold text-foreground text-sm">Requests</h3>
                 <button onClick={() => setShowRequests(false)}>
                   <X className="w-4 h-4 text-muted-foreground" />
                 </button>
