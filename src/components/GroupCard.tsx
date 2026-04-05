@@ -18,7 +18,7 @@ const gradients = [
 ];
 
 const GroupCard = ({ group, onClick, index }: GroupCardProps) => {
-  const { transferRequests, acceptTransfer, declineTransfer } = useAppStore();
+  const { transferRequests, acceptTransfer, declineTransfer, currentUser } = useAppStore();
   const [showTransferPopup, setShowTransferPopup] = useState(false);
 
   const pendingTransfer = transferRequests.find(
