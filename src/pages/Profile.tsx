@@ -7,6 +7,7 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Quest, User, friends, nonFollowedUsers } from "@/data/mockData";
 import { useLocation, useSearchParams } from "react-router-dom";
+import { usePopup } from "@/hooks/use-popup";
 
 const Profile = () => {
   const {
