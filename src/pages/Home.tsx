@@ -354,6 +354,7 @@ const Boards = () => {
                   autoOpenCommentsId={activeHighlight && activeCommentId ? activeHighlight : undefined}
                   highlightCommentId={activeCommentId || undefined}
                   onViewProfile={(user) => setViewingProfile(user)}
+                  scrollToQuestId={justAddedQuestId}
                 />
               )}
             </motion.div>
