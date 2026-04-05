@@ -1,5 +1,5 @@
 import { useAppStore } from "@/data/appState";
-import { currentUser, QuestVolunteer } from "@/data/mockData";
+import { QuestVolunteer } from "@/data/mockData";
 import UserAvatar from "@/components/UserAvatar";
 import { ArrowLeft, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send, ExternalLink, HandMetal, Check, Pencil, X } from "lucide-react";
 import { useState } from "react";

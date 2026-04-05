@@ -1,4 +1,4 @@
-import { Group, currentUser } from "@/data/mockData";
+import { Group } from "@/data/mockData";
 import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
 import { motion, AnimatePresence } from "framer-motion";

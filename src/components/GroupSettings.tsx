@@ -1,5 +1,5 @@
 import { useAppStore } from "@/data/appState";
-import { currentUser, Group, User } from "@/data/mockData";
+import { Group, User } from "@/data/mockData";
 import UserAvatar from "@/components/UserAvatar";
 import OwnerLeaveDialog from "@/components/OwnerLeaveDialog";
 import { X, UserPlus, LogOut, Crown, Clock, Trash2, Pencil, Check } from "lucide-react";

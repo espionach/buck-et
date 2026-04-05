@@ -1,5 +1,5 @@
 import { useAppStore } from "@/data/appState";
-import { currentUser, friends, nonFollowedUsers, User } from "@/data/mockData";
+import { friends, nonFollowedUsers, User } from "@/data/mockData";
 import QuestCard from "@/components/QuestCard";
 import UserAvatar from "@/components/UserAvatar";
 import NotificationPanel from "@/components/NotificationPanel";
