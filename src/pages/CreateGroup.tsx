@@ -92,22 +92,26 @@ const CreateGroup = () => {
           <label className="text-sm font-semibold text-foreground mb-2 block">
             Add Members ({selectedMembers.length} selected)
           </label>
-          <div className="space-y-2">
+          <div className="rounded-xl border border-border bg-card overflow-hidden divide-y divide-border/50">
             {friendsList.map((user) => (
               <button
                 key={user.id}
                 onClick={() => toggleMember(user.id)}
-                className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all ${
-                  selectedMembers.includes(user.id)
-                    ? "border-primary bg-primary/5"
-                    : "border-border bg-card"
-                }`}
+                className="w-full flex items-center gap-3 px-4 py-3 transition-colors hover:bg-muted/30"
               >
                 <span className="text-lg">{user.avatar}</span>
                 <span className="text-sm font-semibold text-foreground flex-1 text-left">{user.name}</span>
-                {selectedMembers.includes(user.id) && (
-                  <X className="w-4 h-4 text-primary" />
-                )}
+                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
+                  selectedMembers.includes(user.id)
+                    ? "border-primary bg-primary"
+                    : "border-muted-foreground/40 bg-transparent"
+                }`}>
+                  {selectedMembers.includes(user.id) && (
+                    <svg className="w-3 h-3 text-primary-foreground" viewBox="0 0 12 12" fill="none">
+                      <path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  )}
+                </div>
               </button>
             ))}
           </div>
