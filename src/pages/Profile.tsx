@@ -364,7 +364,7 @@ const Profile = () => {
               }}
               className="px-2.5 py-0 h-6 rounded-md bg-muted text-muted-foreground text-xs font-medium flex items-center gap-1"
             >
-              <Edit className="w-3.5 h-3.5" />
+              <Edit className="w-3 h-3" />
               Edit
             </button>
           </div>
