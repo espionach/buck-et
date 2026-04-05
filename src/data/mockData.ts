@@ -352,6 +352,18 @@ export const quests: Quest[] = [
     comments: [],
   },
   {
+    id: "q12",
+    title: "Road trip to the mountains to find the best hidden waterfall and camp under the stars with everyone",
+    description: "Pack everything — this is going to be epic!",
+    createdBy: currentUser,
+    groupId: "g3",
+    isFollowerOnly: false,
+    participants: [currentUser, friends[0], friends[2]],
+    isDone: false,
+    createdAt: "2026-03-18",
+    comments: [],
+  },
+  {
     id: "q6",
     title: "Beach bonfire last Friday",
     description: "What a night 🔥",
