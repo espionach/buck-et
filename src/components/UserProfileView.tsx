@@ -21,6 +21,7 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
 
   const isFriend = friends.some((f) => f.id === user.id);
   const hasRequested = sentFriendRequests.includes(user.id);
+  const incomingRequest = friendRequests.find((r) => r.from.id === user.id);
 
   const profileQuests = quests.filter(
     (q) =>
