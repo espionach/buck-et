@@ -31,7 +31,7 @@ const Profile = () => {
   const [editName, setEditName] = useState(currentUser.name);
   const [editBio, setEditBio] = useState(currentUser.bio);
   const [showFriends, setShowFriends] = useState(false);
-  const [showRequests, setShowRequests] = useState(false);
+  
   const [viewingUser, setViewingUser] = useState<User | null>(null);
   const [viewingUserTab, setViewingUserTab] = useState<"current" | "past">("current");
   const [snapshotQuestIds, setSnapshotQuestIds] = useState<string[]>([]);
@@ -368,7 +368,7 @@ const Profile = () => {
           </button>
         </div>
         <p className="text-sm text-muted-foreground mt-1 text-center">{currentUser.bio}</p>
-        <div className="flex items-center gap-4 mt-3">
+        <div className="flex items-center justify-center mt-3">
           <button
             onClick={() => setShowFriends(true)}
             className="flex items-center gap-1.5 text-sm font-semibold text-foreground"
@@ -376,82 +376,10 @@ const Profile = () => {
             <UsersIcon className="w-4 h-4" />
             {friendsList.length} Friends
           </button>
-          {friendRequests.length > 0 && (
-            <button
-              onClick={() => setShowRequests(true)}
-              className="relative px-3 py-1.5 rounded-xl bg-primary/10 text-primary text-sm font-semibold flex items-center gap-1.5"
-            >
-              <UserPlus className="w-4 h-4" />
-              Requests
-              <span className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
-                {friendRequests.length}
-              </span>
-            </button>
-          )}
         </div>
       </div>
 
-      {/* Friend Requests Modal Popup */}
-      <AnimatePresence>
-        {showRequests && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-foreground/40 flex items-center justify-center p-5"
-            onClick={() => setShowRequests(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-sm bg-card rounded-xl p-5 shadow-lg max-h-[60vh] overflow-y-auto space-y-2"
-            >
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="font-bold text-foreground text-sm">Requests</h3>
-                <button onClick={() => setShowRequests(false)}>
-                  <X className="w-4 h-4 text-muted-foreground" />
-                </button>
-              </div>
-              {friendRequests.map((req) => (
-                <div key={req.id} className="flex items-center justify-between">
-                  <button
-                    className="flex items-center gap-2"
-                    onClick={() => {
-                      setShowRequests(false);
-                      setViewingUser(req.from);
-                    }}
-                  >
-                    <UserAvatar user={req.from} size="sm" />
-                    <span className="text-sm font-semibold text-foreground">{req.from.name}</span>
-                  </button>
-                  <div className="flex gap-1.5">
-                    <button
-                      onClick={() => {
-                        acceptFriendRequest(req.id);
-                        if (friendRequests.length <= 1) setShowRequests(false);
-                      }}
-                      className="p-1.5 rounded-lg bg-secondary text-secondary-foreground"
-                    >
-                      <Check className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      onClick={() => {
-                        declineFriendRequest(req.id);
-                        if (friendRequests.length <= 1) setShowRequests(false);
-                      }}
-                      className="p-1.5 rounded-lg bg-muted text-muted-foreground"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+
 
       {/* Friends Modal Popup */}
       <AnimatePresence>
