@@ -170,7 +170,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
         </div>
 
         {/* Title + join button row */}
-        <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center justify-between gap-3">
           <h4 className="font-display font-bold text-foreground leading-snug text-[15px] flex-1 min-w-0">{quest.title}</h4>
 
           {!quest.isDone && (
@@ -180,7 +180,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
                 handleToggleImIn();
               }}
               disabled={!canJoin}
-              className={`shrink-0 flex items-center justify-center transition-all active:scale-95 mt-[3px] ${
+              className={`shrink-0 flex items-center justify-center transition-all active:scale-95 self-start ${
                 isIn
                   ? "w-8 h-8 rounded-full bg-secondary text-secondary-foreground"
                   : !canJoin
