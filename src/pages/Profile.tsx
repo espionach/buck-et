@@ -21,6 +21,7 @@ const Profile = () => {
     deleteQuest,
     removeParticipant,
     cleanupEmptyQuests,
+    setHideGlobalFab,
   } = useAppStore();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
