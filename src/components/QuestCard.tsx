@@ -171,7 +171,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
 
         {/* Title + join button row */}
         <div className="flex items-center justify-between gap-3">
-          <h4 className="font-display font-bold text-foreground leading-tight text-[15px] flex-1 min-w-0 truncate">{quest.title}</h4>
+          <h4 className="font-display font-bold text-foreground leading-tight text-[15px] flex-1 min-w-0">{quest.title}</h4>
 
           {!quest.isDone && (
             <button
