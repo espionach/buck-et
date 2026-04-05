@@ -292,7 +292,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
               </button>
             )}
 
-            {quest.isDone && isIn && !hideActions && (
+            {quest.isDone && isIn && !hideActions && canToggleStatus && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
