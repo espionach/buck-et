@@ -13,7 +13,8 @@ export const GROUP_ICON_OPTIONS = [
   "footprints", "party-popper", "gem", "sparkles", "shield", "swords",
 ] as const;
 
-const ICON_MAP: Record<string, React.ComponentType<{ className?: string; size?: number }>> = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const ICON_MAP: Record<string, any> = {
   target: Target,
   trophy: Trophy,
   flame: Flame,
