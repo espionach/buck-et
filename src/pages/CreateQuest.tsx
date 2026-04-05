@@ -193,7 +193,7 @@ const CreateQuest = () => {
               <input
                 ref={photoInputRef}
                 type="file"
-                accept="image/*"
+                accept="image/*,video/*"
                 multiple
                 onChange={handlePhotoUpload}
                 className="hidden"
