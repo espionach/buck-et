@@ -166,6 +166,13 @@ const Profile = () => {
     setEditQuestLinks(quest.links || []);
     setEditQuestPhotos(quest.photos || []);
     setNewLink("");
+    setEditDate(quest.logistics?.date || "");
+    setEditTime(quest.logistics?.time || "");
+    setEditLocation(quest.logistics?.location || "");
+    setEditMeetupSpot(quest.logistics?.meetupSpot || "");
+    setEditTransportation(quest.logistics?.transportation || "");
+    setEditCarpoolSlots(quest.logistics?.carpoolSlots?.toString() || "");
+    setEditCustomNotes(quest.logistics?.customNotes || "");
   };
 
   const handleSaveCurrentQuest = () => {
@@ -175,11 +182,23 @@ const Profile = () => {
       );
       removedUsers.forEach((u) => removeParticipant(editingCurrentQuest.id, u.id));
 
+      const hasLogistics = editDate || editTime || editLocation || editMeetupSpot || editTransportation || editCustomNotes;
       updateQuest(editingCurrentQuest.id, {
         title: editQuestTitle.trim(),
         description: editQuestDescription.trim() || undefined,
         links: editQuestLinks.length > 0 ? editQuestLinks : undefined,
         photos: editQuestPhotos.length > 0 ? editQuestPhotos : undefined,
+        logistics: hasLogistics ? {
+          ...(editingCurrentQuest.logistics || {}),
+          date: editDate || undefined,
+          time: editTime || undefined,
+          location: editLocation || undefined,
+          meetupSpot: editMeetupSpot || undefined,
+          transportation: (editTransportation as any) || undefined,
+          carpoolSlots: editCarpoolSlots ? parseInt(editCarpoolSlots) : undefined,
+          volunteers: editingCurrentQuest.logistics?.volunteers || [],
+          customNotes: editCustomNotes || undefined,
+        } : undefined,
       });
       setEditingCurrentQuest(null);
     }
