@@ -1,6 +1,7 @@
 import { Home, LayoutGrid, User, Plus } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useAppStore } from "@/data/appState";
 
 const tabs = [
   { path: "/", icon: Home, label: "Home" },
@@ -11,6 +12,7 @@ const tabs = [
 const BottomNav = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const hideGlobalFab = useAppStore((s) => s.hideGlobalFab);
 
   return (
     <>
