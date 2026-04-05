@@ -207,6 +207,38 @@ export const pendingFollowRequests = pendingFriendRequests;
 
 export const quests: Quest[] = [
   {
+    id: "q-full",
+    title: "Epic beach volleyball tournament & BBQ cookout",
+    description: "Teams of 4, round-robin style. Losers buy ice cream 🍦🏐",
+    createdBy: currentUser,
+    groupId: "g1",
+    isFollowerOnly: false,
+    participants: [currentUser, friends[0], friends[1], friends[2], friends[3], friends[4]],
+    isDone: false,
+    createdAt: "2026-03-20",
+    photos: ["/mock-photos/bonfire1.jpg", "/mock-photos/hike1.jpg"],
+    links: ["https://www.beachvolleyballrules.com", "https://maps.google.com/beach-park"],
+    comments: [
+      { id: "cf1", userId: "u2", user: friends[0], text: "I call team captain!", createdAt: "2026-03-20" },
+      { id: "cf2", userId: "u3", user: friends[1], text: "Bringing the grill and charcoal 🔥", createdAt: "2026-03-21" },
+      { id: "cf3", userId: "u5", user: friends[3], text: "Can we do a potluck style for sides?", createdAt: "2026-03-21" },
+    ],
+    logistics: {
+      date: "2026-04-20",
+      time: "10:00 AM",
+      location: "Sunset Beach Park, Court #3",
+      meetupSpot: "Parking lot B, near the lifeguard tower",
+      transportation: "car",
+      carpoolSlots: 5,
+      volunteers: [
+        { userId: "u1", user: currentUser, role: "driver" },
+        { userId: "u2", user: friends[0], role: "snack_provider" },
+        { userId: "u6", user: friends[4], role: "navigator" },
+      ],
+      customNotes: "Bring sunscreen, towels, and a change of clothes. Net and ball provided!",
+    },
+  },
+  {
     id: "q1",
     title: "Watch sunrise from the pier",
     description: "Meet at 5:30am, bring coffee ☕",
