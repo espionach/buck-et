@@ -401,13 +401,30 @@ export const useAppStore = create<AppState>((set) => ({
   declineTransfer: (transferId) =>
     set((s) => {
       const transfer = s.transferRequests.find((tr) => tr.id === transferId);
+      if (!transfer) return { transferRequests: s.transferRequests.filter((tr) => tr.id !== transferId) };
+
+      const entityName = transfer.type === "quest"
+        ? s.quests.find((q) => q.id === transfer.entityId)?.title || "a quest"
+        : s.groups.find((g) => g.id === transfer.entityId)?.name || "a board";
+
+      const declineNotification: AppNotification = {
+        id: `n${Date.now()}`,
+        type: "transfer_declined",
+        message: `${s.currentUser.name} declined the transfer of '${entityName}'`,
+        entityId: transfer.entityId,
+        fromUser: s.currentUser,
+        read: false,
+        createdAt: new Date().toISOString().split("T")[0],
+      };
+
       return {
         transferRequests: s.transferRequests.filter((tr) => tr.id !== transferId),
-        notifications: transfer
-          ? s.notifications.filter(
-              (n) => !(n.type === (`transfer_${transfer.type}` as any) && n.entityId === transfer.entityId)
-            )
-          : s.notifications,
+        notifications: [
+          declineNotification,
+          ...s.notifications.filter(
+            (n) => !(n.type === (`transfer_${transfer.type}` as any) && n.entityId === transfer.entityId)
+          ),
+        ],
       };
     }),
 

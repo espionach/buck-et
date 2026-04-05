@@ -17,6 +17,7 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
     switch (type) {
       case "transfer_quest":
       case "transfer_group":
+      case "transfer_declined":
         return <ArrowRightLeft className="w-4 h-4 text-primary" />;
       case "new_comment":
         return <MessageCircle className="w-4 h-4 text-secondary" />;
