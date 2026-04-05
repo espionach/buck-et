@@ -138,13 +138,13 @@ const Boards = () => {
 
             {/* Pending invitations - hidden during search */}
             {pendingInvitations.length > 0 && !search && (
-              <div className="space-y-2 mb-4">
+              <div className="space-y-1.5 mb-3">
                 {/* Always show first invitation */}
                 <motion.div
                   key={pendingInvitations[0].id}
                   initial={{ opacity: 0, y: -8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="p-4 rounded-xl border border-border/50 bg-card/60 opacity-80"
+                  className="px-3 py-2.5 rounded-lg border border-border/40 bg-card/50 opacity-75"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
