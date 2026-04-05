@@ -1,6 +1,7 @@
 import { useAppStore } from "@/data/appState";
 import { QuestVolunteer } from "@/data/mockData";
 import UserAvatar from "@/components/UserAvatar";
+import { GroupIconDisplay } from "@/components/GroupIcon";
 import { ArrowLeft, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send, ExternalLink, HandMetal, Check, Pencil, X } from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
