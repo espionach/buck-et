@@ -350,46 +350,47 @@ const Profile = () => {
   return (
     <div className="min-h-screen pb-24 px-5 pt-14">
       {/* Profile Header */}
-      <div className="flex items-start justify-between mb-6">
-        <div className="flex items-center gap-4">
-          <UserAvatar user={currentUser} size="xl" />
-          <div>
+      <div className="flex items-center gap-4 mb-6">
+        <UserAvatar user={currentUser} size="xl" />
+        <div>
+          <div className="flex items-center gap-2">
             <h1 className="text-xl font-bold text-foreground">{currentUser.name}</h1>
-            <p className="text-sm text-muted-foreground">{currentUser.bio}</p>
-            <div className="flex items-center gap-4 mt-1.5">
+            <button
+              onClick={() => {
+                setEditName(currentUser.name);
+                setEditBio(currentUser.bio);
+                setEditProfilePic(currentUser.profilePicture || "");
+                setShowEditProfile(true);
+              }}
+              className="px-3 py-1.5 rounded-lg bg-muted text-muted-foreground text-sm font-semibold flex items-center gap-1.5"
+            >
+              <Edit className="w-3.5 h-3.5" />
+              Edit
+            </button>
+          </div>
+          <p className="text-sm text-muted-foreground">{currentUser.bio}</p>
+          <div className="flex items-center gap-4 mt-1.5">
+            <button
+              onClick={() => setShowFriends(true)}
+              className="flex items-center gap-1.5 text-sm font-semibold text-foreground"
+            >
+              <UsersIcon className="w-4 h-4" />
+              {friendsList.length} Friends
+            </button>
+            {friendRequests.length > 0 && (
               <button
-                onClick={() => setShowFriends(true)}
-                className="flex items-center gap-1.5 text-sm font-semibold text-foreground"
+                onClick={() => setShowRequests(true)}
+                className="relative px-3 py-1.5 rounded-xl bg-primary/10 text-primary text-sm font-semibold flex items-center gap-1.5"
               >
-                <UsersIcon className="w-4 h-4" />
-                {friendsList.length} Friends
+                <UserPlus className="w-4 h-4" />
+                Requests
+                <span className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
+                  {friendRequests.length}
+                </span>
               </button>
-              {friendRequests.length > 0 && (
-                <button
-                  onClick={() => setShowRequests(true)}
-                  className="relative px-3 py-1.5 rounded-xl bg-primary/10 text-primary text-sm font-semibold flex items-center gap-1.5"
-                >
-                  <UserPlus className="w-4 h-4" />
-                  Requests
-                  <span className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
-                    {friendRequests.length}
-                  </span>
-                </button>
-              )}
-            </div>
+            )}
           </div>
         </div>
-        <button
-          onClick={() => {
-            setEditName(currentUser.name);
-            setEditBio(currentUser.bio);
-            setEditProfilePic(currentUser.profilePicture || "");
-            setShowEditProfile(true);
-          }}
-          className="p-2 rounded-xl bg-muted text-muted-foreground"
-        >
-          <Edit className="w-5 h-5" />
-        </button>
       </div>
 
       {/* Friend Requests Modal Popup */}
