@@ -6,7 +6,7 @@ import UserProfileView from "@/components/UserProfileView";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Quest, User, friends, nonFollowedUsers } from "@/data/mockData";
-import { useLocation, useSearchParams } from "react-router-dom";
+import { useLocation, useSearchParams, useNavigate } from "react-router-dom";
 import { usePopup } from "@/hooks/use-popup";
 
 const Profile = () => {
@@ -25,10 +25,18 @@ const Profile = () => {
     setHideGlobalFab,
   } = useAppStore();
   const location = useLocation();
+  const nav = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const justAddedQuestId = (location.state as any)?.justAddedQuestId as string | undefined;
   const [tab, setTab] = useState<"current" | "past">(
     new URLSearchParams(location.search).get("tab") === "past" ? "past" : "current"
   );
+  // Clear navigation state so refresh doesn't re-trigger
+  useEffect(() => {
+    if (justAddedQuestId) {
+      nav(location.pathname + location.search, { replace: true, state: {} });
+    }
+  }, []);
   const [showEditProfile, setShowEditProfile] = useState(false);
   const [editName, setEditName] = useState(currentUser.name);
   const [editBio, setEditBio] = useState(currentUser.bio);
@@ -110,7 +118,17 @@ const Profile = () => {
 
   const current = myQuests
     .filter((q) => !q.isDone)
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    .sort((a, b) => {
+      const aDate = a.logistics?.date;
+      const bDate = b.logistics?.date;
+      // Both dated: sort by upcoming date (soonest first)
+      if (aDate && bDate) return new Date(aDate).getTime() - new Date(bDate).getTime();
+      // Dated before undated
+      if (aDate && !bDate) return -1;
+      if (!aDate && bDate) return 1;
+      // Both undated: newest created first
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
 
   // Snapshot current quest IDs so unjoined quests stay visible until navigation
   useEffect(() => {
@@ -499,6 +517,7 @@ const Profile = () => {
             onViewProfile={(user) => {
               if (user.id !== currentUser.id) setViewingUser(user);
             }}
+            scrollToQuestId={tab === "current" ? justAddedQuestId : undefined}
           />
         )}
       </motion.div>
