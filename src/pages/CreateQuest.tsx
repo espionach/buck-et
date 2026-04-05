@@ -260,7 +260,7 @@ const CreateQuest = () => {
         >
           <span className="text-foreground font-medium">
             {selectedGroupData
-              ? `${selectedGroupData.emoji} ${selectedGroupData.name}`
+              ? <span className="flex items-center gap-1.5"><GroupIconDisplay icon={selectedGroupData.emoji} size={16} className="text-foreground" />{selectedGroupData.name}</span>
               : "🌍 Friends Only"}
           </span>
           <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${showGroupDropdown ? "rotate-180" : ""}`} />
