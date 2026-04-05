@@ -209,6 +209,17 @@ export const useAppStore = create<AppState>((set) => ({
   unfriend: (userId) =>
     set((s) => ({
       friends: s.friends.filter((f) => f.id !== userId),
+      quests: s.quests.map((q) => {
+        // Remove unfriended user from quests owned by current user
+        if (q.createdBy.id === s.currentUser.id) {
+          return { ...q, participants: q.participants.filter((p) => p.id !== userId) };
+        }
+        // Remove current user from quests owned by unfriended user
+        if (q.createdBy.id === userId) {
+          return { ...q, participants: q.participants.filter((p) => p.id !== s.currentUser.id) };
+        }
+        return q;
+      }),
     })),
 
   addComment: (questId, comment) =>
