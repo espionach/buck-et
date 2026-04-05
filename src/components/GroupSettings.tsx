@@ -185,7 +185,7 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
                       </div>
                     </button>
                     <span
-                      className={`text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1 ${getRoleBadgeClass(role)}`}
+                      className={`text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center justify-center gap-1 min-w-[60px] ${getRoleBadgeClass(role)}`}
                     >
                       {getRoleIcon(role)}
                       {role}
