@@ -1,7 +1,7 @@
 import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Bell, MessageCircle, UserPlus, ArrowRightLeft } from "lucide-react";
+import { X, Bell, MessageCircle, UserPlus, ArrowRightLeft, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface NotificationPanelProps {
@@ -10,7 +10,7 @@ interface NotificationPanelProps {
 }
 
 const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
-  const { notifications, markNotificationRead, markAllNotificationsRead } = useAppStore();
+  const { notifications, markNotificationRead, markAllNotificationsRead, friendRequests, acceptFriendRequest, declineFriendRequest } = useAppStore();
   const navigate = useNavigate();
 
   const getIcon = (type: string) => {
@@ -63,10 +63,10 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -12, scale: 0.97 }}
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-sm bg-card rounded-xl shadow-xl border border-border overflow-hidden"
+            className="w-full max-w-xs bg-card rounded-xl shadow-xl border border-border overflow-hidden"
           >
             <div className="flex items-center justify-between p-4 border-b border-border/50">
-              <h3 className="font-bold text-foreground text-sm">Notifications</h3>
+              <h3 className="font-bold text-foreground text-lg">Notifications</h3>
               <div className="flex items-center gap-2">
                 {notifications.some((n) => !n.read) && (
                   <button
@@ -83,7 +83,43 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
             </div>
 
             <div className="max-h-[60vh] overflow-y-auto">
-              {notifications.length === 0 ? (
+              {/* Friend Requests */}
+              {friendRequests.length > 0 && (
+                <div className="border-b border-border/50">
+                  {friendRequests.map((req) => (
+                    <div
+                      key={req.id}
+                      className="flex items-center gap-3 p-4 border-b border-border/30 last:border-b-0 bg-primary/5"
+                    >
+                      <div className="shrink-0">
+                        <UserAvatar user={req.from} size="sm" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-foreground leading-relaxed">
+                          <span className="font-semibold">{req.from.name}</span> sent you a friend request
+                        </p>
+                      </div>
+                      <div className="flex gap-1.5 shrink-0">
+                        <button
+                          onClick={() => acceptFriendRequest(req.id)}
+                          className="p-1.5 rounded-lg bg-secondary text-secondary-foreground"
+                        >
+                          <Check className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => declineFriendRequest(req.id)}
+                          className="p-1.5 rounded-lg bg-muted text-muted-foreground"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Regular Notifications */}
+              {notifications.length === 0 && friendRequests.length === 0 ? (
                 <div className="text-center py-10 text-muted-foreground">
                   <Bell className="w-6 h-6 mx-auto mb-2 opacity-40" />
                   <p className="text-sm">No notifications yet</p>

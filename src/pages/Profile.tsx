@@ -368,7 +368,7 @@ const Profile = () => {
           </button>
         </div>
         <p className="text-sm text-muted-foreground mt-1 text-center">{currentUser.bio}</p>
-        <div className="flex items-center gap-4 mt-3">
+        <div className="flex items-center justify-center mt-3">
           <button
             onClick={() => setShowFriends(true)}
             className="flex items-center gap-1.5 text-sm font-semibold text-foreground"
@@ -376,18 +376,6 @@ const Profile = () => {
             <UsersIcon className="w-4 h-4" />
             {friendsList.length} Friends
           </button>
-          {friendRequests.length > 0 && (
-            <button
-              onClick={() => setShowRequests(true)}
-              className="relative px-3 py-1.5 rounded-xl bg-primary/10 text-primary text-sm font-semibold flex items-center gap-1.5"
-            >
-              <UserPlus className="w-4 h-4" />
-              Requests
-              <span className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
-                {friendRequests.length}
-              </span>
-            </button>
-          )}
         </div>
       </div>
 

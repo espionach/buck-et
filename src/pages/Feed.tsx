@@ -26,7 +26,7 @@ const Feed = () => {
     cleanupEmptyQuests();
   }, [location.pathname]);
 
-  const unreadCount = notifications.filter((n) => !n.read).length;
+  const unreadCount = notifications.filter((n) => !n.read).length + friendRequests.length;
 
   // Show followers-only quests AND group quests where user is a member
   const userGroupIds = groups.map((g) => g.id);
