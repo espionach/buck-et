@@ -357,7 +357,7 @@ const Profile = () => {
           <div>
             <h1 className="text-xl font-bold text-foreground">{currentUser.name}</h1>
             <p className="text-sm text-muted-foreground">{currentUser.bio}</p>
-            <div className="flex items-center justify-between mt-1.5">
+            <div className="flex items-center justify-evenly mt-1.5">
               <button
                 onClick={() => setShowFriends(true)}
                 className="flex items-center gap-1.5 text-sm font-semibold text-foreground"
