@@ -320,16 +320,6 @@ const Boards = () => {
               ))}
             </div>
 
-            {/* In-board new quest button */}
-            {boardTab === "active" && (
-              <button
-                onClick={() => navigate(`/create?groupId=${selectedGroup}`)}
-                className="w-full flex items-center justify-center gap-2 py-3 mb-4 rounded-xl bg-primary/10 text-primary font-semibold text-sm active:scale-[0.98] transition-transform"
-              >
-                <Plus className="w-4 h-4" />
-                New Quest for this board
-              </button>
-            )}
 
             {/* Quest list */}
             <motion.div
