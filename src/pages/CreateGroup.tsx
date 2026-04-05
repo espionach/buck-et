@@ -4,6 +4,7 @@ import { ArrowLeft, Plus } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import UserAvatar from "@/components/UserAvatar";
 
 const CreateGroup = () => {
   const navigate = useNavigate();
