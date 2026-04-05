@@ -165,12 +165,14 @@ export const useAppStore = create<AppState>((set) => ({
       return {
         groupInvitations: s.groupInvitations.filter((i) => i.id !== invitationId),
         groups: [...s.groups, { ...invitation.group, members: [...invitation.group.members, s.currentUser] }],
+        notifications: s.notifications.filter((n) => !(n.type === "board_invitation" && n.entityId === invitationId)),
       };
     }),
 
   declineGroupInvitation: (invitationId) =>
     set((s) => ({
       groupInvitations: s.groupInvitations.filter((i) => i.id !== invitationId),
+      notifications: s.notifications.filter((n) => !(n.type === "board_invitation" && n.entityId === invitationId)),
     })),
 
   acceptFriendRequest: (requestId) =>
