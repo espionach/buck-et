@@ -31,6 +31,8 @@ interface AppState {
   transferRequests: TransferRequest[];
   notifications: AppNotification[];
   currentUser: User;
+  hideGlobalFab: boolean;
+  setHideGlobalFab: (hide: boolean) => void;
 
   addQuest: (quest: Quest) => void;
   toggleImIn: (questId: string) => void;
