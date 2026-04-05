@@ -1,7 +1,7 @@
 import { useAppStore } from "@/data/appState";
 import { currentUser, Quest } from "@/data/mockData";
-import { ArrowLeft, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
-import { useState } from "react";
+import { ArrowLeft, Sparkles, ChevronDown, ChevronUp, ImagePlus, Link as LinkIcon, X } from "lucide-react";
+import { useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 
@@ -28,6 +28,33 @@ const CreateQuest = () => {
   const [carpoolSlots, setCarpoolSlots] = useState("");
   const [customNotes, setCustomNotes] = useState("");
 
+  // Photos & links
+  const [photos, setPhotos] = useState<string[]>([]);
+  const [links, setLinks] = useState<string[]>([]);
+  const [newLink, setNewLink] = useState("");
+  const photoInputRef = useRef<HTMLInputElement>(null);
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    Array.from(files).forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        if (ev.target?.result) {
+          setPhotos((prev) => [...prev, ev.target!.result as string]);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+    e.target.value = "";
+  };
+
+  const handleAddLink = () => {
+    if (!newLink.trim()) return;
+    setLinks((prev) => [...prev, newLink.trim()]);
+    setNewLink("");
+  };
+
   const handleCreate = () => {
     if (!title.trim()) return;
     const quest: Quest = {
@@ -41,6 +68,8 @@ const CreateQuest = () => {
       isDone: false,
       createdAt: new Date().toISOString().split("T")[0],
       comments: [],
+      photos: photos.length > 0 ? photos : undefined,
+      links: links.length > 0 ? links : undefined,
       logistics: (date || time || location || meetupSpot || transportation || customNotes) ? {
         date: date || undefined,
         time: time || undefined,
