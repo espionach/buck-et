@@ -31,7 +31,7 @@ const Profile = () => {
   const [editName, setEditName] = useState(currentUser.name);
   const [editBio, setEditBio] = useState(currentUser.bio);
   const [showFriends, setShowFriends] = useState(false);
-  const [showRequests, setShowRequests] = useState(false);
+  
   const [viewingUser, setViewingUser] = useState<User | null>(null);
   const [viewingUserTab, setViewingUserTab] = useState<"current" | "past">("current");
   const [snapshotQuestIds, setSnapshotQuestIds] = useState<string[]>([]);
