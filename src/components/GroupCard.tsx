@@ -40,7 +40,7 @@ const GroupCard = ({ group, onClick, index }: GroupCardProps) => {
           {/* Transfer icon badge */}
           {pendingTransfer && (
             <div
-              className="absolute top-3 right-3 z-10 p-2 rounded-full bg-primary/20 text-primary cursor-pointer"
+              className="absolute top-3 right-3 z-10 p-2 rounded-full bg-destructive text-destructive-foreground cursor-pointer shadow-md animate-pulse"
               onClick={(e) => {
                 e.stopPropagation();
                 setShowTransferPopup(true);
