@@ -164,7 +164,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
             </button>
           </div>
           <p className="text-[11px] text-muted-foreground ml-8">
-            {group ? `${group.emoji} ${group.name}` : "🌍 Followers only"}
+            {group ? <><GroupIconDisplay icon={group.emoji} size={12} className="text-muted-foreground inline-block mr-1" />{group.name}</> : "🌍 Followers only"}
           </p>
         </div>
 

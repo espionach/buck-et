@@ -292,7 +292,7 @@ const CreateQuest = () => {
                   selectedGroup === g.id ? "bg-primary/5 text-primary font-semibold" : "text-foreground hover:bg-muted"
                 }`}
               >
-                {g.emoji} {g.name}
+                <span className="flex items-center gap-1.5"><GroupIconDisplay icon={g.emoji} size={14} className="text-foreground" />{g.name}</span>
               </button>
             ))}
           </div>

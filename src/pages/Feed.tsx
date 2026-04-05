@@ -4,6 +4,7 @@ import QuestList from "@/components/QuestList";
 import UserAvatar from "@/components/UserAvatar";
 import NotificationPanel from "@/components/NotificationPanel";
 import { Search, Lock, UserPlus, Mail, X } from "lucide-react";
+import { GroupIconDisplay } from "@/components/GroupIcon";
 import UserProfileView from "@/components/UserProfileView";
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
