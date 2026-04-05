@@ -41,6 +41,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
   const [newComment, setNewComment] = useState("");
   const [showOwnerLeave, setShowOwnerLeave] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  usePopup(showOwnerLeave || showDeleteConfirm);
 
   // Check for pending transfer request for this quest targeting current user
   const pendingTransfer = transferRequests.find(

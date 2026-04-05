@@ -4,6 +4,7 @@ import UserAvatar from "@/components/UserAvatar";
 import OwnerLeaveDialog from "@/components/OwnerLeaveDialog";
 import { X, UserPlus, LogOut, Crown, Clock, Trash2, Pencil, Check } from "lucide-react";
 import { useState } from "react";
+import { usePopup } from "@/hooks/use-popup";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface GroupSettingsProps {
