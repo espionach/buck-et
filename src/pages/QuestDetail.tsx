@@ -3,7 +3,7 @@ import { QuestVolunteer } from "@/data/mockData";
 import UserAvatar from "@/components/UserAvatar";
 import { GroupIconDisplay } from "@/components/GroupIcon";
 import { ArrowLeft, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send, ExternalLink, HandMetal, Check, Pencil, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -35,6 +35,8 @@ const QuestDetail = () => {
   const navigate = useNavigate();
   const { questId } = useParams<{ questId: string }>();
   const { quests, groups, addComment, volunteerForQuest, unvolunteerFromQuest, updateQuestLogistics, currentUser } = useAppStore();
+
+  useEffect(() => { window.scrollTo(0, 0); }, [questId]);
 
   const quest = quests.find((q) => q.id === questId);
   const [newComment, setNewComment] = useState("");
