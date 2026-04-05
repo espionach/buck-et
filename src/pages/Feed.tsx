@@ -1,6 +1,6 @@
 import { useAppStore } from "@/data/appState";
 import { friends, nonFollowedUsers, User } from "@/data/mockData";
-import QuestCard from "@/components/QuestCard";
+import QuestList from "@/components/QuestList";
 import UserAvatar from "@/components/UserAvatar";
 import NotificationPanel from "@/components/NotificationPanel";
 import { Search, Lock, UserPlus, Mail, X } from "lucide-react";
