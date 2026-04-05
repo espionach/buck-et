@@ -272,10 +272,9 @@ const Profile = () => {
       <div className="min-h-screen pb-24 px-5 pt-14">
         <button
           onClick={() => setShowEditProfile(false)}
-          className="text-sm text-primary font-semibold mb-4 flex items-center gap-1"
+          className="p-2 rounded-xl bg-muted text-muted-foreground mb-4"
         >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Profile
+          <ArrowLeft className="w-5 h-5" />
         </button>
 
         <h1 className="text-xl font-bold text-foreground mb-6">Edit Profile</h1>
