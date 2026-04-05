@@ -91,7 +91,10 @@ export const useAppStore = create<AppState>((set) => ({
   notifications: initialNotifications,
   currentUser: currentUser,
   hideGlobalFab: false,
+  popupCount: 0,
   setHideGlobalFab: (hide) => set({ hideGlobalFab: hide }),
+  pushPopup: () => set((s) => ({ popupCount: s.popupCount + 1 })),
+  popPopup: () => set((s) => ({ popupCount: Math.max(0, s.popupCount - 1) })),
 
   addQuest: (quest) => set((s) => ({ quests: [quest, ...s.quests] })),
 
