@@ -23,6 +23,8 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
         return <MessageCircle className="w-4 h-4 text-secondary" />;
       case "new_participant":
         return <UserPlus className="w-4 h-4 text-secondary" />;
+      case "board_invitation":
+        return <Users className="w-4 h-4 text-primary" />;
       default:
         return <Bell className="w-4 h-4 text-muted-foreground" />;
     }
