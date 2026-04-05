@@ -93,7 +93,7 @@ const Profile = () => {
 
   const current = myQuests
     .filter((q) => !q.isDone)
-    .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   // Snapshot current quest IDs so unjoined quests stay visible until navigation
   useEffect(() => {
