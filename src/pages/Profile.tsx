@@ -25,10 +25,18 @@ const Profile = () => {
     setHideGlobalFab,
   } = useAppStore();
   const location = useLocation();
+  const nav = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const justAddedQuestId = (location.state as any)?.justAddedQuestId as string | undefined;
   const [tab, setTab] = useState<"current" | "past">(
     new URLSearchParams(location.search).get("tab") === "past" ? "past" : "current"
   );
+  // Clear navigation state so refresh doesn't re-trigger
+  useEffect(() => {
+    if (justAddedQuestId) {
+      nav(location.pathname + location.search, { replace: true, state: {} });
+    }
+  }, []);
   const [showEditProfile, setShowEditProfile] = useState(false);
   const [editName, setEditName] = useState(currentUser.name);
   const [editBio, setEditBio] = useState(currentUser.bio);
