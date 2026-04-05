@@ -44,37 +44,35 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
         <ArrowLeft className="w-5 h-5" />
       </button>
 
-      <div className="flex items-center gap-4 mb-4">
+      <div className="flex flex-col items-center mb-4">
         <UserAvatar user={user} size="lg" />
-        <div>
-          <h2 className="text-lg font-bold text-foreground">{user.name}</h2>
-          <p className="text-sm text-muted-foreground">{user.bio}</p>
-          <div className="flex items-center gap-4 mt-1.5">
-            {isFriend ? (
-              <button
-                onClick={() => setShowFriends(true)}
-                className="flex items-center gap-1.5 text-sm font-semibold text-foreground"
-              >
-                <UsersIcon className="w-4 h-4" />
-                {userFriendsList.length} Friends
-              </button>
-            ) : (
-              <div className="flex items-center gap-1.5 text-sm font-semibold text-muted-foreground">
-                <UsersIcon className="w-4 h-4" />
-                {userFriendsList.length} Friends
-              </div>
-            )}
+        <h2 className="text-lg font-bold text-foreground mt-3">{user.name}</h2>
+        <p className="text-sm text-muted-foreground mt-1 text-center">{user.bio}</p>
+        <div className="flex items-center gap-4 mt-3">
+          {isFriend ? (
+            <button
+              onClick={() => setShowFriends(true)}
+              className="flex items-center gap-1.5 text-sm font-semibold text-foreground"
+            >
+              <UsersIcon className="w-4 h-4" />
+              {userFriendsList.length} Friends
+            </button>
+          ) : (
+            <div className="flex items-center gap-1.5 text-sm font-semibold text-muted-foreground">
+              <UsersIcon className="w-4 h-4" />
+              {userFriendsList.length} Friends
+            </div>
+          )}
 
-            {isFriend && (
-              <button
-                onClick={() => setShowUnfriendConfirm(true)}
-                className="px-4 py-2 rounded-xl bg-muted text-muted-foreground font-semibold text-sm flex items-center gap-2"
-              >
-                <UserMinus className="w-4 h-4" />
-                Unfriend
-              </button>
-            )}
-          </div>
+          {isFriend && (
+            <button
+              onClick={() => setShowUnfriendConfirm(true)}
+              className="px-4 py-2 rounded-xl bg-muted text-muted-foreground font-semibold text-sm flex items-center gap-2"
+            >
+              <UserMinus className="w-4 h-4" />
+              Unfriend
+            </button>
+          )}
         </div>
       </div>
 
