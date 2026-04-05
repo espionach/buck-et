@@ -154,7 +154,7 @@ const Boards = () => {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="text-lg">{pendingInvitations[0].group.emoji}</span>
+                      <GroupIconDisplay icon={pendingInvitations[0].group.emoji} size={20} />
                       <div>
                         <p className="font-semibold text-foreground text-xs">{pendingInvitations[0].group.name}</p>
                         <p className="text-[10px] text-muted-foreground">
