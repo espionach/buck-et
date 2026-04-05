@@ -245,14 +245,6 @@ const Boards = () => {
               ))}
             </div>
 
-            {/* New Group Button */}
-            <button
-              onClick={() => navigate("/create-group")}
-              className="w-full flex items-center justify-center gap-2 py-4 rounded-xl border-2 border-dashed border-border text-muted-foreground hover:border-primary hover:text-primary transition-colors"
-            >
-              <Plus className="w-5 h-5" />
-              <span className="font-semibold text-sm">New Group</span>
-            </button>
           </motion.div>
         ) : (
           <motion.div
