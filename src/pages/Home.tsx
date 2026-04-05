@@ -40,6 +40,12 @@ const Boards = () => {
     cleanupEmptyQuests();
   }, [location.pathname]);
 
+  // Hide global FAB during settings
+  useEffect(() => {
+    setHideGlobalFab(showSettings);
+    return () => setHideGlobalFab(false);
+  }, [showSettings]);
+
   // Sort groups by date created (newest first)
   const sortedGroups = [...groups].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
