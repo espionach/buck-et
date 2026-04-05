@@ -353,7 +353,7 @@ const Profile = () => {
       <div className="flex items-center gap-4 mb-6">
         <UserAvatar user={currentUser} size="xl" />
         <div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             <h1 className="text-xl font-bold text-foreground">{currentUser.name}</h1>
             <button
               onClick={() => {
@@ -362,7 +362,7 @@ const Profile = () => {
                 setEditProfilePic(currentUser.profilePicture || "");
                 setShowEditProfile(true);
               }}
-              className="px-4 py-0 h-7 rounded-lg bg-muted text-muted-foreground text-sm font-semibold flex items-center gap-1.5"
+              className="px-2.5 py-0 h-6 rounded-md bg-muted text-muted-foreground text-xs font-medium flex items-center gap-1"
             >
               <Edit className="w-3.5 h-3.5" />
               Edit
