@@ -137,7 +137,7 @@ const Feed = () => {
             if (!searchMode) setSearchMode(true);
           }}
           placeholder="Search quests or people..."
-          className="w-full pl-10 pr-10 py-3 rounded-xl bg-card border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+          className="w-full pl-10 pr-10 py-3 rounded-xl bg-muted border-none text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
         />
         {(search || searchMode) && (
           <button
