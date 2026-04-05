@@ -93,7 +93,7 @@ const CreateGroup = () => {
           <label className="text-sm font-semibold text-foreground mb-2 block">
             Add Members ({selectedMembers.length} selected)
           </label>
-          <div className="rounded-xl border border-border bg-card overflow-hidden divide-y divide-border/50">
+          <div className="rounded-xl border border-border bg-card overflow-hidden">
             {friendsList.map((user) => (
               <button
                 key={user.id}
