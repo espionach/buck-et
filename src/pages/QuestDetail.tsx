@@ -145,12 +145,15 @@ const QuestDetail = () => {
             </div>
           )}
 
-          {/* Photos */}
+          {/* Photos & Videos */}
           {quest.photos && quest.photos.length > 0 && (
             <div className="flex gap-2 overflow-x-auto pb-1">
               {quest.photos.map((photo, i) => (
-                <img key={i} src={photo} alt={`Quest photo ${i + 1}`}
-                  className="w-24 h-24 rounded-xl object-cover shrink-0 border border-border/30" />
+                photo.startsWith("data:video") ? (
+                  <video key={i} src={photo} className="w-24 h-24 rounded-xl object-cover shrink-0 border border-border/30" muted controls />
+                ) : (
+                  <img key={i} src={photo} alt={`Quest photo ${i + 1}`} className="w-24 h-24 rounded-xl object-cover shrink-0 border border-border/30" />
+                )
               ))}
             </div>
           )}

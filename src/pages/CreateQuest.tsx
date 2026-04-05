@@ -165,11 +165,15 @@ const CreateQuest = () => {
 
           {/* Photos */}
           <div>
-            <label className="text-[11px] text-muted-foreground mb-1 block">Photos</label>
+            <label className="text-[11px] text-muted-foreground mb-1 block">Photos & Videos</label>
             <div className="flex flex-wrap gap-2">
               {photos.map((photo, i) => (
                 <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden">
-                  <img src={photo} alt="" className="w-full h-full object-cover" />
+                  {photo.startsWith("data:video") ? (
+                    <video src={photo} className="w-full h-full object-cover" muted />
+                  ) : (
+                    <img src={photo} alt="" className="w-full h-full object-cover" />
+                  )}
                   <button
                     type="button"
                     onClick={() => setPhotos((prev) => prev.filter((_, idx) => idx !== i))}
@@ -189,7 +193,7 @@ const CreateQuest = () => {
               <input
                 ref={photoInputRef}
                 type="file"
-                accept="image/*"
+                accept="image/*,video/*"
                 multiple
                 onChange={handlePhotoUpload}
                 className="hidden"
