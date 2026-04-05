@@ -551,6 +551,65 @@ const Profile = () => {
                 />
               </div>
 
+              {/* Logistics fields */}
+              <div className="space-y-3">
+                <label className="text-sm font-semibold text-foreground block">Quest Details</label>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[11px] text-muted-foreground mb-1 block">Date</label>
+                    <input type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl bg-muted border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                  </div>
+                  <div>
+                    <label className="text-[11px] text-muted-foreground mb-1 block">Time</label>
+                    <input type="text" value={editTime} onChange={(e) => setEditTime(e.target.value)} placeholder="e.g. 6:00 PM"
+                      className="w-full px-3 py-2 rounded-xl bg-muted border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[11px] text-muted-foreground mb-1 block">Location</label>
+                  <input type="text" value={editLocation} onChange={(e) => setEditLocation(e.target.value)} placeholder="Where's this happening?"
+                    className="w-full px-3 py-2 rounded-xl bg-muted border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                </div>
+                <div>
+                  <label className="text-[11px] text-muted-foreground mb-1 block">Meetup Spot</label>
+                  <input type="text" value={editMeetupSpot} onChange={(e) => setEditMeetupSpot(e.target.value)} placeholder="Where should everyone meet?"
+                    className="w-full px-3 py-2 rounded-xl bg-muted border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                </div>
+                <div>
+                  <label className="text-[11px] text-muted-foreground mb-1 block">Transportation</label>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { id: "car", label: "🚗 Car" },
+                      { id: "bike", label: "🚲 Bike" },
+                      { id: "transit", label: "🚇 Transit" },
+                      { id: "walk", label: "🚶 Walk" },
+                    ].map((t) => (
+                      <button key={t.id} type="button"
+                        onClick={() => setEditTransportation(editTransportation === t.id ? "" : t.id)}
+                        className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                          editTransportation === t.id ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                        }`}
+                      >
+                        {t.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                {editTransportation === "car" && (
+                  <div>
+                    <label className="text-[11px] text-muted-foreground mb-1 block">Carpool Seats Available</label>
+                    <input type="number" value={editCarpoolSlots} onChange={(e) => setEditCarpoolSlots(e.target.value)} placeholder="e.g. 4"
+                      className="w-24 px-3 py-2 rounded-xl bg-muted border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                  </div>
+                )}
+                <div>
+                  <label className="text-[11px] text-muted-foreground mb-1 block">Additional Notes</label>
+                  <textarea value={editCustomNotes} onChange={(e) => setEditCustomNotes(e.target.value)} placeholder="Anything else everyone should know?"
+                    rows={2} className="w-full px-3 py-2 rounded-xl bg-muted border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none" />
+                </div>
+              </div>
+
               {/* Participants with remove */}
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1.5 block">Participants</label>
