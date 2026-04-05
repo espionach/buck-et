@@ -1,7 +1,7 @@
 import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Bell, MessageCircle, UserPlus, ArrowRightLeft, Check } from "lucide-react";
+import { X, Bell, MessageCircle, UserPlus, ArrowRightLeft, Check, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface NotificationPanelProps {
@@ -10,7 +10,7 @@ interface NotificationPanelProps {
 }
 
 const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
-  const { notifications, markNotificationRead, markAllNotificationsRead, friendRequests, acceptFriendRequest, declineFriendRequest } = useAppStore();
+  const { notifications, markNotificationRead, markAllNotificationsRead, friendRequests, acceptFriendRequest, declineFriendRequest, groupInvitations, acceptGroupInvitation, declineGroupInvitation, clearNotification } = useAppStore();
   const navigate = useNavigate();
 
   const getIcon = (type: string) => {
@@ -23,6 +23,8 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
         return <MessageCircle className="w-4 h-4 text-secondary" />;
       case "new_participant":
         return <UserPlus className="w-4 h-4 text-secondary" />;
+      case "board_invitation":
+        return <Users className="w-4 h-4 text-primary" />;
       default:
         return <Bell className="w-4 h-4 text-muted-foreground" />;
     }
@@ -125,27 +127,75 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
                   <p className="text-sm">No notifications yet</p>
                 </div>
               ) : (
-                notifications.map((n) => (
-                  <button
-                    key={n.id}
-                    onClick={() => handleNotificationClick(n)}
-                    className={`w-full text-left flex items-start gap-3 p-4 border-b border-border/30 transition-colors active:scale-[0.99] ${
-                      n.read ? "opacity-60" : "bg-primary/5"
-                    }`}
-                  >
-                    <div className="shrink-0 mt-0.5">
-                      <UserAvatar user={n.fromUser} size="sm" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs text-foreground leading-relaxed">{n.message}</p>
-                      <p className="text-[10px] text-muted-foreground mt-1">{n.createdAt}</p>
-                    </div>
-                    <div className="shrink-0 mt-1">{getIcon(n.type)}</div>
-                    {!n.read && (
-                      <div className="w-2 h-2 rounded-full bg-primary shrink-0 mt-1.5" />
-                    )}
-                  </button>
-                ))
+                notifications.map((n) => {
+                  // Board invitation with pending invite - show accept/decline
+                  const pendingInvite = n.type === "board_invitation" && n.entityId
+                    ? groupInvitations.find((gi) => gi.id === n.entityId)
+                    : null;
+
+                  if (pendingInvite) {
+                    return (
+                      <div
+                        key={n.id}
+                        className={`flex items-center gap-3 p-4 border-b border-border/30 ${
+                          n.read ? "opacity-60" : "bg-primary/5"
+                        }`}
+                      >
+                        <div className="shrink-0">
+                          <UserAvatar user={n.fromUser} size="sm" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-foreground leading-relaxed">{n.message}</p>
+                          <p className="text-[10px] text-muted-foreground mt-1">{n.createdAt}</p>
+                        </div>
+                        <div className="flex gap-1.5 shrink-0">
+                          <button
+                            onClick={() => {
+                              acceptGroupInvitation(pendingInvite.id);
+                              clearNotification(n.id);
+                              onClose();
+                              navigate("/boards");
+                            }}
+                            className="p-1.5 rounded-lg bg-secondary text-secondary-foreground"
+                          >
+                            <Check className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => {
+                              declineGroupInvitation(pendingInvite.id);
+                              clearNotification(n.id);
+                            }}
+                            className="p-1.5 rounded-lg bg-muted text-muted-foreground"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <button
+                      key={n.id}
+                      onClick={() => handleNotificationClick(n)}
+                      className={`w-full text-left flex items-start gap-3 p-4 border-b border-border/30 transition-colors active:scale-[0.99] ${
+                        n.read ? "opacity-60" : "bg-primary/5"
+                      }`}
+                    >
+                      <div className="shrink-0 mt-0.5">
+                        <UserAvatar user={n.fromUser} size="sm" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-foreground leading-relaxed">{n.message}</p>
+                        <p className="text-[10px] text-muted-foreground mt-1">{n.createdAt}</p>
+                      </div>
+                      <div className="shrink-0 mt-1">{getIcon(n.type)}</div>
+                      {!n.read && (
+                        <div className="w-2 h-2 rounded-full bg-primary shrink-0 mt-1.5" />
+                      )}
+                    </button>
+                  );
+                })
               )}
             </div>
           </motion.div>
