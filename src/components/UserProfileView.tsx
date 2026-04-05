@@ -38,10 +38,9 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
     <div className="min-h-screen pb-24 px-5 pt-14">
       <button
         onClick={onBack}
-        className="text-sm text-primary font-semibold mb-4 flex items-center gap-1"
+        className="p-2 rounded-xl bg-muted text-muted-foreground mb-4"
       >
-        <ArrowLeft className="w-4 h-4" />
-        {backLabel}
+        <ArrowLeft className="w-5 h-5" />
       </button>
 
       <div className="flex items-center gap-4 mb-4">
