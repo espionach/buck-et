@@ -1,6 +1,7 @@
 import { useAppStore } from "@/data/appState";
 import { Group, GroupMember } from "@/data/mockData";
 import { ArrowLeft, Plus } from "lucide-react";
+import GroupIconPicker from "@/components/GroupIconPicker";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -11,7 +12,7 @@ const CreateGroup = () => {
   const { addGroup, friends: friendsList, currentUser } = useAppStore();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [emoji, setEmoji] = useState("🎯");
+  const [emoji, setEmoji] = useState("target");
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
 
   const toggleMember = (id: string) => {
@@ -60,11 +61,7 @@ const CreateGroup = () => {
         <div className="flex gap-3">
           <div>
             <label className="text-sm font-semibold text-foreground mb-2 block">Icon</label>
-            <input
-              value={emoji}
-              onChange={(e) => setEmoji(e.target.value)}
-              className="w-16 h-14 rounded-xl bg-card border border-border text-center text-2xl focus:outline-none focus:ring-2 focus:ring-primary/30"
-            />
+            <GroupIconPicker value={emoji} onChange={setEmoji} size="md" />
           </div>
           <div className="flex-1">
             <label className="text-sm font-semibold text-foreground mb-2 block">Group Name</label>

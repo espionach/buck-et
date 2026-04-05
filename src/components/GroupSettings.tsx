@@ -2,7 +2,8 @@ import { useAppStore } from "@/data/appState";
 import { Group, User } from "@/data/mockData";
 import UserAvatar from "@/components/UserAvatar";
 import OwnerLeaveDialog from "@/components/OwnerLeaveDialog";
-import { X, UserPlus, LogOut, Crown, Clock, Trash2, Pencil, Check } from "lucide-react";
+import { UserPlus, LogOut, Crown, Clock, Trash2, Pencil, Check } from "lucide-react";
+import GroupIconPicker from "@/components/GroupIconPicker";
 import { useState } from "react";
 import { usePopup } from "@/hooks/use-popup";
 import { motion, AnimatePresence } from "framer-motion";
@@ -86,12 +87,8 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
         <h2 className="text-xl font-bold text-foreground">Edit Board</h2>
 
           {/* Edit name/emoji */}
-          <div className="flex gap-2">
-            <input
-              value={editEmoji}
-              onChange={(e) => setEditEmoji(e.target.value)}
-              className="w-14 px-2 py-2.5 rounded-xl bg-muted border border-border text-center text-xl focus:outline-none focus:ring-2 focus:ring-primary/30"
-            />
+          <div className="flex gap-2 items-end">
+            <GroupIconPicker value={editEmoji} onChange={setEditEmoji} size="md" />
             <div className="flex-1 flex items-center gap-1.5">
               <input
                 value={editName}

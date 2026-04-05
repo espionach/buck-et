@@ -1,6 +1,7 @@
 import { useAppStore } from "@/data/appState";
 import { QuestVolunteer } from "@/data/mockData";
 import UserAvatar from "@/components/UserAvatar";
+import { GroupIconDisplay } from "@/components/GroupIcon";
 import { ArrowLeft, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send, ExternalLink, HandMetal, Check, Pencil, X } from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -109,7 +110,7 @@ const QuestDetail = () => {
           <div className="flex-1 min-w-0">
             <h1 className="text-lg font-bold text-foreground truncate">{quest.title}</h1>
             <p className="text-xs text-muted-foreground">
-              {group ? `${group.emoji} ${group.name}` : "🌍 Followers only"}
+              {group ? <span className="flex items-center gap-1"><GroupIconDisplay icon={group.emoji} size={12} className="text-muted-foreground" />{group.name}</span> : "🌍 Followers only"}
             </p>
           </div>
         </div>

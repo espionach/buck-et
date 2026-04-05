@@ -1,6 +1,7 @@
 import { useAppStore } from "@/data/appState";
 import { Quest } from "@/data/mockData";
 import { ArrowLeft, Sparkles, ChevronDown, ChevronUp, ImagePlus, Link as LinkIcon, X } from "lucide-react";
+import { GroupIconDisplay } from "@/components/GroupIcon";
 import { useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -259,7 +260,7 @@ const CreateQuest = () => {
         >
           <span className="text-foreground font-medium">
             {selectedGroupData
-              ? `${selectedGroupData.emoji} ${selectedGroupData.name}`
+              ? <span className="flex items-center gap-1.5"><GroupIconDisplay icon={selectedGroupData.emoji} size={16} className="text-foreground" />{selectedGroupData.name}</span>
               : "🌍 Friends Only"}
           </span>
           <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${showGroupDropdown ? "rotate-180" : ""}`} />
@@ -291,7 +292,7 @@ const CreateQuest = () => {
                   selectedGroup === g.id ? "bg-primary/5 text-primary font-semibold" : "text-foreground hover:bg-muted"
                 }`}
               >
-                {g.emoji} {g.name}
+                <span className="flex items-center gap-1.5"><GroupIconDisplay icon={g.emoji} size={14} className="text-foreground" />{g.name}</span>
               </button>
             ))}
           </div>

@@ -1,4 +1,5 @@
 import { Group } from "@/data/mockData";
+import { GroupIconDisplay } from "@/components/GroupIcon";
 import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
 import { motion, AnimatePresence } from "framer-motion";
@@ -53,7 +54,7 @@ const GroupCard = ({ group, onClick, index }: GroupCardProps) => {
           )}
 
           <div className="flex items-start justify-between mb-3">
-            <span className="text-3xl">{group.emoji}</span>
+            <GroupIconDisplay icon={group.emoji} size={28} />
           </div>
           <h3 className="font-display font-bold text-sm text-foreground mb-1 line-clamp-1">{group.name}</h3>
           <div className="flex items-center gap-1.5 text-muted-foreground ml-0">

@@ -1,6 +1,7 @@
 import { useAppStore } from "@/data/appState";
 import { User } from "@/data/mockData";
 import GroupCard from "@/components/GroupCard";
+import { GroupIconDisplay } from "@/components/GroupIcon";
 import QuestList from "@/components/QuestList";
 import GroupSettings from "@/components/GroupSettings";
 import UserAvatar from "@/components/UserAvatar";
@@ -154,7 +155,7 @@ const Boards = () => {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="text-lg">{pendingInvitations[0].group.emoji}</span>
+                      <GroupIconDisplay icon={pendingInvitations[0].group.emoji} size={20} />
                       <div>
                         <p className="font-semibold text-foreground text-xs">{pendingInvitations[0].group.name}</p>
                         <p className="text-[10px] text-muted-foreground">
@@ -202,7 +203,7 @@ const Boards = () => {
                             >
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                  <span className="text-lg">{inv.group.emoji}</span>
+                                  <GroupIconDisplay icon={inv.group.emoji} size={20} />
                                   <div>
                                     <p className="font-semibold text-foreground text-xs">{inv.group.name}</p>
                                     <p className="text-[10px] text-muted-foreground">
@@ -276,7 +277,7 @@ const Boards = () => {
 
             <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-3">
-                <span className="text-4xl">{selectedGroupData?.emoji}</span>
+                <GroupIconDisplay icon={selectedGroupData?.emoji || "target"} size={32} />
                 <div>
                   <h2 className="text-xl font-bold text-foreground">{selectedGroupData?.name}</h2>
                   <p className="text-sm text-muted-foreground">

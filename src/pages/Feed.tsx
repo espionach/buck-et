@@ -4,6 +4,7 @@ import QuestList from "@/components/QuestList";
 import UserAvatar from "@/components/UserAvatar";
 import NotificationPanel from "@/components/NotificationPanel";
 import { Search, Lock, UserPlus, Mail, X } from "lucide-react";
+import { GroupIconDisplay } from "@/components/GroupIcon";
 import UserProfileView from "@/components/UserProfileView";
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
@@ -41,10 +42,10 @@ const Feed = () => {
   });
 
   // Apply filter
-  const filterOptions = [
+  const filterOptions: { key: string; label: React.ReactNode }[] = [
     { key: "all", label: "All" },
     { key: "followers", label: "Friends" },
-    ...groups.map((g) => ({ key: g.id, label: `${g.emoji} ${g.name}` })),
+    ...groups.map((g) => ({ key: g.id, label: <span className="flex items-center gap-1"><GroupIconDisplay icon={g.emoji} size={12} />{g.name}</span> })),
   ];
 
   const filteredByTab = feedQuests.filter((q) => {

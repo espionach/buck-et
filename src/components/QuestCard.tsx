@@ -1,6 +1,7 @@
 import { Quest, Comment, User } from "@/data/mockData";
 import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
+import { GroupIconDisplay } from "@/components/GroupIcon";
 import OwnerLeaveDialog from "@/components/OwnerLeaveDialog";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, HandMetal, MessageCircle, ChevronDown, ChevronUp, Send, Pencil, Plus, Undo2, ExternalLink, X, Calendar } from "lucide-react";
@@ -163,7 +164,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
             </button>
           </div>
           <p className="text-[11px] text-muted-foreground ml-8">
-            {group ? `${group.emoji} ${group.name}` : "🌍 Followers only"}
+            {group ? <><GroupIconDisplay icon={group.emoji} size={12} className="text-muted-foreground inline-block mr-1" />{group.name}</> : "🌍 Followers only"}
           </p>
         </div>
 
