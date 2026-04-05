@@ -176,6 +176,25 @@ export const pendingGroupInvitations: GroupInvitation[] = [
     invitedBy: friends[0],
     status: "pending",
   },
+  {
+    id: "gi2",
+    groupId: "g-new2",
+    group: {
+      id: "g-new2",
+      name: "Book Worms",
+      emoji: "📚",
+      members: [friends[1], friends[2]],
+      memberRoles: [
+        { user: friends[1], role: "owner" },
+        { user: friends[2], role: "member" },
+      ],
+      ownerId: friends[1].id,
+      activeQuests: 0,
+      createdAt: "2026-03-20",
+    },
+    invitedBy: friends[1],
+    status: "pending",
+  },
 ];
 
 export const pendingFriendRequests: FriendRequest[] = [
