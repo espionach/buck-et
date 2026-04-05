@@ -187,7 +187,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
                 !canJoin
                   ? "bg-muted/50 text-muted-foreground/50 cursor-not-allowed"
                   : isIn
-                  ? "bg-green-500 text-white"
+                  ? "bg-secondary text-secondary-foreground"
                   : "bg-muted text-muted-foreground"
               }`}
             >
