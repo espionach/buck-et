@@ -240,11 +240,54 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
         {/* Date */}
         {!quest.isDone && quest.logistics?.date && (
           <div className="flex items-center gap-1.5 mt-2 text-xs text-muted-foreground">
-            <Calendar className="w-3.5 h-3.5" />
+            <Calendar className="w-3.5 h-3.5 shrink-0" />
             <span>
               {format(parseISO(quest.logistics.date), "MMM d, yyyy")}
               {quest.logistics.time && ` · ${quest.logistics.time}`}
             </span>
+          </div>
+        )}
+
+        {/* Location */}
+        {quest.logistics?.location && (
+          <div className="flex items-center gap-1.5 mt-1.5 text-xs text-muted-foreground">
+            <MapPin className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate pr-12">{quest.logistics.location}</span>
+          </div>
+        )}
+
+        {/* Meetup Spot */}
+        {quest.logistics?.meetupSpot && (
+          <div className="flex items-center gap-1.5 mt-1.5 text-xs text-muted-foreground/70">
+            <MapPin className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate pr-12">Meet at: {quest.logistics.meetupSpot}</span>
+          </div>
+        )}
+
+        {/* Transportation */}
+        {quest.logistics?.transportation && (
+          <div className="flex items-center gap-1.5 mt-1.5 text-xs text-muted-foreground">
+            {quest.logistics.transportation === "drive" || quest.logistics.transportation === "carpool" ? (
+              <Car className="w-3.5 h-3.5 shrink-0" />
+            ) : quest.logistics.transportation === "bike" ? (
+              <Bike className="w-3.5 h-3.5 shrink-0" />
+            ) : quest.logistics.transportation === "transit" ? (
+              <Train className="w-3.5 h-3.5 shrink-0" />
+            ) : (
+              <Footprints className="w-3.5 h-3.5 shrink-0" />
+            )}
+            <span className="truncate pr-12 capitalize">
+              {quest.logistics.transportation}
+              {quest.logistics.transportation === "carpool" && quest.logistics.carpoolSlots && ` · ${quest.logistics.carpoolSlots} spots`}
+            </span>
+          </div>
+        )}
+
+        {/* Custom Notes */}
+        {quest.logistics?.customNotes && (
+          <div className="flex items-center gap-1.5 mt-1.5 text-xs text-muted-foreground">
+            <StickyNote className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate pr-12">{quest.logistics.customNotes}</span>
           </div>
         )}
 
