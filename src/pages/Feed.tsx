@@ -37,7 +37,8 @@ const Feed = () => {
     // Group quests: show if user is in that group
     if (q.groupId && userGroupIds.includes(q.groupId)) return true;
     // Friend-only quests: only show if creator is a friend (or self)
-    if (q.isFollowerOnly && (friendIds.has(q.createdBy.id) || q.createdBy.id === currentUser.id)) return true;
+    if (q.createdBy.id === currentUser.id) return false;
+    if (q.isFollowerOnly && friendIds.has(q.createdBy.id)) return true;
     return false;
   });
 
