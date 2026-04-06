@@ -242,9 +242,14 @@ const Profile = () => {
   };
 
   const handleDeleteQuest = () => {
+    setShowDeleteQuestConfirm(true);
+  };
+
+  const confirmDeleteQuest = () => {
     if (editingCurrentQuest) {
       deleteQuest(editingCurrentQuest.id);
       setEditingCurrentQuest(null);
+      setShowDeleteQuestConfirm(false);
     }
   };
 
