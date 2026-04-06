@@ -74,6 +74,7 @@ const Profile = () => {
   const [questPhotos, setQuestPhotos] = useState<string[]>([]);
   const [questCompletedAt, setQuestCompletedAt] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showDeleteQuestConfirm, setShowDeleteQuestConfirm] = useState(false);
 
   // Sync tab from URL params
   useEffect(() => {
