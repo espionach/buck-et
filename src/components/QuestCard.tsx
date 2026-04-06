@@ -267,18 +267,20 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
         {/* Transportation */}
         {quest.logistics?.transportation && (
           <div className="flex items-center gap-1.5 mt-1.5 text-xs text-muted-foreground">
-            {quest.logistics.transportation === "drive" || quest.logistics.transportation === "carpool" ? (
+            {quest.logistics.transportation === "car" ? (
               <Car className="w-3.5 h-3.5 shrink-0" />
             ) : quest.logistics.transportation === "bike" ? (
               <Bike className="w-3.5 h-3.5 shrink-0" />
             ) : quest.logistics.transportation === "transit" ? (
               <Train className="w-3.5 h-3.5 shrink-0" />
-            ) : (
+            ) : quest.logistics.transportation === "walk" ? (
               <Footprints className="w-3.5 h-3.5 shrink-0" />
+            ) : (
+              <Car className="w-3.5 h-3.5 shrink-0" />
             )}
             <span className="truncate pr-12 capitalize">
               {quest.logistics.transportation}
-              {quest.logistics.transportation === "carpool" && quest.logistics.carpoolSlots && ` · ${quest.logistics.carpoolSlots} spots`}
+              {quest.logistics.carpoolSlots && ` · ${quest.logistics.carpoolSlots} spots`}
             </span>
           </div>
         )}
