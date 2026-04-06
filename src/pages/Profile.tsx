@@ -434,6 +434,8 @@ const Profile = () => {
         </div>
       </div>
 
+  const [showDeleteQuestConfirm, setShowDeleteQuestConfirm] = useState(false);
+
 
 
       {/* Friends Modal Popup */}
