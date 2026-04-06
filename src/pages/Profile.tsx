@@ -544,8 +544,10 @@ const Profile = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-md bg-card rounded-xl p-5 space-y-4 shadow-lg max-h-[85vh] overflow-y-auto"
+              className="w-full max-w-md bg-card rounded-xl shadow-lg max-h-[85vh] flex flex-col overflow-hidden"
             >
+              {/* Scrollable content */}
+              <div className="flex-1 overflow-y-auto p-5 space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="font-bold text-foreground">Edit Quest</h3>
                 <button onClick={() => setEditingCurrentQuest(null)}>
@@ -728,8 +730,10 @@ const Profile = () => {
                   </button>
                 </div>
               </div>
+              </div>
 
-              <div className="flex gap-2">
+              {/* Sticky buttons at bottom */}
+              <div className="p-5 pt-3 border-t border-border/50 flex gap-2 shrink-0">
                 <button
                   onClick={handleSaveCurrentQuest}
                   disabled={!editQuestTitle.trim()}
@@ -742,6 +746,46 @@ const Profile = () => {
                   className="p-3 rounded-xl bg-destructive/10 text-destructive"
                 >
                   <Trash2 className="w-5 h-5" />
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Delete quest confirmation */}
+      <AnimatePresence>
+        {showDeleteQuestConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] bg-foreground/40 flex items-center justify-center p-5"
+            onClick={() => setShowDeleteQuestConfirm(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-xs bg-card rounded-xl p-5 space-y-4 shadow-lg text-center"
+            >
+              <p className="text-sm font-bold text-foreground">Delete this quest?</p>
+              <p className="text-xs text-muted-foreground">
+                This quest will be permanently deleted for everyone. This action cannot be undone.
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowDeleteQuestConfirm(false)}
+                  className="flex-1 py-2.5 rounded-xl bg-muted text-muted-foreground font-semibold text-sm"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDeleteQuest}
+                  className="flex-1 py-2.5 rounded-xl bg-destructive text-destructive-foreground font-semibold text-sm"
+                >
+                  Delete
                 </button>
               </div>
             </motion.div>
