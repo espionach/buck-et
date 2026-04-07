@@ -40,12 +40,6 @@ const QuestDetail = () => {
 
   const quest = quests.find((q) => q.id === questId);
   const [newComment, setNewComment] = useState("");
-  const [editingLogistics, setEditingLogistics] = useState(false);
-  const [editDate, setEditDate] = useState("");
-  const [editTime, setEditTime] = useState("");
-  const [editLocation, setEditLocation] = useState("");
-  const [editMeetup, setEditMeetup] = useState("");
-  const [editNotes, setEditNotes] = useState("");
 
   if (!quest) {
     return (

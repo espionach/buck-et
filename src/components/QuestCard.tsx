@@ -248,50 +248,6 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
           </div>
         )}
 
-        {/* Location */}
-        {quest.logistics?.location && (
-          <div className="flex items-center gap-1.5 mt-1.5 text-xs text-muted-foreground">
-            <MapPin className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate pr-12">{quest.logistics.location}</span>
-          </div>
-        )}
-
-        {/* Meetup Spot */}
-        {quest.logistics?.meetupSpot && (
-          <div className="flex items-center gap-1.5 mt-1.5 text-xs text-muted-foreground/70">
-            <MapPin className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate pr-12">Meet at: {quest.logistics.meetupSpot}</span>
-          </div>
-        )}
-
-        {/* Transportation */}
-        {quest.logistics?.transportation && (
-          <div className="flex items-center gap-1.5 mt-1.5 text-xs text-muted-foreground">
-            {quest.logistics.transportation === "car" ? (
-              <Car className="w-3.5 h-3.5 shrink-0" />
-            ) : quest.logistics.transportation === "bike" ? (
-              <Bike className="w-3.5 h-3.5 shrink-0" />
-            ) : quest.logistics.transportation === "transit" ? (
-              <Train className="w-3.5 h-3.5 shrink-0" />
-            ) : quest.logistics.transportation === "walk" ? (
-              <Footprints className="w-3.5 h-3.5 shrink-0" />
-            ) : (
-              <Car className="w-3.5 h-3.5 shrink-0" />
-            )}
-            <span className="truncate pr-12 capitalize">
-              {quest.logistics.transportation}
-              {quest.logistics.carpoolSlots && ` · ${quest.logistics.carpoolSlots} spots`}
-            </span>
-          </div>
-        )}
-
-        {/* Custom Notes */}
-        {quest.logistics?.customNotes && (
-          <div className="flex items-center gap-1.5 mt-1.5 text-xs text-muted-foreground">
-            <StickyNote className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate pr-12">{quest.logistics.customNotes}</span>
-          </div>
-        )}
 
         {/* Social proof + actions */}
         <div className="flex items-center justify-between mt-3 pt-3 border-t border-border/30">
