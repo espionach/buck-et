@@ -34,7 +34,7 @@ const volunteerRoles = [
 const QuestDetail = () => {
   const navigate = useNavigate();
   const { questId } = useParams<{ questId: string }>();
-  const { quests, groups, addComment, volunteerForQuest, unvolunteerFromQuest, updateQuestLogistics, currentUser } = useAppStore();
+  const { quests, groups, addComment, volunteerForQuest, unvolunteerFromQuest, currentUser } = useAppStore();
 
   useEffect(() => { window.scrollTo(0, 0); }, [questId]);
 
