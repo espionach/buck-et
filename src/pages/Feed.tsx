@@ -34,10 +34,11 @@ const Feed = () => {
   const friendIds = new Set(friendsList.map((f) => f.id));
   const feedQuests = quests.filter((q) => {
     if (q.isDone) return false;
+    // Never show user's own quests on the feed
+    if (q.createdBy.id === currentUser.id) return false;
     // Group quests: show if user is in that group
     if (q.groupId && userGroupIds.includes(q.groupId)) return true;
-    // Friend-only quests: only show if creator is a friend (or self)
-    if (q.createdBy.id === currentUser.id) return false;
+    // Friend-only quests: only show if creator is a friend
     if (q.isFollowerOnly && friendIds.has(q.createdBy.id)) return true;
     return false;
   });
