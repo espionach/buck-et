@@ -75,25 +75,6 @@ const QuestDetail = () => {
     setNewComment("");
   };
 
-  const startEditLogistics = () => {
-    setEditDate(logistics.date || "");
-    setEditTime(logistics.time || "");
-    setEditLocation(logistics.location || "");
-    setEditMeetup(logistics.meetupSpot || "");
-    setEditNotes(logistics.customNotes || "");
-    setEditingLogistics(true);
-  };
-
-  const saveLogistics = () => {
-    updateQuestLogistics(quest.id, {
-      date: editDate || undefined,
-      time: editTime || undefined,
-      location: editLocation || undefined,
-      meetupSpot: editMeetup || undefined,
-      customNotes: editNotes || undefined,
-    });
-    setEditingLogistics(false);
-  };
 
   return (
     <div className="min-h-screen pb-28">
