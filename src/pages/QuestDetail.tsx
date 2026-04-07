@@ -2,7 +2,7 @@ import { useAppStore } from "@/data/appState";
 import { QuestVolunteer } from "@/data/mockData";
 import UserAvatar from "@/components/UserAvatar";
 import { GroupIconDisplay } from "@/components/GroupIcon";
-import { ArrowLeft, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send, ExternalLink, HandMetal, Check, Pencil, X } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send, ExternalLink, HandMetal, Check } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -34,18 +34,12 @@ const volunteerRoles = [
 const QuestDetail = () => {
   const navigate = useNavigate();
   const { questId } = useParams<{ questId: string }>();
-  const { quests, groups, addComment, volunteerForQuest, unvolunteerFromQuest, updateQuestLogistics, currentUser } = useAppStore();
+  const { quests, groups, addComment, volunteerForQuest, unvolunteerFromQuest, currentUser } = useAppStore();
 
   useEffect(() => { window.scrollTo(0, 0); }, [questId]);
 
   const quest = quests.find((q) => q.id === questId);
   const [newComment, setNewComment] = useState("");
-  const [editingLogistics, setEditingLogistics] = useState(false);
-  const [editDate, setEditDate] = useState("");
-  const [editTime, setEditTime] = useState("");
-  const [editLocation, setEditLocation] = useState("");
-  const [editMeetup, setEditMeetup] = useState("");
-  const [editNotes, setEditNotes] = useState("");
 
   if (!quest) {
     return (
@@ -81,25 +75,6 @@ const QuestDetail = () => {
     setNewComment("");
   };
 
-  const startEditLogistics = () => {
-    setEditDate(logistics.date || "");
-    setEditTime(logistics.time || "");
-    setEditLocation(logistics.location || "");
-    setEditMeetup(logistics.meetupSpot || "");
-    setEditNotes(logistics.customNotes || "");
-    setEditingLogistics(true);
-  };
-
-  const saveLogistics = () => {
-    updateQuestLogistics(quest.id, {
-      date: editDate || undefined,
-      time: editTime || undefined,
-      location: editLocation || undefined,
-      meetupSpot: editMeetup || undefined,
-      customNotes: editNotes || undefined,
-    });
-    setEditingLogistics(false);
-  };
 
   return (
     <div className="min-h-screen pb-28">
@@ -187,97 +162,48 @@ const QuestDetail = () => {
 
         {/* Logistics Section */}
         <div className="p-4 rounded-xl border border-border/50 bg-card space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-foreground">Quest Details</h3>
-            {isOwner && !editingLogistics && (
-              <button onClick={startEditLogistics} className="p-1.5 rounded-lg bg-muted text-muted-foreground hover:text-foreground">
-                <Pencil className="w-3.5 h-3.5" />
-              </button>
-            )}
-            {editingLogistics && (
-              <div className="flex gap-1.5">
-                <button onClick={() => setEditingLogistics(false)} className="p-1.5 rounded-lg bg-muted text-muted-foreground">
-                  <X className="w-3.5 h-3.5" />
-                </button>
-                <button onClick={saveLogistics} className="p-1.5 rounded-lg bg-secondary text-secondary-foreground">
-                  <Check className="w-3.5 h-3.5" />
-                </button>
+          <h3 className="text-sm font-bold text-foreground">Quest Details</h3>
+
+          <div className="space-y-2.5">
+            {logistics.date && (
+              <div className="flex items-center gap-2.5 text-sm">
+                <Calendar className="w-4 h-4 text-primary" />
+                <span className="text-foreground">{logistics.date}</span>
+                {logistics.time && <span className="text-muted-foreground">at {logistics.time}</span>}
               </div>
+            )}
+            {logistics.location && (
+              <div className="flex items-center gap-2.5 text-sm">
+                <MapPin className="w-4 h-4 text-primary" />
+                <span className="text-foreground">{logistics.location}</span>
+              </div>
+            )}
+            {logistics.meetupSpot && (
+              <div className="flex items-start gap-2.5 text-sm">
+                <MapPin className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
+                <span className="text-muted-foreground">Meet at: {logistics.meetupSpot}</span>
+              </div>
+            )}
+            {logistics.transportation && TransportIcon && (
+              <div className="flex items-center gap-2.5 text-sm">
+                <TransportIcon className="w-4 h-4 text-primary" />
+                <span className="text-foreground">{transportLabels[logistics.transportation]}</span>
+                {logistics.carpoolSlots && logistics.transportation === "car" && (
+                  <span className="text-muted-foreground text-xs">({logistics.carpoolSlots} seats available)</span>
+                )}
+              </div>
+            )}
+            {logistics.customNotes && (
+              <p className="text-xs text-muted-foreground mt-2 p-2.5 rounded-lg bg-muted/50">
+                📝 {logistics.customNotes}
+              </p>
+            )}
+            {!logistics.date && !logistics.location && !logistics.transportation && !logistics.customNotes && (
+              <p className="text-xs text-muted-foreground text-center py-2">
+                No details added yet
+              </p>
             )}
           </div>
-
-          {editingLogistics ? (
-            <div className="space-y-3">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-[11px] text-muted-foreground mb-1 block">Date</label>
-                  <input type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg bg-muted border-none text-foreground text-xs focus:outline-none focus:ring-1 focus:ring-primary/30" />
-                </div>
-                <div>
-                  <label className="text-[11px] text-muted-foreground mb-1 block">Time</label>
-                  <input type="text" value={editTime} onChange={(e) => setEditTime(e.target.value)} placeholder="e.g. 6:00 PM"
-                    className="w-full px-3 py-2 rounded-lg bg-muted border-none text-foreground text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/30" />
-                </div>
-              </div>
-              <div>
-                <label className="text-[11px] text-muted-foreground mb-1 block">Location</label>
-                <input type="text" value={editLocation} onChange={(e) => setEditLocation(e.target.value)} placeholder="Where's this happening?"
-                  className="w-full px-3 py-2 rounded-lg bg-muted border-none text-foreground text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/30" />
-              </div>
-              <div>
-                <label className="text-[11px] text-muted-foreground mb-1 block">Meetup Spot</label>
-                <input type="text" value={editMeetup} onChange={(e) => setEditMeetup(e.target.value)} placeholder="Where should we meet?"
-                  className="w-full px-3 py-2 rounded-lg bg-muted border-none text-foreground text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/30" />
-              </div>
-              <div>
-                <label className="text-[11px] text-muted-foreground mb-1 block">Notes</label>
-                <textarea value={editNotes} onChange={(e) => setEditNotes(e.target.value)} placeholder="Anything else everyone should know?"
-                  rows={2} className="w-full px-3 py-2 rounded-lg bg-muted border-none text-foreground text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/30 resize-none" />
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-2.5">
-              {logistics.date && (
-                <div className="flex items-center gap-2.5 text-sm">
-                  <Calendar className="w-4 h-4 text-primary" />
-                  <span className="text-foreground">{logistics.date}</span>
-                  {logistics.time && <span className="text-muted-foreground">at {logistics.time}</span>}
-                </div>
-              )}
-              {logistics.location && (
-                <div className="flex items-center gap-2.5 text-sm">
-                  <MapPin className="w-4 h-4 text-primary" />
-                  <span className="text-foreground">{logistics.location}</span>
-                </div>
-              )}
-              {logistics.meetupSpot && (
-                <div className="flex items-start gap-2.5 text-sm">
-                  <MapPin className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
-                  <span className="text-muted-foreground">Meet at: {logistics.meetupSpot}</span>
-                </div>
-              )}
-              {logistics.transportation && TransportIcon && (
-                <div className="flex items-center gap-2.5 text-sm">
-                  <TransportIcon className="w-4 h-4 text-primary" />
-                  <span className="text-foreground">{transportLabels[logistics.transportation]}</span>
-                  {logistics.carpoolSlots && logistics.transportation === "car" && (
-                    <span className="text-muted-foreground text-xs">({logistics.carpoolSlots} seats available)</span>
-                  )}
-                </div>
-              )}
-              {logistics.customNotes && (
-                <p className="text-xs text-muted-foreground mt-2 p-2.5 rounded-lg bg-muted/50">
-                  📝 {logistics.customNotes}
-                </p>
-              )}
-              {!logistics.date && !logistics.location && !logistics.transportation && !logistics.customNotes && (
-                <p className="text-xs text-muted-foreground text-center py-2">
-                  {isOwner ? "Tap the pencil to add details" : "No details added yet"}
-                </p>
-              )}
-            </div>
-          )}
         </div>
 
         {/* Volunteer Section */}
