@@ -29,7 +29,7 @@ const Feed = () => {
 
   const unreadCount = notifications.filter((n) => !n.read).length + friendRequests.length;
 
-  // Show followers-only quests from friends AND group quests where user is a member
+  // Show friends-only quests from friends AND group quests where user is a member
   const userGroupIds = groups.map((g) => g.id);
   const friendIds = new Set(friendsList.map((f) => f.id));
   const feedQuests = quests.filter((q) => {
@@ -38,7 +38,7 @@ const Feed = () => {
     if (q.createdBy.id === currentUser.id) return false;
     // Group quests: show if user is in that group
     if (q.groupId && userGroupIds.includes(q.groupId)) return true;
-    // Friend-only quests: only show if creator is a friend
+    // Friends-only quests: only show if creator is a friend
     if (q.isFollowerOnly && friendIds.has(q.createdBy.id)) return true;
     return false;
   });
