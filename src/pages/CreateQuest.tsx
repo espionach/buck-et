@@ -69,7 +69,7 @@ const CreateQuest = () => {
       groupId: selectedGroup || undefined,
       isFollowerOnly: !selectedGroup,
       participants: [currentUser],
-      isDone: false,
+      completedByUserIds: [],
       createdAt: new Date().toISOString().split("T")[0],
       comments: [],
       photos: photos.length > 0 ? photos : undefined,
