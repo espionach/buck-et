@@ -419,7 +419,7 @@ export const quests: Quest[] = [
     groupId: "g1",
     isFollowerOnly: false,
     participants: [currentUser, friends[0], friends[1], friends[2]],
-    completedByUserIds: []
+    completedByUserIds: [],
     createdAt: "2026-03-07",
     completedAt: "2026-03-08",
     photos: ["/mock-photos/bonfire1.jpg", "/mock-photos/bonfire2.jpg"],
@@ -435,7 +435,7 @@ export const quests: Quest[] = [
     groupId: "g3",
     isFollowerOnly: false,
     participants: [currentUser, friends[0], friends[2]],
-    completedByUserIds: []
+    completedByUserIds: [],
     createdAt: "2026-03-05",
     completedAt: "2026-03-06",
     photos: ["/mock-photos/hike1.jpg"],
@@ -449,7 +449,7 @@ export const quests: Quest[] = [
     groupId: "g2",
     isFollowerOnly: false,
     participants: [currentUser, friends[3], friends[4]],
-    completedByUserIds: []
+    completedByUserIds: [],
     createdAt: "2026-02-25",
     completedAt: "2026-03-01",
     notes: "Best har gow was at Dragon Gate!",
