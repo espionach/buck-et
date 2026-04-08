@@ -75,7 +75,7 @@ export interface Quest {
   groupId?: string;
   isFollowerOnly: boolean;
   participants: User[];
-  isDone: boolean;
+  completedByUserIds: string[];
   createdAt: string;
   completedAt?: string;
   photos?: string[];
