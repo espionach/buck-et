@@ -35,7 +35,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
   const canJoin = !disableJoin && userInGroup;
   const isOwner = quest.createdBy.id === currentUser.id;
   const groupOwner = group ? group.ownerId === currentUser.id : false;
-  const canToggleStatus = isOwner || groupOwner;
+  const canToggleStatus = isIn;
   const isFollowersOnly = quest.isFollowerOnly;
   const canNavigateToDetail = isIn && !quest.completedByUserIds.includes(currentUser.id);
 
