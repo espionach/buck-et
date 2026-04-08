@@ -37,7 +37,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
   const groupOwner = group ? group.ownerId === currentUser.id : false;
   const canToggleStatus = isOwner || groupOwner;
   const isFollowersOnly = quest.isFollowerOnly;
-  const canNavigateToDetail = isIn && !quest.isDone;
+  const canNavigateToDetail = isIn && !quest.completedByUserIds.includes(currentUser.id);
 
   const [showComments, setShowComments] = useState(autoOpenComments);
   const [newComment, setNewComment] = useState("");
@@ -93,7 +93,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
         animate={{ opacity: 1 }}
         transition={{ delay: index * 0.06 }}
         onClick={() => canNavigateToDetail && navigate(`/quest/${quest.id}`)}
-        className={`relative p-4 overflow-hidden ${quest.isDone ? "opacity-60" : ""} ${canNavigateToDetail ? "cursor-pointer active:scale-[0.99] transition-transform" : ""} ${justAdded ? "animate-just-added rounded-xl" : ""}`}
+        className={`relative p-4 overflow-hidden ${quest.completedByUserIds.includes(currentUser.id) ? "opacity-60" : ""} ${canNavigateToDetail ? "cursor-pointer active:scale-[0.99] transition-transform" : ""} ${justAdded ? "animate-just-added rounded-xl" : ""}`}
       >
         {/* Transfer request banner */}
         {pendingTransfer && (
@@ -125,7 +125,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
         )}
 
         {/* Pencil icon for owned current quests */}
-        {!quest.isDone && isOwner && onEditCurrent && (
+        {!quest.completedByUserIds.includes(currentUser.id) && isOwner && onEditCurrent && (
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -138,7 +138,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
         )}
 
         {/* Plus icon for past quests — right side, inside card */}
-        {quest.isDone && onEditPast && (
+        {quest.completedByUserIds.includes(currentUser.id) && onEditPast && (
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -173,7 +173,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
         <div className="flex items-center justify-between gap-3">
           <h4 className="font-display font-bold text-foreground leading-snug text-[15px] flex-1 min-w-0">{quest.title}</h4>
 
-          {!quest.isDone && (
+          {!quest.completedByUserIds.includes(currentUser.id) && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -218,7 +218,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
         )}
 
         {/* Completed timestamp */}
-        {quest.isDone && quest.completedAt && (
+        {quest.completedByUserIds.includes(currentUser.id) && quest.completedAt && (
           <p className="text-[10px] text-muted-foreground mt-1">
             Completed {quest.completedAt}
           </p>
@@ -238,7 +238,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
         )}
 
         {/* Date */}
-        {!quest.isDone && quest.logistics?.date && (
+        {!quest.completedByUserIds.includes(currentUser.id) && quest.logistics?.date && (
           <div className="flex items-center gap-1.5 mt-2 text-xs text-muted-foreground">
             <Calendar className="w-3.5 h-3.5 shrink-0" />
             <span>
@@ -282,7 +282,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
               {showComments ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
             </button>
 
-            {!quest.isDone && isIn && !hideActions && canToggleStatus && (
+            {!quest.completedByUserIds.includes(currentUser.id) && isIn && !hideActions && canToggleStatus && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -295,7 +295,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
               </button>
             )}
 
-            {quest.isDone && isIn && !hideActions && canToggleStatus && (
+            {quest.completedByUserIds.includes(currentUser.id) && isIn && !hideActions && canToggleStatus && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
