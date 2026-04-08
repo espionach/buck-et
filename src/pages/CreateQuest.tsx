@@ -1,6 +1,6 @@
 import { useAppStore } from "@/data/appState";
 import { Quest } from "@/data/mockData";
-import { ArrowLeft, Sparkles, ChevronDown, ChevronUp, ImagePlus, Link as LinkIcon, X } from "lucide-react";
+import { ArrowLeft, Sparkles, ChevronDown, ImagePlus, Link as LinkIcon, X } from "lucide-react";
 import { GroupIconDisplay } from "@/components/GroupIcon";
 import { useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -18,7 +18,6 @@ const CreateQuest = () => {
   const [showGroupDropdown, setShowGroupDropdown] = useState(false);
 
   // Logistics fields
-  const [showLogistics, setShowLogistics] = useState(false);
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [location, setLocation] = useState("");
@@ -60,7 +59,6 @@ const CreateQuest = () => {
     if (!title.trim()) return;
     const questId = `q${Date.now()}`;
     const hasDate = !!(date || time || location || meetupSpot || transportation || customNotes);
-    const isUndated = !date;
     const quest: Quest = {
       id: questId,
       title: title.trim(),
@@ -94,155 +92,8 @@ const CreateQuest = () => {
     }
   };
 
-  const logisticsSection = (
-    <div className="space-y-3">
-      <button
-        type="button"
-        onClick={() => setShowLogistics(!showLogistics)}
-        className="flex items-center justify-between w-full text-sm font-semibold text-foreground"
-      >
-        <span>📋 Quest Details (optional)</span>
-        {showLogistics ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
-      </button>
-
-      {showLogistics && (
-        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="space-y-3 overflow-hidden">
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-[11px] text-muted-foreground mb-1 block">Date</label>
-              <input type="date" value={date} onChange={(e) => setDate(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
-            </div>
-            <div>
-              <label className="text-[11px] text-muted-foreground mb-1 block">Time</label>
-              <input type="text" value={time} onChange={(e) => setTime(e.target.value)} placeholder="e.g. 6:00 PM"
-                className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
-            </div>
-          </div>
-
-          <div>
-            <label className="text-[11px] text-muted-foreground mb-1 block">Location</label>
-            <input type="text" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Where's this happening?"
-              className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
-          </div>
-
-          <div>
-            <label className="text-[11px] text-muted-foreground mb-1 block">Meetup Spot</label>
-            <input type="text" value={meetupSpot} onChange={(e) => setMeetupSpot(e.target.value)} placeholder="Where should everyone meet?"
-              className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
-          </div>
-
-          <div>
-            <label className="text-[11px] text-muted-foreground mb-1 block">Transportation</label>
-            <div className="flex flex-wrap gap-2">
-              {[
-                { id: "car", label: "🚗 Car" },
-                { id: "bike", label: "🚲 Bike" },
-                { id: "transit", label: "🚇 Transit" },
-                { id: "walk", label: "🚶 Walk" },
-              ].map((t) => (
-                <button key={t.id} type="button"
-                  onClick={() => setTransportation(transportation === t.id ? "" : t.id)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-                    transportation === t.id ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
-                  }`}
-                >
-                  {t.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {transportation === "car" && (
-            <div>
-              <label className="text-[11px] text-muted-foreground mb-1 block">Carpool Seats Available</label>
-              <input type="number" value={carpoolSlots} onChange={(e) => setCarpoolSlots(e.target.value)} placeholder="e.g. 4"
-                className="w-24 px-3 py-2.5 rounded-xl bg-card border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
-            </div>
-          )}
-
-          <div>
-            <label className="text-[11px] text-muted-foreground mb-1 block">Additional Notes</label>
-            <textarea value={customNotes} onChange={(e) => setCustomNotes(e.target.value)} placeholder="Anything else everyone should know?"
-              rows={2} className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none" />
-          </div>
-
-          {/* Photos & Videos */}
-          <div>
-            <label className="text-[11px] text-muted-foreground mb-1 block">Photos & Videos</label>
-            <div className="flex flex-wrap gap-2">
-              {photos.map((photo, i) => (
-                <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden">
-                  {photo.startsWith("data:video") ? (
-                    <video src={photo} className="w-full h-full object-cover" muted />
-                  ) : (
-                    <img src={photo} alt="" className="w-full h-full object-cover" />
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => setPhotos((prev) => prev.filter((_, idx) => idx !== i))}
-                    className="absolute top-0.5 right-0.5 p-0.5 rounded-full bg-foreground/60 text-background"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </div>
-              ))}
-              <button
-                type="button"
-                onClick={() => photoInputRef.current?.click()}
-                className="w-16 h-16 rounded-lg border border-dashed border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <ImagePlus className="w-5 h-5" />
-              </button>
-              <input
-                ref={photoInputRef}
-                type="file"
-                accept="image/*,video/*"
-                multiple
-                onChange={handlePhotoUpload}
-                className="hidden"
-              />
-            </div>
-          </div>
-
-          {/* Links */}
-          <div>
-            <label className="text-[11px] text-muted-foreground mb-1 block">Links</label>
-            {links.map((link, i) => (
-              <div key={i} className="flex items-center gap-2 mb-1.5">
-                <LinkIcon className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                <span className="text-xs text-primary truncate flex-1">{link}</span>
-                <button type="button" onClick={() => setLinks((prev) => prev.filter((_, idx) => idx !== i))}>
-                  <X className="w-3.5 h-3.5 text-muted-foreground" />
-                </button>
-              </div>
-            ))}
-            <div className="flex gap-2">
-              <input
-                type="url"
-                value={newLink}
-                onChange={(e) => setNewLink(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleAddLink())}
-                placeholder="Paste a URL..."
-                className="flex-1 px-3 py-2 rounded-xl bg-muted border-none text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-              />
-              <button
-                type="button"
-                onClick={handleAddLink}
-                disabled={!newLink.trim()}
-                className="px-3 py-2 rounded-xl bg-primary/10 text-primary text-sm font-semibold disabled:opacity-40"
-              >
-                Add
-              </button>
-            </div>
-          </div>
-        </motion.div>
-      )}
-    </div>
-  );
-
   return (
-    <div className="min-h-screen px-5 pt-14 pb-10">
+    <div className="min-h-screen px-5 pt-14 pb-28">
       {/* Header */}
       <div className="flex items-center gap-3 mb-8">
         <button
@@ -322,7 +173,7 @@ const CreateQuest = () => {
 
           <div>
             <label className="text-sm font-semibold text-foreground mb-2 block">
-              Details (optional)
+              Description (optional)
             </label>
             <textarea
               value={description}
@@ -333,18 +184,156 @@ const CreateQuest = () => {
             />
           </div>
 
-          {logisticsSection}
+          {/* Quest Details - always visible */}
+          <div className="space-y-3">
+            <span className="text-sm font-semibold text-foreground">Quest Details (optional)</span>
 
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-[11px] text-muted-foreground mb-1 block">Date</label>
+                <input type="date" value={date} onChange={(e) => setDate(e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+              </div>
+              <div>
+                <label className="text-[11px] text-muted-foreground mb-1 block">Time</label>
+                <input type="text" value={time} onChange={(e) => setTime(e.target.value)} placeholder="e.g. 6:00 PM"
+                  className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+              </div>
+            </div>
+
+            <div>
+              <label className="text-[11px] text-muted-foreground mb-1 block">Location</label>
+              <input type="text" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Where's this happening?"
+                className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+            </div>
+
+            <div>
+              <label className="text-[11px] text-muted-foreground mb-1 block">Meetup Spot</label>
+              <input type="text" value={meetupSpot} onChange={(e) => setMeetupSpot(e.target.value)} placeholder="Where should everyone meet?"
+                className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+            </div>
+
+            <div>
+              <label className="text-[11px] text-muted-foreground mb-1 block">Transportation</label>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { id: "car", label: "Car" },
+                  { id: "bike", label: "Bike" },
+                  { id: "transit", label: "Transit" },
+                  { id: "walk", label: "Walk" },
+                ].map((t) => (
+                  <button key={t.id} type="button"
+                    onClick={() => setTransportation(transportation === t.id ? "" : t.id)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                      transportation === t.id ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                    }`}
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {transportation === "car" && (
+              <div>
+                <label className="text-[11px] text-muted-foreground mb-1 block">Carpool Seats Available</label>
+                <input type="number" value={carpoolSlots} onChange={(e) => setCarpoolSlots(e.target.value)} placeholder="e.g. 4"
+                  className="w-24 px-3 py-2.5 rounded-xl bg-card border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+              </div>
+            )}
+
+            <div>
+              <label className="text-[11px] text-muted-foreground mb-1 block">Additional Notes</label>
+              <textarea value={customNotes} onChange={(e) => setCustomNotes(e.target.value)} placeholder="Anything else everyone should know?"
+                rows={2} className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none" />
+            </div>
+
+            {/* Photos & Videos */}
+            <div>
+              <label className="text-[11px] text-muted-foreground mb-1 block">Photos & Videos</label>
+              <div className="flex flex-wrap gap-2">
+                {photos.map((photo, i) => (
+                  <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden">
+                    {photo.startsWith("data:video") ? (
+                      <video src={photo} className="w-full h-full object-cover" muted />
+                    ) : (
+                      <img src={photo} alt="" className="w-full h-full object-cover" />
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setPhotos((prev) => prev.filter((_, idx) => idx !== i))}
+                      className="absolute top-0.5 right-0.5 p-0.5 rounded-full bg-foreground/60 text-background"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => photoInputRef.current?.click()}
+                  className="w-16 h-16 rounded-lg border border-dashed border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <ImagePlus className="w-5 h-5" />
+                </button>
+                <input
+                  ref={photoInputRef}
+                  type="file"
+                  accept="image/*,video/*"
+                  multiple
+                  onChange={handlePhotoUpload}
+                  className="hidden"
+                />
+              </div>
+            </div>
+
+            {/* Links */}
+            <div>
+              <label className="text-[11px] text-muted-foreground mb-1 block">Links</label>
+              {links.map((link, i) => (
+                <div key={i} className="flex items-center gap-2 mb-1.5">
+                  <LinkIcon className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                  <span className="text-xs text-primary truncate flex-1">{link}</span>
+                  <button type="button" onClick={() => setLinks((prev) => prev.filter((_, idx) => idx !== i))}>
+                    <X className="w-3.5 h-3.5 text-muted-foreground" />
+                  </button>
+                </div>
+              ))}
+              <div className="flex gap-2">
+                <input
+                  type="url"
+                  value={newLink}
+                  onChange={(e) => setNewLink(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleAddLink())}
+                  placeholder="Paste a URL..."
+                  className="flex-1 px-3 py-2 rounded-xl bg-muted border-none text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                />
+                <button
+                  type="button"
+                  onClick={handleAddLink}
+                  disabled={!newLink.trim()}
+                  className="px-3 py-2 rounded-xl bg-primary/10 text-primary text-sm font-semibold disabled:opacity-40"
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Floating Launch Quest button */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 px-5 pb-6 pt-3 bg-gradient-to-t from-background via-background to-transparent">
+        <div className="max-w-md mx-auto">
           <button
             onClick={handleCreate}
             disabled={!title.trim()}
-            className="w-full py-4 rounded-xl bg-primary text-primary-foreground font-bold text-base flex items-center justify-center gap-2 disabled:opacity-40 active:scale-[0.98] transition-transform"
+            className="w-full py-4 rounded-xl bg-primary text-primary-foreground font-bold text-base flex items-center justify-center gap-2 disabled:opacity-40 active:scale-[0.98] transition-transform shadow-lg"
           >
             <Sparkles className="w-5 h-5" />
             Launch Quest
           </button>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 };
