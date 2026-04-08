@@ -65,8 +65,8 @@ const Boards = () => {
     ? quests.filter((q) => q.groupId === selectedGroup)
     : [];
 
-  const activeGroupQuests = allGroupQuests.filter((q) => !q.isDone);
-  const completedGroupQuests = allGroupQuests.filter((q) => q.isDone).sort((a, b) => {
+  const activeGroupQuests = allGroupQuests.filter((q) => !q.completedByUserIds.includes(currentUser.id));
+  const completedGroupQuests = allGroupQuests.filter((q) => q.completedByUserIds.includes(currentUser.id)).sort((a, b) => {
     const aDate = a.completedAt || a.createdAt;
     const bDate = b.completedAt || b.createdAt;
     return new Date(bDate).getTime() - new Date(aDate).getTime();

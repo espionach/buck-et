@@ -30,8 +30,8 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
       q.createdBy.id === user.id ||
       q.participants.some((p) => p.id === user.id)
   );
-  const activeQuests = profileQuests.filter((q) => !q.isDone);
-  const completedQuests = profileQuests.filter((q) => q.isDone);
+  const activeQuests = profileQuests.filter((q) => !q.completedByUserIds.includes(user.id));
+  const completedQuests = profileQuests.filter((q) => q.completedByUserIds.includes(user.id));
   const shownQuests = tab === "current" ? activeQuests : completedQuests;
 
   // Mock friend count for other users

@@ -75,7 +75,7 @@ export interface Quest {
   groupId?: string;
   isFollowerOnly: boolean;
   participants: User[];
-  isDone: boolean;
+  completedByUserIds: string[];
   createdAt: string;
   completedAt?: string;
   photos?: string[];
@@ -214,7 +214,7 @@ export const quests: Quest[] = [
     groupId: "g1",
     isFollowerOnly: false,
     participants: [currentUser, friends[0], friends[1], friends[2], friends[3], friends[4]],
-    isDone: false,
+    completedByUserIds: [],
     createdAt: "2026-03-20",
     photos: ["/mock-photos/bonfire1.jpg", "/mock-photos/hike1.jpg"],
     links: ["https://www.beachvolleyballrules.com", "https://maps.google.com/beach-park"],
@@ -246,7 +246,7 @@ export const quests: Quest[] = [
     groupId: "g3",
     isFollowerOnly: false,
     participants: [currentUser, friends[0], friends[2]],
-    isDone: false,
+    completedByUserIds: [],
     createdAt: "2026-03-19",
     links: [
       "https://www.nps.gov/subjects/nationalparksystem/national-parks-of-the-western-united-states.htm",
@@ -262,7 +262,7 @@ export const quests: Quest[] = [
     groupId: "g1",
     isFollowerOnly: false,
     participants: [currentUser, friends[1], friends[2]],
-    isDone: false,
+    completedByUserIds: [],
     createdAt: "2026-03-12",
     logistics: {
       date: "2026-04-05",
@@ -289,7 +289,7 @@ export const quests: Quest[] = [
     groupId: "g2",
     isFollowerOnly: false,
     participants: [currentUser, friends[3]],
-    isDone: false,
+    completedByUserIds: [],
     createdAt: "2026-03-11",
     logistics: {
       date: "2026-04-02",
@@ -310,7 +310,7 @@ export const quests: Quest[] = [
     groupId: "g3",
     isFollowerOnly: false,
     participants: [friends[4], friends[0]],
-    isDone: false,
+    completedByUserIds: [],
     createdAt: "2026-03-10",
     comments: [],
   },
@@ -321,7 +321,7 @@ export const quests: Quest[] = [
     createdBy: friends[0],
     isFollowerOnly: true,
     participants: [friends[0], friends[2]],
-    isDone: false,
+    completedByUserIds: [],
     createdAt: "2026-03-12",
     comments: [
       { id: "c4", userId: "u2", user: friends[0], text: "Meet at Goodwill on 5th!", createdAt: "2026-03-12" },
@@ -333,7 +333,7 @@ export const quests: Quest[] = [
     createdBy: friends[4],
     isFollowerOnly: true,
     participants: [friends[4]],
-    isDone: false,
+    completedByUserIds: [],
     createdAt: "2026-03-09",
     comments: [],
   },
@@ -345,7 +345,7 @@ export const quests: Quest[] = [
     groupId: "g1",
     isFollowerOnly: false,
     participants: [currentUser, friends[0], friends[1]],
-    isDone: false,
+    completedByUserIds: [],
     createdAt: "2026-03-15",
     links: ["https://www.kayakrentals.com/dawn-tours"],
     logistics: {
@@ -371,7 +371,7 @@ export const quests: Quest[] = [
     groupId: "g3",
     isFollowerOnly: false,
     participants: [currentUser, friends[2], friends[4]],
-    isDone: false,
+    completedByUserIds: [],
     createdAt: "2026-03-16",
     photos: ["/mock-photos/ghibli1.jpg", "/mock-photos/ghibli2.jpg"],
     logistics: {
@@ -394,7 +394,7 @@ export const quests: Quest[] = [
     createdBy: currentUser,
     isFollowerOnly: true,
     participants: [currentUser, friends[3]],
-    isDone: false,
+    completedByUserIds: [],
     createdAt: "2026-03-17",
     links: ["https://yogawithadriene.com/morning-flow", "https://maps.google.com/park-location"],
     comments: [],
@@ -407,7 +407,7 @@ export const quests: Quest[] = [
     groupId: "g3",
     isFollowerOnly: false,
     participants: [currentUser, friends[0], friends[2]],
-    isDone: false,
+    completedByUserIds: [],
     createdAt: "2026-03-18",
     comments: [],
   },
@@ -419,7 +419,7 @@ export const quests: Quest[] = [
     groupId: "g1",
     isFollowerOnly: false,
     participants: [currentUser, friends[0], friends[1], friends[2]],
-    isDone: true,
+    completedByUserIds: [currentUser.id, friends[0].id, friends[1].id, friends[2].id],
     createdAt: "2026-03-07",
     completedAt: "2026-03-08",
     photos: ["/mock-photos/bonfire1.jpg", "/mock-photos/bonfire2.jpg"],
@@ -435,7 +435,7 @@ export const quests: Quest[] = [
     groupId: "g3",
     isFollowerOnly: false,
     participants: [currentUser, friends[0], friends[2]],
-    isDone: true,
+    completedByUserIds: [currentUser.id, friends[0].id, friends[2].id],
     createdAt: "2026-03-05",
     completedAt: "2026-03-06",
     photos: ["/mock-photos/hike1.jpg"],
@@ -449,7 +449,7 @@ export const quests: Quest[] = [
     groupId: "g2",
     isFollowerOnly: false,
     participants: [currentUser, friends[3], friends[4]],
-    isDone: true,
+    completedByUserIds: [currentUser.id, friends[3].id, friends[4].id],
     createdAt: "2026-02-25",
     completedAt: "2026-03-01",
     notes: "Best har gow was at Dragon Gate!",

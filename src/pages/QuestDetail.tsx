@@ -51,7 +51,7 @@ const QuestDetail = () => {
 
   // Only joined participants can view
   const isIn = quest.participants.some((p) => p.id === currentUser.id);
-  if (!isIn || quest.isDone) {
+  if (!isIn || quest.completedByUserIds.includes(currentUser.id)) {
     navigate(-1);
     return null;
   }
@@ -87,7 +87,7 @@ const QuestDetail = () => {
           <div className="flex-1 min-w-0">
             <h1 className="text-lg font-bold text-foreground">{quest.title}</h1>
             <p className="text-xs text-muted-foreground">
-              {group ? <span className="flex items-center gap-1"><GroupIconDisplay icon={group.emoji} size={12} className="text-muted-foreground" />{group.name}</span> : "🌍 Followers only"}
+              {group ? <span className="flex items-center gap-1"><GroupIconDisplay icon={group.emoji} size={12} className="text-muted-foreground" />{group.name}</span> : "🌍 Friends only"}
             </p>
           </div>
         </div>

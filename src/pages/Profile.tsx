@@ -118,7 +118,7 @@ const Profile = () => {
   );
 
   const current = myQuests
-    .filter((q) => !q.isDone)
+    .filter((q) => !q.completedByUserIds.includes(currentUser.id))
     .sort((a, b) => {
       const aDate = a.logistics?.date;
       const bDate = b.logistics?.date;
@@ -136,7 +136,7 @@ const Profile = () => {
     const currentIds = quests
       .filter(
         (q) =>
-          !q.isDone &&
+          !q.completedByUserIds.includes(currentUser.id) &&
           (q.createdBy.id === currentUser.id ||
             q.participants.some((p) => p.id === currentUser.id))
       )
@@ -145,7 +145,7 @@ const Profile = () => {
   }, [location.pathname]);
 
   const past = myQuests
-    .filter((q) => q.isDone)
+    .filter((q) => q.completedByUserIds.includes(currentUser.id))
     .sort((a, b) => {
       const aDate = a.completedAt || a.createdAt;
       const bDate = b.completedAt || b.createdAt;
@@ -602,10 +602,10 @@ const Profile = () => {
                   <label className="text-[11px] text-muted-foreground mb-1 block">Transportation</label>
                   <div className="flex flex-wrap gap-2">
                     {[
-                      { id: "car", label: "🚗 Car" },
-                      { id: "bike", label: "🚲 Bike" },
-                      { id: "transit", label: "🚇 Transit" },
-                      { id: "walk", label: "🚶 Walk" },
+                      { id: "car", label: "Car" },
+                      { id: "bike", label: "Bike" },
+                      { id: "transit", label: "Transit" },
+                      { id: "walk", label: "Walk" },
                     ].map((t) => (
                       <button key={t.id} type="button"
                         onClick={() => setEditTransportation(editTransportation === t.id ? "" : t.id)}
@@ -871,17 +871,6 @@ const Profile = () => {
                   value={questCompletedAt}
                   onChange={(e) => setQuestCompletedAt(e.target.value)}
                   className="w-full px-3 py-2.5 rounded-xl bg-muted border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-                />
-              </div>
-
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1.5 block">Notes & Reflections</label>
-                <textarea
-                  value={questNotes}
-                  onChange={(e) => setQuestNotes(e.target.value)}
-                  placeholder="Add your thoughts, memories..."
-                  rows={3}
-                  className="w-full px-3 py-2.5 rounded-xl bg-muted border border-border text-sm text-foreground resize-none focus:outline-none focus:ring-2 focus:ring-primary/30"
                 />
               </div>
 

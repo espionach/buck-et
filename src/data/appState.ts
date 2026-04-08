@@ -116,7 +116,13 @@ export const useAppStore = create<AppState>((set) => ({
     set((s) => ({
       quests: s.quests.map((q) =>
         q.id === questId
-          ? { ...q, isDone: true, completedAt: new Date().toISOString().split("T")[0] }
+          ? {
+              ...q,
+              completedByUserIds: q.completedByUserIds.includes(s.currentUser.id)
+                ? q.completedByUserIds
+                : [...q.completedByUserIds, s.currentUser.id],
+              completedAt: q.completedAt || new Date().toISOString().split("T")[0],
+            }
           : q
       ),
     })),
@@ -125,7 +131,10 @@ export const useAppStore = create<AppState>((set) => ({
     set((s) => ({
       quests: s.quests.map((q) =>
         q.id === questId
-          ? { ...q, isDone: false, completedAt: undefined }
+          ? {
+              ...q,
+              completedByUserIds: q.completedByUserIds.filter((id) => id !== s.currentUser.id),
+            }
           : q
       ),
     })),
@@ -306,7 +315,7 @@ export const useAppStore = create<AppState>((set) => ({
 
   cleanupEmptyQuests: () =>
     set((s) => ({
-      quests: s.quests.filter((q) => q.isDone || q.participants.length > 0 || q.createdBy.id === s.currentUser.id),
+      quests: s.quests.filter((q) => q.completedByUserIds.length > 0 || q.participants.length > 0 || q.createdBy.id === s.currentUser.id),
     })),
 
   transferQuestOwnership: (questId, newOwnerId) =>
