@@ -118,7 +118,7 @@ const Profile = () => {
   );
 
   const current = myQuests
-    .filter((q) => !q.isDone)
+    .filter((q) => !q.completedByUserIds.includes(currentUser.id))
     .sort((a, b) => {
       const aDate = a.logistics?.date;
       const bDate = b.logistics?.date;
@@ -136,7 +136,7 @@ const Profile = () => {
     const currentIds = quests
       .filter(
         (q) =>
-          !q.isDone &&
+          !q.completedByUserIds.includes(currentUser.id) &&
           (q.createdBy.id === currentUser.id ||
             q.participants.some((p) => p.id === currentUser.id))
       )
@@ -145,7 +145,7 @@ const Profile = () => {
   }, [location.pathname]);
 
   const past = myQuests
-    .filter((q) => q.isDone)
+    .filter((q) => q.completedByUserIds.includes(currentUser.id))
     .sort((a, b) => {
       const aDate = a.completedAt || a.createdAt;
       const bDate = b.completedAt || b.createdAt;

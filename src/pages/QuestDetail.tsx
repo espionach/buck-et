@@ -51,7 +51,7 @@ const QuestDetail = () => {
 
   // Only joined participants can view
   const isIn = quest.participants.some((p) => p.id === currentUser.id);
-  if (!isIn || quest.isDone) {
+  if (!isIn || quest.completedByUserIds.includes(currentUser.id)) {
     navigate(-1);
     return null;
   }
