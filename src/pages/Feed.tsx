@@ -33,7 +33,7 @@ const Feed = () => {
   const userGroupIds = groups.map((g) => g.id);
   const friendIds = new Set(friendsList.map((f) => f.id));
   const feedQuests = quests.filter((q) => {
-    if (q.completedByUserIds.length > 0) return false;
+    if (q.completedByUserIds.includes(currentUser.id)) return false;
     // Never show user's own quests on the feed
     if (q.createdBy.id === currentUser.id) return false;
     // Group quests: show if user is in that group
