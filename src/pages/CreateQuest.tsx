@@ -1,6 +1,6 @@
 import { useAppStore } from "@/data/appState";
 import { Quest } from "@/data/mockData";
-import { ArrowLeft, Sparkles, ChevronDown, ImagePlus, Link as LinkIcon, X } from "lucide-react";
+import { ArrowLeft, Sparkles, ChevronDown, ImagePlus, Link as LinkIcon, X, Globe } from "lucide-react";
 import { GroupIconDisplay } from "@/components/GroupIcon";
 import { useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -115,7 +115,7 @@ const CreateQuest = () => {
           <span className="text-foreground font-medium">
             {selectedGroupData
               ? <span className="flex items-center gap-1.5"><GroupIconDisplay icon={selectedGroupData.emoji} size={16} className="text-foreground" />{selectedGroupData.name}</span>
-              : "🌍 Friends Only"}
+              : <span className="flex items-center gap-1.5"><Globe className="w-4 h-4" />Friends Only</span>}
           </span>
           <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${showGroupDropdown ? "rotate-180" : ""}`} />
         </button>
@@ -132,7 +132,7 @@ const CreateQuest = () => {
                 !selectedGroup ? "bg-primary/5 text-primary font-semibold" : "text-foreground hover:bg-muted"
               }`}
             >
-              🌍 Friends Only
+              <span className="flex items-center gap-1.5"><Globe className="w-4 h-4" />Friends Only</span>
             </button>
             {groups.map((g) => (
               <button
@@ -322,7 +322,7 @@ const CreateQuest = () => {
       </motion.div>
 
       {/* Floating Launch Quest button */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 px-5 pb-6 pt-3 bg-gradient-to-t from-background via-background to-transparent">
+      <div className="fixed bottom-0 left-0 right-0 z-50 px-5 pb-6 pt-3 bg-background">
         <div className="max-w-md mx-auto">
           <button
             onClick={handleCreate}
