@@ -4,7 +4,7 @@ import UserAvatar from "@/components/UserAvatar";
 import { GroupIconDisplay } from "@/components/GroupIcon";
 import OwnerLeaveDialog from "@/components/OwnerLeaveDialog";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, HandMetal, MessageCircle, ChevronDown, ChevronUp, Send, Pencil, Plus, Undo2, ExternalLink, X, Calendar } from "lucide-react";
+import { Check, HandMetal, MessageCircle, ChevronDown, ChevronUp, Send, Pencil, Plus, Undo2, ExternalLink, X, Calendar, Globe } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { usePopup } from "@/hooks/use-popup";
@@ -165,7 +165,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
             </button>
           </div>
           <p className="text-[11px] text-muted-foreground ml-10 -mt-1">
-            {group ? <><GroupIconDisplay icon={group.emoji} size={12} className="text-muted-foreground inline-block mr-1" />{group.name}</> : "🌍 Friends only"}
+            {group ? <><GroupIconDisplay icon={group.emoji} size={12} className="text-muted-foreground inline-block mr-1" />{group.name}</> : <span className="inline-flex items-center gap-1"><Globe className="w-3 h-3" />Friends only</span>}
           </p>
         </div>
 
