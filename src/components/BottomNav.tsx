@@ -5,7 +5,7 @@ import { useAppStore } from "@/data/appState";
 
 const tabs = [
   { path: "/", icon: Home, label: "Home" },
-  { path: "/boards", icon: LayoutGrid, label: "Boards" },
+  { path: "/groups", icon: LayoutGrid, label: "Groups" },
   { path: "/profile", icon: User, label: "Profile" },
 ];
 
@@ -33,7 +33,7 @@ const BottomNav = () => {
       <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-xl border-t border-border safe-bottom">
         <div className="flex items-center justify-around h-16 max-w-md mx-auto px-2">
           {tabs.map((tab) => {
-            const isActive = location.pathname === tab.path;
+            const isActive = location.pathname === tab.path || (tab.path === "/groups" && location.pathname === "/boards");
             return (
               <button
                 key={tab.path}
