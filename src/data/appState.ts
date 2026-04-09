@@ -157,6 +157,16 @@ export const useAppStore = create<AppState>((set) => ({
             }
           : g
       ),
+      // Remove the user from all quests belonging to this group
+      quests: s.quests.map((q) =>
+        q.groupId === groupId
+          ? {
+              ...q,
+              participants: q.participants.filter((p) => p.id !== userId),
+              completedByUserIds: q.completedByUserIds.filter((id) => id !== userId),
+            }
+          : q
+      ),
     })),
 
   leaveGroup: (groupId) =>
