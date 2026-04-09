@@ -2,7 +2,6 @@ import { Quest, User } from "@/data/mockData";
 import QuestCard from "@/components/QuestCard";
 import { useState, useEffect, useRef } from "react";
 import { Search as SearchIcon } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
 
 interface QuestListProps {
   quests: Quest[];
