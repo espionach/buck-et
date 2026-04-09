@@ -6,7 +6,7 @@ import QuestList from "@/components/QuestList";
 import GroupSettings from "@/components/GroupSettings";
 import UserAvatar from "@/components/UserAvatar";
 import UserProfileView from "@/components/UserProfileView";
-import { Plus, Search, Check, X, Settings, ArrowLeft } from "lucide-react";
+import { Plus, Search, Check, X, Settings, ArrowLeft, Map, ScrollText } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -340,9 +340,9 @@ const Boards = () => {
             >
               {groupQuests.length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
-                  <p className="text-4xl mb-2">{boardTab === "active" ? "🗺️" : "📜"}</p>
+                  {boardTab === "active" ? <Map className="w-10 h-10 mx-auto mb-2 opacity-40" /> : <ScrollText className="w-10 h-10 mx-auto mb-2 opacity-40" />}
                   <p className="text-sm">
-                    {boardTab === "active" ? "No active quests yet — start one! 🚀" : "No completed quests yet"}
+                    {boardTab === "active" ? "No active quests yet — start one!" : "No completed quests yet"}
                   </p>
                 </div>
               ) : (
