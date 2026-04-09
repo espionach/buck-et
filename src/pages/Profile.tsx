@@ -563,7 +563,7 @@ const Profile = () => {
               </div>
 
               <div>
-                <label className="text-sm font-semibold text-foreground mb-1.5 block">Details</label>
+                <label className="text-sm font-semibold text-foreground mb-1.5 block">Description</label>
                 <textarea
                   value={editQuestDescription}
                   onChange={(e) => setEditQuestDescription(e.target.value)}

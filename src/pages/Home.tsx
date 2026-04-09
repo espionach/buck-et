@@ -103,7 +103,7 @@ const Boards = () => {
     return (
       <UserProfileView
         user={viewingProfile}
-        backLabel="Back to Board"
+        backLabel="Back to Group"
         onBack={() => setViewingProfile(null)}
         onViewProfile={(user) => setViewingProfile(user)}
       />
