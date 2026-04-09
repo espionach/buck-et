@@ -84,7 +84,7 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
   return (
     <>
       <div className="space-y-4">
-        <h2 className="text-xl font-bold text-foreground">Edit Board</h2>
+        <h2 className="text-xl font-bold text-foreground">Edit Group</h2>
 
           {/* Edit name/emoji */}
           <div className="flex gap-2 items-end">
@@ -255,7 +255,7 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
                 Remove <span className="text-primary">{confirmRemoveUser.userName}</span> from{" "}
                 <span className="text-primary">{group.name}</span>?
               </p>
-              <p className="text-xs text-muted-foreground">They will no longer have access to this board.</p>
+              <p className="text-xs text-muted-foreground">They will no longer have access to this group.</p>
               <div className="flex gap-2">
                 <button
                   onClick={() => setConfirmRemoveUser(null)}
