@@ -115,7 +115,7 @@ const Boards = () => {
       {/* Header - only show when no group is selected */}
       {!selectedGroup && (
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-3xl font-bold text-foreground">Your Boards</h1>
+          <h1 className="text-3xl font-bold text-foreground">Your Groups</h1>
           <button
             onClick={() => navigate("/create-group")}
             className="p-2 text-muted-foreground hover:text-primary transition-colors"
