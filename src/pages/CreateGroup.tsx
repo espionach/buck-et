@@ -45,7 +45,7 @@ const CreateGroup = () => {
       createdAt: new Date().toISOString().split("T")[0],
     };
     addGroup(group);
-    navigate("/boards", { replace: true });
+    navigate("/groups", { replace: true });
   };
 
   return (

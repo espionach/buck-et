@@ -1,7 +1,7 @@
 import { useAppStore } from "@/data/appState";
 import QuestList from "@/components/QuestList";
 import UserAvatar from "@/components/UserAvatar";
-import { Edit, X, Check, Users as UsersIcon, UserPlus, Trash2, ImagePlus, Camera, Link as LinkIcon, Plus, ArrowLeft } from "lucide-react";
+import { Edit, X, Check, Users as UsersIcon, UserPlus, Trash2, ImagePlus, Camera, Link as LinkIcon, Plus, ArrowLeft, Map, ScrollText } from "lucide-react";
 import UserProfileView from "@/components/UserProfileView";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -506,7 +506,7 @@ const Profile = () => {
       >
         {active.length === 0 ? (
           <div className="text-center py-12 text-muted-foreground">
-            <p className="text-4xl mb-2">{tab === "current" ? "🗺️" : "📜"}</p>
+            {tab === "current" ? <Map className="w-10 h-10 mx-auto mb-2 opacity-40" /> : <ScrollText className="w-10 h-10 mx-auto mb-2 opacity-40" />}
             <p className="text-sm">
               {tab === "current" ? "No active quests — go start one!" : "No completed quests yet"}
             </p>
@@ -563,7 +563,7 @@ const Profile = () => {
               </div>
 
               <div>
-                <label className="text-sm font-semibold text-foreground mb-1.5 block">Details</label>
+                <label className="text-sm font-semibold text-foreground mb-1.5 block">Description</label>
                 <textarea
                   value={editQuestDescription}
                   onChange={(e) => setEditQuestDescription(e.target.value)}

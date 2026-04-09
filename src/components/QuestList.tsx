@@ -1,6 +1,7 @@
 import { Quest, User } from "@/data/mockData";
 import QuestCard from "@/components/QuestCard";
 import { useState, useEffect, useRef } from "react";
+import { Search as SearchIcon } from "lucide-react";
 
 interface QuestListProps {
   quests: Quest[];
@@ -60,7 +61,7 @@ const QuestList = ({
   if (quests.length === 0) {
     return (
       <div className="text-center py-12 text-muted-foreground">
-        <p className="text-4xl mb-2">{emptyIcon}</p>
+        <SearchIcon className="w-10 h-10 mx-auto mb-2 opacity-40" />
         <p className="text-sm font-semibold">{emptyText}</p>
         {emptySubtext && <p className="text-sm">{emptySubtext}</p>}
       </div>

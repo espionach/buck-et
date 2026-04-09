@@ -157,6 +157,16 @@ export const useAppStore = create<AppState>((set) => ({
             }
           : g
       ),
+      // Remove the user from all quests belonging to this group
+      quests: s.quests.map((q) =>
+        q.groupId === groupId
+          ? {
+              ...q,
+              participants: q.participants.filter((p) => p.id !== userId),
+              completedByUserIds: q.completedByUserIds.filter((id) => id !== userId),
+            }
+          : q
+      ),
     })),
 
   leaveGroup: (groupId) =>
@@ -216,7 +226,7 @@ export const useAppStore = create<AppState>((set) => ({
       const notification: AppNotification = {
         id: `n${Date.now()}`,
         type: "friend_request",
-        message: `${s.currentUser.name} sent a friend request to ${toUser.name}`,
+        message: `sent a friend request to ${toUser.name}`,
         fromUser: s.currentUser,
         read: false,
         createdAt: new Date().toISOString().split("T")[0],
@@ -380,7 +390,7 @@ export const useAppStore = create<AppState>((set) => ({
       const notification: AppNotification = {
         id: `n${Date.now()}`,
         type: "transfer_quest",
-        message: `${s.currentUser.name} wants to transfer '${quest.title}' to you`,
+        message: `wants to transfer '${quest.title}' to you`,
         entityId: questId,
         groupId: quest.groupId,
         fromUser: s.currentUser,
@@ -409,7 +419,7 @@ export const useAppStore = create<AppState>((set) => ({
       const notification: AppNotification = {
         id: `n${Date.now()}`,
         type: "transfer_group",
-        message: `${s.currentUser.name} wants to transfer '${group.name}' board to you`,
+        message: `wants to transfer '${group.name}' group to you`,
         entityId: groupId,
         fromUser: s.currentUser,
         read: false,
@@ -482,7 +492,7 @@ export const useAppStore = create<AppState>((set) => ({
       const declineNotification: AppNotification = {
         id: `n${Date.now()}`,
         type: "transfer_declined",
-        message: `${s.currentUser.name} declined the transfer of '${entityName}'`,
+        message: `declined the transfer of '${entityName}'`,
         entityId: transfer.entityId,
         fromUser: s.currentUser,
         read: false,

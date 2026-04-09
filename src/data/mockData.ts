@@ -500,7 +500,7 @@ export const initialNotifications: AppNotification[] = [
   {
     id: "n-inv1",
     type: "board_invitation",
-    message: `${friends[0].name} invited you to join Film Club`,
+    message: `invited you to join Film Club`,
     entityId: "gi1",
     fromUser: friends[0],
     read: false,
@@ -509,7 +509,7 @@ export const initialNotifications: AppNotification[] = [
   {
     id: "n-inv2",
     type: "board_invitation",
-    message: `${friends[1].name} invited you to join Book Worms`,
+    message: `invited you to join Book Worms`,
     entityId: "gi2",
     fromUser: friends[1],
     read: false,
@@ -518,7 +518,7 @@ export const initialNotifications: AppNotification[] = [
   {
     id: "n1",
     type: "transfer_quest",
-    message: "Jake Williams wants to transfer 'Watch sunrise from the pier' to you",
+    message: "wants to transfer 'Watch sunrise from the pier' to you",
     entityId: "q1",
     groupId: "g1",
     fromUser: friends[1],
@@ -528,7 +528,7 @@ export const initialNotifications: AppNotification[] = [
   {
     id: "n2",
     type: "transfer_group",
-    message: "Sam Kim wants to transfer 'Foodie Gang' board to you",
+    message: "wants to transfer 'Foodie Gang' group to you",
     entityId: "g2",
     fromUser: friends[3],
     read: false,
@@ -537,7 +537,7 @@ export const initialNotifications: AppNotification[] = [
   {
     id: "n3",
     type: "new_comment",
-    message: "Priya Patel commented on 'Kayak the river at dawn'",
+    message: "commented on 'Kayak the river at dawn'",
     entityId: "q8",
     groupId: "g1",
     commentId: "c6",
@@ -548,7 +548,7 @@ export const initialNotifications: AppNotification[] = [
   {
     id: "n4",
     type: "new_participant",
-    message: "Maya Johnson joined 'Weekend movie marathon'",
+    message: "joined 'Weekend movie marathon'",
     entityId: "q9",
     groupId: "g3",
     fromUser: friends[0],

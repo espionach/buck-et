@@ -23,6 +23,7 @@ const AppLayout = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/boards" element={<Boards />} />
+        <Route path="/groups" element={<Boards />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/create" element={<CreateQuest />} />
         <Route path="/create-group" element={<CreateGroup />} />

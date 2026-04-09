@@ -38,19 +38,26 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
     if (notification.type === "new_comment" && notification.groupId) {
       const params = new URLSearchParams({ open: notification.groupId, highlightQuest: notification.entityId || "" });
       if (notification.commentId) params.set("commentId", notification.commentId);
-      navigate(`/boards?${params.toString()}`);
+      navigate(`/groups?${params.toString()}`);
     } else if (notification.type === "transfer_quest" && notification.groupId) {
-      navigate(`/boards?open=${notification.groupId}`);
+      navigate(`/groups?open=${notification.groupId}`);
     } else if (notification.type === "transfer_group") {
-      navigate("/boards");
+      navigate("/groups");
     } else if (notification.type === "new_participant" && notification.groupId) {
-      navigate(`/boards?open=${notification.groupId}`);
+      navigate(`/groups?open=${notification.groupId}`);
     } else {
       navigate("/profile?tab=current");
     }
 
     onClose();
   };
+
+  /** Render notification message with bold fromUser name */
+  const renderMessage = (n: typeof notifications[0]) => (
+    <p className="text-xs text-foreground leading-relaxed">
+      <span className="font-bold">{n.fromUser.name}</span>{" "}{n.message}
+    </p>
+  );
 
   return (
     <AnimatePresence>
@@ -100,7 +107,7 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-xs text-foreground leading-relaxed">
-                          <span className="font-semibold">{req.from.name}</span> sent you a friend request
+                          <span className="font-bold">{req.from.name}</span> sent you a friend request
                         </p>
                       </div>
                       <div className="flex gap-1.5 shrink-0">
@@ -147,7 +154,7 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
                           <UserAvatar user={n.fromUser} size="sm" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-xs text-foreground leading-relaxed">{n.message}</p>
+                          {renderMessage(n)}
                           <p className="text-[10px] text-muted-foreground mt-1">{n.createdAt}</p>
                         </div>
                         <div className="flex gap-1.5 shrink-0">
@@ -156,7 +163,7 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
                               acceptGroupInvitation(pendingInvite.id);
                               clearNotification(n.id);
                               onClose();
-                              navigate("/boards");
+                              navigate("/groups");
                             }}
                             className="p-1.5 rounded-lg bg-secondary text-secondary-foreground"
                           >
@@ -188,7 +195,7 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
                         <UserAvatar user={n.fromUser} size="sm" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs text-foreground leading-relaxed">{n.message}</p>
+                        {renderMessage(n)}
                         <p className="text-[10px] text-muted-foreground mt-1">{n.createdAt}</p>
                       </div>
                       <div className="shrink-0 mt-1">{getIcon(n.type)}</div>
