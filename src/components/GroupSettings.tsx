@@ -190,7 +190,7 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
                     {isOwner && !isCurrentUser && (
                       <button
                         onClick={() => handleRemove(mr.user.id)}
-                        className="p-1.5 rounded-lg text-destructive/60 hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="p-1.5 rounded-lg text-destructive hover:bg-destructive/10 transition-colors"
                         title="Remove member"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
