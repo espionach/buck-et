@@ -2,7 +2,7 @@ import { useAppStore } from "@/data/appState";
 import { QuestVolunteer } from "@/data/mockData";
 import UserAvatar from "@/components/UserAvatar";
 import { GroupIconDisplay } from "@/components/GroupIcon";
-import { ArrowLeft, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send, ExternalLink, HandMetal, Check } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send, ExternalLink, HandMetal, Check, Globe, StickyNote } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -24,11 +24,11 @@ const transportLabels = {
 };
 
 const volunteerRoles = [
-  { id: "driver", label: "🚗 Driver", description: "I can drive people" },
-  { id: "snack_provider", label: "🍿 Snacks", description: "I'll bring snacks" },
-  { id: "navigator", label: "🗺️ Navigator", description: "I'll handle directions" },
-  { id: "photographer", label: "📸 Photographer", description: "I'll take photos" },
-  { id: "supplies", label: "🎒 Supplies", description: "I'll bring gear/supplies" },
+  { id: "driver", label: "Driver", description: "I can drive people" },
+  { id: "snack_provider", label: "Snacks", description: "I'll bring snacks" },
+  { id: "navigator", label: "Navigator", description: "I'll handle directions" },
+  { id: "photographer", label: "Photographer", description: "I'll take photos" },
+  { id: "supplies", label: "Supplies", description: "I'll bring gear/supplies" },
 ];
 
 const QuestDetail = () => {
@@ -87,7 +87,7 @@ const QuestDetail = () => {
           <div className="flex-1 min-w-0">
             <h1 className="text-lg font-bold text-foreground">{quest.title}</h1>
             <p className="text-xs text-muted-foreground">
-              {group ? <span className="flex items-center gap-1"><GroupIconDisplay icon={group.emoji} size={12} className="text-muted-foreground" />{group.name}</span> : "🌍 Friends only"}
+              {group ? <span className="flex items-center gap-1"><GroupIconDisplay icon={group.emoji} size={12} className="text-muted-foreground" />{group.name}</span> : <span className="flex items-center gap-1"><Globe className="w-3 h-3" />Friends only</span>}
             </p>
           </div>
         </div>
@@ -194,8 +194,8 @@ const QuestDetail = () => {
               </div>
             )}
             {logistics.customNotes && (
-              <p className="text-xs text-muted-foreground mt-2 p-2.5 rounded-lg bg-muted/50">
-                📝 {logistics.customNotes}
+              <p className="text-xs text-muted-foreground mt-2 p-2.5 rounded-lg bg-muted/50 flex items-start gap-1.5">
+                <StickyNote className="w-3.5 h-3.5 shrink-0 mt-0.5" /> {logistics.customNotes}
               </p>
             )}
             {!logistics.date && !logistics.location && !logistics.transportation && !logistics.customNotes && (
