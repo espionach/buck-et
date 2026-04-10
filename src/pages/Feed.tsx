@@ -46,7 +46,7 @@ const Feed = () => {
   // Apply filter
   const filterOptions: { key: string; label: React.ReactNode }[] = [
     { key: "all", label: "All" },
-    { key: "followers", label: "Friends" },
+    { key: "followers", label: <span className="inline-flex items-center gap-1"><Globe className="w-3 h-3" />Friends</span> },
     ...groups.map((g) => ({ key: g.id, label: <span className="flex items-center gap-1"><GroupIconDisplay icon={g.emoji} size={12} />{g.name}</span> })),
   ];
 
