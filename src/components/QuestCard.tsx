@@ -2,7 +2,7 @@ import { Quest, Comment, User } from "@/data/mockData";
 import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
 import { GroupIconDisplay } from "@/components/GroupIcon";
-import OwnerLeaveDialog from "@/components/OwnerLeaveDialog";
+
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, HandMetal, MessageCircle, ChevronDown, ChevronUp, Send, Pencil, Plus, Undo2, ExternalLink, X, Calendar, Globe } from "lucide-react";
 import { useState } from "react";
@@ -41,9 +41,8 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
 
   const [showComments, setShowComments] = useState(autoOpenComments);
   const [newComment, setNewComment] = useState("");
-  const [showOwnerLeave, setShowOwnerLeave] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  usePopup(showOwnerLeave || showDeleteConfirm);
+  usePopup(showDeleteConfirm);
 
   // Check for pending transfer request for this quest targeting current user
   const pendingTransfer = transferRequests.find(
@@ -358,27 +357,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
         </AnimatePresence>
       </motion.div>
 
-      {/* Owner leave dialog — for group quests */}
-      <AnimatePresence>
-        {showOwnerLeave && (
-          <OwnerLeaveDialog
-            type="quest"
-            members={quest.participants}
-            ownerId={currentUser.id}
-            onDelete={() => {
-              deleteQuest(quest.id);
-              setShowOwnerLeave(false);
-            }}
-            onTransfer={(newOwnerId) => {
-              requestQuestTransfer(quest.id, newOwnerId);
-              setShowOwnerLeave(false);
-            }}
-            onCancel={() => setShowOwnerLeave(false)}
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Followers-only delete confirmation */}
+      {/* Delete confirmation */}
       <AnimatePresence>
         {showDeleteConfirm && (
           <motion.div
