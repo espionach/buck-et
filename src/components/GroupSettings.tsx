@@ -181,12 +181,6 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
                         </p>
                       </div>
                     </button>
-                    <span
-                      className={`text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center justify-center gap-1 w-[68px] ${getRoleBadgeClass(role)}`}
-                    >
-                      {getRoleIcon(role)}
-                      {role}
-                    </span>
                     {isOwner && !isCurrentUser && (
                       <button
                         onClick={() => handleRemove(mr.user.id)}
@@ -196,6 +190,12 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     )}
+                    <span
+                      className={`text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center justify-center gap-1 w-[68px] ${getRoleBadgeClass(role)}`}
+                    >
+                      {getRoleIcon(role)}
+                      {role}
+                    </span>
                   </div>
                 );
               })}
