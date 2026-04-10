@@ -151,22 +151,22 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
         )}
 
         {/* Header: Creator name + group */}
-        <div className="mb-2">
-          <div className="flex items-center gap-2">
-            <UserAvatar user={quest.createdBy} size="sm" />
+        <div className="mb-2 flex items-start gap-2.5">
+          <UserAvatar user={quest.createdBy} size="sm" className="mt-0.5" />
+          <div className="min-w-0">
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 if (onViewProfile) onViewProfile(quest.createdBy);
               }}
-              className="text-sm font-bold text-foreground hover:underline"
+              className="text-sm font-bold text-foreground hover:underline leading-tight"
             >
               {quest.createdBy.name}
             </button>
+            <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">
+              {group ? <><GroupIconDisplay icon={group.emoji} size={12} className="text-muted-foreground inline-block mr-1" />{group.name}</> : <span className="inline-flex items-center gap-1"><Globe className="w-3 h-3" />Friends only</span>}
+            </p>
           </div>
-          <p className="text-[11px] text-muted-foreground ml-10 -mt-1">
-            {group ? <><GroupIconDisplay icon={group.emoji} size={12} className="text-muted-foreground inline-block mr-1" />{group.name}</> : <span className="inline-flex items-center gap-1"><Globe className="w-3 h-3" />Friends only</span>}
-          </p>
         </div>
 
         {/* Title + join button row */}
