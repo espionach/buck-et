@@ -3,7 +3,7 @@ import { friends, nonFollowedUsers, User } from "@/data/mockData";
 import QuestList from "@/components/QuestList";
 import UserAvatar from "@/components/UserAvatar";
 import NotificationPanel from "@/components/NotificationPanel";
-import { Search, Lock, UserPlus, Mail, X } from "lucide-react";
+import { Search, Lock, UserPlus, Mail, X, Globe } from "lucide-react";
 import { GroupIconDisplay } from "@/components/GroupIcon";
 import UserProfileView from "@/components/UserProfileView";
 import { useState, useEffect, useRef } from "react";
