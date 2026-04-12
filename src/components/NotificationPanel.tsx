@@ -52,10 +52,12 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
     onClose();
   };
 
-  /** Render notification message with bold fromUser name */
+  /** Render notification message with bold fromUser name and group name */
   const renderMessage = (n: typeof notifications[0]) => (
     <p className="text-xs text-foreground leading-relaxed">
       <span className="font-bold">{n.fromUser.name}</span>{" "}{n.message}
+      {n.groupName && <span className="font-bold">{n.groupName}</span>}
+      {n.type === "transfer_group" && n.groupName && " group to you"}
     </p>
   );
 
