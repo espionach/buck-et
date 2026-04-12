@@ -252,7 +252,9 @@ const Feed = () => {
                     onMarkUndone={() => navigate("/profile?tab=current")}
                     onViewProfile={(user) => {
                       if (search.trim()) {
-                        setRecentSearches((prev) => [search.trim(), ...prev.filter((s) => s !== search.trim())].slice(0, 10));
+                        const next = [search.trim(), ...recentSearches.filter((s) => s !== search.trim())].slice(0, 10);
+                        setRecentSearches(next);
+                        localStorage.setItem("recentSearches", JSON.stringify(next));
                       }
                       setSelectedProfile(user);
                     }}
@@ -271,7 +273,9 @@ const Feed = () => {
                         key={user.id}
                         onClick={() => {
                           if (search.trim()) {
-                            setRecentSearches((prev) => [search.trim(), ...prev.filter((s) => s !== search.trim())].slice(0, 10));
+                            const next = [search.trim(), ...recentSearches.filter((s) => s !== search.trim())].slice(0, 10);
+                            setRecentSearches(next);
+                            localStorage.setItem("recentSearches", JSON.stringify(next));
                           }
                           setSelectedProfile(user);
                         }}
