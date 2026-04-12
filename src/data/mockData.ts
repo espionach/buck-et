@@ -501,7 +501,8 @@ export const initialNotifications: AppNotification[] = [
   {
     id: "n-inv1",
     type: "board_invitation",
-    message: `invited you to join Film Club`,
+    message: `invited you to join `,
+    groupName: "Film Club",
     entityId: "gi1",
     fromUser: friends[0],
     read: false,
@@ -510,7 +511,8 @@ export const initialNotifications: AppNotification[] = [
   {
     id: "n-inv2",
     type: "board_invitation",
-    message: `invited you to join Book Worms`,
+    message: `invited you to join `,
+    groupName: "Book Worms",
     entityId: "gi2",
     fromUser: friends[1],
     read: false,
