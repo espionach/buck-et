@@ -474,6 +474,7 @@ export interface AppNotification {
   entityId?: string;
   groupId?: string;
   commentId?: string;
+  groupName?: string;
   fromUser: User;
   read: boolean;
   createdAt: string;
