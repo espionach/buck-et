@@ -117,19 +117,18 @@ const Profile = () => {
       snapshotQuestIds.includes(q.id)
   );
 
-  const current = myQuests
-    .filter((q) => !q.completedByUserIds.includes(currentUser.id))
-    .sort((a, b) => {
-      const aDate = a.logistics?.date;
-      const bDate = b.logistics?.date;
-      // Both dated: sort by upcoming date (soonest first)
-      if (aDate && bDate) return new Date(aDate).getTime() - new Date(bDate).getTime();
-      // Dated before undated
-      if (aDate && !bDate) return -1;
-      if (!aDate && bDate) return 1;
-      // Both undated: newest created first
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    });
+  const currentAll = myQuests
+    .filter((q) => !q.completedByUserIds.includes(currentUser.id));
+
+  const datedQuests = currentAll
+    .filter((q) => q.logistics?.date)
+    .sort((a, b) => new Date(a.logistics!.date!).getTime() - new Date(b.logistics!.date!).getTime());
+
+  const undatedQuests = currentAll
+    .filter((q) => !q.logistics?.date)
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+  const current = [...datedQuests, ...undatedQuests];
 
   // Snapshot current quest IDs so unjoined quests stay visible until navigation
   useEffect(() => {
@@ -497,7 +496,7 @@ const Profile = () => {
         ))}
       </div>
 
-      {/* Quests */}
+      {/* Sidequests */}
       <motion.div
         key={tab}
         initial={{ opacity: 0, y: 8 }}
@@ -508,21 +507,51 @@ const Profile = () => {
           <div className="text-center py-12 text-muted-foreground">
             {tab === "current" ? <Map className="w-10 h-10 mx-auto mb-2 opacity-40" /> : <ScrollText className="w-10 h-10 mx-auto mb-2 opacity-40" />}
             <p className="text-sm">
-              {tab === "current" ? "No active quests — go start one!" : "No completed quests yet"}
+              {tab === "current" ? "No active sidequests — go start one!" : "No completed sidequests yet"}
             </p>
           </div>
+        ) : tab === "current" ? (
+          <>
+            <QuestList
+              quests={datedQuests}
+              showGroup
+              onEditCurrent={handleOpenCurrentEditor}
+              onMarkDone={() => setTab("past")}
+              onMarkUndone={() => setTab("current")}
+              onViewProfile={(user) => {
+                if (user.id !== currentUser.id) setViewingUser(user);
+              }}
+              scrollToQuestId={justAddedQuestId}
+            />
+            {undatedQuests.length > 0 && (
+              <>
+                <div className="pt-4 pb-2 px-1">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Someday</p>
+                </div>
+                <QuestList
+                  quests={undatedQuests}
+                  showGroup
+                  onEditCurrent={handleOpenCurrentEditor}
+                  onMarkDone={() => setTab("past")}
+                  onMarkUndone={() => setTab("current")}
+                  onViewProfile={(user) => {
+                    if (user.id !== currentUser.id) setViewingUser(user);
+                  }}
+                  scrollToQuestId={justAddedQuestId}
+                />
+              </>
+            )}
+          </>
         ) : (
           <QuestList
             quests={active}
             showGroup
-            onEditCurrent={tab === "current" ? handleOpenCurrentEditor : undefined}
-            onEditPast={tab === "past" ? handleOpenPastEditor : undefined}
+            onEditPast={handleOpenPastEditor}
             onMarkDone={() => setTab("past")}
             onMarkUndone={() => setTab("current")}
             onViewProfile={(user) => {
               if (user.id !== currentUser.id) setViewingUser(user);
             }}
-            scrollToQuestId={tab === "current" ? justAddedQuestId : undefined}
           />
         )}
       </motion.div>
@@ -547,14 +576,14 @@ const Profile = () => {
               {/* Scrollable content */}
               <div className="flex-1 overflow-y-auto p-5 space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="font-bold text-foreground">Edit Quest</h3>
+                <h3 className="font-bold text-foreground">Edit Sidequest</h3>
                 <button onClick={() => setEditingCurrentQuest(null)}>
                   <X className="w-5 h-5 text-muted-foreground" />
                 </button>
               </div>
 
               <div>
-                <label className="text-sm font-semibold text-foreground mb-1.5 block">Quest Name</label>
+                <label className="text-sm font-semibold text-foreground mb-1.5 block">Sidequest Name</label>
                 <input
                   value={editQuestTitle}
                   onChange={(e) => setEditQuestTitle(e.target.value)}
@@ -575,7 +604,7 @@ const Profile = () => {
 
               {/* Logistics fields */}
               <div className="space-y-3">
-                <label className="text-sm font-semibold text-foreground block">Quest Details</label>
+                <label className="text-sm font-semibold text-foreground block">Sidequest Details</label>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="text-[11px] text-muted-foreground mb-1 block">Date</label>
@@ -768,9 +797,9 @@ const Profile = () => {
               onClick={(e) => e.stopPropagation()}
               className="w-full max-w-xs bg-card rounded-xl p-5 space-y-4 shadow-lg text-center"
             >
-              <p className="text-sm font-bold text-foreground">Delete this quest?</p>
+              <p className="text-sm font-bold text-foreground">Delete this sidequest?</p>
               <p className="text-xs text-muted-foreground">
-                This quest will be permanently deleted for everyone. This action cannot be undone.
+                This sidequest will be permanently deleted for everyone. This action cannot be undone.
               </p>
               <div className="flex gap-2">
                 <button
@@ -812,7 +841,7 @@ const Profile = () => {
                 Remove <span className="text-primary">{confirmRemoveUser.userName}</span> from{" "}
                 <span className="text-primary">{confirmRemoveUser.context}</span>?
               </p>
-              <p className="text-xs text-muted-foreground">They'll be removed from this quest but can rejoin later.</p>
+              <p className="text-xs text-muted-foreground">They'll be removed from this sidequest but can rejoin later.</p>
               <div className="flex gap-2">
                 <button
                   onClick={() => setConfirmRemoveUser(null)}
@@ -850,7 +879,7 @@ const Profile = () => {
               className="w-full max-w-md bg-card rounded-xl p-5 space-y-4 shadow-lg max-h-[85vh] overflow-y-auto"
             >
               <div className="flex items-center justify-between">
-                <h3 className="font-bold text-foreground">Quest Memories</h3>
+                <h3 className="font-bold text-foreground">Sidequest Memories</h3>
                 <button onClick={() => setEditingPastQuest(null)}>
                   <X className="w-5 h-5 text-muted-foreground" />
                 </button>

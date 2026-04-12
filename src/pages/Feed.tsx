@@ -18,7 +18,11 @@ const Feed = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [feedFilter, setFeedFilter] = useState<"all" | "followers" | string>("all");
   const [searchMode, setSearchMode] = useState(false);
-  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [recentSearches, setRecentSearches] = useState<string[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem("recentSearches") || "[]");
+    } catch { return []; }
+  });
   const searchInputRef = useRef<HTMLInputElement>(null);
   const location = useLocation();
   const navigate = useNavigate();
@@ -177,7 +181,7 @@ const Feed = () => {
                   searchTab === t ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
                 }`}
               >
-                {t === "quests" ? "Quests" : "People"}
+                {t === "quests" ? "Sidequests" : "People"}
               </button>
             ))}
           </div>
@@ -191,7 +195,10 @@ const Feed = () => {
                 </p>
                 {recentSearches.length > 0 && (
                   <button
-                    onClick={() => setRecentSearches([])}
+                    onClick={() => {
+                      setRecentSearches([]);
+                      localStorage.removeItem("recentSearches");
+                    }}
                     className="text-[10px] font-semibold text-destructive"
                   >
                     Clear all
@@ -218,7 +225,11 @@ const Feed = () => {
                         <span className="text-sm text-foreground truncate">{term}</span>
                       </button>
                       <button
-                        onClick={() => setRecentSearches((prev) => prev.filter((_, idx) => idx !== i))}
+                        onClick={() => setRecentSearches((prev) => {
+                          const next = prev.filter((_, idx) => idx !== i);
+                          localStorage.setItem("recentSearches", JSON.stringify(next));
+                          return next;
+                        })}
                         className="shrink-0"
                       >
                         <X className="w-3.5 h-3.5 text-destructive" />
@@ -236,12 +247,14 @@ const Feed = () => {
                   <QuestList
                     quests={filteredQuests}
                     emptyIcon="🔭"
-                    emptyText="No quests found"
+                    emptyText="No sidequests found"
                     onMarkDone={() => navigate("/profile?tab=past")}
                     onMarkUndone={() => navigate("/profile?tab=current")}
                     onViewProfile={(user) => {
                       if (search.trim()) {
-                        setRecentSearches((prev) => [search.trim(), ...prev.filter((s) => s !== search.trim())].slice(0, 10));
+                        const next = [search.trim(), ...recentSearches.filter((s) => s !== search.trim())].slice(0, 10);
+                        setRecentSearches(next);
+                        localStorage.setItem("recentSearches", JSON.stringify(next));
                       }
                       setSelectedProfile(user);
                     }}
@@ -260,7 +273,9 @@ const Feed = () => {
                         key={user.id}
                         onClick={() => {
                           if (search.trim()) {
-                            setRecentSearches((prev) => [search.trim(), ...prev.filter((s) => s !== search.trim())].slice(0, 10));
+                            const next = [search.trim(), ...recentSearches.filter((s) => s !== search.trim())].slice(0, 10);
+                            setRecentSearches(next);
+                            localStorage.setItem("recentSearches", JSON.stringify(next));
                           }
                           setSelectedProfile(user);
                         }}
@@ -313,8 +328,8 @@ const Feed = () => {
               <QuestList
                 quests={filteredQuests}
                 emptyIcon="🔭"
-                emptyText="No quests to show"
-                emptySubtext="Follow more friends to see their side quests!"
+                emptyText="No sidequests to show"
+                emptySubtext="Follow more friends to see their sidequests!"
                 onMarkDone={() => navigate("/profile?tab=past")}
                 onMarkUndone={() => navigate("/profile?tab=current")}
                 onViewProfile={(user) => setSelectedProfile(user)}

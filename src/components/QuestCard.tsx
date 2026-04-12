@@ -100,7 +100,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
         {pendingTransfer && (
           <div className="mb-3 p-3 rounded-xl bg-primary/10 border border-primary/20">
             <p className="text-xs text-foreground font-medium mb-2">
-              {pendingTransfer.fromUser.name} wants to transfer this quest to you
+              {pendingTransfer.fromUser.name} wants to transfer this sidequest to you
             </p>
             <div className="flex gap-2">
               <button
@@ -292,7 +292,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
                 className="flex items-center gap-1 text-xs text-secondary font-semibold"
               >
                 <Check className="w-3.5 h-3.5" />
-                Finish Quest
+                Finish Sidequest
               </button>
             )}
 
@@ -382,7 +382,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
             >
               <p className="text-sm font-bold text-foreground">Are you sure?</p>
               <p className="text-xs text-muted-foreground">
-                This quest will be permanently deleted for everyone.
+                This sidequest will be permanently deleted for everyone.
               </p>
               <div className="flex gap-2">
                 <button

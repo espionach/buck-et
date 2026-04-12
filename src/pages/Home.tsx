@@ -325,7 +325,7 @@ const Boards = () => {
                     boardTab === t ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
                   }`}
                 >
-                  {t === "active" ? `Active (${activeGroupQuests.length})` : `Completed (${completedGroupQuests.length})`}
+                  {boardTab === "active" ? `Active (${activeGroupQuests.length})` : `Completed (${completedGroupQuests.length})`}
                 </button>
               ))}
             </div>
@@ -341,8 +341,8 @@ const Boards = () => {
               {groupQuests.length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
                   {boardTab === "active" ? <Map className="w-10 h-10 mx-auto mb-2 opacity-40" /> : <ScrollText className="w-10 h-10 mx-auto mb-2 opacity-40" />}
-                  <p className="text-sm">
-                    {boardTab === "active" ? "No active quests yet — start one!" : "No completed quests yet"}
+                 <p className="text-sm">
+                    {boardTab === "active" ? "No active sidequests yet — start one!" : "No completed sidequests yet"}
                   </p>
                 </div>
               ) : (

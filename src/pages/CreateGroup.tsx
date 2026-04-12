@@ -45,7 +45,7 @@ const CreateGroup = () => {
       createdAt: new Date().toISOString().split("T")[0],
     };
     addGroup(group);
-    navigate("/groups", { replace: true });
+    navigate(`/groups?open=${group.id}`, { replace: true });
   };
 
   return (
