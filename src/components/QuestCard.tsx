@@ -405,6 +405,26 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Owner leave dialog for group quests */}
+      <AnimatePresence>
+        {showOwnerLeave && (
+          <OwnerLeaveDialog
+            type="quest"
+            members={quest.participants}
+            ownerId={currentUser.id}
+            onDelete={() => {
+              setShowOwnerLeave(false);
+              setShowDeleteConfirm(true);
+            }}
+            onTransfer={(newOwnerId) => {
+              requestQuestTransfer(quest.id, newOwnerId);
+              setShowOwnerLeave(false);
+            }}
+            onCancel={() => setShowOwnerLeave(false)}
+          />
+        )}
+      </AnimatePresence>
     </>
   );
 };
