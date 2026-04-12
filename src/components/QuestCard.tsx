@@ -5,6 +5,7 @@ import { GroupIconDisplay } from "@/components/GroupIcon";
 
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, HandMetal, MessageCircle, ChevronDown, ChevronUp, Send, Pencil, Plus, Undo2, ExternalLink, X, Calendar, Globe } from "lucide-react";
+import OwnerLeaveDialog from "@/components/OwnerLeaveDialog";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { usePopup } from "@/hooks/use-popup";
@@ -42,7 +43,8 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
   const [showComments, setShowComments] = useState(autoOpenComments);
   const [newComment, setNewComment] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  usePopup(showDeleteConfirm);
+  const [showOwnerLeave, setShowOwnerLeave] = useState(false);
+  usePopup(showDeleteConfirm || showOwnerLeave);
 
   // Check for pending transfer request for this quest targeting current user
   const pendingTransfer = transferRequests.find(
@@ -65,7 +67,11 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
   const handleToggleImIn = () => {
     if (!canJoin) return;
       if (isOwner && isIn) {
-        setShowDeleteConfirm(true);
+        if (group && !isFollowersOnly) {
+          setShowOwnerLeave(true);
+        } else {
+          setShowDeleteConfirm(true);
+        }
         return;
       }
     toggleImIn(quest.id);
@@ -397,6 +403,26 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
               </div>
             </motion.div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Owner leave dialog for group quests */}
+      <AnimatePresence>
+        {showOwnerLeave && (
+          <OwnerLeaveDialog
+            type="quest"
+            members={quest.participants}
+            ownerId={currentUser.id}
+            onDelete={() => {
+              setShowOwnerLeave(false);
+              setShowDeleteConfirm(true);
+            }}
+            onTransfer={(newOwnerId) => {
+              requestQuestTransfer(quest.id, newOwnerId);
+              setShowOwnerLeave(false);
+            }}
+            onCancel={() => setShowOwnerLeave(false)}
+          />
         )}
       </AnimatePresence>
     </>
