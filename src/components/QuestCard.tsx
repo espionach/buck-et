@@ -5,6 +5,7 @@ import { GroupIconDisplay } from "@/components/GroupIcon";
 
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, HandMetal, MessageCircle, ChevronDown, ChevronUp, Send, Pencil, Plus, Undo2, ExternalLink, X, Calendar, Globe } from "lucide-react";
+import OwnerLeaveDialog from "@/components/OwnerLeaveDialog";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { usePopup } from "@/hooks/use-popup";
