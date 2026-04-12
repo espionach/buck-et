@@ -487,7 +487,7 @@ export const useAppStore = create<AppState>((set) => ({
       if (!transfer) return { transferRequests: s.transferRequests.filter((tr) => tr.id !== transferId) };
 
       const entityName = transfer.type === "quest"
-        ? s.quests.find((q) => q.id === transfer.entityId)?.title || "a quest"
+        ? s.quests.find((q) => q.id === transfer.entityId)?.title || "a sidequest"
         : s.groups.find((g) => g.id === transfer.entityId)?.name || "a board";
 
       const isGroupTransfer = transfer.type === "group";

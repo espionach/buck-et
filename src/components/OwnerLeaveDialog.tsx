@@ -48,7 +48,7 @@ const OwnerLeaveDialog = ({ type, members, ownerId, onDelete, onTransfer, onCanc
                 </button>
               </div>
               <p className="text-sm text-muted-foreground">
-                What would you like to do with this {type}?
+                What would you like to do with this {type === "quest" ? "sidequest" : type}?
               </p>
 
               <button
