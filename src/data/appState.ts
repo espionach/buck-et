@@ -419,7 +419,8 @@ export const useAppStore = create<AppState>((set) => ({
       const notification: AppNotification = {
         id: `n${Date.now()}`,
         type: "transfer_group",
-        message: `wants to transfer '${group.name}' group to you`,
+        message: `wants to transfer `,
+        groupName: group.name,
         entityId: groupId,
         fromUser: s.currentUser,
         read: false,
