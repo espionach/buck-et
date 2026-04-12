@@ -18,7 +18,11 @@ const Feed = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [feedFilter, setFeedFilter] = useState<"all" | "followers" | string>("all");
   const [searchMode, setSearchMode] = useState(false);
-  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [recentSearches, setRecentSearches] = useState<string[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem("recentSearches") || "[]");
+    } catch { return []; }
+  });
   const searchInputRef = useRef<HTMLInputElement>(null);
   const location = useLocation();
   const navigate = useNavigate();

@@ -117,19 +117,18 @@ const Profile = () => {
       snapshotQuestIds.includes(q.id)
   );
 
-  const current = myQuests
-    .filter((q) => !q.completedByUserIds.includes(currentUser.id))
-    .sort((a, b) => {
-      const aDate = a.logistics?.date;
-      const bDate = b.logistics?.date;
-      // Both dated: sort by upcoming date (soonest first)
-      if (aDate && bDate) return new Date(aDate).getTime() - new Date(bDate).getTime();
-      // Dated before undated
-      if (aDate && !bDate) return -1;
-      if (!aDate && bDate) return 1;
-      // Both undated: newest created first
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    });
+  const currentAll = myQuests
+    .filter((q) => !q.completedByUserIds.includes(currentUser.id));
+
+  const datedQuests = currentAll
+    .filter((q) => q.logistics?.date)
+    .sort((a, b) => new Date(a.logistics!.date!).getTime() - new Date(b.logistics!.date!).getTime());
+
+  const undatedQuests = currentAll
+    .filter((q) => !q.logistics?.date)
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+  const current = [...datedQuests, ...undatedQuests];
 
   // Snapshot current quest IDs so unjoined quests stay visible until navigation
   useEffect(() => {
@@ -497,7 +496,7 @@ const Profile = () => {
         ))}
       </div>
 
-      {/* Quests */}
+      {/* Sidequests */}
       <motion.div
         key={tab}
         initial={{ opacity: 0, y: 8 }}
@@ -508,21 +507,51 @@ const Profile = () => {
           <div className="text-center py-12 text-muted-foreground">
             {tab === "current" ? <Map className="w-10 h-10 mx-auto mb-2 opacity-40" /> : <ScrollText className="w-10 h-10 mx-auto mb-2 opacity-40" />}
             <p className="text-sm">
-              {tab === "current" ? "No active quests — go start one!" : "No completed quests yet"}
+              {tab === "current" ? "No active sidequests — go start one!" : "No completed sidequests yet"}
             </p>
           </div>
+        ) : tab === "current" ? (
+          <>
+            <QuestList
+              quests={datedQuests}
+              showGroup
+              onEditCurrent={handleOpenCurrentEditor}
+              onMarkDone={() => setTab("past")}
+              onMarkUndone={() => setTab("current")}
+              onViewProfile={(user) => {
+                if (user.id !== currentUser.id) setViewingUser(user);
+              }}
+              scrollToQuestId={justAddedQuestId}
+            />
+            {undatedQuests.length > 0 && (
+              <>
+                <div className="pt-4 pb-2 px-1">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Someday</p>
+                </div>
+                <QuestList
+                  quests={undatedQuests}
+                  showGroup
+                  onEditCurrent={handleOpenCurrentEditor}
+                  onMarkDone={() => setTab("past")}
+                  onMarkUndone={() => setTab("current")}
+                  onViewProfile={(user) => {
+                    if (user.id !== currentUser.id) setViewingUser(user);
+                  }}
+                  scrollToQuestId={justAddedQuestId}
+                />
+              </>
+            )}
+          </>
         ) : (
           <QuestList
             quests={active}
             showGroup
-            onEditCurrent={tab === "current" ? handleOpenCurrentEditor : undefined}
-            onEditPast={tab === "past" ? handleOpenPastEditor : undefined}
+            onEditPast={handleOpenPastEditor}
             onMarkDone={() => setTab("past")}
             onMarkUndone={() => setTab("current")}
             onViewProfile={(user) => {
               if (user.id !== currentUser.id) setViewingUser(user);
             }}
-            scrollToQuestId={tab === "current" ? justAddedQuestId : undefined}
           />
         )}
       </motion.div>
