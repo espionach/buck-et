@@ -531,7 +531,8 @@ export const initialNotifications: AppNotification[] = [
   {
     id: "n2",
     type: "transfer_group",
-    message: "wants to transfer 'Foodie Gang' group to you",
+    message: "wants to transfer ",
+    groupName: "Foodie Gang",
     entityId: "g2",
     fromUser: friends[3],
     read: false,
