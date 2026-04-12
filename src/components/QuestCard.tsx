@@ -67,7 +67,11 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
   const handleToggleImIn = () => {
     if (!canJoin) return;
       if (isOwner && isIn) {
-        setShowDeleteConfirm(true);
+        if (group && !isFollowersOnly) {
+          setShowOwnerLeave(true);
+        } else {
+          setShowDeleteConfirm(true);
+        }
         return;
       }
     toggleImIn(quest.id);
