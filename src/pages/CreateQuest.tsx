@@ -102,7 +102,7 @@ const CreateQuest = () => {
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <h1 className="text-xl font-bold text-foreground">New Quest</h1>
+        <h1 className="text-xl font-bold text-foreground">New Sidequest</h1>
       </div>
 
       {/* Group selector dropdown */}
@@ -160,7 +160,7 @@ const CreateQuest = () => {
         <div className="space-y-5">
           <div>
             <label className="text-sm font-semibold text-foreground mb-2 block">
-              What's the quest?
+              What's the sidequest?
             </label>
             <input
               value={title}
@@ -186,7 +186,7 @@ const CreateQuest = () => {
 
           {/* Quest Details - always visible */}
           <div className="space-y-3">
-            <span className="text-sm font-semibold text-foreground">Quest Details (optional)</span>
+            <span className="text-sm font-semibold text-foreground">Sidequest Details (optional)</span>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
@@ -330,7 +330,7 @@ const CreateQuest = () => {
             className="w-full py-4 rounded-xl bg-primary text-primary-foreground font-bold text-base flex items-center justify-center gap-2 disabled:opacity-40 active:scale-[0.98] transition-transform shadow-lg"
           >
             <Sparkles className="w-5 h-5" />
-            Launch Quest
+            Launch Sidequest
           </button>
         </div>
       </div>

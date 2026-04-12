@@ -181,7 +181,7 @@ const Feed = () => {
                   searchTab === t ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
                 }`}
               >
-                {t === "quests" ? "Quests" : "People"}
+                {t === "quests" ? "Sidequests" : "People"}
               </button>
             ))}
           </div>
@@ -247,7 +247,7 @@ const Feed = () => {
                   <QuestList
                     quests={filteredQuests}
                     emptyIcon="🔭"
-                    emptyText="No quests found"
+                    emptyText="No sidequests found"
                     onMarkDone={() => navigate("/profile?tab=past")}
                     onMarkUndone={() => navigate("/profile?tab=current")}
                     onViewProfile={(user) => {
@@ -328,8 +328,8 @@ const Feed = () => {
               <QuestList
                 quests={filteredQuests}
                 emptyIcon="🔭"
-                emptyText="No quests to show"
-                emptySubtext="Follow more friends to see their side quests!"
+                emptyText="No sidequests to show"
+                emptySubtext="Follow more friends to see their sidequests!"
                 onMarkDone={() => navigate("/profile?tab=past")}
                 onMarkUndone={() => navigate("/profile?tab=current")}
                 onViewProfile={(user) => setSelectedProfile(user)}

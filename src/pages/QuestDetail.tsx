@@ -44,7 +44,7 @@ const QuestDetail = () => {
   if (!quest) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Quest not found</p>
+        <p className="text-muted-foreground">Sidequest not found</p>
       </div>
     );
   }
@@ -101,7 +101,7 @@ const QuestDetail = () => {
             <UserAvatar user={quest.createdBy} size="sm" />
             <div>
               <span className="text-sm font-bold text-foreground">{quest.createdBy.name}</span>
-              <p className="text-[11px] text-muted-foreground">Quest Owner</p>
+              <p className="text-[11px] text-muted-foreground">Sidequest Owner</p>
             </div>
           </div>
 
@@ -162,7 +162,7 @@ const QuestDetail = () => {
 
         {/* Logistics Section */}
         <div className="p-4 rounded-xl border border-border/50 bg-card space-y-3">
-          <h3 className="text-sm font-bold text-foreground">Quest Details</h3>
+          <h3 className="text-sm font-bold text-foreground">Sidequest Details</h3>
 
           <div className="space-y-2.5">
             {logistics.date && (

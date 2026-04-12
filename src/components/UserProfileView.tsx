@@ -167,7 +167,7 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
         <div className="text-center py-16">
           <Lock className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
           <p className="font-bold text-foreground mb-1">Private Account</p>
-          <p className="text-sm text-muted-foreground mb-4">Add as friend to see their quests</p>
+          <p className="text-sm text-muted-foreground mb-4">Add as friend to see their sidequests</p>
           {incomingRequest ? (
             <button
               onClick={() => acceptFriendRequest(incomingRequest.id)}
@@ -214,7 +214,7 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
           <div className="divide-y divide-border">
             {shownQuests.length === 0 ? (
               <p className="text-center text-sm text-muted-foreground py-8">
-                {tab === "current" ? "No active quests" : "No completed quests"}
+                {tab === "current" ? "No active sidequests" : "No completed sidequests"}
               </p>
             ) : (
               shownQuests.map((q, i) => (

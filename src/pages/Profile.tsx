@@ -576,14 +576,14 @@ const Profile = () => {
               {/* Scrollable content */}
               <div className="flex-1 overflow-y-auto p-5 space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="font-bold text-foreground">Edit Quest</h3>
+                <h3 className="font-bold text-foreground">Edit Sidequest</h3>
                 <button onClick={() => setEditingCurrentQuest(null)}>
                   <X className="w-5 h-5 text-muted-foreground" />
                 </button>
               </div>
 
               <div>
-                <label className="text-sm font-semibold text-foreground mb-1.5 block">Quest Name</label>
+                <label className="text-sm font-semibold text-foreground mb-1.5 block">Sidequest Name</label>
                 <input
                   value={editQuestTitle}
                   onChange={(e) => setEditQuestTitle(e.target.value)}
@@ -604,7 +604,7 @@ const Profile = () => {
 
               {/* Logistics fields */}
               <div className="space-y-3">
-                <label className="text-sm font-semibold text-foreground block">Quest Details</label>
+                <label className="text-sm font-semibold text-foreground block">Sidequest Details</label>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="text-[11px] text-muted-foreground mb-1 block">Date</label>
@@ -797,9 +797,9 @@ const Profile = () => {
               onClick={(e) => e.stopPropagation()}
               className="w-full max-w-xs bg-card rounded-xl p-5 space-y-4 shadow-lg text-center"
             >
-              <p className="text-sm font-bold text-foreground">Delete this quest?</p>
+              <p className="text-sm font-bold text-foreground">Delete this sidequest?</p>
               <p className="text-xs text-muted-foreground">
-                This quest will be permanently deleted for everyone. This action cannot be undone.
+                This sidequest will be permanently deleted for everyone. This action cannot be undone.
               </p>
               <div className="flex gap-2">
                 <button
@@ -841,7 +841,7 @@ const Profile = () => {
                 Remove <span className="text-primary">{confirmRemoveUser.userName}</span> from{" "}
                 <span className="text-primary">{confirmRemoveUser.context}</span>?
               </p>
-              <p className="text-xs text-muted-foreground">They'll be removed from this quest but can rejoin later.</p>
+              <p className="text-xs text-muted-foreground">They'll be removed from this sidequest but can rejoin later.</p>
               <div className="flex gap-2">
                 <button
                   onClick={() => setConfirmRemoveUser(null)}
@@ -879,7 +879,7 @@ const Profile = () => {
               className="w-full max-w-md bg-card rounded-xl p-5 space-y-4 shadow-lg max-h-[85vh] overflow-y-auto"
             >
               <div className="flex items-center justify-between">
-                <h3 className="font-bold text-foreground">Quest Memories</h3>
+                <h3 className="font-bold text-foreground">Sidequest Memories</h3>
                 <button onClick={() => setEditingPastQuest(null)}>
                   <X className="w-5 h-5 text-muted-foreground" />
                 </button>

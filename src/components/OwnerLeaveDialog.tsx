@@ -57,7 +57,7 @@ const OwnerLeaveDialog = ({ type, members, ownerId, onDelete, onTransfer, onCanc
               >
                 <Trash2 className="w-5 h-5" />
                 <div className="text-left">
-                  <p className="text-sm font-semibold">Delete {type}</p>
+                  <p className="text-sm font-semibold">Delete {type === "quest" ? "sidequest" : type}</p>
                   <p className="text-xs opacity-70">Remove for everyone</p>
                 </div>
               </button>
