@@ -490,11 +490,13 @@ export const useAppStore = create<AppState>((set) => ({
         ? s.quests.find((q) => q.id === transfer.entityId)?.title || "a quest"
         : s.groups.find((g) => g.id === transfer.entityId)?.name || "a board";
 
+      const isGroupTransfer = transfer.type === "group";
       const declineNotification: AppNotification = {
         id: `n${Date.now()}`,
         type: "transfer_declined",
         message: `declined the transfer of '${entityName}'`,
         entityId: transfer.entityId,
+        ...(isGroupTransfer ? { groupName: entityName } : {}),
         fromUser: s.currentUser,
         read: false,
         createdAt: new Date().toISOString().split("T")[0],
