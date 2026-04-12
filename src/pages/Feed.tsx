@@ -195,7 +195,10 @@ const Feed = () => {
                 </p>
                 {recentSearches.length > 0 && (
                   <button
-                    onClick={() => setRecentSearches([])}
+                    onClick={() => {
+                      setRecentSearches([]);
+                      localStorage.removeItem("recentSearches");
+                    }}
                     className="text-[10px] font-semibold text-destructive"
                   >
                     Clear all
@@ -222,7 +225,11 @@ const Feed = () => {
                         <span className="text-sm text-foreground truncate">{term}</span>
                       </button>
                       <button
-                        onClick={() => setRecentSearches((prev) => prev.filter((_, idx) => idx !== i))}
+                        onClick={() => setRecentSearches((prev) => {
+                          const next = prev.filter((_, idx) => idx !== i);
+                          localStorage.setItem("recentSearches", JSON.stringify(next));
+                          return next;
+                        })}
                         className="shrink-0"
                       >
                         <X className="w-3.5 h-3.5 text-destructive" />
