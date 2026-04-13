@@ -33,9 +33,12 @@ interface AppState {
   currentUser: User;
   hideGlobalFab: boolean;
   popupCount: number;
+  pinnedQuestIds: string[];
   setHideGlobalFab: (hide: boolean) => void;
   pushPopup: () => void;
   popPopup: () => void;
+  pinQuest: (questId: string) => void;
+  unpinQuest: (questId: string) => void;
 
   addQuest: (quest: Quest) => void;
   toggleImIn: (questId: string) => void;
@@ -92,9 +95,21 @@ export const useAppStore = create<AppState>((set) => ({
   currentUser: currentUser,
   hideGlobalFab: false,
   popupCount: 0,
+  pinnedQuestIds: JSON.parse(localStorage.getItem("pinnedQuestIds") || "[]"),
   setHideGlobalFab: (hide) => set({ hideGlobalFab: hide }),
   pushPopup: () => set((s) => ({ popupCount: s.popupCount + 1 })),
   popPopup: () => set((s) => ({ popupCount: Math.max(0, s.popupCount - 1) })),
+  pinQuest: (questId) => set((s) => {
+    if (s.pinnedQuestIds.includes(questId) || s.pinnedQuestIds.length >= 3) return s;
+    const next = [...s.pinnedQuestIds, questId];
+    localStorage.setItem("pinnedQuestIds", JSON.stringify(next));
+    return { pinnedQuestIds: next };
+  }),
+  unpinQuest: (questId) => set((s) => {
+    const next = s.pinnedQuestIds.filter((id) => id !== questId);
+    localStorage.setItem("pinnedQuestIds", JSON.stringify(next));
+    return { pinnedQuestIds: next };
+  }),
 
   addQuest: (quest) => set((s) => ({ quests: [quest, ...s.quests] })),
 
