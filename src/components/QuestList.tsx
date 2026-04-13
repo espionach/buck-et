@@ -35,6 +35,7 @@ const QuestList = ({
   onMarkDone,
   onMarkUndone,
   onViewProfile,
+  onQuestClick,
   autoOpenCommentsId,
   highlightCommentId,
   scrollToQuestId,
@@ -86,6 +87,7 @@ const QuestList = ({
             onMarkDone={onMarkDone}
             onMarkUndone={onMarkUndone}
             onViewProfile={onViewProfile}
+            onQuestClick={onQuestClick}
             autoOpenComments={q.id === autoOpenCommentsId}
             highlightCommentId={q.id === autoOpenCommentsId ? highlightCommentId : undefined}
             justAdded={q.id === justAdded}
