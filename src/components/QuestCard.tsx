@@ -24,10 +24,11 @@ interface QuestCardProps {
   highlightCommentId?: string;
   hideActions?: boolean;
   onViewProfile?: (user: User) => void;
+  onQuestClick?: () => void;
   justAdded?: boolean;
 }
 
-const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPast, disableJoin = false, onMarkDone, onMarkUndone, autoOpenComments = false, highlightCommentId, hideActions = false, onViewProfile, justAdded = false }: QuestCardProps) => {
+const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPast, disableJoin = false, onMarkDone, onMarkUndone, autoOpenComments = false, highlightCommentId, hideActions = false, onViewProfile, onQuestClick, justAdded = false }: QuestCardProps) => {
   const navigate = useNavigate();
   const { toggleImIn, markDone, markUndone, groups, addComment, deleteQuest, transferQuestOwnership, requestQuestTransfer, transferRequests, acceptTransfer, declineTransfer, currentUser } = useAppStore();
   const isIn = quest.participants.some((p) => p.id === currentUser.id);
@@ -93,7 +94,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: index * 0.06 }}
-        onClick={() => canNavigateToDetail && navigate(`/quest/${quest.id}`)}
+        onClick={() => { if (canNavigateToDetail) { onQuestClick?.(); navigate(`/quest/${quest.id}`); } }}
         className={`relative p-4 overflow-hidden ${quest.completedByUserIds.includes(currentUser.id) ? "opacity-60" : ""} ${canNavigateToDetail ? "cursor-pointer active:scale-[0.99] transition-transform" : ""} ${justAdded ? "animate-just-added rounded-xl" : ""}`}
       >
         {/* Transfer request banner */}

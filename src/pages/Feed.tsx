@@ -250,6 +250,13 @@ const Feed = () => {
                     emptyText="No sidequests found"
                     onMarkDone={() => navigate("/profile?tab=past")}
                     onMarkUndone={() => navigate("/profile?tab=current")}
+                    onQuestClick={() => {
+                      if (search.trim()) {
+                        const next = [search.trim(), ...recentSearches.filter((s) => s !== search.trim())].slice(0, 10);
+                        setRecentSearches(next);
+                        localStorage.setItem("recentSearches", JSON.stringify(next));
+                      }
+                    }}
                     onViewProfile={(user) => {
                       if (search.trim()) {
                         const next = [search.trim(), ...recentSearches.filter((s) => s !== search.trim())].slice(0, 10);
