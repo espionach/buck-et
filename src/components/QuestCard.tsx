@@ -4,9 +4,9 @@ import UserAvatar from "@/components/UserAvatar";
 import { GroupIconDisplay } from "@/components/GroupIcon";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, HandMetal, MessageCircle, ChevronDown, ChevronUp, Send, Pencil, Plus, Undo2, ExternalLink, X, Calendar, Globe } from "lucide-react";
+import { Check, MessageCircle, ChevronDown, ChevronUp, Send, MoreVertical, Plus, Undo2, ExternalLink, X, Calendar, Globe, Pin, Pencil, Trash2 } from "lucide-react";
 import OwnerLeaveDialog from "@/components/OwnerLeaveDialog";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { usePopup } from "@/hooks/use-popup";
 import { format, parseISO } from "date-fns";
@@ -26,11 +26,12 @@ interface QuestCardProps {
   onViewProfile?: (user: User) => void;
   onQuestClick?: () => void;
   justAdded?: boolean;
+  isPinned?: boolean;
 }
 
-const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPast, disableJoin = false, onMarkDone, onMarkUndone, autoOpenComments = false, highlightCommentId, hideActions = false, onViewProfile, onQuestClick, justAdded = false }: QuestCardProps) => {
+const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPast, disableJoin = false, onMarkDone, onMarkUndone, autoOpenComments = false, highlightCommentId, hideActions = false, onViewProfile, onQuestClick, justAdded = false, isPinned = false }: QuestCardProps) => {
   const navigate = useNavigate();
-  const { toggleImIn, markDone, markUndone, groups, addComment, deleteQuest, transferQuestOwnership, requestQuestTransfer, transferRequests, acceptTransfer, declineTransfer, currentUser } = useAppStore();
+  const { toggleImIn, markDone, markUndone, groups, addComment, deleteQuest, transferQuestOwnership, requestQuestTransfer, transferRequests, acceptTransfer, declineTransfer, currentUser, pinQuest, unpinQuest, pinnedQuestIds } = useAppStore();
   const isIn = quest.participants.some((p) => p.id === currentUser.id);
   const group = quest.groupId ? groups.find((g) => g.id === quest.groupId) : null;
   const userInGroup = group ? group.members.some((m) => m.id === currentUser.id) : true;
@@ -40,12 +41,27 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
   const canToggleStatus = isIn;
   const isFollowersOnly = quest.isFollowerOnly;
   const canNavigateToDetail = isIn && !quest.completedByUserIds.includes(currentUser.id);
+  const pinned = pinnedQuestIds.includes(quest.id);
 
   const [showComments, setShowComments] = useState(autoOpenComments);
   const [newComment, setNewComment] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showOwnerLeave, setShowOwnerLeave] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
   usePopup(showDeleteConfirm || showOwnerLeave);
+
+  // Close menu on outside click
+  useEffect(() => {
+    if (!showMenu) return;
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setShowMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [showMenu]);
 
   // Check for pending transfer request for this quest targeting current user
   const pendingTransfer = transferRequests.find(
@@ -88,6 +104,9 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
     onMarkUndone?.();
   };
 
+  // Should we show the three-dots menu?
+  const showThreeDots = !quest.completedByUserIds.includes(currentUser.id) && (isOwner || isIn);
+
   return (
     <>
       <motion.div
@@ -95,8 +114,13 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
         animate={{ opacity: 1 }}
         transition={{ delay: index * 0.06 }}
         onClick={() => { if (canNavigateToDetail) { onQuestClick?.(); navigate(`/quest/${quest.id}`); } }}
-        className={`relative p-4 overflow-hidden ${quest.completedByUserIds.includes(currentUser.id) ? "opacity-60" : ""} ${canNavigateToDetail ? "cursor-pointer active:scale-[0.99] transition-transform" : ""} ${justAdded ? "animate-just-added rounded-xl" : ""}`}
+        className={`relative p-4 overflow-hidden ${quest.completedByUserIds.includes(currentUser.id) ? "opacity-60" : ""} ${canNavigateToDetail ? "cursor-pointer active:scale-[0.99] transition-transform" : ""} ${justAdded ? "animate-just-added rounded-xl" : ""} ${isPinned ? "rounded-xl border-2 border-primary/30 bg-primary/[0.03]" : ""}`}
       >
+        {/* Pin icon for pinned quests */}
+        {isPinned && (
+          <Pin className="absolute top-3 left-3 w-3.5 h-3.5 text-primary" />
+        )}
+
         {/* Transfer request banner */}
         {pendingTransfer && (
           <div className="mb-3 p-3 rounded-xl bg-primary/10 border border-primary/20">
@@ -126,17 +150,74 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
           </div>
         )}
 
-        {/* Pencil icon for owned current quests */}
-        {!quest.completedByUserIds.includes(currentUser.id) && isOwner && onEditCurrent && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onEditCurrent(quest);
-            }}
-            className="absolute top-3 right-3 p-1.5 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <Pencil className="w-3.5 h-3.5" />
-          </button>
+        {/* Three-dots menu for owned/joined current quests */}
+        {showThreeDots && (
+          <div className="absolute top-3 right-3 z-10" ref={menuRef}>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowMenu(!showMenu);
+              }}
+              className="p-1.5 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <MoreVertical className="w-4 h-4" />
+            </button>
+            <AnimatePresence>
+              {showMenu && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className="absolute right-0 top-8 bg-card border border-border rounded-xl shadow-lg py-1 min-w-[140px] z-20"
+                >
+                  {isOwner && onEditCurrent && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowMenu(false);
+                        onEditCurrent(quest);
+                      }}
+                      className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-muted transition-colors"
+                    >
+                      <Pencil className="w-3.5 h-3.5" /> Edit
+                    </button>
+                  )}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowMenu(false);
+                      if (pinned) {
+                        unpinQuest(quest.id);
+                      } else {
+                        pinQuest(quest.id);
+                      }
+                    }}
+                    disabled={!pinned && pinnedQuestIds.length >= 3}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-muted transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    <Pin className="w-3.5 h-3.5" /> {pinned ? "Unpin" : "Pin"}
+                    {!pinned && pinnedQuestIds.length >= 3 && <span className="text-[10px] text-muted-foreground ml-auto">Max 3</span>}
+                  </button>
+                  {isOwner && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowMenu(false);
+                        if (group && !isFollowersOnly) {
+                          setShowOwnerLeave(true);
+                        } else {
+                          setShowDeleteConfirm(true);
+                        }
+                      }}
+                      className="w-full flex items-center gap-2 px-3 py-2 text-xs text-destructive hover:bg-destructive/10 transition-colors"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" /> Delete
+                    </button>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         )}
 
         {/* Plus icon for past quests — right side, inside card */}
@@ -153,7 +234,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
         )}
 
         {/* Header: Creator name + group */}
-        <div className="mb-2 flex items-start gap-2.5">
+        <div className={`mb-2 flex items-start gap-2.5 ${isPinned ? "pl-5" : ""}`}>
           <UserAvatar user={quest.createdBy} size="sm" className="mt-0.5" />
           <div className="min-w-0">
             <button
