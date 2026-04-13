@@ -24,6 +24,7 @@ interface QuestCardProps {
   highlightCommentId?: string;
   hideActions?: boolean;
   onViewProfile?: (user: User) => void;
+  onQuestClick?: () => void;
   justAdded?: boolean;
 }
 

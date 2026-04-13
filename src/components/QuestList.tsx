@@ -16,6 +16,7 @@ interface QuestListProps {
   onMarkDone?: () => void;
   onMarkUndone?: () => void;
   onViewProfile?: (user: User) => void;
+  onQuestClick?: () => void;
   autoOpenCommentsId?: string;
   highlightCommentId?: string;
   scrollToQuestId?: string;
