@@ -1,7 +1,7 @@
 import { useAppStore } from "@/data/appState";
 import QuestList from "@/components/QuestList";
 import UserAvatar from "@/components/UserAvatar";
-import { Edit, X, Check, Users as UsersIcon, UserPlus, Trash2, ImagePlus, Camera, Link as LinkIcon, Plus, ArrowLeft, Map, ScrollText } from "lucide-react";
+import { Edit, X, Check, Users as UsersIcon, UserPlus, Trash2, ImagePlus, Camera, Link as LinkIcon, Plus, ArrowLeft, Map, ScrollText, Pin } from "lucide-react";
 import UserProfileView from "@/components/UserProfileView";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -23,6 +23,7 @@ const Profile = () => {
     removeParticipant,
     cleanupEmptyQuests,
     setHideGlobalFab,
+    pinnedQuestIds,
   } = useAppStore();
   const location = useLocation();
   const nav = useNavigate();
@@ -512,24 +513,39 @@ const Profile = () => {
           </div>
         ) : tab === "current" ? (
           <>
-            <QuestList
-              quests={datedQuests}
-              showGroup
-              onEditCurrent={handleOpenCurrentEditor}
-              onMarkDone={() => setTab("past")}
-              onMarkUndone={() => setTab("current")}
-              onViewProfile={(user) => {
-                if (user.id !== currentUser.id) setViewingUser(user);
-              }}
-              scrollToQuestId={justAddedQuestId}
-            />
-            {undatedQuests.length > 0 && (
-              <>
-                <div className="pt-4 pb-2 px-1">
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Someday</p>
-                </div>
+            {/* Pinned section */}
+            {(() => {
+              const pinnedQuests = current.filter((q) => pinnedQuestIds.includes(q.id));
+              if (pinnedQuests.length === 0) return null;
+              return (
+                <>
+                  <div className="pt-2 pb-2 px-1">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
+                      <Pin className="w-3 h-3" /> Pinned
+                    </p>
+                  </div>
+                  <QuestList
+                    quests={pinnedQuests}
+                    showGroup
+                    onEditCurrent={handleOpenCurrentEditor}
+                    onMarkDone={() => setTab("past")}
+                    onMarkUndone={() => setTab("current")}
+                    onViewProfile={(user) => {
+                      if (user.id !== currentUser.id) setViewingUser(user);
+                    }}
+                    scrollToQuestId={justAddedQuestId}
+                    pinnedQuestIds={pinnedQuestIds}
+                  />
+                </>
+              );
+            })()}
+            {/* Dated quests (excluding pinned) */}
+            {(() => {
+              const unpinnedDated = datedQuests.filter((q) => !pinnedQuestIds.includes(q.id));
+              if (unpinnedDated.length === 0) return null;
+              return (
                 <QuestList
-                  quests={undatedQuests}
+                  quests={unpinnedDated}
                   showGroup
                   onEditCurrent={handleOpenCurrentEditor}
                   onMarkDone={() => setTab("past")}
@@ -538,9 +554,34 @@ const Profile = () => {
                     if (user.id !== currentUser.id) setViewingUser(user);
                   }}
                   scrollToQuestId={justAddedQuestId}
+                  pinnedQuestIds={pinnedQuestIds}
                 />
-              </>
-            )}
+              );
+            })()}
+            {/* Someday (undated, excluding pinned) */}
+            {(() => {
+              const unpinnedUndated = undatedQuests.filter((q) => !pinnedQuestIds.includes(q.id));
+              if (unpinnedUndated.length === 0) return null;
+              return (
+                <>
+                  <div className="pt-4 pb-2 px-1">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Someday</p>
+                  </div>
+                  <QuestList
+                    quests={unpinnedUndated}
+                    showGroup
+                    onEditCurrent={handleOpenCurrentEditor}
+                    onMarkDone={() => setTab("past")}
+                    onMarkUndone={() => setTab("current")}
+                    onViewProfile={(user) => {
+                      if (user.id !== currentUser.id) setViewingUser(user);
+                    }}
+                    scrollToQuestId={justAddedQuestId}
+                    pinnedQuestIds={pinnedQuestIds}
+                  />
+                </>
+              );
+            })()}
           </>
         ) : (
           <QuestList
@@ -767,12 +808,6 @@ const Profile = () => {
                   className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm disabled:opacity-40"
                 >
                   Save Changes
-                </button>
-                <button
-                  onClick={handleDeleteQuest}
-                  className="p-3 rounded-xl bg-destructive/10 text-destructive"
-                >
-                  <Trash2 className="w-5 h-5" />
                 </button>
               </div>
             </motion.div>
