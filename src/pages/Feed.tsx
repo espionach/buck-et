@@ -12,12 +12,12 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 const Feed = () => {
   const { quests, groups, friends: friendsList, cleanupEmptyQuests, notifications, friendRequests, currentUser } = useAppStore();
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(() => sessionStorage.getItem("feedSearchText") || "");
   const [searchTab, setSearchTab] = useState<"quests" | "people">("quests");
   const [selectedProfile, setSelectedProfile] = useState<User | null>(null);
   const [showNotifications, setShowNotifications] = useState(false);
   const [feedFilter, setFeedFilter] = useState<"all" | "followers" | string>("all");
-  const [searchMode, setSearchMode] = useState(false);
+  const [searchMode, setSearchMode] = useState(() => !!sessionStorage.getItem("feedSearchText"));
   const [recentSearches, setRecentSearches] = useState<string[]>(() => {
     try {
       return JSON.parse(localStorage.getItem("recentSearches") || "[]");
@@ -160,6 +160,7 @@ const Feed = () => {
             onClick={() => {
               setSearch("");
               setSearchMode(false);
+              sessionStorage.removeItem("feedSearchText");
             }}
             className="absolute right-3.5 top-1/2 -translate-y-1/2"
           >
@@ -255,6 +256,7 @@ const Feed = () => {
                         const next = [search.trim(), ...recentSearches.filter((s) => s !== search.trim())].slice(0, 10);
                         setRecentSearches(next);
                         localStorage.setItem("recentSearches", JSON.stringify(next));
+                        sessionStorage.setItem("feedSearchText", search);
                       }
                     }}
                     onViewProfile={(user) => {
