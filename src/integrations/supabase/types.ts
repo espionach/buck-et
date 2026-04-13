@@ -14,6 +14,219 @@ export type Database = {
   }
   public: {
     Tables: {
+      comments: {
+        Row: {
+          created_at: string
+          id: string
+          sidequest_id: string
+          text: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          sidequest_id: string
+          text: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          sidequest_id?: string
+          text?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_sidequest_id_fkey"
+            columns: ["sidequest_id"]
+            isOneToOne: false
+            referencedRelation: "sidequests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      friend_requests: {
+        Row: {
+          created_at: string
+          from_user_id: string
+          id: string
+          status: string
+          to_user_id: string
+        }
+        Insert: {
+          created_at?: string
+          from_user_id: string
+          id?: string
+          status?: string
+          to_user_id: string
+        }
+        Update: {
+          created_at?: string
+          from_user_id?: string
+          id?: string
+          status?: string
+          to_user_id?: string
+        }
+        Relationships: []
+      }
+      friendships: {
+        Row: {
+          created_at: string
+          friend_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          friend_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          friend_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      group_invitations: {
+        Row: {
+          created_at: string
+          group_id: string
+          id: string
+          invited_by: string
+          invited_user_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          group_id: string
+          id?: string
+          invited_by: string
+          invited_user_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          group_id?: string
+          id?: string
+          invited_by?: string
+          invited_user_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_invitations_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      group_members: {
+        Row: {
+          created_at: string
+          group_id: string
+          id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          group_id: string
+          id?: string
+          role?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          group_id?: string
+          id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      groups: {
+        Row: {
+          created_at: string
+          description: string | null
+          emoji: string
+          id: string
+          name: string
+          owner_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          emoji?: string
+          id?: string
+          name: string
+          owner_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          emoji?: string
+          id?: string
+          name?: string
+          owner_id?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          comment_id: string | null
+          created_at: string
+          entity_id: string | null
+          from_user_id: string | null
+          group_id: string | null
+          group_name: string | null
+          id: string
+          message: string
+          read: boolean
+          type: string
+          user_id: string
+        }
+        Insert: {
+          comment_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          from_user_id?: string | null
+          group_id?: string | null
+          group_name?: string | null
+          id?: string
+          message: string
+          read?: boolean
+          type: string
+          user_id: string
+        }
+        Update: {
+          comment_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          from_user_id?: string | null
+          group_id?: string | null
+          group_name?: string | null
+          id?: string
+          message?: string
+          read?: boolean
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -41,6 +254,197 @@ export type Database = {
           id?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      sidequest_completions: {
+        Row: {
+          completed_at: string
+          id: string
+          sidequest_id: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          id?: string
+          sidequest_id: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          id?: string
+          sidequest_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sidequest_completions_sidequest_id_fkey"
+            columns: ["sidequest_id"]
+            isOneToOne: false
+            referencedRelation: "sidequests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sidequest_participants: {
+        Row: {
+          created_at: string
+          id: string
+          sidequest_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          sidequest_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          sidequest_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sidequest_participants_sidequest_id_fkey"
+            columns: ["sidequest_id"]
+            isOneToOne: false
+            referencedRelation: "sidequests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sidequest_volunteers: {
+        Row: {
+          created_at: string
+          id: string
+          role: string
+          sidequest_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: string
+          sidequest_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: string
+          sidequest_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sidequest_volunteers_sidequest_id_fkey"
+            columns: ["sidequest_id"]
+            isOneToOne: false
+            referencedRelation: "sidequests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sidequests: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          created_by: string
+          description: string | null
+          group_id: string | null
+          id: string
+          is_friends_only: boolean
+          links: string[] | null
+          logistics_carpool_slots: number | null
+          logistics_custom_notes: string | null
+          logistics_date: string | null
+          logistics_location: string | null
+          logistics_meetup_spot: string | null
+          logistics_time: string | null
+          logistics_transportation: string | null
+          notes: string | null
+          photos: string[] | null
+          title: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          created_by: string
+          description?: string | null
+          group_id?: string | null
+          id?: string
+          is_friends_only?: boolean
+          links?: string[] | null
+          logistics_carpool_slots?: number | null
+          logistics_custom_notes?: string | null
+          logistics_date?: string | null
+          logistics_location?: string | null
+          logistics_meetup_spot?: string | null
+          logistics_time?: string | null
+          logistics_transportation?: string | null
+          notes?: string | null
+          photos?: string[] | null
+          title: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          group_id?: string | null
+          id?: string
+          is_friends_only?: boolean
+          links?: string[] | null
+          logistics_carpool_slots?: number | null
+          logistics_custom_notes?: string | null
+          logistics_date?: string | null
+          logistics_location?: string | null
+          logistics_meetup_spot?: string | null
+          logistics_time?: string | null
+          logistics_transportation?: string | null
+          notes?: string | null
+          photos?: string[] | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sidequests_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transfer_requests: {
+        Row: {
+          created_at: string
+          entity_id: string
+          from_user_id: string
+          id: string
+          status: string
+          to_user_id: string
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          entity_id: string
+          from_user_id: string
+          id?: string
+          status?: string
+          to_user_id: string
+          type: string
+        }
+        Update: {
+          created_at?: string
+          entity_id?: string
+          from_user_id?: string
+          id?: string
+          status?: string
+          to_user_id?: string
+          type?: string
         }
         Relationships: []
       }
