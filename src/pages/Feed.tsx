@@ -1,5 +1,5 @@
 import { useAppStore } from "@/data/appState";
-import { friends, nonFollowedUsers, User } from "@/data/mockData";
+import { User } from "@/data/mockData";
 import QuestList from "@/components/QuestList";
 import UserAvatar from "@/components/UserAvatar";
 import NotificationPanel from "@/components/NotificationPanel";
@@ -60,7 +60,7 @@ const Feed = () => {
     return q.groupId === feedFilter;
   });
 
-  const allSearchableUsers = [...friends, ...nonFollowedUsers];
+  const allSearchableUsers = useAppStore((s) => s.allUsers);
   const isFriend = (user: User) => friendsList.some((f) => f.id === user.id);
 
   // Snapshot which quests were joined at page load so order stays stable

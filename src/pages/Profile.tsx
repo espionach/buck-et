@@ -5,7 +5,7 @@ import { Edit, X, Check, Users as UsersIcon, UserPlus, Trash2, ImagePlus, Camera
 import UserProfileView from "@/components/UserProfileView";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Quest, User, friends, nonFollowedUsers } from "@/data/mockData";
+import { Quest, User } from "@/data/mockData";
 import { useLocation, useSearchParams, useNavigate } from "react-router-dom";
 import { usePopup } from "@/hooks/use-popup";
 
