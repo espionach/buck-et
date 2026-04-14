@@ -88,7 +88,7 @@ const Profile = () => {
   useEffect(() => {
     const viewUserId = searchParams.get("viewUser");
     if (viewUserId && viewUserId !== currentUser.id) {
-      const allUsers = [...friends, ...nonFollowedUsers];
+      const allUsers = useAppStore.getState().allUsers;
       const found = allUsers.find((u) => u.id === viewUserId);
       if (found) {
         setViewingUser(found);
