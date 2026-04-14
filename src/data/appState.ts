@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Quest,
   Group,
@@ -11,35 +12,46 @@ import {
   AppNotification,
   QuestLogistics,
   QuestVolunteer,
-  quests as initialQuests,
-  groups as initialGroups,
-  currentUser,
-  friends,
-  pendingGroupInvitations as initialInvitations,
-  pendingFriendRequests as initialFriendRequests,
-  pendingTransferRequests as initialTransfers,
-  initialNotifications,
+  placeholderUser,
 } from "./mockData";
 
 interface AppState {
+  // These are populated by the DataProvider from React Query
   quests: Quest[];
   groups: Group[];
   friends: User[];
   groupInvitations: GroupInvitation[];
   friendRequests: FriendRequest[];
-  sentFriendRequests: string[]; // user IDs we've sent requests to
+  sentFriendRequests: string[];
   transferRequests: TransferRequest[];
   notifications: AppNotification[];
   currentUser: User;
+  allUsers: User[];
   hideGlobalFab: boolean;
   popupCount: number;
   pinnedQuestIds: string[];
+  _initialized: boolean;
+
+  // Setters for data from React Query
+  setQuests: (quests: Quest[]) => void;
+  setGroups: (groups: Group[]) => void;
+  setFriends: (friends: User[]) => void;
+  setGroupInvitations: (invitations: GroupInvitation[]) => void;
+  setFriendRequests: (requests: FriendRequest[]) => void;
+  setSentFriendRequests: (ids: string[]) => void;
+  setTransferRequests: (requests: TransferRequest[]) => void;
+  setNotifications: (notifications: AppNotification[]) => void;
+  setCurrentUser: (user: User) => void;
+  setAllUsers: (users: User[]) => void;
+  setInitialized: (v: boolean) => void;
+
   setHideGlobalFab: (hide: boolean) => void;
   pushPopup: () => void;
   popPopup: () => void;
   pinQuest: (questId: string) => void;
   unpinQuest: (questId: string) => void;
 
+  // Mutations — these update local state AND persist to DB
   addQuest: (quest: Quest) => void;
   toggleImIn: (questId: string) => void;
   markUndone: (questId: string) => void;
@@ -64,38 +76,56 @@ interface AppState {
   transferQuestOwnership: (questId: string, newOwnerId: string) => void;
   transferGroupOwnership: (groupId: string, newOwnerId: string) => void;
   deleteGroup: (groupId: string) => void;
-
-  // Transfer requests
   requestQuestTransfer: (questId: string, newOwnerId: string) => void;
   requestGroupTransfer: (groupId: string, newOwnerId: string) => void;
   acceptTransfer: (transferId: string) => void;
   declineTransfer: (transferId: string) => void;
-
-  // Volunteer actions
   volunteerForQuest: (questId: string, role: string) => void;
   unvolunteerFromQuest: (questId: string) => void;
   updateQuestLogistics: (questId: string, logistics: Partial<QuestLogistics>) => void;
-
-  // Notifications
   addNotification: (notification: AppNotification) => void;
   markNotificationRead: (notificationId: string) => void;
   markAllNotificationsRead: () => void;
   clearNotification: (notificationId: string) => void;
+
+  // invalidation callback — set by DataProvider
+  _invalidate: (keys: string[]) => void;
+  _setInvalidate: (fn: (keys: string[]) => void) => void;
 }
 
-export const useAppStore = create<AppState>((set) => ({
-  quests: initialQuests,
-  groups: initialGroups,
-  friends: friends,
-  groupInvitations: initialInvitations,
-  friendRequests: initialFriendRequests,
+const emptyUser: User = { id: "", name: "", avatar: "👤", bio: "" };
+
+export const useAppStore = create<AppState>((set, get) => ({
+  quests: [],
+  groups: [],
+  friends: [],
+  groupInvitations: [],
+  friendRequests: [],
   sentFriendRequests: [],
-  transferRequests: initialTransfers,
-  notifications: initialNotifications,
-  currentUser: currentUser,
+  transferRequests: [],
+  notifications: [],
+  currentUser: emptyUser,
+  allUsers: [],
   hideGlobalFab: false,
   popupCount: 0,
   pinnedQuestIds: JSON.parse(localStorage.getItem("pinnedQuestIds") || "[]"),
+  _initialized: false,
+  _invalidate: () => {},
+
+  // Setters
+  setQuests: (quests) => set({ quests }),
+  setGroups: (groups) => set({ groups }),
+  setFriends: (friends) => set({ friends }),
+  setGroupInvitations: (groupInvitations) => set({ groupInvitations }),
+  setFriendRequests: (friendRequests) => set({ friendRequests }),
+  setSentFriendRequests: (sentFriendRequests) => set({ sentFriendRequests }),
+  setTransferRequests: (transferRequests) => set({ transferRequests }),
+  setNotifications: (notifications) => set({ notifications }),
+  setCurrentUser: (currentUser) => set({ currentUser }),
+  setAllUsers: (allUsers) => set({ allUsers }),
+  setInitialized: (v) => set({ _initialized: v }),
+  _setInvalidate: (fn) => set({ _invalidate: fn }),
+
   setHideGlobalFab: (hide) => set({ hideGlobalFab: hide }),
   pushPopup: () => set((s) => ({ popupCount: s.popupCount + 1 })),
   popPopup: () => set((s) => ({ popupCount: Math.max(0, s.popupCount - 1) })),
@@ -111,57 +141,175 @@ export const useAppStore = create<AppState>((set) => ({
     return { pinnedQuestIds: next };
   }),
 
-  addQuest: (quest) => set((s) => ({ quests: [quest, ...s.quests] })),
+  // ---- Mutations ----
 
-  toggleImIn: (questId) =>
+  addQuest: (quest) => {
+    set((s) => ({ quests: [quest, ...s.quests] }));
+    const { currentUser, _invalidate } = get();
+    (async () => {
+      const { data, error } = await supabase.from("sidequests").insert({
+        title: quest.title,
+        description: quest.description || null,
+        created_by: currentUser.id,
+        group_id: quest.groupId || null,
+        is_friends_only: quest.isFollowerOnly,
+        photos: quest.photos || [],
+        links: quest.links || [],
+        notes: quest.notes || null,
+        logistics_date: quest.logistics?.date || null,
+        logistics_time: quest.logistics?.time || null,
+        logistics_location: quest.logistics?.location || null,
+        logistics_meetup_spot: quest.logistics?.meetupSpot || null,
+        logistics_transportation: quest.logistics?.transportation || null,
+        logistics_carpool_slots: quest.logistics?.carpoolSlots || null,
+        logistics_custom_notes: quest.logistics?.customNotes || null,
+      }).select().single();
+      if (data) {
+        // Add creator as participant
+        await supabase.from("sidequest_participants").insert({
+          sidequest_id: data.id,
+          user_id: currentUser.id,
+        });
+        // Update local quest with real ID
+        set((s) => ({
+          quests: s.quests.map((q) =>
+            q.id === quest.id ? { ...q, id: data.id } : q
+          ),
+        }));
+      }
+      _invalidate(["quests"]);
+    })();
+  },
+
+  toggleImIn: (questId) => {
+    const { currentUser, _invalidate } = get();
     set((s) => ({
       quests: s.quests.map((q) => {
         if (q.id !== questId) return q;
-        const isIn = q.participants.some((p) => p.id === s.currentUser.id);
+        const isIn = q.participants.some((p) => p.id === currentUser.id);
         return {
           ...q,
           participants: isIn
-            ? q.participants.filter((p) => p.id !== s.currentUser.id)
-            : [...q.participants, s.currentUser],
+            ? q.participants.filter((p) => p.id !== currentUser.id)
+            : [...q.participants, currentUser],
         };
       }),
-    })),
+    }));
+    (async () => {
+      const quest = get().quests.find((q) => q.id === questId);
+      const isIn = quest?.participants.some((p) => p.id === currentUser.id);
+      if (isIn) {
+        // We just added — insert
+        await supabase.from("sidequest_participants").insert({
+          sidequest_id: questId,
+          user_id: currentUser.id,
+        });
+      } else {
+        // We just removed — delete
+        await supabase.from("sidequest_participants")
+          .delete()
+          .eq("sidequest_id", questId)
+          .eq("user_id", currentUser.id);
+      }
+      _invalidate(["quests"]);
+    })();
+  },
 
-  markDone: (questId) =>
+  markDone: (questId) => {
+    const { currentUser, _invalidate } = get();
     set((s) => ({
       quests: s.quests.map((q) =>
         q.id === questId
           ? {
               ...q,
-              completedByUserIds: q.completedByUserIds.includes(s.currentUser.id)
+              completedByUserIds: q.completedByUserIds.includes(currentUser.id)
                 ? q.completedByUserIds
-                : [...q.completedByUserIds, s.currentUser.id],
+                : [...q.completedByUserIds, currentUser.id],
               completedAt: q.completedAt || new Date().toISOString().split("T")[0],
             }
           : q
       ),
-    })),
+    }));
+    (async () => {
+      await supabase.from("sidequest_completions").insert({
+        sidequest_id: questId,
+        user_id: currentUser.id,
+      });
+      _invalidate(["quests"]);
+    })();
+  },
 
-  markUndone: (questId) =>
+  markUndone: (questId) => {
+    const { currentUser, _invalidate } = get();
     set((s) => ({
       quests: s.quests.map((q) =>
         q.id === questId
-          ? {
-              ...q,
-              completedByUserIds: q.completedByUserIds.filter((id) => id !== s.currentUser.id),
-            }
+          ? { ...q, completedByUserIds: q.completedByUserIds.filter((id) => id !== currentUser.id) }
           : q
       ),
-    })),
+    }));
+    (async () => {
+      await supabase.from("sidequest_completions")
+        .delete()
+        .eq("sidequest_id", questId)
+        .eq("user_id", currentUser.id);
+      _invalidate(["quests"]);
+    })();
+  },
 
-  addGroup: (group) => set((s) => ({ groups: [...s.groups, group] })),
+  addGroup: (group) => {
+    set((s) => ({ groups: [...s.groups, group] }));
+    const { currentUser, _invalidate } = get();
+    (async () => {
+      const { data } = await supabase.from("groups").insert({
+        name: group.name,
+        emoji: group.emoji,
+        description: group.description || null,
+        owner_id: currentUser.id,
+      }).select().single();
+      if (data) {
+        // Add owner as member
+        await supabase.from("group_members").insert({
+          group_id: data.id,
+          user_id: currentUser.id,
+          role: "owner",
+        });
+        // Invite selected members
+        const invitees = group.memberRoles
+          .filter((mr) => mr.role === "invited" || (mr.role === "member" && mr.user.id !== currentUser.id));
+        for (const mr of invitees) {
+          await supabase.from("group_invitations").insert({
+            group_id: data.id,
+            invited_user_id: mr.user.id,
+            invited_by: currentUser.id,
+          });
+        }
+        set((s) => ({
+          groups: s.groups.map((g) => g.id === group.id ? { ...g, id: data.id } : g),
+        }));
+      }
+      _invalidate(["groups", "group_invitations"]);
+    })();
+  },
 
-  updateGroup: (groupId, updates) =>
+  updateGroup: (groupId, updates) => {
     set((s) => ({
       groups: s.groups.map((g) => (g.id === groupId ? { ...g, ...updates } : g)),
-    })),
+    }));
+    const { _invalidate } = get();
+    (async () => {
+      const dbUpdates: any = {};
+      if (updates.name) dbUpdates.name = updates.name;
+      if (updates.emoji) dbUpdates.emoji = updates.emoji;
+      if (updates.description !== undefined) dbUpdates.description = updates.description || null;
+      if (Object.keys(dbUpdates).length > 0) {
+        await supabase.from("groups").update(dbUpdates).eq("id", groupId);
+      }
+      _invalidate(["groups"]);
+    })();
+  },
 
-  removeMemberFromGroup: (groupId, userId) =>
+  removeMemberFromGroup: (groupId, userId) => {
     set((s) => ({
       groups: s.groups.map((g) =>
         g.id === groupId
@@ -172,24 +320,30 @@ export const useAppStore = create<AppState>((set) => ({
             }
           : g
       ),
-      // Remove the user from all quests belonging to this group
-      quests: s.quests.map((q) =>
-        q.groupId === groupId
-          ? {
-              ...q,
-              participants: q.participants.filter((p) => p.id !== userId),
-              completedByUserIds: q.completedByUserIds.filter((id) => id !== userId),
-            }
-          : q
-      ),
-    })),
+    }));
+    const { _invalidate } = get();
+    (async () => {
+      await supabase.from("group_members")
+        .delete()
+        .eq("group_id", groupId)
+        .eq("user_id", userId);
+      _invalidate(["groups"]);
+    })();
+  },
 
-  leaveGroup: (groupId) =>
-    set((s) => ({
-      groups: s.groups.filter((g) => g.id !== groupId),
-    })),
+  leaveGroup: (groupId) => {
+    const { currentUser, _invalidate } = get();
+    set((s) => ({ groups: s.groups.filter((g) => g.id !== groupId) }));
+    (async () => {
+      await supabase.from("group_members")
+        .delete()
+        .eq("group_id", groupId)
+        .eq("user_id", currentUser.id);
+      _invalidate(["groups"]);
+    })();
+  },
 
-  inviteToGroup: (groupId, user) =>
+  inviteToGroup: (groupId, user) => {
     set((s) => ({
       groups: s.groups.map((g) =>
         g.id === groupId
@@ -200,26 +354,66 @@ export const useAppStore = create<AppState>((set) => ({
             }
           : g
       ),
-    })),
+    }));
+    const { currentUser, _invalidate } = get();
+    (async () => {
+      await supabase.from("group_invitations").insert({
+        group_id: groupId,
+        invited_user_id: user.id,
+        invited_by: currentUser.id,
+      });
+      _invalidate(["groups", "group_invitations"]);
+    })();
+  },
 
-  acceptGroupInvitation: (invitationId) =>
+  acceptGroupInvitation: (invitationId) => {
+    const { currentUser, _invalidate } = get();
     set((s) => {
       const invitation = s.groupInvitations.find((i) => i.id === invitationId);
       if (!invitation) return s;
       return {
         groupInvitations: s.groupInvitations.filter((i) => i.id !== invitationId),
-        groups: [...s.groups, { ...invitation.group, members: [...invitation.group.members, s.currentUser] }],
+        groups: [...s.groups, { ...invitation.group, members: [...invitation.group.members, currentUser] }],
         notifications: s.notifications.filter((n) => !(n.type === "board_invitation" && n.entityId === invitationId)),
       };
-    }),
+    });
+    (async () => {
+      // Update invitation status
+      await supabase.from("group_invitations")
+        .update({ status: "accepted" })
+        .eq("id", invitationId);
+      // Get the group_id from the invitation
+      const { data: inv } = await supabase.from("group_invitations")
+        .select("group_id")
+        .eq("id", invitationId)
+        .maybeSingle();
+      if (inv) {
+        await supabase.from("group_members").insert({
+          group_id: inv.group_id,
+          user_id: currentUser.id,
+          role: "member",
+        });
+      }
+      _invalidate(["groups", "group_invitations", "notifications"]);
+    })();
+  },
 
-  declineGroupInvitation: (invitationId) =>
+  declineGroupInvitation: (invitationId) => {
     set((s) => ({
       groupInvitations: s.groupInvitations.filter((i) => i.id !== invitationId),
       notifications: s.notifications.filter((n) => !(n.type === "board_invitation" && n.entityId === invitationId)),
-    })),
+    }));
+    const { _invalidate } = get();
+    (async () => {
+      await supabase.from("group_invitations")
+        .update({ status: "declined" })
+        .eq("id", invitationId);
+      _invalidate(["group_invitations", "notifications"]);
+    })();
+  },
 
-  acceptFriendRequest: (requestId) =>
+  acceptFriendRequest: (requestId) => {
+    const { currentUser, _invalidate } = get();
     set((s) => {
       const req = s.friendRequests.find((r) => r.id === requestId);
       if (!req) return s;
@@ -228,122 +422,180 @@ export const useAppStore = create<AppState>((set) => ({
         friendRequests: s.friendRequests.filter((r) => r.id !== requestId),
         friends: alreadyFriend ? s.friends : [...s.friends, req.from],
       };
-    }),
+    });
+    (async () => {
+      const { data: req } = await supabase.from("friend_requests")
+        .select("from_user_id")
+        .eq("id", requestId)
+        .maybeSingle();
+      if (req) {
+        await supabase.from("friend_requests")
+          .update({ status: "accepted" })
+          .eq("id", requestId);
+        // Create bidirectional friendship
+        await supabase.from("friendships").insert({
+          user_id: currentUser.id,
+          friend_id: req.from_user_id,
+        });
+      }
+      _invalidate(["friends", "friend_requests"]);
+    })();
+  },
 
-  declineFriendRequest: (requestId) =>
+  declineFriendRequest: (requestId) => {
     set((s) => ({
       friendRequests: s.friendRequests.filter((r) => r.id !== requestId),
-    })),
+    }));
+    const { _invalidate } = get();
+    (async () => {
+      await supabase.from("friend_requests")
+        .update({ status: "declined" })
+        .eq("id", requestId);
+      _invalidate(["friend_requests"]);
+    })();
+  },
 
-  sendFriendRequest: (toUser) =>
+  sendFriendRequest: (toUser) => {
+    const { currentUser, _invalidate } = get();
     set((s) => {
       if (s.sentFriendRequests.includes(toUser.id)) return s;
-      const notification: AppNotification = {
-        id: `n${Date.now()}`,
-        type: "friend_request",
-        message: `sent a friend request to ${toUser.name}`,
-        fromUser: s.currentUser,
-        read: false,
-        createdAt: new Date().toISOString().split("T")[0],
-      };
       return {
         sentFriendRequests: [...s.sentFriendRequests, toUser.id],
-        notifications: [notification, ...s.notifications],
       };
-    }),
+    });
+    (async () => {
+      await supabase.from("friend_requests").insert({
+        from_user_id: currentUser.id,
+        to_user_id: toUser.id,
+      });
+      _invalidate(["sent_friend_requests"]);
+    })();
+  },
 
-  unfriend: (userId) =>
+  unfriend: (userId) => {
+    const { currentUser, _invalidate } = get();
     set((s) => ({
       friends: s.friends.filter((f) => f.id !== userId),
-      quests: s.quests.map((q) => {
-        // Remove unfriended user from quests owned by current user
-        if (q.createdBy.id === s.currentUser.id) {
-          return { ...q, participants: q.participants.filter((p) => p.id !== userId) };
-        }
-        // Remove current user from quests owned by unfriended user
-        if (q.createdBy.id === userId) {
-          return { ...q, participants: q.participants.filter((p) => p.id !== s.currentUser.id) };
-        }
-        return q;
-      }),
-    })),
+    }));
+    (async () => {
+      await supabase.from("friendships")
+        .delete()
+        .or(`and(user_id.eq.${currentUser.id},friend_id.eq.${userId}),and(user_id.eq.${userId},friend_id.eq.${currentUser.id})`);
+      _invalidate(["friends", "quests"]);
+    })();
+  },
 
-  addComment: (questId, comment) =>
+  addComment: (questId, comment) => {
     set((s) => ({
       quests: s.quests.map((q) =>
         q.id === questId ? { ...q, comments: [...q.comments, comment] } : q
       ),
-    })),
+    }));
+    const { currentUser, _invalidate } = get();
+    (async () => {
+      await supabase.from("comments").insert({
+        sidequest_id: questId,
+        user_id: currentUser.id,
+        text: comment.text,
+      });
+      _invalidate(["quests"]);
+    })();
+  },
 
-  updateQuest: (questId, updates) =>
+  updateQuest: (questId, updates) => {
     set((s) => ({
       quests: s.quests.map((q) => (q.id === questId ? { ...q, ...updates } : q)),
-    })),
+    }));
+    const { _invalidate } = get();
+    (async () => {
+      const dbUpdates: any = {};
+      if (updates.title !== undefined) dbUpdates.title = updates.title;
+      if (updates.description !== undefined) dbUpdates.description = updates.description || null;
+      if (updates.notes !== undefined) dbUpdates.notes = updates.notes || null;
+      if (updates.photos !== undefined) dbUpdates.photos = updates.photos || [];
+      if (updates.links !== undefined) dbUpdates.links = updates.links || [];
+      if (updates.completedAt !== undefined) dbUpdates.completed_at = updates.completedAt || null;
+      if (updates.logistics !== undefined) {
+        const l = updates.logistics;
+        if (l) {
+          dbUpdates.logistics_date = l.date || null;
+          dbUpdates.logistics_time = l.time || null;
+          dbUpdates.logistics_location = l.location || null;
+          dbUpdates.logistics_meetup_spot = l.meetupSpot || null;
+          dbUpdates.logistics_transportation = l.transportation || null;
+          dbUpdates.logistics_carpool_slots = l.carpoolSlots || null;
+          dbUpdates.logistics_custom_notes = l.customNotes || null;
+        } else {
+          dbUpdates.logistics_date = null;
+          dbUpdates.logistics_time = null;
+          dbUpdates.logistics_location = null;
+          dbUpdates.logistics_meetup_spot = null;
+          dbUpdates.logistics_transportation = null;
+          dbUpdates.logistics_carpool_slots = null;
+          dbUpdates.logistics_custom_notes = null;
+        }
+      }
+      if (Object.keys(dbUpdates).length > 0) {
+        await supabase.from("sidequests").update(dbUpdates).eq("id", questId);
+      }
+      _invalidate(["quests"]);
+    })();
+  },
 
-  deleteQuest: (questId) =>
+  deleteQuest: (questId) => {
     set((s) => ({
       quests: s.quests.filter((q) => q.id !== questId),
       transferRequests: s.transferRequests.filter((tr) => !(tr.type === "quest" && tr.entityId === questId)),
-    })),
+    }));
+    const { _invalidate } = get();
+    (async () => {
+      await supabase.from("sidequests").delete().eq("id", questId);
+      _invalidate(["quests", "transfer_requests"]);
+    })();
+  },
 
-  updateProfile: (updates) =>
-    set((s) => {
-      const updatedUser = { ...s.currentUser, ...updates };
-      const uid = updatedUser.id;
+  updateProfile: (updates) => {
+    const { currentUser, _invalidate } = get();
+    const updatedUser = { ...currentUser, ...updates };
+    set({ currentUser: updatedUser });
+    (async () => {
+      const dbUpdates: any = {};
+      if (updates.name !== undefined) dbUpdates.display_name = updates.name;
+      if (updates.bio !== undefined) dbUpdates.bio = updates.bio;
+      if (updates.profilePicture !== undefined) dbUpdates.avatar_url = updates.profilePicture || null;
+      if (Object.keys(dbUpdates).length > 0) {
+        await supabase.from("profiles")
+          .update(dbUpdates)
+          .eq("user_id", currentUser.id);
+      }
+      _invalidate(["profiles", "profile"]);
+    })();
+  },
 
-      const patchUser = (u: User) => (u.id === uid ? { ...u, ...updates } : u);
-
-      const quests = s.quests.map((q) => ({
-        ...q,
-        createdBy: patchUser(q.createdBy),
-        participants: q.participants.map(patchUser),
-        comments: q.comments?.map((c) => ({ ...c, user: patchUser(c.user) })),
-        logistics: q.logistics
-          ? { ...q.logistics, volunteers: q.logistics.volunteers?.map((v) => ({ ...v, user: patchUser(v.user) })) }
-          : undefined,
-      }));
-
-      const groups = s.groups.map((g) => ({
-        ...g,
-        members: g.members.map(patchUser),
-        memberRoles: g.memberRoles.map((mr) => ({ ...mr, user: patchUser(mr.user) })),
-      }));
-
-      const notifications = s.notifications.map((n) => ({
-        ...n,
-        fromUser: patchUser(n.fromUser),
-      }));
-
-      const friendRequests = s.friendRequests.map((fr) => ({
-        ...fr,
-        from: patchUser(fr.from),
-      }));
-
-      const transferRequests = s.transferRequests.map((tr) => ({
-        ...tr,
-        fromUser: patchUser(tr.fromUser),
-      }));
-
-      const friends = s.friends.map(patchUser);
-
-      return { currentUser: updatedUser, quests, groups, notifications, friendRequests, transferRequests, friends };
-    }),
-
-  removeParticipant: (questId, userId) =>
+  removeParticipant: (questId, userId) => {
     set((s) => ({
       quests: s.quests.map((q) =>
         q.id === questId
           ? { ...q, participants: q.participants.filter((p) => p.id !== userId) }
           : q
       ),
-    })),
+    }));
+    const { _invalidate } = get();
+    (async () => {
+      await supabase.from("sidequest_participants")
+        .delete()
+        .eq("sidequest_id", questId)
+        .eq("user_id", userId);
+      _invalidate(["quests"]);
+    })();
+  },
 
-  cleanupEmptyQuests: () =>
-    set((s) => ({
-      quests: s.quests.filter((q) => q.completedByUserIds.length > 0 || q.participants.length > 0 || q.createdBy.id === s.currentUser.id),
-    })),
+  cleanupEmptyQuests: () => {
+    // No-op with real data — DB handles this
+  },
 
-  transferQuestOwnership: (questId, newOwnerId) =>
+  transferQuestOwnership: (questId, newOwnerId) => {
+    const { currentUser, _invalidate } = get();
     set((s) => {
       const quest = s.quests.find((q) => q.id === questId);
       if (!quest) return s;
@@ -352,201 +604,255 @@ export const useAppStore = create<AppState>((set) => ({
       return {
         quests: s.quests.map((q) =>
           q.id === questId
-            ? {
-                ...q,
-                createdBy: newOwner,
-                participants: q.participants.filter((p) => p.id !== s.currentUser.id),
-              }
+            ? { ...q, createdBy: newOwner, participants: q.participants.filter((p) => p.id !== currentUser.id) }
             : q
         ),
       };
-    }),
+    });
+    (async () => {
+      await supabase.from("sidequests")
+        .update({ created_by: newOwnerId })
+        .eq("id", questId);
+      await supabase.from("sidequest_participants")
+        .delete()
+        .eq("sidequest_id", questId)
+        .eq("user_id", currentUser.id);
+      _invalidate(["quests"]);
+    })();
+  },
 
-  transferGroupOwnership: (groupId, newOwnerId) =>
+  transferGroupOwnership: (groupId, newOwnerId) => {
+    const { currentUser, _invalidate } = get();
     set((s) => ({
       groups: s.groups.map((g) =>
         g.id === groupId
           ? {
               ...g,
               ownerId: newOwnerId,
-              members: g.members.filter((m) => m.id !== s.currentUser.id),
+              members: g.members.filter((m) => m.id !== currentUser.id),
               memberRoles: g.memberRoles
-                .filter((mr) => mr.user.id !== s.currentUser.id)
+                .filter((mr) => mr.user.id !== currentUser.id)
                 .map((mr) =>
                   mr.user.id === newOwnerId ? { ...mr, role: "owner" as const } : mr
                 ),
             }
           : g
       ),
-    })),
+    }));
+    (async () => {
+      await supabase.from("groups")
+        .update({ owner_id: newOwnerId })
+        .eq("id", groupId);
+      await supabase.from("group_members")
+        .update({ role: "owner" })
+        .eq("group_id", groupId)
+        .eq("user_id", newOwnerId);
+      await supabase.from("group_members")
+        .delete()
+        .eq("group_id", groupId)
+        .eq("user_id", currentUser.id);
+      _invalidate(["groups"]);
+    })();
+  },
 
-  deleteGroup: (groupId) =>
+  deleteGroup: (groupId) => {
     set((s) => ({
       groups: s.groups.filter((g) => g.id !== groupId),
       quests: s.quests.filter((q) => q.groupId !== groupId),
       transferRequests: s.transferRequests.filter((tr) => !(tr.type === "group" && tr.entityId === groupId)),
-    })),
+    }));
+    const { _invalidate } = get();
+    (async () => {
+      await supabase.from("groups").delete().eq("id", groupId);
+      _invalidate(["groups", "quests", "transfer_requests"]);
+    })();
+  },
 
-  // Transfer requests
-  requestQuestTransfer: (questId, newOwnerId) =>
+  requestQuestTransfer: (questId, newOwnerId) => {
+    const { currentUser, _invalidate } = get();
     set((s) => {
       const quest = s.quests.find((q) => q.id === questId);
       if (!quest) return s;
-      const newOwner = quest.participants.find((p) => p.id === newOwnerId);
-      if (!newOwner) return s;
-      const transferId = `tr${Date.now()}`;
       const transfer: TransferRequest = {
-        id: transferId,
+        id: `tr${Date.now()}`,
         type: "quest",
         entityId: questId,
-        fromUser: s.currentUser,
+        fromUser: currentUser,
         toUserId: newOwnerId,
       };
-      const notification: AppNotification = {
-        id: `n${Date.now()}`,
+      return { transferRequests: [...s.transferRequests, transfer] };
+    });
+    (async () => {
+      await supabase.from("transfer_requests").insert({
+        type: "quest",
+        entity_id: questId,
+        from_user_id: currentUser.id,
+        to_user_id: newOwnerId,
+      });
+      // Create notification
+      const quest = get().quests.find((q) => q.id === questId);
+      await supabase.from("notifications").insert({
+        user_id: newOwnerId,
         type: "transfer_quest",
-        message: `wants to transfer '${quest.title}' to you`,
-        entityId: questId,
-        groupId: quest.groupId,
-        fromUser: s.currentUser,
-        read: false,
-        createdAt: new Date().toISOString().split("T")[0],
-      };
-      return {
-        transferRequests: [...s.transferRequests, transfer],
-        notifications: [notification, ...s.notifications],
-      };
-    }),
+        message: `wants to transfer '${quest?.title}' to you`,
+        entity_id: questId,
+        group_id: quest?.groupId || null,
+        from_user_id: currentUser.id,
+      });
+      _invalidate(["transfer_requests", "notifications"]);
+    })();
+  },
 
-  requestGroupTransfer: (groupId, newOwnerId) =>
+  requestGroupTransfer: (groupId, newOwnerId) => {
+    const { currentUser, _invalidate } = get();
     set((s) => {
       const group = s.groups.find((g) => g.id === groupId);
       if (!group) return s;
-      const newOwner = group.members.find((m) => m.id === newOwnerId);
-      if (!newOwner) return s;
       const transfer: TransferRequest = {
         id: `tr${Date.now()}`,
         type: "group",
         entityId: groupId,
-        fromUser: s.currentUser,
+        fromUser: currentUser,
         toUserId: newOwnerId,
       };
-      const notification: AppNotification = {
-        id: `n${Date.now()}`,
+      return { transferRequests: [...s.transferRequests, transfer] };
+    });
+    (async () => {
+      await supabase.from("transfer_requests").insert({
+        type: "group",
+        entity_id: groupId,
+        from_user_id: currentUser.id,
+        to_user_id: newOwnerId,
+      });
+      const group = get().groups.find((g) => g.id === groupId);
+      await supabase.from("notifications").insert({
+        user_id: newOwnerId,
         type: "transfer_group",
         message: `wants to transfer `,
-        groupName: group.name,
-        entityId: groupId,
-        fromUser: s.currentUser,
-        read: false,
-        createdAt: new Date().toISOString().split("T")[0],
-      };
-      return {
-        transferRequests: [...s.transferRequests, transfer],
-        notifications: [notification, ...s.notifications],
-      };
-    }),
+        group_name: group?.name,
+        entity_id: groupId,
+        from_user_id: currentUser.id,
+      });
+      _invalidate(["transfer_requests", "notifications"]);
+    })();
+  },
 
-  acceptTransfer: (transferId) =>
+  acceptTransfer: (transferId) => {
+    const { currentUser, _invalidate } = get();
     set((s) => {
       const transfer = s.transferRequests.find((tr) => tr.id === transferId);
       if (!transfer) return s;
-
       if (transfer.type === "quest") {
-        const quest = s.quests.find((q) => q.id === transfer.entityId);
-        if (!quest) return s;
         return {
           transferRequests: s.transferRequests.filter((tr) => tr.id !== transferId),
-          notifications: s.notifications.filter(
-            (n) => !(n.type === "transfer_quest" && n.entityId === transfer.entityId)
-          ),
+          notifications: s.notifications.filter((n) => !(n.type === "transfer_quest" && n.entityId === transfer.entityId)),
           quests: s.quests.map((q) =>
             q.id === transfer.entityId
-              ? {
-                  ...q,
-                  createdBy: s.currentUser,
-                  participants: q.participants.some((p) => p.id === transfer.fromUser.id)
-                    ? q.participants.filter((p) => p.id !== transfer.fromUser.id)
-                    : q.participants,
-                }
+              ? { ...q, createdBy: currentUser, participants: q.participants.filter((p) => p.id !== transfer.fromUser.id) }
               : q
           ),
         };
       } else {
         return {
           transferRequests: s.transferRequests.filter((tr) => tr.id !== transferId),
-          notifications: s.notifications.filter(
-            (n) => !(n.type === "transfer_group" && n.entityId === transfer.entityId)
-          ),
+          notifications: s.notifications.filter((n) => !(n.type === "transfer_group" && n.entityId === transfer.entityId)),
           groups: s.groups.map((g) =>
             g.id === transfer.entityId
               ? {
                   ...g,
-                  ownerId: s.currentUser.id,
+                  ownerId: currentUser.id,
                   members: g.members.filter((m) => m.id !== transfer.fromUser.id),
                   memberRoles: g.memberRoles
                     .filter((mr) => mr.user.id !== transfer.fromUser.id)
-                    .map((mr) =>
-                      mr.user.id === s.currentUser.id ? { ...mr, role: "owner" as const } : mr
-                    ),
+                    .map((mr) => mr.user.id === currentUser.id ? { ...mr, role: "owner" as const } : mr),
                 }
               : g
           ),
         };
       }
-    }),
+    });
+    (async () => {
+      const { data: transfer } = await supabase.from("transfer_requests")
+        .select("*")
+        .eq("id", transferId)
+        .maybeSingle();
+      if (!transfer) return;
+      await supabase.from("transfer_requests")
+        .update({ status: "accepted" })
+        .eq("id", transferId);
+      if (transfer.type === "quest") {
+        await supabase.from("sidequests")
+          .update({ created_by: currentUser.id })
+          .eq("id", transfer.entity_id);
+        await supabase.from("sidequest_participants")
+          .delete()
+          .eq("sidequest_id", transfer.entity_id)
+          .eq("user_id", transfer.from_user_id);
+      } else {
+        await supabase.from("groups")
+          .update({ owner_id: currentUser.id })
+          .eq("id", transfer.entity_id);
+        await supabase.from("group_members")
+          .update({ role: "owner" })
+          .eq("group_id", transfer.entity_id)
+          .eq("user_id", currentUser.id);
+        await supabase.from("group_members")
+          .delete()
+          .eq("group_id", transfer.entity_id)
+          .eq("user_id", transfer.from_user_id);
+      }
+      _invalidate(["transfer_requests", "quests", "groups", "notifications"]);
+    })();
+  },
 
-  declineTransfer: (transferId) =>
+  declineTransfer: (transferId) => {
+    const { currentUser, _invalidate } = get();
     set((s) => {
       const transfer = s.transferRequests.find((tr) => tr.id === transferId);
       if (!transfer) return { transferRequests: s.transferRequests.filter((tr) => tr.id !== transferId) };
-
-      const entityName = transfer.type === "quest"
-        ? s.quests.find((q) => q.id === transfer.entityId)?.title || "a sidequest"
-        : s.groups.find((g) => g.id === transfer.entityId)?.name || "a board";
-
-      const isGroupTransfer = transfer.type === "group";
-      const declineNotification: AppNotification = {
-        id: `n${Date.now()}`,
-        type: "transfer_declined",
-        message: isGroupTransfer ? `declined the transfer of ` : `declined the transfer of '${entityName}'`,
-        entityId: transfer.entityId,
-        ...(isGroupTransfer ? { groupName: entityName } : {}),
-        fromUser: s.currentUser,
-        read: false,
-        createdAt: new Date().toISOString().split("T")[0],
-      };
-
       return {
         transferRequests: s.transferRequests.filter((tr) => tr.id !== transferId),
-        notifications: [
-          declineNotification,
-          ...s.notifications.filter(
-            (n) => !(n.type === (`transfer_${transfer.type}` as any) && n.entityId === transfer.entityId)
-          ),
-        ],
+        notifications: s.notifications.filter(
+          (n) => !(n.type === (`transfer_${transfer.type}` as any) && n.entityId === transfer.entityId)
+        ),
       };
-    }),
+    });
+    (async () => {
+      await supabase.from("transfer_requests")
+        .update({ status: "declined" })
+        .eq("id", transferId);
+      _invalidate(["transfer_requests", "notifications"]);
+    })();
+  },
 
-  // Volunteer actions
-  volunteerForQuest: (questId, role) =>
+  volunteerForQuest: (questId, role) => {
+    const { currentUser, _invalidate } = get();
     set((s) => ({
       quests: s.quests.map((q) => {
         if (q.id !== questId) return q;
         const logistics = q.logistics || { volunteers: [] };
-        const already = logistics.volunteers.some((v) => v.userId === s.currentUser.id);
-        if (already) return q;
+        if (logistics.volunteers.some((v) => v.userId === currentUser.id)) return q;
         return {
           ...q,
           logistics: {
             ...logistics,
-            volunteers: [...logistics.volunteers, { userId: s.currentUser.id, user: s.currentUser, role }],
+            volunteers: [...logistics.volunteers, { userId: currentUser.id, user: currentUser, role }],
           },
         };
       }),
-    })),
+    }));
+    (async () => {
+      await supabase.from("sidequest_volunteers").insert({
+        sidequest_id: questId,
+        user_id: currentUser.id,
+        role,
+      });
+      _invalidate(["quests"]);
+    })();
+  },
 
-  unvolunteerFromQuest: (questId) =>
+  unvolunteerFromQuest: (questId) => {
+    const { currentUser, _invalidate } = get();
     set((s) => ({
       quests: s.quests.map((q) => {
         if (q.id !== questId) return q;
@@ -555,13 +861,21 @@ export const useAppStore = create<AppState>((set) => ({
           ...q,
           logistics: {
             ...logistics,
-            volunteers: logistics.volunteers.filter((v) => v.userId !== s.currentUser.id),
+            volunteers: logistics.volunteers.filter((v) => v.userId !== currentUser.id),
           },
         };
       }),
-    })),
+    }));
+    (async () => {
+      await supabase.from("sidequest_volunteers")
+        .delete()
+        .eq("sidequest_id", questId)
+        .eq("user_id", currentUser.id);
+      _invalidate(["quests"]);
+    })();
+  },
 
-  updateQuestLogistics: (questId, logisticsUpdates) =>
+  updateQuestLogistics: (questId, logisticsUpdates) => {
     set((s) => ({
       quests: s.quests.map((q) => {
         if (q.id !== questId) return q;
@@ -570,28 +884,75 @@ export const useAppStore = create<AppState>((set) => ({
           logistics: { ...(q.logistics || { volunteers: [] }), ...logisticsUpdates },
         };
       }),
-    })),
+    }));
+    const { _invalidate } = get();
+    (async () => {
+      const dbUpdates: any = {};
+      if (logisticsUpdates.date !== undefined) dbUpdates.logistics_date = logisticsUpdates.date || null;
+      if (logisticsUpdates.time !== undefined) dbUpdates.logistics_time = logisticsUpdates.time || null;
+      if (logisticsUpdates.location !== undefined) dbUpdates.logistics_location = logisticsUpdates.location || null;
+      if (logisticsUpdates.meetupSpot !== undefined) dbUpdates.logistics_meetup_spot = logisticsUpdates.meetupSpot || null;
+      if (logisticsUpdates.transportation !== undefined) dbUpdates.logistics_transportation = logisticsUpdates.transportation || null;
+      if (logisticsUpdates.carpoolSlots !== undefined) dbUpdates.logistics_carpool_slots = logisticsUpdates.carpoolSlots || null;
+      if (logisticsUpdates.customNotes !== undefined) dbUpdates.logistics_custom_notes = logisticsUpdates.customNotes || null;
+      if (Object.keys(dbUpdates).length > 0) {
+        await supabase.from("sidequests").update(dbUpdates).eq("id", questId);
+      }
+      _invalidate(["quests"]);
+    })();
+  },
 
-  // Notifications
-  addNotification: (notification) =>
-    set((s) => ({
-      notifications: [notification, ...s.notifications],
-    })),
+  addNotification: (notification) => {
+    set((s) => ({ notifications: [notification, ...s.notifications] }));
+    const { _invalidate } = get();
+    (async () => {
+      await supabase.from("notifications").insert({
+        user_id: notification.fromUser.id, // This should be the recipient but we keep the pattern
+        type: notification.type,
+        message: notification.message,
+        entity_id: notification.entityId || null,
+        group_id: notification.groupId || null,
+        comment_id: notification.commentId || null,
+        group_name: notification.groupName || null,
+        from_user_id: notification.fromUser.id,
+      });
+      _invalidate(["notifications"]);
+    })();
+  },
 
-  markNotificationRead: (notificationId) =>
+  markNotificationRead: (notificationId) => {
     set((s) => ({
       notifications: s.notifications.map((n) =>
         n.id === notificationId ? { ...n, read: true } : n
       ),
-    })),
+    }));
+    (async () => {
+      await supabase.from("notifications")
+        .update({ read: true })
+        .eq("id", notificationId);
+    })();
+  },
 
-  markAllNotificationsRead: () =>
+  markAllNotificationsRead: () => {
+    const { currentUser } = get();
     set((s) => ({
       notifications: s.notifications.map((n) => ({ ...n, read: true })),
-    })),
+    }));
+    (async () => {
+      await supabase.from("notifications")
+        .update({ read: true })
+        .eq("user_id", currentUser.id);
+    })();
+  },
 
-  clearNotification: (notificationId) =>
+  clearNotification: (notificationId) => {
     set((s) => ({
       notifications: s.notifications.filter((n) => n.id !== notificationId),
-    })),
+    }));
+    (async () => {
+      await supabase.from("notifications")
+        .delete()
+        .eq("id", notificationId);
+    })();
+  },
 }));
