@@ -1,15 +1,17 @@
 import { useAppStore } from "@/data/appState";
 import QuestList from "@/components/QuestList";
 import UserAvatar from "@/components/UserAvatar";
-import { Edit, X, Check, Users as UsersIcon, UserPlus, Trash2, ImagePlus, Camera, Link as LinkIcon, Plus, ArrowLeft, Map, ScrollText, Pin } from "lucide-react";
+import { Edit, X, Check, Users as UsersIcon, UserPlus, Trash2, ImagePlus, Camera, Link as LinkIcon, Plus, ArrowLeft, Map, ScrollText, Pin, LogOut } from "lucide-react";
 import UserProfileView from "@/components/UserProfileView";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Quest, User } from "@/data/mockData";
 import { useLocation, useSearchParams, useNavigate } from "react-router-dom";
 import { usePopup } from "@/hooks/use-popup";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Profile = () => {
+  const { signOut } = useAuth();
   const {
     currentUser,
     quests,
@@ -429,13 +431,20 @@ const Profile = () => {
           </button>
         </div>
         <p className="text-sm text-muted-foreground mt-1 text-center">{currentUser.bio}</p>
-        <div className="flex items-center justify-center mt-3">
+        <div className="flex items-center justify-center gap-4 mt-3">
           <button
             onClick={() => setShowFriends(true)}
             className="flex items-center gap-1.5 text-sm font-semibold text-foreground"
           >
             <UsersIcon className="w-4 h-4" />
             {friendsList.length} Friends
+          </button>
+          <button
+            onClick={signOut}
+            className="flex items-center gap-1.5 text-sm font-medium text-destructive"
+          >
+            <LogOut className="w-4 h-4" />
+            Sign Out
           </button>
         </div>
       </div>
