@@ -1,15 +1,17 @@
 import { useAppStore } from "@/data/appState";
 import QuestList from "@/components/QuestList";
 import UserAvatar from "@/components/UserAvatar";
-import { Edit, X, Check, Users as UsersIcon, UserPlus, Trash2, ImagePlus, Camera, Link as LinkIcon, Plus, ArrowLeft, Map, ScrollText, Pin } from "lucide-react";
+import { Edit, X, Check, Users as UsersIcon, UserPlus, Trash2, ImagePlus, Camera, Link as LinkIcon, Plus, ArrowLeft, Map, ScrollText, Pin, LogOut } from "lucide-react";
 import UserProfileView from "@/components/UserProfileView";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Quest, User } from "@/data/mockData";
 import { useLocation, useSearchParams, useNavigate } from "react-router-dom";
 import { usePopup } from "@/hooks/use-popup";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Profile = () => {
+  const { signOut } = useAuth();
   const {
     currentUser,
     quests,
