@@ -431,13 +431,20 @@ const Profile = () => {
           </button>
         </div>
         <p className="text-sm text-muted-foreground mt-1 text-center">{currentUser.bio}</p>
-        <div className="flex items-center justify-center mt-3">
+        <div className="flex items-center justify-center gap-4 mt-3">
           <button
             onClick={() => setShowFriends(true)}
             className="flex items-center gap-1.5 text-sm font-semibold text-foreground"
           >
             <UsersIcon className="w-4 h-4" />
             {friendsList.length} Friends
+          </button>
+          <button
+            onClick={signOut}
+            className="flex items-center gap-1.5 text-sm font-medium text-destructive"
+          >
+            <LogOut className="w-4 h-4" />
+            Sign Out
           </button>
         </div>
       </div>
