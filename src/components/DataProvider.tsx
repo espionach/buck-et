@@ -1,7 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAppStore } from "@/data/appState";
+import ErrorBanner, { ApiError } from "@/components/ErrorBanner";
 import {
   useCurrentProfile,
   useQuests,
@@ -15,10 +16,50 @@ import {
   useSearchableUsers,
 } from "@/hooks/useSupabaseData";
 
+let errorIdCounter = 0;
+
+function extractErrorInfo(error: unknown): { message: string; code?: string } {
+  if (!error) return { message: "Unknown error" };
+  if (typeof error === "object" && error !== null) {
+    const e = error as any;
+    return {
+      message: e.message || e.error_description || String(error),
+      code: e.code || e.status || undefined,
+    };
+  }
+  return { message: String(error) };
+}
+
 export const DataProvider = ({ children }: { children: React.ReactNode }) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const store = useAppStore();
+  const [apiErrors, setApiErrors] = useState<ApiError[]>([]);
+
+  const logError = useCallback((source: string, error: unknown) => {
+    const info = extractErrorInfo(error);
+    console.error(`[${source}]`, info.message, info.code ? `(code: ${info.code})` : "");
+    setApiErrors((prev) => {
+      // Deduplicate: skip if same source+message already present
+      if (prev.some((e) => e.source === source && e.message === info.message)) return prev;
+      const newErr: ApiError = {
+        id: String(++errorIdCounter),
+        source,
+        message: info.message,
+        code: info.code,
+        timestamp: new Date(),
+      };
+      return [newErr, ...prev].slice(0, 20); // keep max 20
+    });
+  }, []);
+
+  const dismissError = useCallback((id: string) => {
+    setApiErrors((prev) => prev.filter((e) => e.id !== id));
+  }, []);
+
+  const dismissAllErrors = useCallback(() => {
+    setApiErrors([]);
+  }, []);
 
   const profile = useCurrentProfile();
   const quests = useQuests();
@@ -30,6 +71,43 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
   const notifications = useNotifications();
   const transferRequests = useTransferRequests();
   const allUsers = useSearchableUsers();
+
+  // Log errors from each query
+  useEffect(() => {
+    if (profile.error) logError("Profile", profile.error);
+  }, [profile.error]);
+
+  useEffect(() => {
+    if (quests.error) logError("Quests", quests.error);
+  }, [quests.error]);
+
+  useEffect(() => {
+    if (groups.error) logError("Groups", groups.error);
+  }, [groups.error]);
+
+  useEffect(() => {
+    if (friends.error) logError("Friends", friends.error);
+  }, [friends.error]);
+
+  useEffect(() => {
+    if (friendRequests.error) logError("Friend Requests", friendRequests.error);
+  }, [friendRequests.error]);
+
+  useEffect(() => {
+    if (groupInvitations.error) logError("Group Invitations", groupInvitations.error);
+  }, [groupInvitations.error]);
+
+  useEffect(() => {
+    if (notifications.error) logError("Notifications", notifications.error);
+  }, [notifications.error]);
+
+  useEffect(() => {
+    if (transferRequests.error) logError("Transfer Requests", transferRequests.error);
+  }, [transferRequests.error]);
+
+  useEffect(() => {
+    if (allUsers.error) logError("User Search", allUsers.error);
+  }, [allUsers.error]);
 
   // Set up invalidation callback
   useEffect(() => {
@@ -85,5 +163,14 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
     if (user && profile.data) store.setInitialized(true);
   }, [user, profile.data]);
 
-  return <>{children}</>;
+  return (
+    <>
+      <ErrorBanner
+        errors={apiErrors}
+        onDismiss={dismissError}
+        onDismissAll={dismissAllErrors}
+      />
+      {children}
+    </>
+  );
 };
