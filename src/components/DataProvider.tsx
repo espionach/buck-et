@@ -3,6 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAppStore } from "@/data/appState";
 import ErrorBanner, { ApiError } from "@/components/ErrorBanner";
+import { getUserFriendlyError } from "@/lib/errorMapping";
 import {
   useCurrentProfile,
   useQuests,
@@ -38,18 +39,25 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logError = useCallback((source: string, error: unknown) => {
     const info = extractErrorInfo(error);
+
+    // Full technical details for developers — always in console
     console.error(`[${source}]`, info.message, info.code ? `(code: ${info.code})` : "");
+
+    // User-friendly message for the banner
+    const friendlyMessage = getUserFriendlyError(source, info.message);
+
     setApiErrors((prev) => {
-      // Deduplicate: skip if same source+message already present
-      if (prev.some((e) => e.source === source && e.message === info.message)) return prev;
+      // Deduplicate by friendly message
+      if (prev.some((e) => e.friendlyMessage === friendlyMessage)) return prev;
       const newErr: ApiError = {
         id: String(++errorIdCounter),
         source,
         message: info.message,
+        friendlyMessage,
         code: info.code,
         timestamp: new Date(),
       };
-      return [newErr, ...prev].slice(0, 20); // keep max 20
+      return [newErr, ...prev].slice(0, 20);
     });
   }, []);
 
