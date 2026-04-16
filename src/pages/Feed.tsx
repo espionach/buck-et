@@ -121,9 +121,22 @@ const Feed = () => {
   return (
     <div className="min-h-screen pb-24 px-5 pt-14">
       <div className="flex items-center justify-between mb-4">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Home</h1>
-          <p className="text-xs text-muted-foreground mt-0.5">Buck-et, we ball. Join sidequests, have fun.</p>
+        <div className="flex items-center gap-3">
+          {/* Bucket logo – filled */}
+          <svg viewBox="0 0 64 80" className="w-10 h-12 flex-shrink-0" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M16 20 C16 8, 48 8, 48 20" stroke="hsl(var(--primary))" strokeWidth="3" strokeLinecap="round" fill="none" />
+            <path d="M8 28 L14 72 C14 76, 50 76, 50 72 L56 28 Z" stroke="hsl(var(--primary))" strokeWidth="2.5" fill="none" />
+            <ellipse cx="32" cy="28" rx="24" ry="6" stroke="hsl(var(--primary))" strokeWidth="2.5" fill="hsl(var(--background))" />
+            <clipPath id="bucketFilled"><path d="M10 30 L15 70 C15 74, 49 74, 49 70 L54 30 Z" /></clipPath>
+            <g clipPath="url(#bucketFilled)">
+              <rect x="8" y="28" width="48" height="50" fill="hsl(var(--primary))" opacity={0.35} />
+              <ellipse cx="32" cy="30" rx="26" ry="4" fill="hsl(var(--primary))" opacity={0.55} />
+            </g>
+          </svg>
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Home</h1>
+            <p className="text-xs text-muted-foreground mt-0.5">Buck-et, we ball. Join sidequests, have fun.</p>
+          </div>
         </div>
         <button
           onClick={() => setShowNotifications(true)}
