@@ -325,7 +325,7 @@ const Boards = () => {
                     boardTab === t ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
                   }`}
                 >
-                  {boardTab === "active" ? `Active (${activeGroupQuests.length})` : `Completed (${completedGroupQuests.length})`}
+                  {t === "active" ? `Active (${activeGroupQuests.length})` : `Completed (${completedGroupQuests.length})`}
                 </button>
               ))}
             </div>
