@@ -56,7 +56,7 @@ interface AppState {
   toggleImIn: (questId: string) => void;
   markUndone: (questId: string) => void;
   markDone: (questId: string) => void;
-  addGroup: (group: Group) => void;
+  addGroup: (group: Group) => Promise<string | null>;
   updateGroup: (groupId: string, updates: Partial<Group>) => void;
   removeMemberFromGroup: (groupId: string, userId: string) => void;
   leaveGroup: (groupId: string) => void;
@@ -257,39 +257,40 @@ export const useAppStore = create<AppState>((set, get) => ({
     })();
   },
 
-  addGroup: (group) => {
+  addGroup: async (group) => {
     set((s) => ({ groups: [...s.groups, group] }));
     const { currentUser, _invalidate } = get();
-    (async () => {
-      const { data } = await supabase.from("groups").insert({
-        name: group.name,
-        emoji: group.emoji,
-        description: group.description || null,
-        owner_id: currentUser.id,
-      }).select().single();
-      if (data) {
-        // Add owner as member
-        await supabase.from("group_members").insert({
-          group_id: data.id,
-          user_id: currentUser.id,
-          role: "owner",
-        });
-        // Invite selected members
-        const invitees = group.memberRoles
-          .filter((mr) => mr.role === "invited" || (mr.role === "member" && mr.user.id !== currentUser.id));
-        for (const mr of invitees) {
-          await supabase.from("group_invitations").insert({
-            group_id: data.id,
-            invited_user_id: mr.user.id,
-            invited_by: currentUser.id,
-          });
-        }
-        set((s) => ({
-          groups: s.groups.map((g) => g.id === group.id ? { ...g, id: data.id } : g),
-        }));
-      }
+    const { data } = await supabase.from("groups").insert({
+      name: group.name,
+      emoji: group.emoji,
+      description: group.description || null,
+      owner_id: currentUser.id,
+    }).select().single();
+    if (!data) {
       _invalidate(["groups", "group_invitations"]);
-    })();
+      return null;
+    }
+    // Add owner as member
+    await supabase.from("group_members").insert({
+      group_id: data.id,
+      user_id: currentUser.id,
+      role: "owner",
+    });
+    // Invite selected members
+    const invitees = group.memberRoles
+      .filter((mr) => mr.role === "invited" || (mr.role === "member" && mr.user.id !== currentUser.id));
+    for (const mr of invitees) {
+      await supabase.from("group_invitations").insert({
+        group_id: data.id,
+        invited_user_id: mr.user.id,
+        invited_by: currentUser.id,
+      });
+    }
+    set((s) => ({
+      groups: s.groups.map((g) => g.id === group.id ? { ...g, id: data.id } : g),
+    }));
+    _invalidate(["groups", "group_invitations"]);
+    return data.id as string;
   },
 
   updateGroup: (groupId, updates) => {

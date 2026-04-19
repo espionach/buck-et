@@ -21,8 +21,11 @@ const CreateGroup = () => {
     );
   };
 
-  const handleCreate = () => {
-    if (!name.trim()) return;
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleCreate = async () => {
+    if (!name.trim() || submitting) return;
+    setSubmitting(true);
     const members = [
       currentUser,
       ...friendsList.filter((f) => selectedMembers.includes(f.id)),
@@ -44,8 +47,9 @@ const CreateGroup = () => {
       activeQuests: 0,
       createdAt: new Date().toISOString().split("T")[0],
     };
-    addGroup(group);
-    navigate(`/groups?open=${group.id}`, { replace: true });
+    const realId = await addGroup(group);
+    setSubmitting(false);
+    navigate(`/groups?open=${realId ?? group.id}`, { replace: true });
   };
 
   return (
@@ -117,11 +121,11 @@ const CreateGroup = () => {
 
         <button
           onClick={handleCreate}
-          disabled={!name.trim()}
+          disabled={!name.trim() || submitting}
           className="w-full py-4 rounded-xl bg-primary text-primary-foreground font-bold text-base flex items-center justify-center gap-2 disabled:opacity-40 active:scale-[0.98] transition-transform"
         >
           <Plus className="w-5 h-5" />
-          Create Group
+          {submitting ? "Creating..." : "Create Group"}
         </button>
       </div>
     </div>
