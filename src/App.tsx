@@ -14,6 +14,8 @@ import QuestDetail from "./pages/QuestDetail";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import BottomNav from "./components/BottomNav";
 
 const queryClient = new QueryClient();
@@ -34,13 +36,15 @@ const AuthRoute = ({ children }: { children: React.ReactNode }) => {
 
 const AppLayout = () => {
   const location = useLocation();
-  const hideNav = ["/create", "/create-group", "/login", "/signup"].includes(location.pathname) || location.pathname.startsWith("/quest/");
+  const hideNav = ["/create", "/create-group", "/login", "/signup", "/forgot-password", "/reset-password"].includes(location.pathname) || location.pathname.startsWith("/quest/");
 
   return (
     <div className="max-w-md mx-auto min-h-screen relative">
       <Routes>
         <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />
         <Route path="/signup" element={<AuthRoute><Signup /></AuthRoute>} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
         <Route path="/boards" element={<ProtectedRoute><Boards /></ProtectedRoute>} />
         <Route path="/groups" element={<ProtectedRoute><Boards /></ProtectedRoute>} />
