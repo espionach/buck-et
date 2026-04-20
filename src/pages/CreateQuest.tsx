@@ -68,7 +68,7 @@ const CreateQuest = () => {
   const handleCreate = () => {
     if (!title.trim()) return;
     const questId = `q${Date.now()}`;
-    const hasDate = !!(date || time || location || meetupSpot || transportation || customNotes);
+    const hasDate = !!(date || time || location || meetupSpot || transportation || customNotes || contributionRoles.length > 0);
     const quest: Quest = {
       id: questId,
       title: title.trim(),
@@ -91,6 +91,7 @@ const CreateQuest = () => {
         carpoolSlots: carpoolSlots ? parseInt(carpoolSlots) : undefined,
         volunteers: [],
         customNotes: customNotes || undefined,
+        contributionRoles: contributionRoles.length > 0 ? contributionRoles : undefined,
       } : undefined,
     };
     addQuest(quest);
