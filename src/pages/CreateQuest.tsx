@@ -33,6 +33,15 @@ const CreateQuest = () => {
   const [newLink, setNewLink] = useState("");
   const photoInputRef = useRef<HTMLInputElement>(null);
 
+  // Contributions the creator wants to open up for sign-ups
+  const [contributionRoles, setContributionRoles] = useState<string[]>([]);
+
+  const toggleContributionRole = (id: string) => {
+    setContributionRoles((prev) =>
+      prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id]
+    );
+  };
+
   const selectedGroupData = groups.find((g) => g.id === selectedGroup);
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
