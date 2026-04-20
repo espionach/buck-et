@@ -103,6 +103,64 @@ const QuestDetail = () => {
               {group ? <span className="flex items-center gap-1"><GroupIconDisplay icon={group.emoji} size={12} className="text-muted-foreground" />{group.name}</span> : <span className="flex items-center gap-1"><Globe className="w-3 h-3" />Friends only</span>}
             </p>
           </div>
+
+          {/* Owner actions menu (Edit, Pin, Delete) */}
+          {isOwner && (
+            <div className="relative" ref={menuRef}>
+              <button
+                onClick={() => setShowMenu((s) => !s)}
+                className="p-2 rounded-xl bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Sidequest actions"
+              >
+                <MoreVertical className="w-5 h-5" />
+              </button>
+              <AnimatePresence>
+                {showMenu && (() => {
+                  const pinned = pinnedQuestIds.includes(quest.id);
+                  const pinDisabled = !pinned && pinnedQuestIds.length >= 3;
+                  return (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      className="absolute right-0 top-11 bg-card border border-border rounded-xl shadow-lg py-1 min-w-[160px] z-20"
+                    >
+                      <button
+                        onClick={() => {
+                          setShowMenu(false);
+                          navigate(`/profile?editQuest=${quest.id}`);
+                        }}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-muted transition-colors"
+                      >
+                        <Pencil className="w-3.5 h-3.5" /> Edit
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowMenu(false);
+                          if (pinned) unpinQuest(quest.id);
+                          else pinQuest(quest.id);
+                        }}
+                        disabled={pinDisabled}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-muted transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                      >
+                        <Pin className="w-3.5 h-3.5" /> {pinned ? "Unpin" : "Pin"}
+                        {pinDisabled && <span className="text-[10px] text-muted-foreground ml-auto">Max 3</span>}
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowMenu(false);
+                          setShowDeleteConfirm(true);
+                        }}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-xs text-destructive hover:bg-destructive/10 transition-colors"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" /> Delete
+                      </button>
+                    </motion.div>
+                  );
+                })()}
+              </AnimatePresence>
+            </div>
+          )}
         </div>
       </div>
 
