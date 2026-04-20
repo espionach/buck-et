@@ -350,6 +350,7 @@ export type Database = {
       sidequests: {
         Row: {
           completed_at: string | null
+          contribution_roles: string[]
           created_at: string
           created_by: string
           description: string | null
@@ -370,6 +371,7 @@ export type Database = {
         }
         Insert: {
           completed_at?: string | null
+          contribution_roles?: string[]
           created_at?: string
           created_by: string
           description?: string | null
@@ -390,6 +392,7 @@ export type Database = {
         }
         Update: {
           completed_at?: string | null
+          contribution_roles?: string[]
           created_at?: string
           created_by?: string
           description?: string | null

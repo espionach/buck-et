@@ -1,6 +1,7 @@
 import { useAppStore } from "@/data/appState";
 import { Quest } from "@/data/mockData";
-import { ArrowLeft, Sparkles, ChevronDown, ImagePlus, Link as LinkIcon, X, Globe } from "lucide-react";
+import { ALL_CONTRIBUTION_ROLES } from "@/data/contributionRoles";
+import { ArrowLeft, Sparkles, ChevronDown, ImagePlus, Link as LinkIcon, X, Globe, Check } from "lucide-react";
 import { GroupIconDisplay } from "@/components/GroupIcon";
 import { useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -32,6 +33,15 @@ const CreateQuest = () => {
   const [newLink, setNewLink] = useState("");
   const photoInputRef = useRef<HTMLInputElement>(null);
 
+  // Contributions the creator wants to open up for sign-ups
+  const [contributionRoles, setContributionRoles] = useState<string[]>([]);
+
+  const toggleContributionRole = (id: string) => {
+    setContributionRoles((prev) =>
+      prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id]
+    );
+  };
+
   const selectedGroupData = groups.find((g) => g.id === selectedGroup);
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,7 +68,7 @@ const CreateQuest = () => {
   const handleCreate = () => {
     if (!title.trim()) return;
     const questId = `q${Date.now()}`;
-    const hasDate = !!(date || time || location || meetupSpot || transportation || customNotes);
+    const hasDate = !!(date || time || location || meetupSpot || transportation || customNotes || contributionRoles.length > 0);
     const quest: Quest = {
       id: questId,
       title: title.trim(),
@@ -81,6 +91,7 @@ const CreateQuest = () => {
         carpoolSlots: carpoolSlots ? parseInt(carpoolSlots) : undefined,
         volunteers: [],
         customNotes: customNotes || undefined,
+        contributionRoles: contributionRoles.length > 0 ? contributionRoles : undefined,
       } : undefined,
     };
     addQuest(quest);
@@ -246,6 +257,38 @@ const CreateQuest = () => {
               <label className="text-[11px] text-muted-foreground mb-1 block">Additional Notes</label>
               <textarea value={customNotes} onChange={(e) => setCustomNotes(e.target.value)} placeholder="Anything else everyone should know?"
                 rows={2} className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none" />
+            </div>
+
+            {/* Contributions — let other users sign up to help */}
+            <div>
+              <label className="text-[11px] text-muted-foreground mb-1 block">
+                Contributions {contributionRoles.length > 0 && (
+                  <span className="text-muted-foreground/70">· {contributionRoles.length} selected</span>
+                )}
+              </label>
+              <p className="text-[11px] text-muted-foreground mb-2">
+                Pick what others can sign up to bring or do.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {ALL_CONTRIBUTION_ROLES.map((role) => {
+                  const selected = contributionRoles.includes(role.id);
+                  return (
+                    <button
+                      key={role.id}
+                      type="button"
+                      onClick={() => toggleContributionRole(role.id)}
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1 ${
+                        selected
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted text-muted-foreground hover:bg-muted/80"
+                      }`}
+                    >
+                      {selected && <Check className="w-3 h-3" />}
+                      {role.label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Photos & Videos */}

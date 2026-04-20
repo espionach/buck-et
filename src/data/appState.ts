@@ -163,6 +163,7 @@ export const useAppStore = create<AppState>((set, get) => ({
         logistics_transportation: quest.logistics?.transportation || null,
         logistics_carpool_slots: quest.logistics?.carpoolSlots || null,
         logistics_custom_notes: quest.logistics?.customNotes || null,
+        contribution_roles: quest.logistics?.contributionRoles || [],
       }).select().single();
       if (data) {
         // Add creator as participant
@@ -526,6 +527,7 @@ export const useAppStore = create<AppState>((set, get) => ({
           dbUpdates.logistics_transportation = l.transportation || null;
           dbUpdates.logistics_carpool_slots = l.carpoolSlots || null;
           dbUpdates.logistics_custom_notes = l.customNotes || null;
+          dbUpdates.contribution_roles = l.contributionRoles || [];
         } else {
           dbUpdates.logistics_date = null;
           dbUpdates.logistics_time = null;
@@ -534,6 +536,7 @@ export const useAppStore = create<AppState>((set, get) => ({
           dbUpdates.logistics_transportation = null;
           dbUpdates.logistics_carpool_slots = null;
           dbUpdates.logistics_custom_notes = null;
+          dbUpdates.contribution_roles = [];
         }
       }
       if (Object.keys(dbUpdates).length > 0) {
@@ -896,6 +899,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       if (logisticsUpdates.transportation !== undefined) dbUpdates.logistics_transportation = logisticsUpdates.transportation || null;
       if (logisticsUpdates.carpoolSlots !== undefined) dbUpdates.logistics_carpool_slots = logisticsUpdates.carpoolSlots || null;
       if (logisticsUpdates.customNotes !== undefined) dbUpdates.logistics_custom_notes = logisticsUpdates.customNotes || null;
+      if (logisticsUpdates.contributionRoles !== undefined) dbUpdates.contribution_roles = logisticsUpdates.contributionRoles || [];
       if (Object.keys(dbUpdates).length > 0) {
         await supabase.from("sidequests").update(dbUpdates).eq("id", questId);
       }
