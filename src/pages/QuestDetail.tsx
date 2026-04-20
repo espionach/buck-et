@@ -3,10 +3,11 @@ import { QuestVolunteer } from "@/data/mockData";
 import { ALL_CONTRIBUTION_ROLES } from "@/data/contributionRoles";
 import UserAvatar from "@/components/UserAvatar";
 import { GroupIconDisplay } from "@/components/GroupIcon";
-import { ArrowLeft, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send, ExternalLink, HandMetal, Check, Globe, StickyNote } from "lucide-react";
-import { useState, useEffect } from "react";
+import { ArrowLeft, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send, ExternalLink, HandMetal, Check, Globe, StickyNote, MoreVertical, Pencil, Pin, Trash2 } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { usePopup } from "@/hooks/use-popup";
 
 const transportIcons = {
   car: Car,
@@ -30,7 +31,23 @@ const volunteerRoles = ALL_CONTRIBUTION_ROLES;
 const QuestDetail = () => {
   const navigate = useNavigate();
   const { questId } = useParams<{ questId: string }>();
-  const { quests, groups, addComment, volunteerForQuest, unvolunteerFromQuest, currentUser } = useAppStore();
+  const { quests, groups, addComment, volunteerForQuest, unvolunteerFromQuest, currentUser, pinQuest, unpinQuest, pinnedQuestIds, deleteQuest } = useAppStore();
+  const [showMenu, setShowMenu] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  usePopup(showDeleteConfirm);
+
+  // Close menu on outside click
+  useEffect(() => {
+    if (!showMenu) return;
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setShowMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [showMenu]);
 
   useEffect(() => { window.scrollTo(0, 0); }, [questId]);
 
@@ -86,6 +103,64 @@ const QuestDetail = () => {
               {group ? <span className="flex items-center gap-1"><GroupIconDisplay icon={group.emoji} size={12} className="text-muted-foreground" />{group.name}</span> : <span className="flex items-center gap-1"><Globe className="w-3 h-3" />Friends only</span>}
             </p>
           </div>
+
+          {/* Owner actions menu (Edit, Pin, Delete) */}
+          {isOwner && (
+            <div className="relative" ref={menuRef}>
+              <button
+                onClick={() => setShowMenu((s) => !s)}
+                className="p-2 rounded-xl bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Sidequest actions"
+              >
+                <MoreVertical className="w-5 h-5" />
+              </button>
+              <AnimatePresence>
+                {showMenu && (() => {
+                  const pinned = pinnedQuestIds.includes(quest.id);
+                  const pinDisabled = !pinned && pinnedQuestIds.length >= 3;
+                  return (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      className="absolute right-0 top-11 bg-card border border-border rounded-xl shadow-lg py-1 min-w-[160px] z-20"
+                    >
+                      <button
+                        onClick={() => {
+                          setShowMenu(false);
+                          navigate(`/profile?editQuest=${quest.id}`);
+                        }}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-muted transition-colors"
+                      >
+                        <Pencil className="w-3.5 h-3.5" /> Edit
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowMenu(false);
+                          if (pinned) unpinQuest(quest.id);
+                          else pinQuest(quest.id);
+                        }}
+                        disabled={pinDisabled}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-muted transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                      >
+                        <Pin className="w-3.5 h-3.5" /> {pinned ? "Unpin" : "Pin"}
+                        {pinDisabled && <span className="text-[10px] text-muted-foreground ml-auto">Max 3</span>}
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowMenu(false);
+                          setShowDeleteConfirm(true);
+                        }}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-xs text-destructive hover:bg-destructive/10 transition-colors"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" /> Delete
+                      </button>
+                    </motion.div>
+                  );
+                })()}
+              </AnimatePresence>
+            </div>
+          )}
         </div>
       </div>
 
@@ -306,6 +381,50 @@ const QuestDetail = () => {
           </div>
         </div>
       </div>
+
+      {/* Delete confirmation */}
+      <AnimatePresence>
+        {showDeleteConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] bg-foreground/40 flex items-center justify-center p-5"
+            onClick={() => setShowDeleteConfirm(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-card rounded-2xl p-5 max-w-sm w-full shadow-xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="text-base font-bold text-foreground mb-1">Delete sidequest?</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                "{quest.title}" will be permanently removed for everyone.
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="flex-1 py-2.5 rounded-xl bg-muted text-muted-foreground font-semibold text-sm"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    deleteQuest(quest.id);
+                    setShowDeleteConfirm(false);
+                    navigate(-1);
+                  }}
+                  className="flex-1 py-2.5 rounded-xl bg-destructive text-destructive-foreground font-semibold text-sm"
+                >
+                  Delete
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

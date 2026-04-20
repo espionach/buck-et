@@ -2,6 +2,7 @@ import { useAppStore } from "@/data/appState";
 import QuestList from "@/components/QuestList";
 import UserAvatar from "@/components/UserAvatar";
 import { Edit, X, Check, Users as UsersIcon, UserPlus, Trash2, ImagePlus, Camera, Link as LinkIcon, Plus, ArrowLeft, Map, ScrollText, Pin, LogOut } from "lucide-react";
+import { ALL_CONTRIBUTION_ROLES } from "@/data/contributionRoles";
 import UserProfileView from "@/components/UserProfileView";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -70,6 +71,7 @@ const Profile = () => {
   const [editTransportation, setEditTransportation] = useState("");
   const [editCarpoolSlots, setEditCarpoolSlots] = useState("");
   const [editCustomNotes, setEditCustomNotes] = useState("");
+  const [editContributionRoles, setEditContributionRoles] = useState<string[]>([]);
 
   // Past quest editing state
   const [editingPastQuest, setEditingPastQuest] = useState<Quest | null>(null);
@@ -101,6 +103,19 @@ const Profile = () => {
       }
     }
   }, [searchParams]);
+
+  // Handle editQuest query param (deep-link from QuestDetail "Edit" menu)
+  useEffect(() => {
+    const editQuestId = searchParams.get("editQuest");
+    if (!editQuestId) return;
+    const found = quests.find((q) => q.id === editQuestId && q.createdBy.id === currentUser.id);
+    if (found) {
+      handleOpenCurrentEditor(found);
+    }
+    const newParams = new URLSearchParams(searchParams);
+    newParams.delete("editQuest");
+    setSearchParams(newParams, { replace: true });
+  }, [searchParams, quests]);
 
   // Cleanup empty quests on mount
   useEffect(() => {
@@ -194,6 +209,7 @@ const Profile = () => {
     setEditTransportation(quest.logistics?.transportation || "");
     setEditCarpoolSlots(quest.logistics?.carpoolSlots?.toString() || "");
     setEditCustomNotes(quest.logistics?.customNotes || "");
+    setEditContributionRoles(quest.logistics?.contributionRoles || []);
   };
 
   const handleSaveCurrentQuest = () => {
@@ -203,7 +219,7 @@ const Profile = () => {
       );
       removedUsers.forEach((u) => removeParticipant(editingCurrentQuest.id, u.id));
 
-      const hasLogistics = editDate || editTime || editLocation || editMeetupSpot || editTransportation || editCustomNotes;
+      const hasLogistics = editDate || editTime || editLocation || editMeetupSpot || editTransportation || editCustomNotes || editContributionRoles.length > 0;
       updateQuest(editingCurrentQuest.id, {
         title: editQuestTitle.trim(),
         description: editQuestDescription.trim() || undefined,
@@ -219,6 +235,7 @@ const Profile = () => {
           carpoolSlots: editCarpoolSlots ? parseInt(editCarpoolSlots) : undefined,
           volunteers: editingCurrentQuest.logistics?.volunteers || [],
           customNotes: editCustomNotes || undefined,
+          contributionRoles: editContributionRoles.length > 0 ? editContributionRoles : undefined,
         } : undefined,
       });
       setEditingCurrentQuest(null);
@@ -709,9 +726,44 @@ const Profile = () => {
                   <textarea value={editCustomNotes} onChange={(e) => setEditCustomNotes(e.target.value)} placeholder="Anything else everyone should know?"
                     rows={2} className="w-full px-3 py-2 rounded-xl bg-muted border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none" />
                 </div>
+
+                {/* Contributions selector */}
+                <div>
+                  <label className="text-[11px] text-muted-foreground mb-1 block">
+                    Contributions {editContributionRoles.length > 0 && (
+                      <span className="text-muted-foreground/70">· {editContributionRoles.length} selected</span>
+                    )}
+                  </label>
+                  <p className="text-[11px] text-muted-foreground mb-2">
+                    Pick what others can sign up to bring or do.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {ALL_CONTRIBUTION_ROLES.map((role) => {
+                      const selected = editContributionRoles.includes(role.id);
+                      return (
+                        <button
+                          key={role.id}
+                          type="button"
+                          onClick={() =>
+                            setEditContributionRoles((prev) =>
+                              prev.includes(role.id) ? prev.filter((r) => r !== role.id) : [...prev, role.id]
+                            )
+                          }
+                          className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1 ${
+                            selected
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-muted text-muted-foreground hover:bg-muted/80"
+                          }`}
+                        >
+                          {selected && <Check className="w-3 h-3" />}
+                          {role.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
 
-              {/* Participants with remove */}
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1.5 block">Participants</label>
                 <div className="space-y-1.5">
