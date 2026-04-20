@@ -1,6 +1,7 @@
 import { useAppStore } from "@/data/appState";
 import { Quest } from "@/data/mockData";
-import { ArrowLeft, Sparkles, ChevronDown, ImagePlus, Link as LinkIcon, X, Globe } from "lucide-react";
+import { ALL_CONTRIBUTION_ROLES } from "@/data/contributionRoles";
+import { ArrowLeft, Sparkles, ChevronDown, ImagePlus, Link as LinkIcon, X, Globe, Check } from "lucide-react";
 import { GroupIconDisplay } from "@/components/GroupIcon";
 import { useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
