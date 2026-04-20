@@ -259,6 +259,38 @@ const CreateQuest = () => {
                 rows={2} className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none" />
             </div>
 
+            {/* Contributions — let other users sign up to help */}
+            <div>
+              <label className="text-[11px] text-muted-foreground mb-1 block">
+                Contributions {contributionRoles.length > 0 && (
+                  <span className="text-muted-foreground/70">· {contributionRoles.length} selected</span>
+                )}
+              </label>
+              <p className="text-[11px] text-muted-foreground mb-2">
+                Pick what others can sign up to bring or do.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {ALL_CONTRIBUTION_ROLES.map((role) => {
+                  const selected = contributionRoles.includes(role.id);
+                  return (
+                    <button
+                      key={role.id}
+                      type="button"
+                      onClick={() => toggleContributionRole(role.id)}
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1 ${
+                        selected
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted text-muted-foreground hover:bg-muted/80"
+                      }`}
+                    >
+                      {selected && <Check className="w-3 h-3" />}
+                      {role.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             {/* Photos & Videos */}
             <div>
               <label className="text-[11px] text-muted-foreground mb-1 block">Photos & Videos</label>
