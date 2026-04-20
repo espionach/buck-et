@@ -1,5 +1,6 @@
 import { useAppStore } from "@/data/appState";
 import { QuestVolunteer } from "@/data/mockData";
+import { ALL_CONTRIBUTION_ROLES } from "@/data/contributionRoles";
 import UserAvatar from "@/components/UserAvatar";
 import { GroupIconDisplay } from "@/components/GroupIcon";
 import { ArrowLeft, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send, ExternalLink, HandMetal, Check, Globe, StickyNote } from "lucide-react";
@@ -23,13 +24,8 @@ const transportLabels = {
   other: "Other",
 };
 
-const volunteerRoles = [
-  { id: "driver", label: "Driver", description: "I can drive people" },
-  { id: "snack_provider", label: "Snacks", description: "I'll bring snacks" },
-  { id: "navigator", label: "Navigator", description: "I'll handle directions" },
-  { id: "photographer", label: "Photographer", description: "I'll take photos" },
-  { id: "supplies", label: "Supplies", description: "I'll bring gear/supplies" },
-];
+// Use the shared full list so labels resolve correctly even for legacy roles
+const volunteerRoles = ALL_CONTRIBUTION_ROLES;
 
 const QuestDetail = () => {
   const navigate = useNavigate();
