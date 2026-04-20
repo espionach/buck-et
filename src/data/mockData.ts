@@ -66,6 +66,8 @@ export interface QuestLogistics {
   carpoolSlots?: number;
   volunteers: QuestVolunteer[];
   customNotes?: string;
+  /** Contribution role IDs the creator chose to include for sign-ups */
+  contributionRoles?: string[];
 }
 
 export interface Quest {
