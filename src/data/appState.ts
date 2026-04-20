@@ -899,6 +899,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       if (logisticsUpdates.transportation !== undefined) dbUpdates.logistics_transportation = logisticsUpdates.transportation || null;
       if (logisticsUpdates.carpoolSlots !== undefined) dbUpdates.logistics_carpool_slots = logisticsUpdates.carpoolSlots || null;
       if (logisticsUpdates.customNotes !== undefined) dbUpdates.logistics_custom_notes = logisticsUpdates.customNotes || null;
+      if (logisticsUpdates.contributionRoles !== undefined) dbUpdates.contribution_roles = logisticsUpdates.contributionRoles || [];
       if (Object.keys(dbUpdates).length > 0) {
         await supabase.from("sidequests").update(dbUpdates).eq("id", questId);
       }
