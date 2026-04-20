@@ -1,0 +1,1 @@
+ALTER TABLE public.sidequests ADD COLUMN contribution_roles text[] NOT NULL DEFAULT '{}'::text[];
