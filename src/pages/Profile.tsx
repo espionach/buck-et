@@ -104,18 +104,32 @@ const Profile = () => {
     }
   }, [searchParams]);
 
+  // Track sidequest detail page to return to when editor was opened from QuestDetail
+  const [returnToQuestId, setReturnToQuestId] = useState<string | null>(null);
+
   // Handle editQuest query param (deep-link from QuestDetail "Edit" menu)
   useEffect(() => {
     const editQuestId = searchParams.get("editQuest");
     if (!editQuestId) return;
     const found = quests.find((q) => q.id === editQuestId && q.createdBy.id === currentUser.id);
     if (found) {
+      setReturnToQuestId(editQuestId);
       handleOpenCurrentEditor(found);
     }
     const newParams = new URLSearchParams(searchParams);
     newParams.delete("editQuest");
     setSearchParams(newParams, { replace: true });
   }, [searchParams, quests]);
+
+  // Close the current-quest editor and, if we came from QuestDetail, navigate back there
+  const closeCurrentEditor = () => {
+    setEditingCurrentQuest(null);
+    if (returnToQuestId) {
+      const targetId = returnToQuestId;
+      setReturnToQuestId(null);
+      nav(`/quest/${targetId}`, { replace: true });
+    }
+  };
 
   // Cleanup empty quests on mount
   useEffect(() => {
@@ -238,7 +252,7 @@ const Profile = () => {
           contributionRoles: editContributionRoles.length > 0 ? editContributionRoles : undefined,
         } : undefined,
       });
-      setEditingCurrentQuest(null);
+      closeCurrentEditor();
     }
   };
 
@@ -267,9 +281,12 @@ const Profile = () => {
 
   const confirmDeleteQuest = () => {
     if (editingCurrentQuest) {
-      deleteQuest(editingCurrentQuest.id);
-      setEditingCurrentQuest(null);
+      const targetQuestId = editingCurrentQuest.id;
+      deleteQuest(targetQuestId);
       setShowDeleteQuestConfirm(false);
+      // Clear return target — the quest is gone, fall back to profile
+      setReturnToQuestId(null);
+      setEditingCurrentQuest(null);
     }
   };
 
@@ -631,7 +648,7 @@ const Profile = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 bg-foreground/40 flex items-center justify-center p-5"
-            onClick={() => setEditingCurrentQuest(null)}
+            onClick={() => closeCurrentEditor()}
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
@@ -644,7 +661,7 @@ const Profile = () => {
               <div className="flex-1 overflow-y-auto p-5 space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="font-bold text-foreground">Edit Sidequest</h3>
-                <button onClick={() => setEditingCurrentQuest(null)}>
+                <button onClick={() => closeCurrentEditor()}>
                   <X className="w-5 h-5 text-muted-foreground" />
                 </button>
               </div>

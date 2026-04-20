@@ -109,7 +109,7 @@ const QuestDetail = () => {
             <div className="relative" ref={menuRef}>
               <button
                 onClick={() => setShowMenu((s) => !s)}
-                className="p-2 rounded-xl bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                className="p-1 -m-1 text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Sidequest actions"
               >
                 <MoreVertical className="w-5 h-5" />
