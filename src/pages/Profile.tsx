@@ -70,6 +70,7 @@ const Profile = () => {
   const [editTransportation, setEditTransportation] = useState("");
   const [editCarpoolSlots, setEditCarpoolSlots] = useState("");
   const [editCustomNotes, setEditCustomNotes] = useState("");
+  const [editContributionRoles, setEditContributionRoles] = useState<string[]>([]);
 
   // Past quest editing state
   const [editingPastQuest, setEditingPastQuest] = useState<Quest | null>(null);
@@ -194,6 +195,7 @@ const Profile = () => {
     setEditTransportation(quest.logistics?.transportation || "");
     setEditCarpoolSlots(quest.logistics?.carpoolSlots?.toString() || "");
     setEditCustomNotes(quest.logistics?.customNotes || "");
+    setEditContributionRoles(quest.logistics?.contributionRoles || []);
   };
 
   const handleSaveCurrentQuest = () => {
@@ -203,7 +205,7 @@ const Profile = () => {
       );
       removedUsers.forEach((u) => removeParticipant(editingCurrentQuest.id, u.id));
 
-      const hasLogistics = editDate || editTime || editLocation || editMeetupSpot || editTransportation || editCustomNotes;
+      const hasLogistics = editDate || editTime || editLocation || editMeetupSpot || editTransportation || editCustomNotes || editContributionRoles.length > 0;
       updateQuest(editingCurrentQuest.id, {
         title: editQuestTitle.trim(),
         description: editQuestDescription.trim() || undefined,
@@ -219,6 +221,7 @@ const Profile = () => {
           carpoolSlots: editCarpoolSlots ? parseInt(editCarpoolSlots) : undefined,
           volunteers: editingCurrentQuest.logistics?.volunteers || [],
           customNotes: editCustomNotes || undefined,
+          contributionRoles: editContributionRoles.length > 0 ? editContributionRoles : undefined,
         } : undefined,
       });
       setEditingCurrentQuest(null);
