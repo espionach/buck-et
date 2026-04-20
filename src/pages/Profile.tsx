@@ -104,6 +104,19 @@ const Profile = () => {
     }
   }, [searchParams]);
 
+  // Handle editQuest query param (deep-link from QuestDetail "Edit" menu)
+  useEffect(() => {
+    const editQuestId = searchParams.get("editQuest");
+    if (!editQuestId) return;
+    const found = quests.find((q) => q.id === editQuestId && q.createdBy.id === currentUser.id);
+    if (found) {
+      handleOpenCurrentEditor(found);
+    }
+    const newParams = new URLSearchParams(searchParams);
+    newParams.delete("editQuest");
+    setSearchParams(newParams, { replace: true });
+  }, [searchParams, quests]);
+
   // Cleanup empty quests on mount
   useEffect(() => {
     cleanupEmptyQuests();
