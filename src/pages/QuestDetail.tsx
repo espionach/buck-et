@@ -381,6 +381,50 @@ const QuestDetail = () => {
           </div>
         </div>
       </div>
+
+      {/* Delete confirmation */}
+      <AnimatePresence>
+        {showDeleteConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] bg-foreground/40 flex items-center justify-center p-5"
+            onClick={() => setShowDeleteConfirm(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-card rounded-2xl p-5 max-w-sm w-full shadow-xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="text-base font-bold text-foreground mb-1">Delete sidequest?</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                "{quest.title}" will be permanently removed for everyone.
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="flex-1 py-2.5 rounded-xl bg-muted text-muted-foreground font-semibold text-sm"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    deleteQuest(quest.id);
+                    setShowDeleteConfirm(false);
+                    navigate(-1);
+                  }}
+                  className="flex-1 py-2.5 rounded-xl bg-destructive text-destructive-foreground font-semibold text-sm"
+                >
+                  Delete
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
