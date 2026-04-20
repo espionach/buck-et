@@ -229,8 +229,10 @@ export function useQuests() {
             createdAt: c.created_at.split("T")[0],
           }));
 
+        const contributionRoles = (q as any).contribution_roles as string[] | null;
         const hasLogistics = q.logistics_date || q.logistics_time || q.logistics_location ||
-          q.logistics_meetup_spot || q.logistics_transportation || q.logistics_custom_notes;
+          q.logistics_meetup_spot || q.logistics_transportation || q.logistics_custom_notes ||
+          (contributionRoles && contributionRoles.length > 0);
         const logistics: QuestLogistics | undefined = hasLogistics || volunteers.length > 0
           ? {
               date: q.logistics_date || undefined,
@@ -241,6 +243,7 @@ export function useQuests() {
               carpoolSlots: q.logistics_carpool_slots || undefined,
               volunteers,
               customNotes: q.logistics_custom_notes || undefined,
+              contributionRoles: contributionRoles || [],
             }
           : undefined;
 
