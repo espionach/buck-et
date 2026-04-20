@@ -202,107 +202,69 @@ const QuestDetail = () => {
           </div>
         </div>
 
-        {/* Volunteer Section */}
-        {logistics.transportation === "car" && (
-          <div className="p-4 rounded-xl border border-border/50 bg-card space-y-3">
-            <h3 className="text-sm font-bold text-foreground">Carpool & Contributions</h3>
-            
-            {/* Current volunteers */}
-            {logistics.volunteers.length > 0 && (
-              <div className="space-y-2">
-                {logistics.volunteers.map((v) => (
-                  <div key={v.userId} className="flex items-center gap-2 p-2 rounded-xl bg-muted/50">
-                    <UserAvatar user={v.user} size="xs" />
-                    <span className="text-xs font-medium text-foreground">{v.user.name}</span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-secondary/20 text-secondary ml-auto">
-                      {volunteerRoles.find((r) => r.id === v.role)?.label || v.role}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
+        {/* Volunteer Section — only the contribution roles the creator picked (plus Driver if carpool) */}
+        {(() => {
+          const selectedRoleIds = logistics.contributionRoles || [];
+          const isCar = logistics.transportation === "car";
+          // Build the offered list: optional driver (when car), then creator-picked roles
+          const offeredRoles = volunteerRoles.filter((r) => {
+            if (r.id === "driver") return isCar;
+            return selectedRoleIds.includes(r.id);
+          });
+          if (offeredRoles.length === 0 && logistics.volunteers.length === 0) return null;
+          const heading = isCar ? "Carpool & Contributions" : "Contributions";
+          const availableForMe = offeredRoles;
+          return (
+            <div className="p-4 rounded-xl border border-border/50 bg-card space-y-3">
+              <h3 className="text-sm font-bold text-foreground">{heading}</h3>
 
-            {/* Volunteer buttons */}
-            {!myVolunteerRole ? (
-              <div>
-                <p className="text-xs text-muted-foreground mb-2">How can you help?</p>
-                <div className="flex flex-wrap gap-2">
-                  {volunteerRoles.map((role) => (
-                    <button
-                      key={role.id}
-                      onClick={() => volunteerForQuest(quest.id, role.id)}
-                      className="px-3 py-1.5 rounded-full bg-muted text-xs text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
-                    >
-                      {role.label}
-                    </button>
+              {logistics.volunteers.length > 0 && (
+                <div className="space-y-2">
+                  {logistics.volunteers.map((v) => (
+                    <div key={v.userId} className="flex items-center gap-2 p-2 rounded-xl bg-muted/50">
+                      <UserAvatar user={v.user} size="xs" />
+                      <span className="text-xs font-medium text-foreground">{v.user.name}</span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-secondary/20 text-secondary ml-auto">
+                        {volunteerRoles.find((r) => r.id === v.role)?.label || v.role}
+                      </span>
+                    </div>
                   ))}
                 </div>
-              </div>
-            ) : (
-              <div className="flex items-center justify-between p-2 rounded-xl bg-secondary/10">
-                <span className="text-xs text-foreground">
-                  You're signed up as {volunteerRoles.find((r) => r.id === myVolunteerRole.role)?.label || myVolunteerRole.role}
-                </span>
-                <button
-                  onClick={() => unvolunteerFromQuest(quest.id)}
-                  className="text-[10px] text-muted-foreground hover:text-foreground"
-                >
-                  Remove
-                </button>
-              </div>
-            )}
-          </div>
-        )}
+              )}
 
-        {/* General volunteer section for non-car quests */}
-        {logistics.transportation !== "car" && (
-          <div className="p-4 rounded-xl border border-border/50 bg-card space-y-3">
-            <h3 className="text-sm font-bold text-foreground">Contributions</h3>
-            
-            {logistics.volunteers.length > 0 && (
-              <div className="space-y-2">
-                {logistics.volunteers.map((v) => (
-                  <div key={v.userId} className="flex items-center gap-2 p-2 rounded-xl bg-muted/50">
-                    <UserAvatar user={v.user} size="xs" />
-                    <span className="text-xs font-medium text-foreground">{v.user.name}</span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-secondary/20 text-secondary ml-auto">
-                      {volunteerRoles.find((r) => r.id === v.role)?.label || v.role}
-                    </span>
+              {!myVolunteerRole ? (
+                availableForMe.length > 0 && (
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-2">How can you help?</p>
+                    <div className="flex flex-wrap gap-2">
+                      {availableForMe.map((role) => (
+                        <button
+                          key={role.id}
+                          onClick={() => volunteerForQuest(quest.id, role.id)}
+                          className="px-3 py-1.5 rounded-full bg-muted text-xs text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
+                        >
+                          {role.label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                ))}
-              </div>
-            )}
-
-            {!myVolunteerRole ? (
-              <div>
-                <p className="text-xs text-muted-foreground mb-2">How can you help?</p>
-                <div className="flex flex-wrap gap-2">
-                  {volunteerRoles.filter((r) => r.id !== "driver").map((role) => (
-                    <button
-                      key={role.id}
-                      onClick={() => volunteerForQuest(quest.id, role.id)}
-                      className="px-3 py-1.5 rounded-full bg-muted text-xs text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
-                    >
-                      {role.label}
-                    </button>
-                  ))}
+                )
+              ) : (
+                <div className="flex items-center justify-between p-2 rounded-xl bg-secondary/10">
+                  <span className="text-xs text-foreground">
+                    You're signed up as {volunteerRoles.find((r) => r.id === myVolunteerRole.role)?.label || myVolunteerRole.role}
+                  </span>
+                  <button
+                    onClick={() => unvolunteerFromQuest(quest.id)}
+                    className="text-[10px] text-muted-foreground hover:text-foreground"
+                  >
+                    Remove
+                  </button>
                 </div>
-              </div>
-            ) : (
-              <div className="flex items-center justify-between p-2 rounded-xl bg-secondary/10">
-                <span className="text-xs text-foreground">
-                  You're signed up as {volunteerRoles.find((r) => r.id === myVolunteerRole.role)?.label || myVolunteerRole.role}
-                </span>
-                <button
-                  onClick={() => unvolunteerFromQuest(quest.id)}
-                  className="text-[10px] text-muted-foreground hover:text-foreground"
-                >
-                  Remove
-                </button>
-              </div>
-            )}
-          </div>
-        )}
+              )}
+            </div>
+          );
+        })()}
 
         {/* Comments Section */}
         <div className="p-4 rounded-xl border border-border/50 bg-card space-y-3">
