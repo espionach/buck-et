@@ -527,6 +527,7 @@ export const useAppStore = create<AppState>((set, get) => ({
           dbUpdates.logistics_transportation = l.transportation || null;
           dbUpdates.logistics_carpool_slots = l.carpoolSlots || null;
           dbUpdates.logistics_custom_notes = l.customNotes || null;
+          dbUpdates.contribution_roles = l.contributionRoles || [];
         } else {
           dbUpdates.logistics_date = null;
           dbUpdates.logistics_time = null;
@@ -535,6 +536,7 @@ export const useAppStore = create<AppState>((set, get) => ({
           dbUpdates.logistics_transportation = null;
           dbUpdates.logistics_carpool_slots = null;
           dbUpdates.logistics_custom_notes = null;
+          dbUpdates.contribution_roles = [];
         }
       }
       if (Object.keys(dbUpdates).length > 0) {
