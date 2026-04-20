@@ -104,18 +104,32 @@ const Profile = () => {
     }
   }, [searchParams]);
 
+  // Track sidequest detail page to return to when editor was opened from QuestDetail
+  const [returnToQuestId, setReturnToQuestId] = useState<string | null>(null);
+
   // Handle editQuest query param (deep-link from QuestDetail "Edit" menu)
   useEffect(() => {
     const editQuestId = searchParams.get("editQuest");
     if (!editQuestId) return;
     const found = quests.find((q) => q.id === editQuestId && q.createdBy.id === currentUser.id);
     if (found) {
+      setReturnToQuestId(editQuestId);
       handleOpenCurrentEditor(found);
     }
     const newParams = new URLSearchParams(searchParams);
     newParams.delete("editQuest");
     setSearchParams(newParams, { replace: true });
   }, [searchParams, quests]);
+
+  // Close the current-quest editor and, if we came from QuestDetail, navigate back there
+  const closeCurrentEditor = () => {
+    setEditingCurrentQuest(null);
+    if (returnToQuestId) {
+      const targetId = returnToQuestId;
+      setReturnToQuestId(null);
+      nav(`/quest/${targetId}`, { replace: true });
+    }
+  };
 
   // Cleanup empty quests on mount
   useEffect(() => {
