@@ -163,6 +163,7 @@ export const useAppStore = create<AppState>((set, get) => ({
         logistics_transportation: quest.logistics?.transportation || null,
         logistics_carpool_slots: quest.logistics?.carpoolSlots || null,
         logistics_custom_notes: quest.logistics?.customNotes || null,
+        contribution_roles: quest.logistics?.contributionRoles || [],
       }).select().single();
       if (data) {
         // Add creator as participant
