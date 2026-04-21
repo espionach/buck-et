@@ -38,8 +38,13 @@ const Permissions = () => {
     navigate("/", { replace: true });
   };
 
+  const handleBack = async () => {
+    if (user) await setOnboardingStep(user.id, "welcome");
+    navigate("/onboarding/welcome", { replace: true });
+  };
+
   return (
-    <OnboardingLayout step="permissions" onSkip={handleSkipAll} skipLabel="Skip all">
+    <OnboardingLayout step="permissions" onSkip={handleSkipAll} skipLabel="Skip all" onBack={handleBack}>
       <div className="flex-1 flex flex-col">
         <h1 className="text-2xl font-bold text-foreground mb-2">Quick permissions</h1>
         <p className="text-sm text-muted-foreground mb-6">

@@ -16,6 +16,8 @@ interface Props {
   steps: CoachmarkStep[];
   onComplete: () => void;
   onSkip: () => void;
+  /** Called when the user taps Back on the very first step. */
+  onBackFromFirst?: () => void;
 }
 
 interface Rect {
@@ -30,7 +32,7 @@ const TOOLTIP_GAP = 14;
 const TOOLTIP_WIDTH = 280;
 const OVERLAY_OPACITY = 0.45;
 
-function Coachmarks({ steps, onComplete, onSkip }: Props) {
+function Coachmarks({ steps, onComplete, onSkip, onBackFromFirst }: Props) {
   const [index, setIndex] = useState(0);
   const [rect, setRect] = useState<Rect | null>(null);
   const [tooltipHeight, setTooltipHeight] = useState(140);
@@ -97,6 +99,14 @@ function Coachmarks({ steps, onComplete, onSkip }: Props) {
   };
 
   const handleSkip = () => onSkip();
+
+  const handleBack = () => {
+    if (index === 0) {
+      onBackFromFirst?.();
+    } else {
+      setIndex((i) => i - 1);
+    }
+  };
 
   // Compute tooltip position
   const viewportH = typeof window !== "undefined" ? window.innerHeight : 800;
@@ -187,12 +197,22 @@ function Coachmarks({ steps, onComplete, onSkip }: Props) {
           </div>
           <div className="text-base font-bold text-foreground mb-1">{step.title}</div>
           <div className="text-sm text-muted-foreground mb-4">{step.body}</div>
-          <button
-            onClick={handleNext}
-            className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm active:scale-[0.98] transition-transform"
-          >
-            {index >= steps.length - 1 ? "Finish" : "Next"}
-          </button>
+          <div className="flex gap-2">
+            {(index > 0 || onBackFromFirst) && (
+              <button
+                onClick={handleBack}
+                className="px-4 py-2.5 rounded-xl bg-muted text-foreground font-semibold text-sm active:scale-[0.98] transition-transform"
+              >
+                Back
+              </button>
+            )}
+            <button
+              onClick={handleNext}
+              className="flex-1 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm active:scale-[0.98] transition-transform"
+            >
+              {index >= steps.length - 1 ? "Finish" : "Next"}
+            </button>
+          </div>
         </div>
       )}
     </div>
