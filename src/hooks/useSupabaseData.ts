@@ -215,9 +215,12 @@ export function useQuests() {
         const participants = (participantsRes.data || [])
           .filter((p) => p.sidequest_id === q.id)
           .map((p) => getUser(p.user_id));
-        const completedByUserIds = (completionsRes.data || [])
-          .filter((c) => c.sidequest_id === q.id)
-          .map((c) => c.user_id);
+        const questCompletions = (completionsRes.data || []).filter((c) => c.sidequest_id === q.id);
+        const completedByUserIds = questCompletions.map((c) => c.user_id);
+        // Per-user completion timestamp — fall back to the quest-level
+        // completed_at for legacy data that predates per-user completions.
+        const myCompletion = user ? questCompletions.find((c) => c.user_id === user.id) : undefined;
+        const myCompletedAt = myCompletion?.completed_at || q.completed_at || null;
         const volunteers: QuestVolunteer[] = (volunteersRes.data || [])
           .filter((v) => v.sidequest_id === q.id)
           .map((v) => ({ userId: v.user_id, user: getUser(v.user_id), role: v.role }));
@@ -259,7 +262,7 @@ export function useQuests() {
           participants,
           completedByUserIds,
           createdAt: q.created_at.split("T")[0],
-          completedAt: q.completed_at?.split("T")[0] || undefined,
+          completedAt: myCompletedAt ? myCompletedAt.split("T")[0] : undefined,
           photos: q.photos && q.photos.length > 0 ? q.photos : undefined,
           notes: q.notes || undefined,
           links: q.links && q.links.length > 0 ? q.links : undefined,
