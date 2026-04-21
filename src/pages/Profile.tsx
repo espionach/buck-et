@@ -221,17 +221,20 @@ const Profile = () => {
     setShowEditProfile(false);
   };
 
-  const handleProfilePicUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const handleProfilePicUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      if (ev.target?.result) {
-        setEditProfilePic(ev.target.result as string);
-      }
-    };
-    reader.readAsDataURL(file);
     e.target.value = "";
+    if (!file) return;
+    setUploadingAvatar(true);
+    try {
+      const url = await uploadAvatar(currentUser.id, file);
+      setEditProfilePic(url);
+    } catch (err: any) {
+      toast.error(err?.message || "Couldn't upload photo. Try again?");
+    } finally {
+      setUploadingAvatar(false);
+    }
   };
 
   // Current quest handlers
