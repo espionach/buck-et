@@ -369,22 +369,26 @@ const CreateQuest = () => {
             <div>
               <label className="text-[11px] text-muted-foreground mb-1 block">Photos & Videos</label>
               <div className="flex flex-wrap gap-2">
-                {photos.map((photo, i) => (
-                  <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden">
-                    {photo.startsWith("data:video") ? (
-                      <video src={photo} className="w-full h-full object-cover" muted />
-                    ) : (
-                      <img src={photo} alt="" className="w-full h-full object-cover" />
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => setPhotos((prev) => prev.filter((_, idx) => idx !== i))}
-                      className="absolute top-0.5 right-0.5 p-0.5 rounded-full bg-foreground/60 text-background"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  </div>
-                ))}
+                {photoPreviews.map((preview, i) => {
+                  const file = pendingPhotos[i];
+                  const isVideo = file?.type?.startsWith("video/");
+                  return (
+                    <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden">
+                      {isVideo ? (
+                        <video src={preview} className="w-full h-full object-cover" muted />
+                      ) : (
+                        <img src={preview} alt="" className="w-full h-full object-cover" />
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => removePendingPhoto(i)}
+                        className="absolute top-0.5 right-0.5 p-0.5 rounded-full bg-foreground/60 text-background"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  );
+                })}
                 <button
                   type="button"
                   onClick={() => photoInputRef.current?.click()}
