@@ -3,9 +3,12 @@ import { Quest } from "@/data/mockData";
 import { ALL_CONTRIBUTION_ROLES } from "@/data/contributionRoles";
 import { ArrowLeft, Sparkles, ChevronDown, ImagePlus, Link as LinkIcon, X, Globe, Check } from "lucide-react";
 import { GroupIconDisplay } from "@/components/GroupIcon";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
+import { uploadSidequestPhotos } from "@/lib/uploads";
+import { toast } from "sonner";
 
 const CreateQuest = () => {
   const navigate = useNavigate();
@@ -27,11 +30,23 @@ const CreateQuest = () => {
   const [carpoolSlots, setCarpoolSlots] = useState("");
   const [customNotes, setCustomNotes] = useState("");
 
-  // Photos & links
-  const [photos, setPhotos] = useState<string[]>([]);
+  // Photos & links — keep raw Files until the sidequest row exists, then upload
+  const [pendingPhotos, setPendingPhotos] = useState<File[]>([]);
+  const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
   const [links, setLinks] = useState<string[]>([]);
   const [newLink, setNewLink] = useState("");
   const photoInputRef = useRef<HTMLInputElement>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  // Revoke object URLs when component unmounts or list changes
+  useEffect(() => {
+    return () => {
+      photoPreviews.forEach((u) => {
+        if (u.startsWith("blob:")) URL.revokeObjectURL(u);
+      });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Contributions the creator wants to open up for sign-ups
   const [contributionRoles, setContributionRoles] = useState<string[]>([]);
@@ -45,18 +60,20 @@ const CreateQuest = () => {
   const selectedGroupData = groups.find((g) => g.id === selectedGroup);
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
-    Array.from(files).forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        if (ev.target?.result) {
-          setPhotos((prev) => [...prev, ev.target!.result as string]);
-        }
-      };
-      reader.readAsDataURL(file);
-    });
+    const files = e.target.files ? Array.from(e.target.files) : [];
     e.target.value = "";
+    if (!files.length) return;
+    setPendingPhotos((prev) => [...prev, ...files]);
+    setPhotoPreviews((prev) => [...prev, ...files.map((f) => URL.createObjectURL(f))]);
+  };
+
+  const removePendingPhoto = (idx: number) => {
+    setPhotoPreviews((prev) => {
+      const removed = prev[idx];
+      if (removed?.startsWith("blob:")) URL.revokeObjectURL(removed);
+      return prev.filter((_, i) => i !== idx);
+    });
+    setPendingPhotos((prev) => prev.filter((_, i) => i !== idx));
   };
 
   const handleAddLink = () => {
