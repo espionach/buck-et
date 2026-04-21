@@ -264,6 +264,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     const { data } = await supabase.from("groups").insert({
       name: group.name,
       emoji: group.emoji,
+      color: group.color || "sky",
       description: group.description || null,
       owner_id: currentUser.id,
     }).select().single();
@@ -303,6 +304,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       const dbUpdates: any = {};
       if (updates.name) dbUpdates.name = updates.name;
       if (updates.emoji) dbUpdates.emoji = updates.emoji;
+      if (updates.color !== undefined) dbUpdates.color = updates.color;
       if (updates.description !== undefined) dbUpdates.description = updates.description || null;
       if (Object.keys(dbUpdates).length > 0) {
         await supabase.from("groups").update(dbUpdates).eq("id", groupId);
@@ -565,6 +567,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     (async () => {
       const dbUpdates: any = {};
       if (updates.name !== undefined) dbUpdates.display_name = updates.name;
+      if (updates.username !== undefined) dbUpdates.username = updates.username;
       if (updates.bio !== undefined) dbUpdates.bio = updates.bio;
       if (updates.profilePicture !== undefined) dbUpdates.avatar_url = updates.profilePicture || null;
       if (Object.keys(dbUpdates).length > 0) {
