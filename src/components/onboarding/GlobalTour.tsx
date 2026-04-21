@@ -47,13 +47,17 @@ const GlobalTour = () => {
 
   if (!tourActive) return null;
 
-  const finish = async () => {
-    // Mark step first so the gate sees a consistent state.
-    if (user) await setOnboardingStep(user.id, "first_quest");
-    // End the tour BEFORE navigating so Coachmarks unmounts and its
-    // route-sync effect can't yank us back to "/" (stripping ?onboarding=1).
+  const finish = () => {
+    // End tour FIRST so Coachmarks unmounts and its route-sync effect
+    // can't yank us back to the last step's route (stripping ?onboarding=1).
     endTour();
+    // Navigate to the "Last step" sidequest screen — same destination as
+    // the Tour page's Skip button.
     navigate("/create?onboarding=1", { replace: true });
+    // Persist progress in the background; the gate already allows /create
+    // because tourActive was true when we navigated and CreateQuest is an
+    // allowed onboarding route.
+    if (user) void setOnboardingStep(user.id, "first_quest");
   };
 
   return <Coachmarks steps={STEPS} onComplete={finish} onSkip={finish} />;
