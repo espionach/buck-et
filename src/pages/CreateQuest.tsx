@@ -189,14 +189,42 @@ const CreateQuest = () => {
     <div className="min-h-screen px-5 pt-14 pb-28">
       {/* Header */}
       <div className="flex items-center gap-3 mb-8">
-        <button
-          onClick={() => navigate(-1)}
-          className="p-2 rounded-xl bg-muted text-muted-foreground"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-        <h1 className="text-xl font-bold text-foreground">New Sidequest</h1>
+        {!isOnboarding && (
+          <button
+            onClick={() => navigate(-1)}
+            className="p-2 rounded-xl bg-muted text-muted-foreground"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+        )}
+        <div className="flex-1">
+          {isOnboarding && (
+            <div className="text-[11px] font-semibold uppercase tracking-wider text-primary mb-1">
+              Last step
+            </div>
+          )}
+          <h1 className="text-xl font-bold text-foreground">
+            {isOnboarding ? "Create your first sidequest" : "New Sidequest"}
+          </h1>
+        </div>
+        {isOnboarding && user && (
+          <button
+            onClick={async () => {
+              await completeOnboarding(user.id);
+              navigate("/", { replace: true });
+            }}
+            className="text-xs font-medium text-muted-foreground active:text-foreground"
+          >
+            Skip
+          </button>
+        )}
       </div>
+
+      {isOnboarding && (
+        <p className="text-sm text-muted-foreground -mt-4 mb-6">
+          Even just a title works — you can add details later. Or skip and head to the app.
+        </p>
+      )}
 
       {/* Group selector dropdown */}
       <div className="relative mb-5">
