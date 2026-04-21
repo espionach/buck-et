@@ -9,6 +9,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Quest, User } from "@/data/mockData";
 import { useLocation, useSearchParams, useNavigate } from "react-router-dom";
 import { usePopup } from "@/hooks/use-popup";
+import { uploadAvatar, uploadSidequestPhotos } from "@/lib/uploads";
+import SidequestPhoto from "@/components/SidequestPhoto";
+import { toast } from "sonner";
 const Profile = () => {
   const {
     currentUser,
@@ -218,17 +221,20 @@ const Profile = () => {
     setShowEditProfile(false);
   };
 
-  const handleProfilePicUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const handleProfilePicUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      if (ev.target?.result) {
-        setEditProfilePic(ev.target.result as string);
-      }
-    };
-    reader.readAsDataURL(file);
     e.target.value = "";
+    if (!file) return;
+    setUploadingAvatar(true);
+    try {
+      const url = await uploadAvatar(currentUser.id, file);
+      setEditProfilePic(url);
+    } catch (err: any) {
+      toast.error(err?.message || "Couldn't upload photo. Try again?");
+    } finally {
+      setUploadingAvatar(false);
+    }
   };
 
   // Current quest handlers
@@ -339,34 +345,36 @@ const Profile = () => {
     setNewLink("");
   };
 
-  const handleCurrentPhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
-    Array.from(files).forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        if (ev.target?.result) {
-          setEditQuestPhotos((prev) => [...prev, ev.target!.result as string]);
-        }
-      };
-      reader.readAsDataURL(file);
-    });
+  const [uploadingPhotos, setUploadingPhotos] = useState(false);
+
+  const handleCurrentPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files ? Array.from(e.target.files) : [];
     e.target.value = "";
+    if (!files.length || !editingCurrentQuest) return;
+    setUploadingPhotos(true);
+    try {
+      const paths = await uploadSidequestPhotos(editingCurrentQuest.id, files);
+      setEditQuestPhotos((prev) => [...prev, ...paths]);
+    } catch (err: any) {
+      toast.error(err?.message || "Couldn't upload photos. Try again?");
+    } finally {
+      setUploadingPhotos(false);
+    }
   };
 
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
-    Array.from(files).forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        if (ev.target?.result) {
-          setQuestPhotos((prev) => [...prev, ev.target!.result as string]);
-        }
-      };
-      reader.readAsDataURL(file);
-    });
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files ? Array.from(e.target.files) : [];
     e.target.value = "";
+    if (!files.length || !editingPastQuest) return;
+    setUploadingPhotos(true);
+    try {
+      const paths = await uploadSidequestPhotos(editingPastQuest.id, files);
+      setQuestPhotos((prev) => [...prev, ...paths]);
+    } catch (err: any) {
+      toast.error(err?.message || "Couldn't upload photos. Try again?");
+    } finally {
+      setUploadingPhotos(false);
+    }
   };
 
   const removePhoto = (index: number) => {
@@ -413,7 +421,8 @@ const Profile = () => {
               )}
               <button
                 onClick={() => setShowPicMenu(true)}
-                className="absolute -bottom-1 -right-1 p-1.5 rounded-full bg-primary text-primary-foreground"
+                disabled={uploadingAvatar}
+                className="absolute -bottom-1 -right-1 p-1.5 rounded-full bg-primary text-primary-foreground disabled:opacity-60"
               >
                 <Camera className="w-4 h-4" />
               </button>
@@ -425,7 +434,9 @@ const Profile = () => {
                 className="hidden"
               />
             </div>
-            <p className="text-xs text-muted-foreground">Tap camera to update photo</p>
+            <p className="text-xs text-muted-foreground">
+              {uploadingAvatar ? "Uploading…" : "Tap camera to update photo"}
+            </p>
           </div>
 
           {/* Photo action sheet */}
@@ -959,11 +970,11 @@ const Profile = () => {
                 <div className="flex flex-wrap gap-2">
                    {editQuestPhotos.map((photo, i) => (
                     <div key={i} className="relative group">
-                      {photo.startsWith("data:video") ? (
-                        <video src={photo} className="w-16 h-16 rounded-xl object-cover border border-border/30" muted />
-                      ) : (
-                        <img src={photo} alt={`Photo ${i + 1}`} className="w-16 h-16 rounded-xl object-cover border border-border/30" />
-                      )}
+                      <SidequestPhoto
+                        src={photo}
+                        alt={`Photo ${i + 1}`}
+                        className="w-16 h-16 rounded-xl object-cover border border-border/30"
+                      />
                       <button
                         onClick={() => setEditQuestPhotos((prev) => prev.filter((_, idx) => idx !== i))}
                         className="absolute -top-1.5 -right-1.5 p-0.5 rounded-full bg-destructive text-destructive-foreground opacity-0 group-hover:opacity-100 transition-opacity"
@@ -974,7 +985,6 @@ const Profile = () => {
                   ))}
                   <button
                     onClick={() => currentPhotoRef.current?.click()}
-                    className="w-16 h-16 rounded-xl border-2 border-dashed border-border flex items-center justify-center text-muted-foreground hover:border-primary hover:text-primary transition-colors"
                   >
                     <ImagePlus className="w-4 h-4" />
                   </button>
@@ -1134,11 +1144,11 @@ const Profile = () => {
                 <div className="flex flex-wrap gap-2">
                   {questPhotos.map((photo, i) => (
                     <div key={i} className="relative group">
-                      {photo.startsWith("data:video") ? (
-                        <video src={photo} className="w-20 h-20 rounded-xl object-cover border border-border/30" muted />
-                      ) : (
-                        <img src={photo} alt={`Photo ${i + 1}`} className="w-20 h-20 rounded-xl object-cover border border-border/30" />
-                      )}
+                      <SidequestPhoto
+                        src={photo}
+                        alt={`Photo ${i + 1}`}
+                        className="w-20 h-20 rounded-xl object-cover border border-border/30"
+                      />
                       <button
                         onClick={() => removePhoto(i)}
                         className="absolute -top-1.5 -right-1.5 p-0.5 rounded-full bg-destructive text-destructive-foreground opacity-0 group-hover:opacity-100 transition-opacity"

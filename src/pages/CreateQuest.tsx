@@ -3,9 +3,12 @@ import { Quest } from "@/data/mockData";
 import { ALL_CONTRIBUTION_ROLES } from "@/data/contributionRoles";
 import { ArrowLeft, Sparkles, ChevronDown, ImagePlus, Link as LinkIcon, X, Globe, Check } from "lucide-react";
 import { GroupIconDisplay } from "@/components/GroupIcon";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
+import { uploadSidequestPhotos } from "@/lib/uploads";
+import { toast } from "sonner";
 
 const CreateQuest = () => {
   const navigate = useNavigate();
@@ -27,11 +30,23 @@ const CreateQuest = () => {
   const [carpoolSlots, setCarpoolSlots] = useState("");
   const [customNotes, setCustomNotes] = useState("");
 
-  // Photos & links
-  const [photos, setPhotos] = useState<string[]>([]);
+  // Photos & links — keep raw Files until the sidequest row exists, then upload
+  const [pendingPhotos, setPendingPhotos] = useState<File[]>([]);
+  const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
   const [links, setLinks] = useState<string[]>([]);
   const [newLink, setNewLink] = useState("");
   const photoInputRef = useRef<HTMLInputElement>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  // Revoke object URLs when component unmounts or list changes
+  useEffect(() => {
+    return () => {
+      photoPreviews.forEach((u) => {
+        if (u.startsWith("blob:")) URL.revokeObjectURL(u);
+      });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Contributions the creator wants to open up for sign-ups
   const [contributionRoles, setContributionRoles] = useState<string[]>([]);
@@ -45,18 +60,20 @@ const CreateQuest = () => {
   const selectedGroupData = groups.find((g) => g.id === selectedGroup);
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
-    Array.from(files).forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        if (ev.target?.result) {
-          setPhotos((prev) => [...prev, ev.target!.result as string]);
-        }
-      };
-      reader.readAsDataURL(file);
-    });
+    const files = e.target.files ? Array.from(e.target.files) : [];
     e.target.value = "";
+    if (!files.length) return;
+    setPendingPhotos((prev) => [...prev, ...files]);
+    setPhotoPreviews((prev) => [...prev, ...files.map((f) => URL.createObjectURL(f))]);
+  };
+
+  const removePendingPhoto = (idx: number) => {
+    setPhotoPreviews((prev) => {
+      const removed = prev[idx];
+      if (removed?.startsWith("blob:")) URL.revokeObjectURL(removed);
+      return prev.filter((_, i) => i !== idx);
+    });
+    setPendingPhotos((prev) => prev.filter((_, i) => i !== idx));
   };
 
   const handleAddLink = () => {
@@ -65,41 +82,98 @@ const CreateQuest = () => {
     setNewLink("");
   };
 
-  const handleCreate = () => {
-    if (!title.trim()) return;
-    const questId = `q${Date.now()}`;
+  const handleCreate = async () => {
+    if (!title.trim() || submitting) return;
+    setSubmitting(true);
     const hasDate = !!(date || time || location || meetupSpot || transportation || customNotes || contributionRoles.length > 0);
-    const quest: Quest = {
-      id: questId,
-      title: title.trim(),
-      description: description.trim() || undefined,
-      createdBy: currentUser,
-      groupId: selectedGroup || undefined,
-      isFollowerOnly: !selectedGroup,
-      participants: [currentUser],
-      completedByUserIds: [],
-      createdAt: new Date().toISOString().split("T")[0],
-      comments: [],
-      photos: photos.length > 0 ? photos : undefined,
-      links: links.length > 0 ? links : undefined,
-      logistics: hasDate ? {
-        date: date || undefined,
-        time: time || undefined,
-        location: location || undefined,
-        meetupSpot: meetupSpot || undefined,
-        transportation: (transportation as any) || undefined,
-        carpoolSlots: carpoolSlots ? parseInt(carpoolSlots) : undefined,
-        volunteers: [],
-        customNotes: customNotes || undefined,
-        contributionRoles: contributionRoles.length > 0 ? contributionRoles : undefined,
-      } : undefined,
-    };
-    addQuest(quest);
+    try {
+      // 1. Insert the sidequest row first so we get a real id and storage RLS allows uploads.
+      const { data: inserted, error: insertErr } = await supabase
+        .from("sidequests")
+        .insert({
+          title: title.trim(),
+          description: description.trim() || null,
+          created_by: currentUser.id,
+          group_id: selectedGroup || null,
+          is_friends_only: !selectedGroup,
+          photos: [],
+          links: links.length > 0 ? links : [],
+          logistics_date: date || null,
+          logistics_time: time || null,
+          logistics_location: location || null,
+          logistics_meetup_spot: meetupSpot || null,
+          logistics_transportation: transportation || null,
+          logistics_carpool_slots: carpoolSlots ? parseInt(carpoolSlots) : null,
+          logistics_custom_notes: customNotes || null,
+          contribution_roles: contributionRoles,
+        })
+        .select()
+        .single();
 
-    if (selectedGroup) {
-      navigate(`/groups?open=${selectedGroup}`, { replace: true, state: { justAddedQuestId: questId } });
-    } else {
-      navigate("/profile", { replace: true, state: { justAddedQuestId: questId } });
+      if (insertErr || !inserted) throw insertErr || new Error("Could not create sidequest");
+      const questId = inserted.id as string;
+
+      // 2. Add creator as participant.
+      await supabase.from("sidequest_participants").insert({
+        sidequest_id: questId,
+        user_id: currentUser.id,
+      });
+
+      // 3. Upload any pending photos under the new quest id.
+      let uploadedPaths: string[] = [];
+      if (pendingPhotos.length > 0) {
+        try {
+          uploadedPaths = await uploadSidequestPhotos(questId, pendingPhotos);
+          if (uploadedPaths.length > 0) {
+            await supabase
+              .from("sidequests")
+              .update({ photos: uploadedPaths })
+              .eq("id", questId);
+          }
+        } catch (err: any) {
+          toast.error("Sidequest created, but photos failed to upload.");
+        }
+      }
+
+      // 4. Sync local store so the new quest shows up immediately.
+      const localQuest: Quest = {
+        id: questId,
+        title: title.trim(),
+        description: description.trim() || undefined,
+        createdBy: currentUser,
+        groupId: selectedGroup || undefined,
+        isFollowerOnly: !selectedGroup,
+        participants: [currentUser],
+        completedByUserIds: [],
+        createdAt: new Date().toISOString().split("T")[0],
+        comments: [],
+        photos: uploadedPaths.length > 0 ? uploadedPaths : undefined,
+        links: links.length > 0 ? links : undefined,
+        logistics: hasDate ? {
+          date: date || undefined,
+          time: time || undefined,
+          location: location || undefined,
+          meetupSpot: meetupSpot || undefined,
+          transportation: (transportation as any) || undefined,
+          carpoolSlots: carpoolSlots ? parseInt(carpoolSlots) : undefined,
+          volunteers: [],
+          customNotes: customNotes || undefined,
+          contributionRoles: contributionRoles.length > 0 ? contributionRoles : undefined,
+        } : undefined,
+      };
+      // Push directly into the store without re-inserting in the DB.
+      const { quests, _invalidate } = useAppStore.getState() as any;
+      useAppStore.setState({ quests: [localQuest, ...quests] });
+      _invalidate?.(["quests"]);
+
+      if (selectedGroup) {
+        navigate(`/groups?open=${selectedGroup}`, { replace: true, state: { justAddedQuestId: questId } });
+      } else {
+        navigate("/profile", { replace: true, state: { justAddedQuestId: questId } });
+      }
+    } catch (err: any) {
+      toast.error(err?.message || "Couldn't create sidequest. Try again?");
+      setSubmitting(false);
     }
   };
 
@@ -295,22 +369,26 @@ const CreateQuest = () => {
             <div>
               <label className="text-[11px] text-muted-foreground mb-1 block">Photos & Videos</label>
               <div className="flex flex-wrap gap-2">
-                {photos.map((photo, i) => (
-                  <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden">
-                    {photo.startsWith("data:video") ? (
-                      <video src={photo} className="w-full h-full object-cover" muted />
-                    ) : (
-                      <img src={photo} alt="" className="w-full h-full object-cover" />
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => setPhotos((prev) => prev.filter((_, idx) => idx !== i))}
-                      className="absolute top-0.5 right-0.5 p-0.5 rounded-full bg-foreground/60 text-background"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  </div>
-                ))}
+                {photoPreviews.map((preview, i) => {
+                  const file = pendingPhotos[i];
+                  const isVideo = file?.type?.startsWith("video/");
+                  return (
+                    <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden">
+                      {isVideo ? (
+                        <video src={preview} className="w-full h-full object-cover" muted />
+                      ) : (
+                        <img src={preview} alt="" className="w-full h-full object-cover" />
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => removePendingPhoto(i)}
+                        className="absolute top-0.5 right-0.5 p-0.5 rounded-full bg-foreground/60 text-background"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  );
+                })}
                 <button
                   type="button"
                   onClick={() => photoInputRef.current?.click()}
@@ -369,11 +447,11 @@ const CreateQuest = () => {
         <div className="max-w-md mx-auto">
           <button
             onClick={handleCreate}
-            disabled={!title.trim()}
+            disabled={!title.trim() || submitting}
             className="w-full py-4 rounded-xl bg-primary text-primary-foreground font-bold text-base flex items-center justify-center gap-2 disabled:opacity-40 active:scale-[0.98] transition-transform shadow-lg"
           >
             <Sparkles className="w-5 h-5" />
-            Launch Sidequest
+            {submitting ? "Launching…" : "Launch Sidequest"}
           </button>
         </div>
       </div>

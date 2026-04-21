@@ -3,6 +3,7 @@ import { QuestVolunteer } from "@/data/mockData";
 import { ALL_CONTRIBUTION_ROLES } from "@/data/contributionRoles";
 import UserAvatar from "@/components/UserAvatar";
 import { GroupIconDisplay } from "@/components/GroupIcon";
+import SidequestPhoto from "@/components/SidequestPhoto";
 import { ArrowLeft, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send, ExternalLink, HandMetal, Check, Globe, StickyNote, MoreVertical, Pencil, Pin, Trash2 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -198,11 +199,12 @@ const QuestDetail = () => {
           {quest.photos && quest.photos.length > 0 && (
             <div className="flex gap-2 overflow-x-auto pb-1">
               {quest.photos.map((photo, i) => (
-                photo.startsWith("data:video") ? (
-                  <video key={i} src={photo} className="w-24 h-24 rounded-xl object-cover shrink-0 border border-border/30" muted controls />
-                ) : (
-                  <img key={i} src={photo} alt={`Quest photo ${i + 1}`} className="w-24 h-24 rounded-xl object-cover shrink-0 border border-border/30" />
-                )
+                <SidequestPhoto
+                  key={i}
+                  src={photo}
+                  alt={`Quest photo ${i + 1}`}
+                  className="w-24 h-24 rounded-xl object-cover shrink-0 border border-border/30"
+                />
               ))}
             </div>
           )}

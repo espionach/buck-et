@@ -527,8 +527,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_view_sidequest: {
+        Args: { _sidequest_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_group_member: {
         Args: { _group_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_sidequest_owner: {
+        Args: { _sidequest_id: string; _user_id: string }
         Returns: boolean
       }
     }
