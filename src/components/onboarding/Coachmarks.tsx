@@ -182,7 +182,7 @@ function Coachmarks({ steps, onComplete, onSkip, onBackFromFirst }: Props) {
             transition: animatePosition
               ? "top 0.25s ease, left 0.25s ease, width 0.25s ease, height 0.25s ease, opacity 0.25s ease"
               : "opacity 0.25s ease",
-            animation: "fade-in 0.25s ease-out",
+            animation: animatePosition ? undefined : "fade-in 0.25s ease-out",
             // Let clicks pass through to the spotlighted element
             pointerEvents: "none",
           }}
@@ -207,7 +207,7 @@ function Coachmarks({ steps, onComplete, onSkip, onBackFromFirst }: Props) {
             transition: animatePosition
               ? "top 0.25s ease, left 0.25s ease, opacity 0.25s ease"
               : "opacity 0.25s ease",
-            animation: "fade-in 0.25s ease-out",
+            animation: animatePosition ? undefined : "fade-in 0.25s ease-out",
           }}
         >
           <div className="flex items-center justify-between mb-1">
