@@ -416,6 +416,15 @@ const Profile = () => {
               >
                 <Camera className="w-4 h-4" />
               </button>
+              {editProfilePic && (
+                <button
+                  onClick={() => setEditProfilePic("")}
+                  aria-label="Remove photo"
+                  className="absolute -top-1 -right-1 p-1 rounded-full bg-destructive text-destructive-foreground"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
               <input
                 ref={profilePicRef}
                 type="file"
@@ -424,7 +433,9 @@ const Profile = () => {
                 className="hidden"
               />
             </div>
-            <p className="text-xs text-muted-foreground">Tap camera to change photo</p>
+            <p className="text-xs text-muted-foreground">
+              Tap camera to change{editProfilePic ? " · X to remove" : ""}
+            </p>
           </div>
 
           <div>
@@ -435,6 +446,27 @@ const Profile = () => {
               placeholder="Name"
               className="w-full px-3 py-2.5 rounded-xl bg-muted border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
             />
+          </div>
+
+          <div>
+            <label className="text-sm font-semibold text-foreground mb-1.5 block">Username</label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground pointer-events-none">@</span>
+              <input
+                value={editUsername}
+                onChange={(e) => {
+                  setEditUsername(e.target.value.replace(/\s/g, ""));
+                  setUsernameError(null);
+                }}
+                placeholder="username"
+                className="w-full pl-7 pr-3 py-2.5 rounded-xl bg-muted border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+              />
+            </div>
+            {usernameError ? (
+              <p className="text-xs text-destructive mt-1">{usernameError}</p>
+            ) : (
+              <p className="text-xs text-muted-foreground mt-1">Letters, numbers, underscores. Must be unique.</p>
+            )}
           </div>
 
           <div>
