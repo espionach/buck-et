@@ -51,6 +51,7 @@ const Profile = () => {
   // Profile picture upload
   const profilePicRef = useRef<HTMLInputElement>(null);
   const [editProfilePic, setEditProfilePic] = useState(currentUser.profilePicture || "");
+  const [showPicMenu, setShowPicMenu] = useState(false);
 
   // Current quest editing state
   const [editingCurrentQuest, setEditingCurrentQuest] = useState<Quest | null>(null);
