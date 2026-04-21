@@ -350,8 +350,7 @@ const Feed = () => {
               <QuestList
                 quests={filteredQuests}
                 emptyIcon="🔭"
-                emptyText="No sidequests to show"
-                emptySubtext="Follow more friends to see their sidequests!"
+                emptyText="It's quiet in here… Where are your friends?"
                 onMarkDone={() => navigate("/profile?tab=past")}
                 onMarkUndone={() => navigate("/profile?tab=current")}
                 onViewProfile={(user) => setSelectedProfile(user)}
