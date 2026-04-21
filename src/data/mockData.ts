@@ -3,6 +3,7 @@
 export interface User {
   id: string;
   name: string;
+  username?: string;
   avatar: string;
   bio: string;
   profilePicture?: string;
@@ -27,6 +28,7 @@ export interface Group {
   id: string;
   name: string;
   emoji: string;
+  color?: string;
   description?: string;
   members: User[];
   memberRoles: GroupMember[];

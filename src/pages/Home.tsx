@@ -57,7 +57,11 @@ const Boards = () => {
     ? sortedGroups.filter(
         (g) =>
           g.name.toLowerCase().includes(search.toLowerCase()) ||
-          g.members.some((m) => m.name.toLowerCase().includes(search.toLowerCase()))
+          g.members.some(
+            (m) =>
+              m.name.toLowerCase().includes(search.toLowerCase()) ||
+              (m.username || "").toLowerCase().includes(search.toLowerCase())
+          )
       )
     : sortedGroups;
 
@@ -286,12 +290,13 @@ const Boards = () => {
                   </p>
                 </div>
               </div>
-              <button
-                onClick={handleOpenSettings}
-                className="p-2 rounded-full bg-muted text-muted-foreground"
-              >
-                <Settings className="w-5 h-5" />
-              </button>
+          <button
+            onClick={handleOpenSettings}
+            aria-label="Group settings"
+            className="p-2 text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <Settings className="w-5 h-5" />
+          </button>
             </div>
 
             {/* Settings - full page */}

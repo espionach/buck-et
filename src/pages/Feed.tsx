@@ -89,13 +89,20 @@ const Feed = () => {
         (q) =>
           q.title.toLowerCase().includes(search.toLowerCase()) ||
           q.createdBy.name.toLowerCase().includes(search.toLowerCase()) ||
-          q.participants.some((p) => p.name.toLowerCase().includes(search.toLowerCase()))
+          (q.createdBy.username || "").toLowerCase().includes(search.toLowerCase()) ||
+          q.participants.some(
+            (p) =>
+              p.name.toLowerCase().includes(search.toLowerCase()) ||
+              (p.username || "").toLowerCase().includes(search.toLowerCase())
+          )
       )
     : sortedQuests;
 
   const filteredPeople = search
-    ? allSearchableUsers.filter((u) =>
-        u.name.toLowerCase().includes(search.toLowerCase())
+    ? allSearchableUsers.filter(
+        (u) =>
+          u.name.toLowerCase().includes(search.toLowerCase()) ||
+          (u.username || "").toLowerCase().includes(search.toLowerCase())
       )
     : allSearchableUsers;
 

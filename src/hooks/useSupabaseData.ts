@@ -14,6 +14,7 @@ function dbProfileToUser(row: any): User {
   const u: User = {
     id: row.user_id,
     name: row.display_name || "Anonymous",
+    username: row.username || undefined,
     avatar: "👤",
     bio: row.bio || "",
     profilePicture: row.avatar_url || undefined,
@@ -159,6 +160,7 @@ export function useGroups() {
           id: g.id,
           name: g.name,
           emoji: g.emoji,
+          color: g.color || "sky",
           description: g.description || undefined,
           members,
           memberRoles,

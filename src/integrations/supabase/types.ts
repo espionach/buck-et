@@ -158,8 +158,38 @@ export type Database = {
           },
         ]
       }
+      group_notification_mutes: {
+        Row: {
+          created_at: string
+          group_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          group_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          group_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_notification_mutes_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       groups: {
         Row: {
+          color: string
           created_at: string
           description: string | null
           emoji: string
@@ -168,6 +198,7 @@ export type Database = {
           owner_id: string
         }
         Insert: {
+          color?: string
           created_at?: string
           description?: string | null
           emoji?: string
@@ -176,6 +207,7 @@ export type Database = {
           owner_id: string
         }
         Update: {
+          color?: string
           created_at?: string
           description?: string | null
           emoji?: string
@@ -272,6 +304,7 @@ export type Database = {
           id: string
           updated_at: string
           user_id: string
+          username: string
         }
         Insert: {
           avatar_url?: string | null
@@ -281,6 +314,7 @@ export type Database = {
           id?: string
           updated_at?: string
           user_id: string
+          username: string
         }
         Update: {
           avatar_url?: string | null
@@ -290,6 +324,7 @@ export type Database = {
           id?: string
           updated_at?: string
           user_id?: string
+          username?: string
         }
         Relationships: []
       }

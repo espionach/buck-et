@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Users, Check, X, ArrowRightLeft } from "lucide-react";
 import { useState } from "react";
 import { usePopup } from "@/hooks/use-popup";
+import { GROUP_COLORS } from "@/data/groupColors";
 
 interface GroupCardProps {
   group: Group;
@@ -13,11 +14,8 @@ interface GroupCardProps {
   index: number;
 }
 
-const gradients = [
-  "from-primary/20 to-quest-gold/20",
-  "from-secondary/20 to-quest-blue/20",
-  "from-accent/20 to-quest-pink/20",
-];
+const gradientFor = (id?: string) =>
+  GROUP_COLORS.find((c) => c.id === id)?.gradient || GROUP_COLORS[0].gradient;
 
 const GroupCard = ({ group, onClick, index }: GroupCardProps) => {
   const { transferRequests, acceptTransfer, declineTransfer, currentUser } = useAppStore();
@@ -38,7 +36,7 @@ const GroupCard = ({ group, onClick, index }: GroupCardProps) => {
       >
         <button
           onClick={onClick}
-          className={`w-full text-left p-5 rounded-xl bg-gradient-to-br ${gradients[index % gradients.length]} border border-border/50 active:scale-[0.98] transition-transform flex flex-col`}
+          className={`w-full text-left p-5 rounded-xl bg-gradient-to-br ${gradientFor(group.color)} border border-border/50 active:scale-[0.98] transition-transform flex flex-col`}
         >
           {/* Transfer icon badge */}
           {pendingTransfer && (

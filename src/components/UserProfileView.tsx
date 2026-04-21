@@ -49,6 +49,9 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
       <div className="flex flex-col items-center mb-4">
         <UserAvatar user={user} size="lg" />
         <h2 className="text-lg font-bold text-foreground mt-3">{user.name}</h2>
+        {user.username && (
+          <p className="text-xs text-muted-foreground/70 mt-0.5">@{user.username}</p>
+        )}
         <p className="text-sm text-muted-foreground mt-1 text-center">{user.bio}</p>
         <div className="flex items-center gap-4 mt-3">
           {isFriend ? (
