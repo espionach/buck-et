@@ -35,6 +35,10 @@ const OVERLAY_OPACITY = 0.45;
 function Coachmarks({ steps, onComplete, onSkip, onBackFromFirst }: Props) {
   const [index, setIndex] = useState(0);
   const [rect, setRect] = useState<Rect | null>(null);
+  // Skip the slide transition on the very first appearance of the spotlight
+  // (and whenever we move to a new step) so it doesn't fly in from the
+  // top-left corner. We re-enable the transition after the first paint.
+  const [animatePosition, setAnimatePosition] = useState(false);
   const [tooltipHeight, setTooltipHeight] = useState(140);
   const tooltipRef = useRef<HTMLDivElement | null>(null);
   const location = useLocation();
@@ -65,6 +69,9 @@ function Coachmarks({ steps, onComplete, onSkip, onBackFromFirst }: Props) {
 
     let raf = 0;
     let cancelled = false;
+    // Reset to "no transition" mode whenever the step changes so the
+    // spotlight appears in place rather than sliding from its previous spot.
+    setAnimatePosition(false);
 
     const measure = () => {
       if (cancelled) return;
@@ -75,6 +82,11 @@ function Coachmarks({ steps, onComplete, onSkip, onBackFromFirst }: Props) {
       }
       const r = el.getBoundingClientRect();
       setRect({ top: r.top, left: r.left, width: r.width, height: r.height });
+      // After we've placed it, enable smooth transitions for subsequent
+      // resize/scroll updates within the same step.
+      requestAnimationFrame(() => {
+        if (!cancelled) setAnimatePosition(true);
+      });
     };
 
     measure();
@@ -159,7 +171,10 @@ function Coachmarks({ steps, onComplete, onSkip, onBackFromFirst }: Props) {
             width: rect.width + SPOTLIGHT_PADDING * 2,
             height: rect.height + SPOTLIGHT_PADDING * 2,
             boxShadow: `0 0 0 9999px hsl(var(--foreground) / ${OVERLAY_OPACITY})`,
-            transition: "top 0.25s ease, left 0.25s ease, width 0.25s ease, height 0.25s ease",
+            transition: animatePosition
+              ? "top 0.25s ease, left 0.25s ease, width 0.25s ease, height 0.25s ease, opacity 0.25s ease"
+              : "opacity 0.25s ease",
+            animation: "fade-in 0.25s ease-out",
             // Let clicks pass through to the spotlighted element
             pointerEvents: "none",
           }}
@@ -181,7 +196,10 @@ function Coachmarks({ steps, onComplete, onSkip, onBackFromFirst }: Props) {
             top: tooltipTop,
             left: tooltipLeft,
             width: TOOLTIP_WIDTH,
-            transition: "top 0.25s ease, left 0.25s ease",
+            transition: animatePosition
+              ? "top 0.25s ease, left 0.25s ease, opacity 0.25s ease"
+              : "opacity 0.25s ease",
+            animation: "fade-in 0.25s ease-out",
           }}
         >
           <div className="flex items-center justify-between mb-1">
