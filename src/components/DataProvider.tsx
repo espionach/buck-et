@@ -183,6 +183,52 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
     if (user && profile.data) store.setInitialized(true);
   }, [user, profile.data]);
 
+  // Process invite ref captured at signup: send a friend request to the inviter once we know the current user.
+  useEffect(() => {
+    if (!user || !profile.data) return;
+    let ref: string | null = null;
+    try {
+      ref = localStorage.getItem("invite_ref");
+    } catch {
+      return;
+    }
+    if (!ref) return;
+    (async () => {
+      try {
+        const { supabase } = await import("@/integrations/supabase/client");
+        const { data: target } = await supabase
+          .from("profiles")
+          .select("user_id, username")
+          .ilike("username", ref!)
+          .maybeSingle();
+        if (target && target.user_id !== user.id) {
+          // Avoid dup if friendship/request already exists
+          const { data: existingFriend } = await supabase
+            .from("friendships")
+            .select("id")
+            .or(`and(user_id.eq.${user.id},friend_id.eq.${target.user_id}),and(user_id.eq.${target.user_id},friend_id.eq.${user.id})`)
+            .maybeSingle();
+          const { data: existingReq } = await supabase
+            .from("friend_requests")
+            .select("id")
+            .or(`and(from_user_id.eq.${user.id},to_user_id.eq.${target.user_id}),and(from_user_id.eq.${target.user_id},to_user_id.eq.${user.id})`)
+            .maybeSingle();
+          if (!existingFriend && !existingReq) {
+            await supabase.from("friend_requests").insert({
+              from_user_id: user.id,
+              to_user_id: target.user_id,
+              status: "pending",
+            });
+          }
+        }
+      } catch (err) {
+        console.error("Invite ref processing failed", err);
+      } finally {
+        try { localStorage.removeItem("invite_ref"); } catch {}
+      }
+    })();
+  }, [user, profile.data]);
+
   return (
     <>
       <ErrorBanner
