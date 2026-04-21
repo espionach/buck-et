@@ -350,7 +350,8 @@ const Feed = () => {
               <QuestList
                 quests={filteredQuests}
                 emptyIcon="🔭"
-                emptyText="It's quiet in here… Where are your friends?"
+                emptyText="It's quiet in here…"
+                emptySubtext="Where are your friends?"
                 onMarkDone={() => navigate("/profile?tab=past")}
                 onMarkUndone={() => navigate("/profile?tab=current")}
                 onViewProfile={(user) => setSelectedProfile(user)}
