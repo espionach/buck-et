@@ -185,6 +185,42 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_preferences: {
+        Row: {
+          created_at: string
+          id: string
+          notify_group_invitation: boolean
+          notify_new_quest_from_friend: boolean
+          notify_new_quest_in_group: boolean
+          notify_ownership_transfer: boolean
+          notify_quest_join: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notify_group_invitation?: boolean
+          notify_new_quest_from_friend?: boolean
+          notify_new_quest_in_group?: boolean
+          notify_ownership_transfer?: boolean
+          notify_quest_join?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notify_group_invitation?: boolean
+          notify_new_quest_from_friend?: boolean
+          notify_new_quest_in_group?: boolean
+          notify_ownership_transfer?: boolean
+          notify_quest_join?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           comment_id: string | null
