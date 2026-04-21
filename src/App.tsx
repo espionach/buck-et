@@ -20,13 +20,29 @@ import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import BottomNav from "./components/BottomNav";
+import Welcome from "./pages/onboarding/Welcome";
+import OnboardingPermissions from "./pages/onboarding/Permissions";
+import OnboardingFriends from "./pages/onboarding/Friends";
+import OnboardingTour from "./pages/onboarding/Tour";
+import { useOnboardingStatus, ONBOARDING_PATHS } from "@/hooks/useOnboarding";
 
 const queryClient = new QueryClient();
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
+  const { onboarded, step, loading: onboardingLoading } = useOnboardingStatus();
+  const location = useLocation();
   if (loading) return <div className="flex min-h-screen items-center justify-center text-muted-foreground">Loading...</div>;
   if (!user) return <Navigate to="/login" replace />;
+  if (onboardingLoading) return <div className="flex min-h-screen items-center justify-center text-muted-foreground">Loading...</div>;
+  // If user hasn't finished onboarding, redirect them into the flow
+  // (but allow them to be on any /onboarding/* route or /create when resuming first_quest)
+  const onOnboardingRoute = location.pathname.startsWith("/onboarding/");
+  const onFirstQuestRoute = location.pathname === "/create";
+  if (!onboarded && !onOnboardingRoute && !onFirstQuestRoute) {
+    const target = step ? ONBOARDING_PATHS[step] : "/onboarding/welcome";
+    return <Navigate to={target} replace />;
+  }
   return <>{children}</>;
 };
 
@@ -48,6 +64,10 @@ const AppLayout = () => {
         <Route path="/signup" element={<AuthRoute><Signup /></AuthRoute>} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/onboarding/welcome" element={<ProtectedRoute><Welcome /></ProtectedRoute>} />
+        <Route path="/onboarding/permissions" element={<ProtectedRoute><OnboardingPermissions /></ProtectedRoute>} />
+        <Route path="/onboarding/friends" element={<ProtectedRoute><OnboardingFriends /></ProtectedRoute>} />
+        <Route path="/onboarding/tour" element={<ProtectedRoute><OnboardingTour /></ProtectedRoute>} />
         <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
         <Route path="/boards" element={<ProtectedRoute><Boards /></ProtectedRoute>} />
         <Route path="/groups" element={<ProtectedRoute><Boards /></ProtectedRoute>} />

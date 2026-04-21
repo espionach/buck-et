@@ -4,9 +4,9 @@ import { motion } from "framer-motion";
 import { useAppStore } from "@/data/appState";
 
 const tabs = [
-  { path: "/", icon: Home, label: "Home" },
-  { path: "/groups", icon: LayoutGrid, label: "Groups" },
-  { path: "/profile", icon: User, label: "Profile" },
+  { path: "/", icon: Home, label: "Home", tourId: "nav-home" },
+  { path: "/groups", icon: LayoutGrid, label: "Groups", tourId: "nav-groups" },
+  { path: "/profile", icon: User, label: "Profile", tourId: "nav-profile" },
 ];
 
 const BottomNav = () => {
@@ -21,6 +21,7 @@ const BottomNav = () => {
         <div className="fixed bottom-20 z-50 w-full max-w-md left-1/2 -translate-x-1/2 px-5 pointer-events-none">
           <div className="flex justify-end">
             <button
+              data-tour="fab"
               onClick={() => navigate("/create")}
               className="pointer-events-auto flex items-center justify-center w-14 h-14 rounded-full bg-primary shadow-lg shadow-primary/30 active:scale-95 transition-transform"
             >
@@ -37,6 +38,7 @@ const BottomNav = () => {
             return (
               <button
                 key={tab.path}
+                data-tour={tab.tourId}
                 onClick={() => navigate(tab.path)}
                 className="flex flex-col items-center gap-0.5 px-4 py-1 relative"
               >
