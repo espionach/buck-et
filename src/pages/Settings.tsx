@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Mail, Lock, Bell, LifeBuoy, Bug, FileText, ShieldCheck, LogOut, Trash2, ChevronRight, Flag, ShieldOff } from "lucide-react";
+import { ArrowLeft, Mail, Lock, Bell, LifeBuoy, Bug, FileText, ShieldCheck, LogOut, Trash2, ChevronRight, Flag, ShieldOff, Compass } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/contexts/AuthContext";
@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { usePopup } from "@/hooks/use-popup";
 import { useAppStore } from "@/data/appState";
+import { resetOnboarding } from "@/hooks/useOnboarding";
 
 type NotifPrefs = {
   notify_ownership_transfer: boolean;
@@ -177,6 +178,12 @@ const Settings = () => {
     window.location.href = "mailto:support@buck-et.app?subject=Bug%20report";
   };
 
+  const handleReplayTour = async () => {
+    if (!user) return;
+    await resetOnboarding(user.id);
+    nav("/onboarding/tour");
+  };
+
   return (
     <div className="min-h-screen pb-24 px-5 pt-14">
       {/* Header */}
@@ -199,6 +206,7 @@ const Settings = () => {
       <Section title="Preferences">
         <Row icon={Bell} label="Notification Settings" onClick={() => setShowNotif(true)} />
         <Row icon={ShieldOff} label="Blocked Users" onClick={() => nav("/settings/blocked")} />
+        <Row icon={Compass} label="Replay App Tour" onClick={handleReplayTour} />
       </Section>
 
       {isMod && (
