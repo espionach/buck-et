@@ -123,6 +123,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   hideGlobalFab: false,
   popupCount: 0,
   pinnedQuestIds: JSON.parse(localStorage.getItem("pinnedQuestIds") || "[]"),
+  tourActive: false,
   _initialized: false,
   _invalidate: () => {},
 
@@ -156,6 +157,8 @@ export const useAppStore = create<AppState>((set, get) => ({
     localStorage.setItem("pinnedQuestIds", JSON.stringify(next));
     return { pinnedQuestIds: next };
   }),
+  startTour: () => set({ tourActive: true }),
+  endTour: () => set({ tourActive: false }),
 
   // ---- Mutations ----
 
