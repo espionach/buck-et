@@ -380,8 +380,8 @@ const Profile = () => {
               {editProfilePic ? (
                 <img src={editProfilePic} alt="Profile" className="w-20 h-20 rounded-full object-cover" />
               ) : (
-                <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-4xl">
-                  {currentUser.avatar}
+                <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center" aria-label="Profile picture">
+                  <UserIcon className="w-10 h-10 text-muted-foreground" strokeWidth={1.75} />
                 </div>
               )}
               <button
@@ -470,6 +470,9 @@ const Profile = () => {
             Edit
           </button>
         </div>
+        {currentUser.username && (
+          <p className="text-xs text-muted-foreground/70 mt-0.5">@{currentUser.username}</p>
+        )}
         <p className="text-sm text-muted-foreground mt-1 text-center">{currentUser.bio}</p>
         <div className="flex items-center justify-center gap-4 mt-3">
           <button
