@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -29,38 +29,40 @@ const SPOTLIGHT_PADDING = 8;
 const TOOLTIP_GAP = 16;
 const TOOLTIP_WIDTH = 280;
 
-const Coachmarks = ({ steps, onComplete, onSkip }: Props) => {
+function Coachmarks({ steps, onComplete, onSkip }: Props) {
   const [index, setIndex] = useState(0);
   const [rect, setRect] = useState<Rect | null>(null);
-  const [routeReady, setRouteReady] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
   const step = steps[index];
+  const onCorrectRoute = !step?.route || location.pathname === step.route;
 
-  // Ensure user is on the right route for this step
+  // Reset rect whenever the step changes so we don't flash old position.
+  useEffect(() => {
+    setRect(null);
+  }, [index]);
+
+  // Ensure user is on the right route for this step.
   useEffect(() => {
     if (!step) return;
     if (step.route && location.pathname !== step.route) {
-      setRouteReady(false);
       navigate(step.route, { replace: true });
-    } else {
-      setRouteReady(true);
     }
   }, [step, location.pathname, navigate]);
 
-  // Find target & track its rect (also re-measure on resize / scroll)
+  // Find target & track its rect (also re-measure on resize / scroll).
   useLayoutEffect(() => {
-    if (!step || !routeReady) return;
+    if (!step || !onCorrectRoute) return;
 
     let raf = 0;
     let cancelled = false;
 
     const measure = () => {
+      if (cancelled) return;
       const el = document.querySelector(step.targetSelector) as HTMLElement | null;
       if (!el) {
-        // Element may not be mounted yet — retry next frame
-        if (!cancelled) raf = requestAnimationFrame(measure);
+        raf = requestAnimationFrame(measure);
         return;
       }
       const r = el.getBoundingClientRect();
@@ -76,20 +78,14 @@ const Coachmarks = ({ steps, onComplete, onSkip }: Props) => {
       window.removeEventListener("resize", measure);
       window.removeEventListener("scroll", measure, true);
     };
-  }, [step, routeReady, index]);
+  }, [step, onCorrectRoute, index]);
 
   if (!step) return null;
-
-  // Reset rect when step changes so spotlight doesn't flash old position
-  useEffect(() => {
-    setRect(null);
-  }, [index]);
 
   const handleNext = () => {
     if (index >= steps.length - 1) {
       onComplete();
     } else {
-      setRect(null);
       setIndex((i) => i + 1);
     }
   };
@@ -194,6 +190,6 @@ const Coachmarks = ({ steps, onComplete, onSkip }: Props) => {
   );
 
   return createPortal(overlay, document.body);
-};
+}
 
 export default Coachmarks;
