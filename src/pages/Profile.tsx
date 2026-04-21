@@ -446,6 +446,15 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen pb-24 px-5 pt-14">
+      {/* Settings icon — top right, no circle */}
+      <button
+        onClick={() => nav("/settings")}
+        aria-label="Settings"
+        className="absolute top-4 right-4 p-2 text-muted-foreground hover:text-foreground transition-colors"
+      >
+        <SettingsIcon className="w-5 h-5" />
+      </button>
+
       {/* Profile Header */}
       <div className="flex flex-col items-center mb-6">
         <UserAvatar user={currentUser} size="xl" />
@@ -472,13 +481,6 @@ const Profile = () => {
           >
             <UsersIcon className="w-4 h-4" />
             {friendsList.length} Friends
-          </button>
-          <button
-            onClick={signOut}
-            className="flex items-center gap-1.5 text-sm font-medium text-destructive"
-          >
-            <LogOut className="w-4 h-4" />
-            Sign Out
           </button>
         </div>
       </div>
