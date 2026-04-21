@@ -40,6 +40,8 @@ const Profile = () => {
   }, []);
   const [showEditProfile, setShowEditProfile] = useState(false);
   const [editName, setEditName] = useState(currentUser.name);
+  const [editUsername, setEditUsername] = useState(currentUser.username || "");
+  const [usernameError, setUsernameError] = useState<string | null>(null);
   const [editBio, setEditBio] = useState(currentUser.bio);
   const [showFriends, setShowFriends] = useState(false);
   
