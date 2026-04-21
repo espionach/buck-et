@@ -51,6 +51,7 @@ const Profile = () => {
   // Profile picture upload
   const profilePicRef = useRef<HTMLInputElement>(null);
   const [editProfilePic, setEditProfilePic] = useState(currentUser.profilePicture || "");
+  const [showPicMenu, setShowPicMenu] = useState(false);
 
   // Current quest editing state
   const [editingCurrentQuest, setEditingCurrentQuest] = useState<Quest | null>(null);
@@ -411,20 +412,11 @@ const Profile = () => {
                 </div>
               )}
               <button
-                onClick={() => profilePicRef.current?.click()}
+                onClick={() => setShowPicMenu(true)}
                 className="absolute -bottom-1 -right-1 p-1.5 rounded-full bg-primary text-primary-foreground"
               >
                 <Camera className="w-4 h-4" />
               </button>
-              {editProfilePic && (
-                <button
-                  onClick={() => setEditProfilePic("")}
-                  aria-label="Remove photo"
-                  className="absolute -top-1 -right-1 p-1 rounded-full bg-destructive text-destructive-foreground"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              )}
               <input
                 ref={profilePicRef}
                 type="file"
@@ -433,10 +425,58 @@ const Profile = () => {
                 className="hidden"
               />
             </div>
-            <p className="text-xs text-muted-foreground">
-              Tap camera to change{editProfilePic ? " · X to remove" : ""}
-            </p>
+            <p className="text-xs text-muted-foreground">Tap camera to update photo</p>
           </div>
+
+          {/* Photo action sheet */}
+          <AnimatePresence>
+            {showPicMenu && (
+              <>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="fixed inset-0 bg-foreground/30 z-40"
+                  onClick={() => setShowPicMenu(false)}
+                />
+                <motion.div
+                  initial={{ opacity: 0, y: 20, scale: 0.96 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 20, scale: 0.96 }}
+                  className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[280px] bg-card border border-border rounded-2xl p-2 shadow-xl"
+                >
+                  <button
+                    onClick={() => {
+                      setShowPicMenu(false);
+                      profilePicRef.current?.click();
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-muted text-left"
+                  >
+                    <ImagePlus className="w-5 h-5 text-foreground" />
+                    <span className="text-sm font-semibold text-foreground">Upload a picture</span>
+                  </button>
+                  {editProfilePic && (
+                    <button
+                      onClick={() => {
+                        setEditProfilePic("");
+                        setShowPicMenu(false);
+                      }}
+                      className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-muted text-left"
+                    >
+                      <Trash2 className="w-5 h-5 text-destructive" />
+                      <span className="text-sm font-semibold text-destructive">Remove current picture</span>
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setShowPicMenu(false)}
+                    className="w-full px-3 py-2.5 mt-1 rounded-xl text-sm font-semibold text-muted-foreground hover:bg-muted"
+                  >
+                    Cancel
+                  </button>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
 
           <div>
             <label className="text-sm font-semibold text-foreground mb-1.5 block">Name</label>
