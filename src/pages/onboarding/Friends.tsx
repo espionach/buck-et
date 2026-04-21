@@ -79,8 +79,13 @@ const Friends = () => {
     navigate("/", { replace: true });
   };
 
+  const handleBack = async () => {
+    if (user) await setOnboardingStep(user.id, "permissions");
+    navigate("/onboarding/permissions", { replace: true });
+  };
+
   return (
-    <OnboardingLayout step="friends" onSkip={handleSkipAll} skipLabel="Skip all">
+    <OnboardingLayout step="friends" onSkip={handleSkipAll} skipLabel="Skip all" onBack={handleBack}>
       <div className="flex-1 flex flex-col overflow-hidden">
         <h1 className="text-2xl font-bold text-foreground mb-2">Add your friends</h1>
         <p className="text-sm text-muted-foreground mb-5">
