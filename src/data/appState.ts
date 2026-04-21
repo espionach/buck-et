@@ -27,6 +27,8 @@ interface AppState {
   notifications: AppNotification[];
   currentUser: User;
   allUsers: User[];
+  blockedUserIds: string[];
+  currentUserRoles: string[];
   hideGlobalFab: boolean;
   popupCount: number;
   pinnedQuestIds: string[];
@@ -43,6 +45,8 @@ interface AppState {
   setNotifications: (notifications: AppNotification[]) => void;
   setCurrentUser: (user: User) => void;
   setAllUsers: (users: User[]) => void;
+  setBlockedUserIds: (ids: string[]) => void;
+  setCurrentUserRoles: (roles: string[]) => void;
   setInitialized: (v: boolean) => void;
 
   setHideGlobalFab: (hide: boolean) => void;
@@ -87,6 +91,11 @@ interface AppState {
   markNotificationRead: (notificationId: string) => void;
   markAllNotificationsRead: () => void;
   clearNotification: (notificationId: string) => void;
+
+  // Moderation
+  blockUser: (userId: string) => Promise<void>;
+  unblockUser: (userId: string) => Promise<void>;
+  reportUser: (userId: string, reason: string, description?: string) => Promise<void>;
 
   // invalidation callback — set by DataProvider
   _invalidate: (keys: string[]) => void;
