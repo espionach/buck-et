@@ -170,6 +170,10 @@ const CreateQuest = () => {
       useAppStore.setState({ quests: [localQuest, ...quests] });
       _invalidate?.(["quests"]);
 
+      // If we're finishing onboarding via this quest, mark it complete first.
+      if (isOnboarding && user) {
+        await completeOnboarding(user.id);
+      }
       if (selectedGroup) {
         navigate(`/groups?open=${selectedGroup}`, { replace: true, state: { justAddedQuestId: questId } });
       } else {
