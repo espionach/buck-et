@@ -184,9 +184,33 @@ const Profile = () => {
 
   const active = tab === "current" ? current : past;
 
-  const handleSaveProfile = () => {
+  const handleSaveProfile = async () => {
+    const trimmedUsername = editUsername.trim();
+    setUsernameError(null);
+
+    if (trimmedUsername && trimmedUsername !== (currentUser.username || "")) {
+      // Validate format
+      if (!/^[a-zA-Z0-9_]{2,30}$/.test(trimmedUsername)) {
+        setUsernameError("Use 2–30 letters, numbers, or underscores.");
+        return;
+      }
+      // Uniqueness check (case-insensitive)
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { data: existing } = await supabase
+        .from("profiles")
+        .select("user_id")
+        .ilike("username", trimmedUsername)
+        .neq("user_id", currentUser.id)
+        .maybeSingle();
+      if (existing) {
+        setUsernameError("That username's already taken.");
+        return;
+      }
+    }
+
     updateProfile({
       name: editName.trim(),
+      username: trimmedUsername || currentUser.username,
       bio: editBio.trim(),
       profilePicture: editProfilePic || undefined,
     });
