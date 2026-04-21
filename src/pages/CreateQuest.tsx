@@ -447,11 +447,11 @@ const CreateQuest = () => {
         <div className="max-w-md mx-auto">
           <button
             onClick={handleCreate}
-            disabled={!title.trim()}
+            disabled={!title.trim() || submitting}
             className="w-full py-4 rounded-xl bg-primary text-primary-foreground font-bold text-base flex items-center justify-center gap-2 disabled:opacity-40 active:scale-[0.98] transition-transform shadow-lg"
           >
             <Sparkles className="w-5 h-5" />
-            Launch Sidequest
+            {submitting ? "Launching…" : "Launch Sidequest"}
           </button>
         </div>
       </div>
