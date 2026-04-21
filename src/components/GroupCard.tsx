@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Users, Check, X, ArrowRightLeft } from "lucide-react";
 import { useState } from "react";
 import { usePopup } from "@/hooks/use-popup";
+import { GROUP_COLORS } from "@/data/groupColors";
 
 interface GroupCardProps {
   group: Group;
@@ -13,16 +14,8 @@ interface GroupCardProps {
   index: number;
 }
 
-// Map color tokens to a tailwind gradient class. Keeping classes as full
-// literal strings ensures Tailwind can detect them at build time.
-const COLOR_GRADIENTS: Record<string, string> = {
-  sky: "from-sky-200/60 to-blue-100/40",
-  rose: "from-rose-200/60 to-pink-100/40",
-  amber: "from-amber-200/60 to-yellow-100/40",
-  emerald: "from-emerald-200/60 to-green-100/40",
-  violet: "from-violet-200/60 to-purple-100/40",
-  slate: "from-slate-200/60 to-zinc-100/40",
-};
+const gradientFor = (id?: string) =>
+  GROUP_COLORS.find((c) => c.id === id)?.gradient || GROUP_COLORS[0].gradient;
 
 const GroupCard = ({ group, onClick, index }: GroupCardProps) => {
   const { transferRequests, acceptTransfer, declineTransfer, currentUser } = useAppStore();
@@ -43,7 +36,7 @@ const GroupCard = ({ group, onClick, index }: GroupCardProps) => {
       >
         <button
           onClick={onClick}
-          className={`w-full text-left p-5 rounded-xl bg-gradient-to-br ${COLOR_GRADIENTS[group.color || "sky"] || COLOR_GRADIENTS.sky} border border-border/50 active:scale-[0.98] transition-transform flex flex-col`}
+          className={`w-full text-left p-5 rounded-xl bg-gradient-to-br ${gradientFor(group.color)} border border-border/50 active:scale-[0.98] transition-transform flex flex-col`}
         >
           {/* Transfer icon badge */}
           {pendingTransfer && (
