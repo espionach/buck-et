@@ -2,11 +2,15 @@ import { useAppStore } from "@/data/appState";
 import { Group, User } from "@/data/mockData";
 import UserAvatar from "@/components/UserAvatar";
 import OwnerLeaveDialog from "@/components/OwnerLeaveDialog";
-import { UserPlus, LogOut, Crown, Clock, Trash2, Pencil, Check } from "lucide-react";
+import { UserPlus, LogOut, Crown, Clock, Trash2, Pencil, Check, Bell, BellOff } from "lucide-react";
 import GroupIconPicker from "@/components/GroupIconPicker";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePopup } from "@/hooks/use-popup";
 import { motion, AnimatePresence } from "framer-motion";
+import { GROUP_COLORS } from "@/data/groupColors";
+import { Switch } from "@/components/ui/switch";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 
 interface GroupSettingsProps {
   group: Group;
@@ -19,17 +23,66 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
   const { updateGroup, removeMemberFromGroup, leaveGroup, inviteToGroup, friends: friendsList, requestGroupTransfer, deleteGroup, currentUser } = useAppStore();
   const [editName, setEditName] = useState(group.name);
   const [editEmoji, setEditEmoji] = useState(group.emoji);
+  const [editColor, setEditColor] = useState(group.color || "sky");
   const [isEditingName, setIsEditingName] = useState(false);
   const [showAddMembers, setShowAddMembers] = useState(false);
   const [showOwnerLeave, setShowOwnerLeave] = useState(false);
   const [confirmRemoveUser, setConfirmRemoveUser] = useState<{ userId: string; userName: string } | null>(null);
+  const [muted, setMuted] = useState(false);
+  const [muteLoading, setMuteLoading] = useState(true);
   usePopup(showOwnerLeave || !!confirmRemoveUser);
 
   const isOwner = group.ownerId === currentUser.id;
 
+  // Load mute state
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("group_notification_mutes")
+        .select("id")
+        .eq("user_id", currentUser.id)
+        .eq("group_id", group.id)
+        .maybeSingle();
+      if (!cancelled) {
+        setMuted(!!data);
+        setMuteLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [group.id, currentUser.id]);
+
+  const toggleMute = async (next: boolean) => {
+    setMuted(next);
+    if (next) {
+      const { error } = await supabase
+        .from("group_notification_mutes")
+        .insert({ user_id: currentUser.id, group_id: group.id });
+      if (error) {
+        setMuted(false);
+        toast({ title: "Couldn't mute group", description: error.message, variant: "destructive" });
+      }
+    } else {
+      const { error } = await supabase
+        .from("group_notification_mutes")
+        .delete()
+        .eq("user_id", currentUser.id)
+        .eq("group_id", group.id);
+      if (error) {
+        setMuted(true);
+        toast({ title: "Couldn't unmute group", description: error.message, variant: "destructive" });
+      }
+    }
+  };
+
+  const handleColorChange = (colorId: string) => {
+    setEditColor(colorId);
+    updateGroup(group.id, { color: colorId });
+  };
+
   const handleSave = () => {
     if (editName.trim()) {
-      updateGroup(group.id, { name: editName.trim(), emoji: editEmoji });
+      updateGroup(group.id, { name: editName.trim(), emoji: editEmoji, color: editColor });
     }
     setIsEditingName(false);
   };
