@@ -421,7 +421,8 @@ const Profile = () => {
               )}
               <button
                 onClick={() => setShowPicMenu(true)}
-                className="absolute -bottom-1 -right-1 p-1.5 rounded-full bg-primary text-primary-foreground"
+                disabled={uploadingAvatar}
+                className="absolute -bottom-1 -right-1 p-1.5 rounded-full bg-primary text-primary-foreground disabled:opacity-60"
               >
                 <Camera className="w-4 h-4" />
               </button>
@@ -433,7 +434,9 @@ const Profile = () => {
                 className="hidden"
               />
             </div>
-            <p className="text-xs text-muted-foreground">Tap camera to update photo</p>
+            <p className="text-xs text-muted-foreground">
+              {uploadingAvatar ? "Uploading…" : "Tap camera to update photo"}
+            </p>
           </div>
 
           {/* Photo action sheet */}
