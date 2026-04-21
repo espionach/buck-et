@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -79,6 +79,11 @@ const Coachmarks = ({ steps, onComplete, onSkip }: Props) => {
   }, [step, routeReady, index]);
 
   if (!step) return null;
+
+  // Reset rect when step changes so spotlight doesn't flash old position
+  useEffect(() => {
+    setRect(null);
+  }, [index]);
 
   const handleNext = () => {
     if (index >= steps.length - 1) {
