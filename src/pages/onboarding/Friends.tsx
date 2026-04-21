@@ -133,7 +133,7 @@ const Friends = () => {
             const isPending = sentSet.has(u.id);
             return (
               <div key={u.id} className="flex items-center gap-3 py-2.5">
-                <UserAvatar user={u} size={40} />
+                <UserAvatar user={u} size="md" />
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-semibold text-foreground truncate">{u.name}</div>
                   {u.username && (
