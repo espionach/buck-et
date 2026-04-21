@@ -1141,11 +1141,11 @@ const Profile = () => {
                 <div className="flex flex-wrap gap-2">
                   {questPhotos.map((photo, i) => (
                     <div key={i} className="relative group">
-                      {photo.startsWith("data:video") ? (
-                        <video src={photo} className="w-20 h-20 rounded-xl object-cover border border-border/30" muted />
-                      ) : (
-                        <img src={photo} alt={`Photo ${i + 1}`} className="w-20 h-20 rounded-xl object-cover border border-border/30" />
-                      )}
+                      <SidequestPhoto
+                        src={photo}
+                        alt={`Photo ${i + 1}`}
+                        className="w-20 h-20 rounded-xl object-cover border border-border/30"
+                      />
                       <button
                         onClick={() => removePhoto(i)}
                         className="absolute -top-1.5 -right-1.5 p-0.5 rounded-full bg-destructive text-destructive-foreground opacity-0 group-hover:opacity-100 transition-opacity"
