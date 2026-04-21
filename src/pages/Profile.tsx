@@ -967,11 +967,11 @@ const Profile = () => {
                 <div className="flex flex-wrap gap-2">
                    {editQuestPhotos.map((photo, i) => (
                     <div key={i} className="relative group">
-                      {photo.startsWith("data:video") ? (
-                        <video src={photo} className="w-16 h-16 rounded-xl object-cover border border-border/30" muted />
-                      ) : (
-                        <img src={photo} alt={`Photo ${i + 1}`} className="w-16 h-16 rounded-xl object-cover border border-border/30" />
-                      )}
+                      <SidequestPhoto
+                        src={photo}
+                        alt={`Photo ${i + 1}`}
+                        className="w-16 h-16 rounded-xl object-cover border border-border/30"
+                      />
                       <button
                         onClick={() => setEditQuestPhotos((prev) => prev.filter((_, idx) => idx !== i))}
                         className="absolute -top-1.5 -right-1.5 p-0.5 rounded-full bg-destructive text-destructive-foreground opacity-0 group-hover:opacity-100 transition-opacity"
@@ -982,7 +982,6 @@ const Profile = () => {
                   ))}
                   <button
                     onClick={() => currentPhotoRef.current?.click()}
-                    className="w-16 h-16 rounded-xl border-2 border-dashed border-border flex items-center justify-center text-muted-foreground hover:border-primary hover:text-primary transition-colors"
                   >
                     <ImagePlus className="w-4 h-4" />
                   </button>
