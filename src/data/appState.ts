@@ -115,6 +115,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   notifications: [],
   currentUser: emptyUser,
   allUsers: [],
+  blockedUserIds: [],
+  currentUserRoles: [],
   hideGlobalFab: false,
   popupCount: 0,
   pinnedQuestIds: JSON.parse(localStorage.getItem("pinnedQuestIds") || "[]"),
@@ -132,6 +134,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   setNotifications: (notifications) => set({ notifications }),
   setCurrentUser: (currentUser) => set({ currentUser }),
   setAllUsers: (allUsers) => set({ allUsers }),
+  setBlockedUserIds: (blockedUserIds) => set({ blockedUserIds }),
+  setCurrentUserRoles: (currentUserRoles) => set({ currentUserRoles }),
   setInitialized: (v) => set({ _initialized: v }),
   _setInvalidate: (fn) => set({ _invalidate: fn }),
 
