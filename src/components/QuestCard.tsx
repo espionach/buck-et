@@ -2,6 +2,7 @@ import { Quest, Comment, User } from "@/data/mockData";
 import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
 import { GroupIconDisplay } from "@/components/GroupIcon";
+import SidequestPhoto from "@/components/SidequestPhoto";
 
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, MessageCircle, ChevronDown, ChevronUp, Send, MoreVertical, Plus, Undo2, ExternalLink, X, Calendar, Globe, Pin, Pencil, Trash2 } from "lucide-react";
