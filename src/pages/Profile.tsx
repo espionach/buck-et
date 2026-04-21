@@ -9,10 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Quest, User } from "@/data/mockData";
 import { useLocation, useSearchParams, useNavigate } from "react-router-dom";
 import { usePopup } from "@/hooks/use-popup";
-import { useAuth } from "@/contexts/AuthContext";
-
 const Profile = () => {
-  const { signOut } = useAuth();
   const {
     currentUser,
     quests,
