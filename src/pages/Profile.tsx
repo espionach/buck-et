@@ -345,34 +345,36 @@ const Profile = () => {
     setNewLink("");
   };
 
-  const handleCurrentPhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
-    Array.from(files).forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        if (ev.target?.result) {
-          setEditQuestPhotos((prev) => [...prev, ev.target!.result as string]);
-        }
-      };
-      reader.readAsDataURL(file);
-    });
+  const [uploadingPhotos, setUploadingPhotos] = useState(false);
+
+  const handleCurrentPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files ? Array.from(e.target.files) : [];
     e.target.value = "";
+    if (!files.length || !editingCurrentQuest) return;
+    setUploadingPhotos(true);
+    try {
+      const paths = await uploadSidequestPhotos(editingCurrentQuest.id, files);
+      setEditQuestPhotos((prev) => [...prev, ...paths]);
+    } catch (err: any) {
+      toast.error(err?.message || "Couldn't upload photos. Try again?");
+    } finally {
+      setUploadingPhotos(false);
+    }
   };
 
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
-    Array.from(files).forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        if (ev.target?.result) {
-          setQuestPhotos((prev) => [...prev, ev.target!.result as string]);
-        }
-      };
-      reader.readAsDataURL(file);
-    });
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files ? Array.from(e.target.files) : [];
     e.target.value = "";
+    if (!files.length || !editingPastQuest) return;
+    setUploadingPhotos(true);
+    try {
+      const paths = await uploadSidequestPhotos(editingPastQuest.id, files);
+      setQuestPhotos((prev) => [...prev, ...paths]);
+    } catch (err: any) {
+      toast.error(err?.message || "Couldn't upload photos. Try again?");
+    } finally {
+      setUploadingPhotos(false);
+    }
   };
 
   const removePhoto = (index: number) => {
