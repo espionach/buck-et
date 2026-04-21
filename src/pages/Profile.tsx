@@ -9,6 +9,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Quest, User } from "@/data/mockData";
 import { useLocation, useSearchParams, useNavigate } from "react-router-dom";
 import { usePopup } from "@/hooks/use-popup";
+import { uploadAvatar, uploadSidequestPhotos } from "@/lib/uploads";
+import SidequestPhoto from "@/components/SidequestPhoto";
+import { toast } from "sonner";
 const Profile = () => {
   const {
     currentUser,
