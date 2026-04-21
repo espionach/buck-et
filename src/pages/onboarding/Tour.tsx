@@ -23,8 +23,13 @@ const Tour = () => {
     navigate("/", { replace: true });
   };
 
+  const handleBack = async () => {
+    if (user) await setOnboardingStep(user.id, "friends");
+    navigate("/onboarding/friends", { replace: true });
+  };
+
   return (
-    <OnboardingLayout step="tour" onSkip={handleSkipAll} skipLabel="Skip all">
+    <OnboardingLayout step="tour" onSkip={handleSkipAll} skipLabel="Skip all" onBack={handleBack}>
       <div className="flex-1 flex flex-col items-center justify-center text-center">
         <div className="w-20 h-20 rounded-3xl bg-primary/10 flex items-center justify-center mb-6">
           <Compass className="w-10 h-10 text-primary" />
