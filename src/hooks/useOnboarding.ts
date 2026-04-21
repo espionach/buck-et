@@ -69,7 +69,9 @@ export function useOnboardingStatus() {
   useEffect(() => {
     const handler = (event: Event) => {
       const customEvent = event as CustomEvent<{ onboarded: boolean; step: OnboardingStep | null }>;
-      setState(customEvent.detail);
+      // Defer to a microtask so we never call setState during another
+      // component's render (which can desync hook counts).
+      queueMicrotask(() => setState(customEvent.detail));
     };
     window.addEventListener(ONBOARDING_STATUS_EVENT, handler);
     return () => window.removeEventListener(ONBOARDING_STATUS_EVENT, handler);
