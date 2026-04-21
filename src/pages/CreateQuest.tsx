@@ -82,41 +82,98 @@ const CreateQuest = () => {
     setNewLink("");
   };
 
-  const handleCreate = () => {
-    if (!title.trim()) return;
-    const questId = `q${Date.now()}`;
+  const handleCreate = async () => {
+    if (!title.trim() || submitting) return;
+    setSubmitting(true);
     const hasDate = !!(date || time || location || meetupSpot || transportation || customNotes || contributionRoles.length > 0);
-    const quest: Quest = {
-      id: questId,
-      title: title.trim(),
-      description: description.trim() || undefined,
-      createdBy: currentUser,
-      groupId: selectedGroup || undefined,
-      isFollowerOnly: !selectedGroup,
-      participants: [currentUser],
-      completedByUserIds: [],
-      createdAt: new Date().toISOString().split("T")[0],
-      comments: [],
-      photos: photos.length > 0 ? photos : undefined,
-      links: links.length > 0 ? links : undefined,
-      logistics: hasDate ? {
-        date: date || undefined,
-        time: time || undefined,
-        location: location || undefined,
-        meetupSpot: meetupSpot || undefined,
-        transportation: (transportation as any) || undefined,
-        carpoolSlots: carpoolSlots ? parseInt(carpoolSlots) : undefined,
-        volunteers: [],
-        customNotes: customNotes || undefined,
-        contributionRoles: contributionRoles.length > 0 ? contributionRoles : undefined,
-      } : undefined,
-    };
-    addQuest(quest);
+    try {
+      // 1. Insert the sidequest row first so we get a real id and storage RLS allows uploads.
+      const { data: inserted, error: insertErr } = await supabase
+        .from("sidequests")
+        .insert({
+          title: title.trim(),
+          description: description.trim() || null,
+          created_by: currentUser.id,
+          group_id: selectedGroup || null,
+          is_friends_only: !selectedGroup,
+          photos: [],
+          links: links.length > 0 ? links : [],
+          logistics_date: date || null,
+          logistics_time: time || null,
+          logistics_location: location || null,
+          logistics_meetup_spot: meetupSpot || null,
+          logistics_transportation: transportation || null,
+          logistics_carpool_slots: carpoolSlots ? parseInt(carpoolSlots) : null,
+          logistics_custom_notes: customNotes || null,
+          contribution_roles: contributionRoles,
+        })
+        .select()
+        .single();
 
-    if (selectedGroup) {
-      navigate(`/groups?open=${selectedGroup}`, { replace: true, state: { justAddedQuestId: questId } });
-    } else {
-      navigate("/profile", { replace: true, state: { justAddedQuestId: questId } });
+      if (insertErr || !inserted) throw insertErr || new Error("Could not create sidequest");
+      const questId = inserted.id as string;
+
+      // 2. Add creator as participant.
+      await supabase.from("sidequest_participants").insert({
+        sidequest_id: questId,
+        user_id: currentUser.id,
+      });
+
+      // 3. Upload any pending photos under the new quest id.
+      let uploadedPaths: string[] = [];
+      if (pendingPhotos.length > 0) {
+        try {
+          uploadedPaths = await uploadSidequestPhotos(questId, pendingPhotos);
+          if (uploadedPaths.length > 0) {
+            await supabase
+              .from("sidequests")
+              .update({ photos: uploadedPaths })
+              .eq("id", questId);
+          }
+        } catch (err: any) {
+          toast.error("Sidequest created, but photos failed to upload.");
+        }
+      }
+
+      // 4. Sync local store so the new quest shows up immediately.
+      const localQuest: Quest = {
+        id: questId,
+        title: title.trim(),
+        description: description.trim() || undefined,
+        createdBy: currentUser,
+        groupId: selectedGroup || undefined,
+        isFollowerOnly: !selectedGroup,
+        participants: [currentUser],
+        completedByUserIds: [],
+        createdAt: new Date().toISOString().split("T")[0],
+        comments: [],
+        photos: uploadedPaths.length > 0 ? uploadedPaths : undefined,
+        links: links.length > 0 ? links : undefined,
+        logistics: hasDate ? {
+          date: date || undefined,
+          time: time || undefined,
+          location: location || undefined,
+          meetupSpot: meetupSpot || undefined,
+          transportation: (transportation as any) || undefined,
+          carpoolSlots: carpoolSlots ? parseInt(carpoolSlots) : undefined,
+          volunteers: [],
+          customNotes: customNotes || undefined,
+          contributionRoles: contributionRoles.length > 0 ? contributionRoles : undefined,
+        } : undefined,
+      };
+      // Push directly into the store without re-inserting in the DB.
+      const { quests, _invalidate } = useAppStore.getState() as any;
+      useAppStore.setState({ quests: [localQuest, ...quests] });
+      _invalidate?.(["quests"]);
+
+      if (selectedGroup) {
+        navigate(`/groups?open=${selectedGroup}`, { replace: true, state: { justAddedQuestId: questId } });
+      } else {
+        navigate("/profile", { replace: true, state: { justAddedQuestId: questId } });
+      }
+    } catch (err: any) {
+      toast.error(err?.message || "Couldn't create sidequest. Try again?");
+      setSubmitting(false);
     }
   };
 
