@@ -2,6 +2,12 @@ import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
+const ONBOARDING_STATUS_EVENT = "onboarding-status-changed";
+
+function emitOnboardingStatus(detail: { onboarded: boolean; step: OnboardingStep | null }) {
+  window.dispatchEvent(new CustomEvent(ONBOARDING_STATUS_EVENT, { detail }));
+}
+
 export type OnboardingStep =
   | "welcome"
   | "permissions"
@@ -60,6 +66,15 @@ export function useOnboardingStatus() {
     };
   }, [user, authLoading]);
 
+  useEffect(() => {
+    const handler = (event: Event) => {
+      const customEvent = event as CustomEvent<{ onboarded: boolean; step: OnboardingStep | null }>;
+      setState(customEvent.detail);
+    };
+    window.addEventListener(ONBOARDING_STATUS_EVENT, handler);
+    return () => window.removeEventListener(ONBOARDING_STATUS_EVENT, handler);
+  }, []);
+
   return { ...(state ?? { onboarded: false, step: null }), loading: state === null };
 }
 
@@ -69,6 +84,7 @@ export async function setOnboardingStep(userId: string, step: OnboardingStep) {
     .from("profiles")
     .update({ onboarding_step: step })
     .eq("user_id", userId);
+  emitOnboardingStatus({ onboarded: false, step });
 }
 
 /** Marks onboarding complete */
@@ -77,6 +93,7 @@ export async function completeOnboarding(userId: string) {
     .from("profiles")
     .update({ onboarded_at: new Date().toISOString(), onboarding_step: null })
     .eq("user_id", userId);
+  emitOnboardingStatus({ onboarded: true, step: null });
 }
 
 /** Resets onboarding so the user can replay the tour */
@@ -85,6 +102,7 @@ export async function resetOnboarding(userId: string) {
     .from("profiles")
     .update({ onboarded_at: null, onboarding_step: "tour" })
     .eq("user_id", userId);
+  emitOnboardingStatus({ onboarded: false, step: "tour" });
 }
 
 /** Convenience: handler that completes + navigates to "/" */
