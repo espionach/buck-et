@@ -551,7 +551,7 @@ const Profile = () => {
           <div className="text-center py-12 text-muted-foreground">
             {tab === "current" ? <Map className="w-10 h-10 mx-auto mb-2 opacity-40" /> : <ScrollText className="w-10 h-10 mx-auto mb-2 opacity-40" />}
             <p className="text-sm">
-              {tab === "current" ? "No active sidequests — go start one!" : "No completed sidequests yet"}
+              {tab === "current" ? "Kinda empty here… Start something fun!" : "Zero done… We'll ignore that for now"}
             </p>
           </div>
         ) : tab === "current" ? (
