@@ -60,7 +60,20 @@ const GlobalTour = () => {
     if (user) void setOnboardingStep(user.id, "first_quest");
   };
 
-  return <Coachmarks steps={STEPS} onComplete={finish} onSkip={finish} />;
+  const backToTourIntro = () => {
+    // Bail out of the tour overlay and return to the Tour intro screen.
+    endTour();
+    navigate("/onboarding/tour", { replace: true });
+  };
+
+  return (
+    <Coachmarks
+      steps={STEPS}
+      onComplete={finish}
+      onSkip={finish}
+      onBackFromFirst={backToTourIntro}
+    />
+  );
 };
 
 export default GlobalTour;
