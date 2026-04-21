@@ -1,11 +1,12 @@
 import { useAppStore } from "@/data/appState";
 import { Group, GroupMember } from "@/data/mockData";
-import { ArrowLeft, Plus } from "lucide-react";
+import { ArrowLeft, Plus, Check } from "lucide-react";
 import GroupIconPicker from "@/components/GroupIconPicker";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import UserAvatar from "@/components/UserAvatar";
+import { GROUP_COLORS } from "@/data/groupColors";
 
 const CreateGroup = () => {
   const navigate = useNavigate();
@@ -13,6 +14,7 @@ const CreateGroup = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [emoji, setEmoji] = useState("target");
+  const [color, setColor] = useState("sky");
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
 
   const toggleMember = (id: string) => {
@@ -40,6 +42,7 @@ const CreateGroup = () => {
       id: `g${Date.now()}`,
       name: name.trim(),
       emoji,
+      color,
       description: description.trim() || undefined,
       members,
       memberRoles,
@@ -88,6 +91,25 @@ const CreateGroup = () => {
             rows={2}
             className="w-full px-4 py-3.5 rounded-xl bg-card border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm resize-none"
           />
+        </div>
+
+        <div>
+          <label className="text-sm font-semibold text-foreground mb-2 block">Card Color</label>
+          <div className="flex flex-wrap gap-2">
+            {GROUP_COLORS.map((c) => (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => setColor(c.id)}
+                aria-label={c.label}
+                className={`w-9 h-9 rounded-full ${c.swatch} flex items-center justify-center transition-transform active:scale-90 ${
+                  color === c.id ? "ring-2 ring-foreground ring-offset-2 ring-offset-background" : ""
+                }`}
+              >
+                {color === c.id && <Check className="w-4 h-4 text-foreground" />}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div>

@@ -40,6 +40,8 @@ const Profile = () => {
   }, []);
   const [showEditProfile, setShowEditProfile] = useState(false);
   const [editName, setEditName] = useState(currentUser.name);
+  const [editUsername, setEditUsername] = useState(currentUser.username || "");
+  const [usernameError, setUsernameError] = useState<string | null>(null);
   const [editBio, setEditBio] = useState(currentUser.bio);
   const [showFriends, setShowFriends] = useState(false);
   
@@ -182,9 +184,33 @@ const Profile = () => {
 
   const active = tab === "current" ? current : past;
 
-  const handleSaveProfile = () => {
+  const handleSaveProfile = async () => {
+    const trimmedUsername = editUsername.trim();
+    setUsernameError(null);
+
+    if (trimmedUsername && trimmedUsername !== (currentUser.username || "")) {
+      // Validate format
+      if (!/^[a-zA-Z0-9_]{2,30}$/.test(trimmedUsername)) {
+        setUsernameError("Use 2–30 letters, numbers, or underscores.");
+        return;
+      }
+      // Uniqueness check (case-insensitive)
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { data: existing } = await supabase
+        .from("profiles")
+        .select("user_id")
+        .ilike("username", trimmedUsername)
+        .neq("user_id", currentUser.id)
+        .maybeSingle();
+      if (existing) {
+        setUsernameError("That username's already taken.");
+        return;
+      }
+    }
+
     updateProfile({
       name: editName.trim(),
+      username: trimmedUsername || currentUser.username,
       bio: editBio.trim(),
       profilePicture: editProfilePic || undefined,
     });
@@ -390,6 +416,15 @@ const Profile = () => {
               >
                 <Camera className="w-4 h-4" />
               </button>
+              {editProfilePic && (
+                <button
+                  onClick={() => setEditProfilePic("")}
+                  aria-label="Remove photo"
+                  className="absolute -top-1 -right-1 p-1 rounded-full bg-destructive text-destructive-foreground"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
               <input
                 ref={profilePicRef}
                 type="file"
@@ -398,7 +433,9 @@ const Profile = () => {
                 className="hidden"
               />
             </div>
-            <p className="text-xs text-muted-foreground">Tap camera to change photo</p>
+            <p className="text-xs text-muted-foreground">
+              Tap camera to change{editProfilePic ? " · X to remove" : ""}
+            </p>
           </div>
 
           <div>
@@ -409,6 +446,27 @@ const Profile = () => {
               placeholder="Name"
               className="w-full px-3 py-2.5 rounded-xl bg-muted border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
             />
+          </div>
+
+          <div>
+            <label className="text-sm font-semibold text-foreground mb-1.5 block">Username</label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground pointer-events-none">@</span>
+              <input
+                value={editUsername}
+                onChange={(e) => {
+                  setEditUsername(e.target.value.replace(/\s/g, ""));
+                  setUsernameError(null);
+                }}
+                placeholder="username"
+                className="w-full pl-7 pr-3 py-2.5 rounded-xl bg-muted border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+              />
+            </div>
+            {usernameError ? (
+              <p className="text-xs text-destructive mt-1">{usernameError}</p>
+            ) : (
+              <p className="text-xs text-muted-foreground mt-1">Letters, numbers, underscores. Must be unique.</p>
+            )}
           </div>
 
           <div>
@@ -460,6 +518,8 @@ const Profile = () => {
           <button
             onClick={() => {
               setEditName(currentUser.name);
+              setEditUsername(currentUser.username || "");
+              setUsernameError(null);
               setEditBio(currentUser.bio);
               setEditProfilePic(currentUser.profilePicture || "");
               setShowEditProfile(true);
