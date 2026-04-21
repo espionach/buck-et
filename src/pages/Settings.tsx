@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Mail, Lock, Bell, LifeBuoy, Bug, FileText, ShieldCheck, LogOut, Trash2, ChevronRight } from "lucide-react";
+import { ArrowLeft, Mail, Lock, Bell, LifeBuoy, Bug, FileText, ShieldCheck, LogOut, Trash2, ChevronRight, Flag, ShieldOff } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { usePopup } from "@/hooks/use-popup";
+import { useAppStore } from "@/data/appState";
 
 type NotifPrefs = {
   notify_ownership_transfer: boolean;
@@ -195,7 +196,14 @@ const Settings = () => {
 
       <Section title="Preferences">
         <Row icon={Bell} label="Notification Settings" onClick={() => setShowNotif(true)} />
+        <Row icon={ShieldOff} label="Blocked Users" onClick={() => nav("/settings/blocked")} />
       </Section>
+
+      {(useAppStore.getState().currentUserRoles.includes("admin") || useAppStore.getState().currentUserRoles.includes("moderator")) && (
+        <Section title="Moderation">
+          <Row icon={Flag} label="User Reports" onClick={() => nav("/admin/reports")} />
+        </Section>
+      )}
 
       <Section title="Support">
         <Row icon={LifeBuoy} label="Contact Support" onClick={handleContactSupport} />
