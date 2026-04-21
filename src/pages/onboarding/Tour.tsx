@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Compass } from "lucide-react";
 import OnboardingLayout from "@/components/onboarding/OnboardingLayout";
 import { useAuth } from "@/contexts/AuthContext";
-import { setOnboardingStep } from "@/hooks/useOnboarding";
+import { completeOnboarding, setOnboardingStep } from "@/hooks/useOnboarding";
 import { useAppStore } from "@/data/appState";
 
 const Tour = () => {
@@ -18,14 +18,13 @@ const Tour = () => {
     requestAnimationFrame(() => startTour());
   };
 
-  const handleSkipTour = async () => {
-    // Skip the tour but keep going to the first sidequest step.
-    if (user) await setOnboardingStep(user.id, "first_quest");
-    navigate("/create?onboarding=1", { replace: true });
+  const handleSkipAll = async () => {
+    if (user) await completeOnboarding(user.id);
+    navigate("/", { replace: true });
   };
 
   return (
-    <OnboardingLayout step="tour" onSkip={handleSkipTour} skipLabel="Skip">
+    <OnboardingLayout step="tour" onSkip={handleSkipAll} skipLabel="Skip all">
       <div className="flex-1 flex flex-col items-center justify-center text-center">
         <div className="w-20 h-20 rounded-3xl bg-primary/10 flex items-center justify-center mb-6">
           <Compass className="w-10 h-10 text-primary" />
