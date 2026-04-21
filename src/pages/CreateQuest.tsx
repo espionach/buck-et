@@ -175,8 +175,9 @@ const CreateQuest = () => {
         await completeOnboarding(user.id);
       }
       if (isOnboarding) {
-        // After their first sidequest, drop them into the app's home feed.
-        navigate("/", { replace: true, state: { justAddedQuestId: questId } });
+        // After their first sidequest, send them to their profile so they
+        // can see it sitting in their Active list.
+        navigate("/profile", { replace: true, state: { justAddedQuestId: questId } });
       } else if (selectedGroup) {
         navigate(`/groups?open=${selectedGroup}`, { replace: true, state: { justAddedQuestId: questId } });
       } else {
