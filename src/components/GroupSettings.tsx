@@ -160,6 +160,47 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
             </div>
           </div>
 
+          {/* Group card color */}
+          <div>
+            <h3 className="font-bold text-foreground text-sm mb-2">Card Color</h3>
+            <div className="flex flex-wrap gap-2">
+              {GROUP_COLORS.map((c) => (
+                <button
+                  key={c.id}
+                  onClick={() => handleColorChange(c.id)}
+                  aria-label={c.label}
+                  className={`w-9 h-9 rounded-full ${c.swatch} flex items-center justify-center transition-transform active:scale-90 ${
+                    editColor === c.id ? "ring-2 ring-foreground ring-offset-2 ring-offset-background" : ""
+                  }`}
+                >
+                  {editColor === c.id && <Check className="w-4 h-4 text-foreground" />}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Per-group notifications */}
+          <div className="flex items-center justify-between p-3 rounded-xl bg-muted/50">
+            <div className="flex items-center gap-2 flex-1">
+              {muted ? (
+                <BellOff className="w-4 h-4 text-muted-foreground" />
+              ) : (
+                <Bell className="w-4 h-4 text-muted-foreground" />
+              )}
+              <div>
+                <p className="text-sm font-semibold text-foreground">Group notifications</p>
+                <p className="text-xs text-muted-foreground">
+                  {muted ? "Muted — you won't be pinged" : "On — get pings for new activity"}
+                </p>
+              </div>
+            </div>
+            <Switch
+              checked={!muted}
+              disabled={muteLoading}
+              onCheckedChange={(v) => toggleMute(!v)}
+            />
+          </div>
+
           {/* Members list */}
           <div>
             <div className="flex items-center justify-between mb-2">
