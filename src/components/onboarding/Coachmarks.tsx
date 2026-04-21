@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -25,23 +25,29 @@ interface Rect {
   height: number;
 }
 
-const SPOTLIGHT_PADDING = 8;
-const TOOLTIP_GAP = 16;
+const SPOTLIGHT_PADDING = 6;
+const TOOLTIP_GAP = 14;
 const TOOLTIP_WIDTH = 280;
+const OVERLAY_OPACITY = 0.45;
 
 function Coachmarks({ steps, onComplete, onSkip }: Props) {
   const [index, setIndex] = useState(0);
   const [rect, setRect] = useState<Rect | null>(null);
+  const [tooltipHeight, setTooltipHeight] = useState(140);
+  const tooltipRef = useRef<HTMLDivElement | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
 
   const step = steps[index];
   const onCorrectRoute = !step?.route || location.pathname === step.route;
 
-  // Reset rect whenever the step changes so we don't flash old position.
-  useEffect(() => {
-    setRect(null);
-  }, [index]);
+  // Measure the tooltip after each render so we can place it without
+  // covering the spotlighted target.
+  useLayoutEffect(() => {
+    if (tooltipRef.current) {
+      setTooltipHeight(tooltipRef.current.offsetHeight);
+    }
+  }, [index, rect]);
 
   // Ensure user is on the right route for this step.
   useEffect(() => {
@@ -99,17 +105,22 @@ function Coachmarks({ steps, onComplete, onSkip }: Props) {
   let tooltipTop = 0;
   let tooltipLeft = 0;
   if (rect) {
-    const placement =
-      step.placement === "bottom"
-        ? "bottom"
-        : step.placement === "top"
+    // Auto-pick placement based on which side has more room, so the tooltip
+    // never covers the target. Honors explicit `placement` only if it fits.
+    const spaceAbove = rect.top - TOOLTIP_GAP - 16;
+    const spaceBelow = viewportH - (rect.top + rect.height) - TOOLTIP_GAP - 16;
+    const preferred = step.placement;
+    let placement: "top" | "bottom" =
+      preferred === "top" && spaceAbove >= tooltipHeight
         ? "top"
-        : rect.top > viewportH / 2
+        : preferred === "bottom" && spaceBelow >= tooltipHeight
+        ? "bottom"
+        : spaceAbove >= tooltipHeight
         ? "top"
         : "bottom";
 
     if (placement === "top") {
-      tooltipTop = rect.top - TOOLTIP_GAP - 140; // estimated tooltip height
+      tooltipTop = rect.top - TOOLTIP_GAP - tooltipHeight;
     } else {
       tooltipTop = rect.top + rect.height + TOOLTIP_GAP;
     }
@@ -120,8 +131,8 @@ function Coachmarks({ steps, onComplete, onSkip }: Props) {
         rect.left + rect.width / 2 - TOOLTIP_WIDTH / 2
       )
     );
-    // Clamp vertically
-    tooltipTop = Math.max(16, Math.min(viewportH - 160, tooltipTop));
+    // Clamp vertically inside viewport
+    tooltipTop = Math.max(16, Math.min(viewportH - tooltipHeight - 16, tooltipTop));
   }
 
   const overlay = (
@@ -131,33 +142,36 @@ function Coachmarks({ steps, onComplete, onSkip }: Props) {
         <div
           aria-hidden
           onClick={handleNext}
-          className="absolute rounded-2xl cursor-pointer"
+          className="absolute rounded-2xl"
           style={{
             top: rect.top - SPOTLIGHT_PADDING,
             left: rect.left - SPOTLIGHT_PADDING,
             width: rect.width + SPOTLIGHT_PADDING * 2,
             height: rect.height + SPOTLIGHT_PADDING * 2,
-            boxShadow: "0 0 0 9999px hsl(var(--foreground) / 0.65)",
-            transition: "all 0.25s ease",
+            boxShadow: `0 0 0 9999px hsl(var(--foreground) / ${OVERLAY_OPACITY})`,
+            transition: "top 0.25s ease, left 0.25s ease, width 0.25s ease, height 0.25s ease",
+            // Let clicks pass through to the spotlighted element
+            pointerEvents: "none",
           }}
         />
       ) : (
         <div
           aria-hidden
-          onClick={handleNext}
-          className="absolute inset-0 cursor-pointer"
-          style={{ background: "hsl(var(--foreground) / 0.65)" }}
+          className="absolute inset-0"
+          style={{ background: `hsl(var(--foreground) / ${OVERLAY_OPACITY})` }}
         />
       )}
 
       {/* Tooltip card */}
       {rect && (
         <div
+          ref={tooltipRef}
           className="absolute bg-card rounded-2xl shadow-xl border border-border p-4"
           style={{
             top: tooltipTop,
             left: tooltipLeft,
             width: TOOLTIP_WIDTH,
+            transition: "top 0.25s ease, left 0.25s ease",
           }}
         >
           <div className="flex items-center justify-between mb-1">

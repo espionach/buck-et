@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Copy, Search, Share2, UserPlus, Check, Clock } from "lucide-react";
 import OnboardingLayout from "@/components/onboarding/OnboardingLayout";
 import { useAuth } from "@/contexts/AuthContext";
-import { completeOnboarding, setOnboardingStep } from "@/hooks/useOnboarding";
+import { setOnboardingStep } from "@/hooks/useOnboarding";
 import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
 import { toast } from "sonner";
@@ -72,11 +72,6 @@ const Friends = () => {
   const handleContinue = async () => {
     if (user) await setOnboardingStep(user.id, "tour");
     navigate("/onboarding/tour");
-  };
-
-  const handleSkipAll = async () => {
-    if (user) await completeOnboarding(user.id);
-    navigate("/", { replace: true });
   };
 
   return (
@@ -167,12 +162,6 @@ const Friends = () => {
         className="w-full py-4 rounded-2xl bg-primary text-primary-foreground font-semibold text-base active:scale-[0.98] transition-transform"
       >
         Continue
-      </button>
-      <button
-        onClick={handleSkipAll}
-        className="w-full py-3 mt-2 text-sm font-medium text-muted-foreground active:text-foreground"
-      >
-        Skip onboarding
       </button>
     </OnboardingLayout>
   );

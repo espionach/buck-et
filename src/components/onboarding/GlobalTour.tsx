@@ -48,9 +48,13 @@ const GlobalTour = () => {
   if (!tourActive) return null;
 
   const finish = async () => {
-    endTour();
+    // Mark step first so the gate sees a consistent state, then navigate,
+    // and only end the tour after we've safely landed on /create.
     if (user) await setOnboardingStep(user.id, "first_quest");
     navigate("/create?onboarding=1", { replace: true });
+    // Defer endTour until after the navigation has flushed so the
+    // protected-route gate doesn't briefly redirect us mid-transition.
+    requestAnimationFrame(() => endTour());
   };
 
   return <Coachmarks steps={STEPS} onComplete={finish} onSkip={finish} />;
