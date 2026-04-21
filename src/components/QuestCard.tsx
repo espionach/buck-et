@@ -301,13 +301,6 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
           </div>
         )}
 
-        {/* Completed timestamp */}
-        {quest.completedByUserIds.includes(currentUser.id) && quest.completedAt && (
-          <p className="text-[10px] text-muted-foreground mt-1">
-            Completed {quest.completedAt}
-          </p>
-        )}
-
         {/* Photos & Videos */}
         {quest.photos && quest.photos.length > 0 && (
           <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
@@ -320,6 +313,14 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
               />
             ))}
           </div>
+        )}
+
+        {/* Completed timestamp — shown below photos/videos so it stays
+            visible after the user marks the quest done. */}
+        {quest.completedByUserIds.includes(currentUser.id) && quest.completedAt && (
+          <p className="text-[11px] text-muted-foreground mt-2">
+            Completed {quest.completedAt}
+          </p>
         )}
 
         {/* Date */}
