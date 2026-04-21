@@ -439,11 +439,12 @@ const Profile = () => {
                   className="fixed inset-0 bg-foreground/30 z-40"
                   onClick={() => setShowPicMenu(false)}
                 />
+                <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none px-5">
                 <motion.div
-                  initial={{ opacity: 0, y: 20, scale: 0.96 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 20, scale: 0.96 }}
-                  className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[280px] bg-card border border-border rounded-2xl p-2 shadow-xl"
+                  initial={{ opacity: 0, scale: 0.96 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.96 }}
+                  className="pointer-events-auto w-[280px] bg-card border border-border rounded-2xl p-2 shadow-xl"
                 >
                   <button
                     onClick={() => {
@@ -474,6 +475,7 @@ const Profile = () => {
                     Cancel
                   </button>
                 </motion.div>
+                </div>
               </>
             )}
           </AnimatePresence>
