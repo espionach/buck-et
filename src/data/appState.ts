@@ -32,6 +32,7 @@ interface AppState {
   hideGlobalFab: boolean;
   popupCount: number;
   pinnedQuestIds: string[];
+  tourActive: boolean;
   _initialized: boolean;
 
   // Setters for data from React Query
@@ -54,6 +55,8 @@ interface AppState {
   popPopup: () => void;
   pinQuest: (questId: string) => void;
   unpinQuest: (questId: string) => void;
+  startTour: () => void;
+  endTour: () => void;
 
   // Mutations — these update local state AND persist to DB
   addQuest: (quest: Quest) => void;
