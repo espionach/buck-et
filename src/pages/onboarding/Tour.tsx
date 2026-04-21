@@ -12,9 +12,10 @@ const Tour = () => {
 
   const handleStartTour = async () => {
     if (user) await setOnboardingStep(user.id, "tour");
-    // Activate the global tour overlay, then jump to Home so coachmarks can target it.
-    startTour();
+    // Navigate to Home FIRST so the BottomNav is mounted and the spotlight
+    // targets exist. Then activate the tour on the next frame.
     navigate("/", { replace: true });
+    requestAnimationFrame(() => startTour());
   };
 
   const handleSkipTour = async () => {
