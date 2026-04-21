@@ -73,6 +73,8 @@ const Row = ({
 const Settings = () => {
   const nav = useNavigate();
   const { user, signOut } = useAuth();
+  const currentUserRoles = useAppStore((s) => s.currentUserRoles);
+  const isMod = currentUserRoles.includes("admin") || currentUserRoles.includes("moderator");
   const [prefs, setPrefs] = useState<NotifPrefs>(DEFAULT_PREFS);
   const [showNotif, setShowNotif] = useState(false);
   const [showEmail, setShowEmail] = useState(false);
@@ -199,7 +201,7 @@ const Settings = () => {
         <Row icon={ShieldOff} label="Blocked Users" onClick={() => nav("/settings/blocked")} />
       </Section>
 
-      {(useAppStore.getState().currentUserRoles.includes("admin") || useAppStore.getState().currentUserRoles.includes("moderator")) && (
+      {isMod && (
         <Section title="Moderation">
           <Row icon={Flag} label="User Reports" onClick={() => nav("/admin/reports")} />
         </Section>
