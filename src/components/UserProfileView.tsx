@@ -1,11 +1,12 @@
 import { useAppStore } from "@/data/appState";
 import QuestCard from "@/components/QuestCard";
 import UserAvatar from "@/components/UserAvatar";
-import { ArrowLeft, X, Users as UsersIcon, Lock, UserPlus, Clock, UserMinus, Check } from "lucide-react";
+import { ArrowLeft, X, Users as UsersIcon, Lock, UserPlus, Clock, UserMinus, Check, ShieldOff } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePopup } from "@/hooks/use-popup";
 import { User } from "@/data/mockData";
+import UserMenu from "@/components/UserMenu";
 
 interface UserProfileViewProps {
   user: User;
@@ -15,12 +16,13 @@ interface UserProfileViewProps {
 }
 
 const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfileViewProps) => {
-  const { quests, friends, currentUser, sentFriendRequests, sendFriendRequest, unfriend, friendRequests, acceptFriendRequest } = useAppStore();
+  const { quests, friends, currentUser, sentFriendRequests, sendFriendRequest, unfriend, friendRequests, acceptFriendRequest, blockedUserIds } = useAppStore();
   const [tab, setTab] = useState<"current" | "past">("current");
   const [showFriends, setShowFriends] = useState(false);
   const [showUnfriendConfirm, setShowUnfriendConfirm] = useState(false);
   usePopup(showFriends || showUnfriendConfirm);
 
+  const isBlocked = blockedUserIds.includes(user.id);
   const isFriend = friends.some((f) => f.id === user.id);
   const hasRequested = sentFriendRequests.includes(user.id);
   const incomingRequest = friendRequests.find((r) => r.from.id === user.id);
@@ -39,12 +41,27 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
 
   return (
     <div className="min-h-screen pb-24 px-5 pt-14">
-      <button
-        onClick={onBack}
-        className="p-2 rounded-xl bg-muted text-muted-foreground mb-4"
-      >
-        <ArrowLeft className="w-5 h-5" />
-      </button>
+      <div className="flex items-center justify-between mb-4">
+        <button
+          onClick={onBack}
+          aria-label="Back"
+          className="p-2 rounded-xl bg-muted text-muted-foreground"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </button>
+        <UserMenu user={user} onBlocked={onBack} />
+      </div>
+
+      {isBlocked ? (
+        <div className="text-center py-20">
+          <ShieldOff className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
+          <p className="font-bold text-foreground mb-1">User unavailable</p>
+          <p className="text-sm text-muted-foreground">
+            You've blocked this user. Unblock them from the menu above to view their profile again.
+          </p>
+        </div>
+      ) : (
+      <>
 
       <div className="flex flex-col items-center mb-4">
         <UserAvatar user={user} size="lg" />
@@ -237,6 +254,8 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
             )}
           </div>
         </>
+      )}
+      </>
       )}
     </div>
   );

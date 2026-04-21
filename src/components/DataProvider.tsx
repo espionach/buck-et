@@ -15,6 +15,8 @@ import {
   useNotifications,
   useTransferRequests,
   useSearchableUsers,
+  useBlockedUsers,
+  useCurrentUserRoles,
 } from "@/hooks/useSupabaseData";
 
 let errorIdCounter = 0;
@@ -79,6 +81,8 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
   const notifications = useNotifications();
   const transferRequests = useTransferRequests();
   const allUsers = useSearchableUsers();
+  const blockedUsers = useBlockedUsers();
+  const userRoles = useCurrentUserRoles();
 
   // Log errors from each query
   useEffect(() => {
@@ -166,6 +170,14 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (allUsers.data) store.setAllUsers(allUsers.data);
   }, [allUsers.data]);
+
+  useEffect(() => {
+    if (blockedUsers.data) store.setBlockedUserIds(blockedUsers.data.map((b) => b.userId));
+  }, [blockedUsers.data]);
+
+  useEffect(() => {
+    if (userRoles.data) store.setCurrentUserRoles(userRoles.data);
+  }, [userRoles.data]);
 
   useEffect(() => {
     if (user && profile.data) store.setInitialized(true);

@@ -27,6 +27,8 @@ interface AppState {
   notifications: AppNotification[];
   currentUser: User;
   allUsers: User[];
+  blockedUserIds: string[];
+  currentUserRoles: string[];
   hideGlobalFab: boolean;
   popupCount: number;
   pinnedQuestIds: string[];
@@ -43,6 +45,8 @@ interface AppState {
   setNotifications: (notifications: AppNotification[]) => void;
   setCurrentUser: (user: User) => void;
   setAllUsers: (users: User[]) => void;
+  setBlockedUserIds: (ids: string[]) => void;
+  setCurrentUserRoles: (roles: string[]) => void;
   setInitialized: (v: boolean) => void;
 
   setHideGlobalFab: (hide: boolean) => void;
@@ -88,6 +92,11 @@ interface AppState {
   markAllNotificationsRead: () => void;
   clearNotification: (notificationId: string) => void;
 
+  // Moderation
+  blockUser: (userId: string) => Promise<void>;
+  unblockUser: (userId: string) => Promise<void>;
+  reportUser: (userId: string, reason: string, description?: string) => Promise<void>;
+
   // invalidation callback — set by DataProvider
   _invalidate: (keys: string[]) => void;
   _setInvalidate: (fn: (keys: string[]) => void) => void;
@@ -106,6 +115,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   notifications: [],
   currentUser: emptyUser,
   allUsers: [],
+  blockedUserIds: [],
+  currentUserRoles: [],
   hideGlobalFab: false,
   popupCount: 0,
   pinnedQuestIds: JSON.parse(localStorage.getItem("pinnedQuestIds") || "[]"),
@@ -123,6 +134,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   setNotifications: (notifications) => set({ notifications }),
   setCurrentUser: (currentUser) => set({ currentUser }),
   setAllUsers: (allUsers) => set({ allUsers }),
+  setBlockedUserIds: (blockedUserIds) => set({ blockedUserIds }),
+  setCurrentUserRoles: (currentUserRoles) => set({ currentUserRoles }),
   setInitialized: (v) => set({ _initialized: v }),
   _setInvalidate: (fn) => set({ _invalidate: fn }),
 
@@ -962,5 +975,48 @@ export const useAppStore = create<AppState>((set, get) => ({
         .delete()
         .eq("id", notificationId);
     })();
+  },
+
+  // ---- Moderation ----
+  blockUser: async (userId) => {
+    const { currentUser, _invalidate } = get();
+    if (!currentUser.id || userId === currentUser.id) return;
+    // Optimistic local removal of friendship/quests/etc.
+    set((s) => ({
+      blockedUserIds: s.blockedUserIds.includes(userId) ? s.blockedUserIds : [...s.blockedUserIds, userId],
+      friends: s.friends.filter((f) => f.id !== userId),
+      friendRequests: s.friendRequests.filter((r) => r.from.id !== userId),
+      sentFriendRequests: s.sentFriendRequests.filter((id) => id !== userId),
+      groupInvitations: s.groupInvitations.filter((i) => i.invitedBy.id !== userId),
+      allUsers: s.allUsers.filter((u) => u.id !== userId),
+    }));
+    await supabase.from("blocked_users").insert({
+      blocker_id: currentUser.id,
+      blocked_id: userId,
+    });
+    _invalidate(["blocked_users", "friends", "friend_requests", "sent_friend_requests", "group_invitations", "quests", "all_users", "profiles"]);
+  },
+
+  unblockUser: async (userId) => {
+    const { currentUser, _invalidate } = get();
+    set((s) => ({
+      blockedUserIds: s.blockedUserIds.filter((id) => id !== userId),
+    }));
+    await supabase.from("blocked_users")
+      .delete()
+      .eq("blocker_id", currentUser.id)
+      .eq("blocked_id", userId);
+    _invalidate(["blocked_users", "all_users", "profiles", "quests"]);
+  },
+
+  reportUser: async (userId, reason, description) => {
+    const { currentUser } = get();
+    if (!currentUser.id || userId === currentUser.id) return;
+    await supabase.from("user_reports").insert({
+      reporter_id: currentUser.id,
+      reported_user_id: userId,
+      reason,
+      description: description?.trim() || null,
+    });
   },
 }));
