@@ -342,7 +342,7 @@ const Boards = () => {
                 <div className="text-center py-12 text-muted-foreground">
                   {boardTab === "active" ? <Map className="w-10 h-10 mx-auto mb-2 opacity-40" /> : <ScrollText className="w-10 h-10 mx-auto mb-2 opacity-40" />}
                  <p className="text-sm">
-                    {boardTab === "active" ? "No active sidequests yet — start one!" : "No completed sidequests yet"}
+                    {boardTab === "active" ? "Kinda empty here… Start something fun!" : "Zero done… We'll ignore that for now"}
                   </p>
                 </div>
               ) : (

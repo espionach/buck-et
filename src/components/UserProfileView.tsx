@@ -214,7 +214,7 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
           <div className="divide-y divide-border">
             {shownQuests.length === 0 ? (
               <p className="text-center text-sm text-muted-foreground py-8">
-                {tab === "current" ? "No active sidequests" : "No completed sidequests"}
+                {tab === "current" ? "Kinda empty here… Start something fun!" : "Zero done… We'll ignore that for now"}
               </p>
             ) : (
               shownQuests.map((q, i) => (

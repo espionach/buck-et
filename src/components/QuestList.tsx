@@ -27,7 +27,7 @@ const QuestList = ({
   quests,
   pageSize = 10,
   emptyIcon = "🔭",
-  emptyText = "No sidequests to show",
+  emptyText = "It's quiet in here… Where are your friends?",
   emptySubtext,
   showGroup = true,
   hideActions = false,
