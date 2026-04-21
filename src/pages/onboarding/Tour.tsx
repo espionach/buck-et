@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Compass } from "lucide-react";
 import OnboardingLayout from "@/components/onboarding/OnboardingLayout";
 import Coachmarks, { CoachmarkStep } from "@/components/onboarding/Coachmarks";
 import { useAuth } from "@/contexts/AuthContext";
@@ -67,7 +68,9 @@ const Tour = () => {
   return (
     <OnboardingLayout step="tour" onSkip={handleFinishTour} skipLabel="Skip">
       <div className="flex-1 flex flex-col items-center justify-center text-center">
-        <div className="text-5xl mb-4">🗺️</div>
+        <div className="w-20 h-20 rounded-3xl bg-primary/10 flex items-center justify-center mb-6">
+          <Compass className="w-10 h-10 text-primary" />
+        </div>
         <h1 className="text-2xl font-bold text-foreground mb-3">Quick tour</h1>
         <p className="text-sm text-muted-foreground max-w-xs">
           Four taps to learn the layout. We'll point at things — you tap to keep going.
