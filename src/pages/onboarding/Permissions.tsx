@@ -1,7 +1,7 @@
 import { Bell, Image as ImageIcon } from "lucide-react";
 import OnboardingLayout from "@/components/onboarding/OnboardingLayout";
 import { useAuth } from "@/contexts/AuthContext";
-import { setOnboardingStep } from "@/hooks/useOnboarding";
+import { completeOnboarding, setOnboardingStep } from "@/hooks/useOnboarding";
 import { useNavigate } from "react-router-dom";
 
 const PermissionRow = ({
@@ -33,8 +33,13 @@ const Permissions = () => {
     navigate("/onboarding/friends");
   };
 
+  const handleSkipAll = async () => {
+    if (user) await completeOnboarding(user.id);
+    navigate("/", { replace: true });
+  };
+
   return (
-    <OnboardingLayout step="permissions" onSkip={handleContinue} skipLabel="Skip">
+    <OnboardingLayout step="permissions" onSkip={handleSkipAll} skipLabel="Skip all">
       <div className="flex-1 flex flex-col">
         <h1 className="text-2xl font-bold text-foreground mb-2">Quick permissions</h1>
         <p className="text-sm text-muted-foreground mb-6">

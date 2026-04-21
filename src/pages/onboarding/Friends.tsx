@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Copy, Search, Share2, UserPlus, Check, Clock } from "lucide-react";
 import OnboardingLayout from "@/components/onboarding/OnboardingLayout";
 import { useAuth } from "@/contexts/AuthContext";
-import { setOnboardingStep } from "@/hooks/useOnboarding";
+import { completeOnboarding, setOnboardingStep } from "@/hooks/useOnboarding";
 import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
 import { toast } from "sonner";
@@ -74,8 +74,13 @@ const Friends = () => {
     navigate("/onboarding/tour");
   };
 
+  const handleSkipAll = async () => {
+    if (user) await completeOnboarding(user.id);
+    navigate("/", { replace: true });
+  };
+
   return (
-    <OnboardingLayout step="friends" onSkip={handleContinue} skipLabel="Skip">
+    <OnboardingLayout step="friends" onSkip={handleSkipAll} skipLabel="Skip all">
       <div className="flex-1 flex flex-col overflow-hidden">
         <h1 className="text-2xl font-bold text-foreground mb-2">Add your friends</h1>
         <p className="text-sm text-muted-foreground mb-5">
