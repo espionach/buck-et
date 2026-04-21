@@ -13,6 +13,7 @@ const BottomNav = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const hideGlobalFab = useAppStore((s) => s.hideGlobalFab || s.popupCount > 0);
+  const tourActive = useAppStore((s) => s.tourActive);
 
   return (
     <>
@@ -22,7 +23,7 @@ const BottomNav = () => {
           <div className="flex justify-end">
             <button
               data-tour="fab"
-              onClick={() => navigate("/create")}
+              onClick={() => navigate(tourActive ? "/create?onboarding=1" : "/create")}
               className="pointer-events-auto flex items-center justify-center w-14 h-14 rounded-full bg-primary shadow-lg shadow-primary/30 active:scale-95 transition-transform"
             >
               <Plus className="w-7 h-7 text-primary-foreground" />
