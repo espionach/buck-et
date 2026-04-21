@@ -255,6 +255,8 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
           </div>
         </>
       )}
+      </>
+      )}
     </div>
   );
 };
