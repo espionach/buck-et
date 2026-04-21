@@ -1,4 +1,6 @@
 import { useAppStore } from "@/data/appState";
+import { useAuth } from "@/contexts/AuthContext";
+import { completeOnboarding } from "@/hooks/useOnboarding";
 import { Quest } from "@/data/mockData";
 import { ALL_CONTRIBUTION_ROLES } from "@/data/contributionRoles";
 import { ArrowLeft, Sparkles, ChevronDown, ImagePlus, Link as LinkIcon, X, Globe, Check } from "lucide-react";
@@ -14,6 +16,8 @@ const CreateQuest = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const preselectedGroup = searchParams.get("groupId");
+  const isOnboarding = searchParams.get("onboarding") === "1";
+  const { user } = useAuth();
   const { groups, addQuest, currentUser } = useAppStore();
 
   const [title, setTitle] = useState("");
