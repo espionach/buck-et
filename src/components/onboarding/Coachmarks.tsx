@@ -125,35 +125,30 @@ function Coachmarks({ steps, onComplete, onSkip }: Props) {
   }
 
   const overlay = (
-    <div className="fixed inset-0 z-[100] pointer-events-auto">
-      {/* Spotlight using SVG mask for a clean cutout */}
-      <svg className="absolute inset-0 w-full h-full" aria-hidden>
-        <defs>
-          <mask id="coachmark-mask">
-            <rect width="100%" height="100%" fill="white" />
-            {rect && (
-              <rect
-                x={rect.left - SPOTLIGHT_PADDING}
-                y={rect.top - SPOTLIGHT_PADDING}
-                width={rect.width + SPOTLIGHT_PADDING * 2}
-                height={rect.height + SPOTLIGHT_PADDING * 2}
-                rx={16}
-                ry={16}
-                fill="black"
-              />
-            )}
-          </mask>
-        </defs>
-        <rect
-          width="100%"
-          height="100%"
-          fill="hsl(var(--foreground))"
-          fillOpacity={0.65}
-          mask="url(#coachmark-mask)"
+    <div className="fixed inset-0 z-[100]">
+      {/* Dim layer with a transparent spotlight cutout via box-shadow */}
+      {rect ? (
+        <div
+          aria-hidden
           onClick={handleNext}
-          style={{ cursor: "pointer" }}
+          className="absolute rounded-2xl cursor-pointer"
+          style={{
+            top: rect.top - SPOTLIGHT_PADDING,
+            left: rect.left - SPOTLIGHT_PADDING,
+            width: rect.width + SPOTLIGHT_PADDING * 2,
+            height: rect.height + SPOTLIGHT_PADDING * 2,
+            boxShadow: "0 0 0 9999px hsl(var(--foreground) / 0.65)",
+            transition: "all 0.25s ease",
+          }}
         />
-      </svg>
+      ) : (
+        <div
+          aria-hidden
+          onClick={handleNext}
+          className="absolute inset-0 cursor-pointer"
+          style={{ background: "hsl(var(--foreground) / 0.65)" }}
+        />
+      )}
 
       {/* Tooltip card */}
       {rect && (
