@@ -192,14 +192,17 @@ const CreateQuest = () => {
     <div className="min-h-screen px-5 pt-14 pb-28">
       {/* Header */}
       <div className="flex items-center gap-3 mb-8">
-        {!isOnboarding && (
-          <button
-            onClick={() => navigate(-1)}
-            className="p-2 rounded-xl bg-muted text-muted-foreground"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-        )}
+        <button
+          onClick={() =>
+            isOnboarding
+              ? navigate("/onboarding/tour", { replace: true })
+              : navigate(-1)
+          }
+          className="p-2 rounded-xl bg-muted text-muted-foreground"
+          aria-label="Back"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </button>
         <div className="flex-1">
           {isOnboarding && (
             <div className="text-[11px] font-semibold uppercase tracking-wider text-primary mb-1">
