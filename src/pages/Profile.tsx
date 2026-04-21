@@ -518,6 +518,8 @@ const Profile = () => {
           <button
             onClick={() => {
               setEditName(currentUser.name);
+              setEditUsername(currentUser.username || "");
+              setUsernameError(null);
               setEditBio(currentUser.bio);
               setEditProfilePic(currentUser.profilePicture || "");
               setShowEditProfile(true);
