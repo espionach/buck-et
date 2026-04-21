@@ -435,3 +435,39 @@ export function useSearchableUsers() {
     enabled: !!user,
   });
 }
+
+// ---- Blocked Users (people I have blocked) ----
+export function useBlockedUsers() {
+  const { user } = useAuth();
+  return useQuery({
+    queryKey: ["blocked_users", user?.id],
+    queryFn: async () => {
+      if (!user) return [] as { id: string; userId: string }[];
+      const { data, error } = await supabase
+        .from("blocked_users")
+        .select("id, blocked_id")
+        .eq("blocker_id", user.id);
+      if (error) throw error;
+      return (data || []).map((b) => ({ id: b.id, userId: b.blocked_id }));
+    },
+    enabled: !!user,
+  });
+}
+
+// ---- Current user roles (admin/moderator) ----
+export function useCurrentUserRoles() {
+  const { user } = useAuth();
+  return useQuery({
+    queryKey: ["user_roles", user?.id],
+    queryFn: async () => {
+      if (!user) return [] as string[];
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id);
+      if (error) throw error;
+      return (data || []).map((r) => r.role as string);
+    },
+    enabled: !!user,
+  });
+}
