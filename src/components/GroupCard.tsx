@@ -13,11 +13,16 @@ interface GroupCardProps {
   index: number;
 }
 
-const gradients = [
-  "from-primary/20 to-quest-gold/20",
-  "from-secondary/20 to-quest-blue/20",
-  "from-accent/20 to-quest-pink/20",
-];
+// Map color tokens to a tailwind gradient class. Keeping classes as full
+// literal strings ensures Tailwind can detect them at build time.
+const COLOR_GRADIENTS: Record<string, string> = {
+  sky: "from-sky-200/60 to-blue-100/40",
+  rose: "from-rose-200/60 to-pink-100/40",
+  amber: "from-amber-200/60 to-yellow-100/40",
+  emerald: "from-emerald-200/60 to-green-100/40",
+  violet: "from-violet-200/60 to-purple-100/40",
+  slate: "from-slate-200/60 to-zinc-100/40",
+};
 
 const GroupCard = ({ group, onClick, index }: GroupCardProps) => {
   const { transferRequests, acceptTransfer, declineTransfer, currentUser } = useAppStore();
@@ -38,7 +43,7 @@ const GroupCard = ({ group, onClick, index }: GroupCardProps) => {
       >
         <button
           onClick={onClick}
-          className={`w-full text-left p-5 rounded-xl bg-gradient-to-br ${gradients[index % gradients.length]} border border-border/50 active:scale-[0.98] transition-transform flex flex-col`}
+          className={`w-full text-left p-5 rounded-xl bg-gradient-to-br ${COLOR_GRADIENTS[group.color || "sky"] || COLOR_GRADIENTS.sky} border border-border/50 active:scale-[0.98] transition-transform flex flex-col`}
         >
           {/* Transfer icon badge */}
           {pendingTransfer && (
