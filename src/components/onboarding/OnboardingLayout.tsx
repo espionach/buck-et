@@ -1,21 +1,31 @@
 import { motion } from "framer-motion";
+import { ChevronLeft } from "lucide-react";
 import { ONBOARDING_ORDER, OnboardingStep } from "@/hooks/useOnboarding";
 
 interface Props {
   step: OnboardingStep;
   onSkip?: () => void;
   skipLabel?: string;
+  onBack?: () => void;
   children: React.ReactNode;
 }
 
-const OnboardingLayout = ({ step, onSkip, skipLabel = "Skip", children }: Props) => {
+const OnboardingLayout = ({ step, onSkip, skipLabel = "Skip", onBack, children }: Props) => {
   const stepIndex = ONBOARDING_ORDER.indexOf(step);
   const totalDots = ONBOARDING_ORDER.length;
 
   return (
     <div className="min-h-screen bg-background flex flex-col px-6 pt-14 pb-8">
-      {/* Top bar: progress dots + skip */}
-      <div className="flex items-center justify-between mb-10">
+      {/* Top bar: back + progress dots + skip */}
+      <div className="flex items-center justify-between mb-10 gap-3">
+        <button
+          onClick={onBack}
+          disabled={!onBack}
+          aria-label="Back"
+          className="w-9 h-9 -ml-2 flex items-center justify-center rounded-full text-foreground active:bg-muted disabled:opacity-0 disabled:pointer-events-none"
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
         <div className="flex items-center gap-1.5">
           {Array.from({ length: totalDots }).map((_, i) => (
             <div
