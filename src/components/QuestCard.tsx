@@ -184,22 +184,24 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
                       <Pencil className="w-3.5 h-3.5" /> Edit
                     </button>
                   )}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowMenu(false);
-                      if (pinned) {
-                        unpinQuest(quest.id);
-                      } else {
-                        pinQuest(quest.id);
-                      }
-                    }}
-                    disabled={!pinned && pinnedQuestIds.length >= 3}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-muted transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                  >
-                    <Pin className="w-3.5 h-3.5" /> {pinned ? "Unpin" : "Pin"}
-                    {!pinned && pinnedQuestIds.length >= 3 && <span className="text-[10px] text-muted-foreground ml-auto">Max 3</span>}
-                  </button>
+                  {!hidePin && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowMenu(false);
+                        if (pinned) {
+                          unpinQuest(quest.id);
+                        } else {
+                          pinQuest(quest.id);
+                        }
+                      }}
+                      disabled={!pinned && pinnedQuestIds.length >= 3}
+                      className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-muted transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      <Pin className="w-3.5 h-3.5" /> {pinned ? "Unpin" : "Pin"}
+                      {!pinned && pinnedQuestIds.length >= 3 && <span className="text-[10px] text-muted-foreground ml-auto">Max 3</span>}
+                    </button>
+                  )}
                   {isOwner && (
                     <button
                       onClick={(e) => {
