@@ -2,7 +2,7 @@ import { useAppStore } from "@/data/appState";
 import { Group, User } from "@/data/mockData";
 import UserAvatar from "@/components/UserAvatar";
 import OwnerLeaveDialog from "@/components/OwnerLeaveDialog";
-import { UserPlus, LogOut, Crown, Clock, Trash2, Pencil, Check, Bell, BellOff } from "lucide-react";
+import { UserPlus, LogOut, Crown, Clock, Trash2, Pencil, Check, Bell, BellOff, Search, X, UserSearch } from "lucide-react";
 import GroupIconPicker from "@/components/GroupIconPicker";
 import { useEffect, useState } from "react";
 import { usePopup } from "@/hooks/use-popup";
@@ -26,11 +26,12 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
   const [editColor, setEditColor] = useState(group.color || "sky");
   const [isEditingName, setIsEditingName] = useState(false);
   const [showAddMembers, setShowAddMembers] = useState(false);
+  const [memberSearch, setMemberSearch] = useState("");
   const [showOwnerLeave, setShowOwnerLeave] = useState(false);
   const [confirmRemoveUser, setConfirmRemoveUser] = useState<{ userId: string; userName: string } | null>(null);
   const [muted, setMuted] = useState(false);
   const [muteLoading, setMuteLoading] = useState(true);
-  usePopup(showOwnerLeave || !!confirmRemoveUser);
+  usePopup(showOwnerLeave || !!confirmRemoveUser || showAddMembers);
 
   const isOwner = group.ownerId === currentUser.id;
 
@@ -209,47 +210,13 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
                 Members ({group.memberRoles.length})
               </h3>
               <button
-                onClick={() => setShowAddMembers(!showAddMembers)}
+                onClick={() => { setMemberSearch(""); setShowAddMembers(true); }}
                 className="flex items-center gap-1 text-xs font-semibold text-primary"
               >
                 <UserPlus className="w-3.5 h-3.5" />
                 Add
               </button>
             </div>
-
-            {/* Add members panel */}
-            <AnimatePresence>
-              {showAddMembers && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="overflow-hidden mb-2"
-                >
-                  {availableToInvite.length === 0 ? (
-                    <p className="text-xs text-muted-foreground py-2">
-                      All your friends are already in this group
-                    </p>
-                  ) : (
-                    <div className="space-y-1 pb-2">
-                      {availableToInvite.map((user) => (
-                        <button
-                          key={user.id}
-                          onClick={() => handleInvite(user)}
-                          className="w-full flex items-center gap-2 p-2 rounded-xl bg-muted/50 border border-border/50 text-left active:scale-[0.98] transition-transform"
-                        >
-                          <UserAvatar user={user} size="sm" />
-                          <span className="text-sm font-medium text-foreground flex-1">
-                            {user.name}
-                          </span>
-                          <UserPlus className="w-4 h-4 text-primary" />
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
 
             {/* Member rows */}
             <div className="space-y-1">
@@ -365,6 +332,93 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
                   Remove
                 </button>
               </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Add member search modal */}
+      <AnimatePresence>
+        {showAddMembers && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[70] bg-foreground/40 flex items-end sm:items-center justify-center p-0 sm:p-5"
+            onClick={() => setShowAddMembers(false)}
+          >
+            <motion.div
+              initial={{ y: 40, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 40, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-md bg-card rounded-t-2xl sm:rounded-2xl p-5 space-y-4 shadow-lg max-h-[80vh] flex flex-col"
+            >
+              <div className="flex items-center justify-between">
+                <h3 className="text-base font-bold text-foreground">Add Members</h3>
+                <button
+                  onClick={() => setShowAddMembers(false)}
+                  className="p-1.5 rounded-lg text-muted-foreground hover:bg-muted transition-colors"
+                  aria-label="Close"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="relative">
+                <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  autoFocus
+                  value={memberSearch}
+                  onChange={(e) => setMemberSearch(e.target.value)}
+                  placeholder="Search friends by name"
+                  className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-muted/50 border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                />
+              </div>
+
+              {(() => {
+                const q = memberSearch.trim().toLowerCase();
+                const matches = q
+                  ? availableToInvite.filter((u) => u.name.toLowerCase().includes(q))
+                  : availableToInvite;
+                const sectionLabel = q ? "Results" : "Suggested";
+                const visible = q ? matches : matches.slice(0, 5);
+                return (
+                  <div className="flex-1 overflow-y-auto -mx-1 px-1">
+                    {availableToInvite.length === 0 ? (
+                      <p className="text-xs text-muted-foreground py-6 text-center">
+                        All your friends are already in this group.
+                      </p>
+                    ) : visible.length === 0 ? (
+                      <div className="py-6 flex flex-col items-center gap-2 text-muted-foreground">
+                        <UserSearch className="w-5 h-5" />
+                        <p className="text-xs">No friends match "{memberSearch}"</p>
+                      </div>
+                    ) : (
+                      <>
+                        <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+                          {sectionLabel}
+                        </p>
+                        <div className="space-y-1">
+                          {visible.map((user) => (
+                            <button
+                              key={user.id}
+                              onClick={() => handleInvite(user)}
+                              className="w-full flex items-center gap-2 p-2 rounded-xl bg-muted/40 hover:bg-muted/70 border border-border/50 text-left active:scale-[0.98] transition-all"
+                            >
+                              <UserAvatar user={user} size="sm" />
+                              <span className="text-sm font-medium text-foreground flex-1 truncate">
+                                {user.name}
+                              </span>
+                              <UserPlus className="w-4 h-4 text-primary" />
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                );
+              })()}
             </motion.div>
           </motion.div>
         )}
