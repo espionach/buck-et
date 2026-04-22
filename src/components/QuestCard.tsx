@@ -359,7 +359,12 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
               className="flex items-center gap-1 text-xs text-muted-foreground"
             >
               <MessageCircle className="w-3.5 h-3.5" />
-              {quest.comments.length > 0 && <span>{quest.comments.length}</span>}
+              {(() => {
+                const count = (function tally(list: Comment[]): number {
+                  return list.reduce((n, c) => n + 1 + (c.replies ? tally(c.replies) : 0), 0);
+                })(quest.comments);
+                return count > 0 ? <span>{count}</span> : null;
+              })()}
               {showComments ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
             </button>
 
