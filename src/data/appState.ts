@@ -236,43 +236,57 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   markDone: (questId) => {
-    const { currentUser, _invalidate } = get();
+    const { currentUser, quests, _invalidate } = get();
+    const quest = quests.find((q) => q.id === questId);
+    if (!quest) return;
+    // Only the owner can finish a sidequest.
+    if (quest.createdBy.id !== currentUser.id) return;
+    // Snapshot every current participant (plus the owner) as "was joined when finished".
+    const participantIds = Array.from(
+      new Set([currentUser.id, ...quest.participants.map((p) => p.id)])
+    );
+    const today = new Date().toISOString().split("T")[0];
     set((s) => ({
       quests: s.quests.map((q) =>
         q.id === questId
           ? {
               ...q,
-              completedByUserIds: q.completedByUserIds.includes(currentUser.id)
-                ? q.completedByUserIds
-                : [...q.completedByUserIds, currentUser.id],
-              completedAt: q.completedAt || new Date().toISOString().split("T")[0],
+              completedByUserIds: Array.from(
+                new Set([...q.completedByUserIds, ...participantIds])
+              ),
+              completedAt: q.completedAt || today,
             }
           : q
       ),
     }));
     (async () => {
-      await supabase.from("sidequest_completions").insert({
-        sidequest_id: questId,
-        user_id: currentUser.id,
-      });
+      // Insert a completion row for every participant (owner included).
+      await supabase.from("sidequest_completions").insert(
+        participantIds.map((uid) => ({ sidequest_id: questId, user_id: uid }))
+      );
       _invalidate(["quests"]);
     })();
   },
 
   markUndone: (questId) => {
-    const { currentUser, _invalidate } = get();
+    const { currentUser, quests, _invalidate } = get();
+    const quest = quests.find((q) => q.id === questId);
+    if (!quest) return;
+    // Only the owner can move a sidequest back to active.
+    if (quest.createdBy.id !== currentUser.id) return;
     set((s) => ({
       quests: s.quests.map((q) =>
         q.id === questId
-          ? { ...q, completedByUserIds: q.completedByUserIds.filter((id) => id !== currentUser.id) }
+          ? { ...q, completedByUserIds: [], completedAt: undefined }
           : q
       ),
     }));
     (async () => {
-      await supabase.from("sidequest_completions")
+      // Clear completion records for every user on this quest.
+      await supabase
+        .from("sidequest_completions")
         .delete()
-        .eq("sidequest_id", questId)
-        .eq("user_id", currentUser.id);
+        .eq("sidequest_id", questId);
       _invalidate(["quests"]);
     })();
   },
