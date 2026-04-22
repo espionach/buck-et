@@ -1,8 +1,9 @@
 import { useAppStore } from "@/data/appState";
 import QuestList from "@/components/QuestList";
 import UserAvatar from "@/components/UserAvatar";
-import { Edit, X, Check, Users as UsersIcon, UserPlus, Trash2, ImagePlus, Camera, Link as LinkIcon, Plus, ArrowLeft, Map, ScrollText, Pin, Settings as SettingsIcon, User as UserIcon } from "lucide-react";
+import { Edit, X, Check, Users as UsersIcon, UserPlus, Trash2, ImagePlus, Camera, Link as LinkIcon, Plus, ArrowLeft, Map, ScrollText, Pin, Settings as SettingsIcon, User as UserIcon, Globe, ChevronDown } from "lucide-react";
 import { ALL_CONTRIBUTION_ROLES } from "@/data/contributionRoles";
+import { GroupIconDisplay } from "@/components/GroupIcon";
 import UserProfileView from "@/components/UserProfileView";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -27,6 +28,7 @@ const Profile = () => {
     cleanupEmptyQuests,
     setHideGlobalFab,
     pinnedQuestIds,
+    groups,
   } = useAppStore();
   const location = useLocation();
   const nav = useNavigate();
@@ -75,6 +77,10 @@ const Profile = () => {
   const [editCarpoolSlots, setEditCarpoolSlots] = useState("");
   const [editCustomNotes, setEditCustomNotes] = useState("");
   const [editContributionRoles, setEditContributionRoles] = useState<string[]>([]);
+
+  // Quest type (Friends Only vs Group) editing state
+  const [editGroupId, setEditGroupId] = useState<string | null>(null);
+  const [showEditGroupDropdown, setShowEditGroupDropdown] = useState(false);
 
   // Past quest editing state
   const [editingPastQuest, setEditingPastQuest] = useState<Quest | null>(null);
@@ -254,6 +260,8 @@ const Profile = () => {
     setEditCarpoolSlots(quest.logistics?.carpoolSlots?.toString() || "");
     setEditCustomNotes(quest.logistics?.customNotes || "");
     setEditContributionRoles(quest.logistics?.contributionRoles || []);
+    setEditGroupId(quest.groupId || null);
+    setShowEditGroupDropdown(false);
   };
 
   const handleSaveCurrentQuest = () => {
@@ -269,6 +277,8 @@ const Profile = () => {
         description: editQuestDescription.trim() || undefined,
         links: editQuestLinks.length > 0 ? editQuestLinks : undefined,
         photos: editQuestPhotos.length > 0 ? editQuestPhotos : undefined,
+        groupId: editGroupId || undefined,
+        isFollowerOnly: !editGroupId,
         logistics: hasLogistics ? {
           ...(editingCurrentQuest.logistics || {}),
           date: editDate || undefined,
