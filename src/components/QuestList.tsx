@@ -42,6 +42,7 @@ const QuestList = ({
   highlightCommentId,
   scrollToQuestId,
   pinnedQuestIds = [],
+  hidePin = false,
 }: QuestListProps) => {
   const [visibleCount, setVisibleCount] = useState(pageSize);
   const scrollRef = useRef<HTMLDivElement>(null);
