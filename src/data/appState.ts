@@ -350,6 +350,12 @@ export const useAppStore = create<AppState>((set, get) => ({
         .delete()
         .eq("group_id", groupId)
         .eq("user_id", userId);
+      // Also revoke any pending invitation for this user in this group
+      await supabase.from("group_invitations")
+        .delete()
+        .eq("group_id", groupId)
+        .eq("invited_user_id", userId)
+        .eq("status", "pending");
       _invalidate(["groups"]);
     })();
   },
