@@ -73,10 +73,9 @@ const CommentThread = ({ quest, highlightCommentId, onInteract }: CommentThreadP
                     onInteract?.(e);
                     setConfirmDelete(c.id);
                   }}
-                  aria-label="Delete comment"
-                  className="text-[10px] font-semibold text-destructive hover:opacity-80 transition-opacity flex items-center gap-1"
+                  className="text-[10px] font-semibold text-destructive hover:opacity-80 transition-opacity"
                 >
-                  <Trash2 className="w-3 h-3" />
+                  Delete
                 </button>
               )}
             </div>
