@@ -1,4 +1,4 @@
-import { Quest, Comment, User } from "@/data/mockData";
+import { Quest, Comment, User, isQuestCompleted } from "@/data/mockData";
 import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
 import { GroupIconDisplay } from "@/components/GroupIcon";
@@ -37,12 +37,15 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
   const isIn = quest.participants.some((p) => p.id === currentUser.id);
   const group = quest.groupId ? groups.find((g) => g.id === quest.groupId) : null;
   const userInGroup = group ? group.members.some((m) => m.id === currentUser.id) : true;
-  const canJoin = !disableJoin && userInGroup;
   const isOwner = quest.createdBy.id === currentUser.id;
   const groupOwner = group ? group.ownerId === currentUser.id : false;
-  const canToggleStatus = isIn;
   const isFollowersOnly = quest.isFollowerOnly;
-  const canNavigateToDetail = isIn && !quest.completedByUserIds.includes(currentUser.id);
+  // Quest-level completion is now driven solely by whether the OWNER finished it.
+  const isFinished = isQuestCompleted(quest);
+  // Whether the current viewer was joined at the time the owner finished.
+  const wasJoinedWhenFinished = quest.completedByUserIds.includes(currentUser.id);
+  const canJoin = !disableJoin && userInGroup && !isFinished;
+  const canNavigateToDetail = isIn && !isFinished;
   const pinned = pinnedQuestIds.includes(quest.id);
 
   const [showComments, setShowComments] = useState(autoOpenComments);
@@ -107,7 +110,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
   };
 
   // Should we show the three-dots menu?
-  const showThreeDots = !quest.completedByUserIds.includes(currentUser.id) && (isOwner || isIn);
+  const showThreeDots = !isFinished && (isOwner || isIn);
 
   return (
     <>
@@ -116,7 +119,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
         animate={{ opacity: 1 }}
         transition={{ delay: index * 0.06 }}
         onClick={() => { if (canNavigateToDetail) { onQuestClick?.(); navigate(`/quest/${quest.id}`); } }}
-        className={`relative p-4 overflow-hidden ${quest.completedByUserIds.includes(currentUser.id) ? "opacity-60" : ""} ${canNavigateToDetail ? "cursor-pointer active:scale-[0.99] transition-transform" : ""} ${justAdded ? "animate-just-added rounded-xl" : ""} ${isPinned ? "rounded-xl border-2 border-primary/30 bg-primary/[0.03]" : ""}`}
+        className={`relative p-4 overflow-hidden ${isFinished ? "opacity-60" : ""} ${canNavigateToDetail ? "cursor-pointer active:scale-[0.99] transition-transform" : ""} ${justAdded ? "animate-just-added rounded-xl" : ""} ${isPinned ? "rounded-xl border-2 border-primary/30 bg-primary/[0.03]" : ""}`}
       >
         {/* Pin icon for pinned quests */}
         {isPinned && (
