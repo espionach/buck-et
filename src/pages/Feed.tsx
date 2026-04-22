@@ -18,11 +18,25 @@ const Feed = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [feedFilter, setFeedFilter] = useState<"all" | "followers" | string>("all");
   const [searchMode, setSearchMode] = useState(() => !!sessionStorage.getItem("feedSearchText"));
+  // Scope recent searches to the current user so multiple accounts on the
+  // same browser don't share each other's history.
+  const recentSearchesKey = currentUser.id ? `recentSearches:${currentUser.id}` : null;
   const [recentSearches, setRecentSearches] = useState<string[]>(() => {
+    if (!recentSearchesKey) return [];
     try {
-      return JSON.parse(localStorage.getItem("recentSearches") || "[]");
+      return JSON.parse(localStorage.getItem(recentSearchesKey) || "[]");
     } catch { return []; }
   });
+
+  // Reload (and clean up) when the signed-in user changes.
+  useEffect(() => {
+    if (!recentSearchesKey) { setRecentSearches([]); return; }
+    // Migrate / discard any legacy unscoped key so it can't leak across users.
+    try { localStorage.removeItem("recentSearches"); } catch {}
+    try {
+      setRecentSearches(JSON.parse(localStorage.getItem(recentSearchesKey) || "[]"));
+    } catch { setRecentSearches([]); }
+  }, [recentSearchesKey]);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const location = useLocation();
   const navigate = useNavigate();
