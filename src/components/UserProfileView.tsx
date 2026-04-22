@@ -99,7 +99,7 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
             You've blocked this user. Unblock them from the menu above to view their profile again.
           </p>
         </div>
-      ) : (
+      ) : !friendsLoaded ? null : (
       <>
 
       <div className="flex flex-col items-center mb-4">
@@ -113,16 +113,15 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
           {isFriend ? (
             <button
               onClick={() => setShowFriends(true)}
-              disabled={!friendsLoaded}
               className="flex items-center gap-1.5 text-sm font-semibold text-foreground"
             >
               <UsersIcon className="w-4 h-4" />
-              {friendsLoaded ? `${userFriendsList.length} Friends` : "— Friends"}
+              {userFriendsList.length} Friends
             </button>
           ) : (
             <div className="flex items-center gap-1.5 text-sm font-semibold text-muted-foreground">
               <UsersIcon className="w-4 h-4" />
-              {friendsLoaded ? `${userFriendsList.length} Friends` : "— Friends"}
+              {userFriendsList.length} Friends
             </div>
           )}
 
