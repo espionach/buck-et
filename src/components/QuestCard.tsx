@@ -401,42 +401,11 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
               className="overflow-hidden"
             >
               <div className="mt-3 pt-3 border-t border-border/30 space-y-2">
-                {quest.comments.length === 0 && (
-                  <p className="text-xs text-muted-foreground text-center py-2">No comments yet</p>
-                )}
-                {quest.comments.map((c) => (
-                  <div
-                    key={c.id}
-                    className={`flex items-start gap-2 p-1.5 rounded-lg transition-colors ${
-                      highlightCommentId === c.id ? "bg-primary/10 ring-1 ring-primary/30" : ""
-                    }`}
-                  >
-                    <UserAvatar user={c.user} size="xs" />
-                    <div>
-                      <span className="text-xs font-semibold text-foreground">{c.user.name}</span>
-                      <p className="text-xs text-muted-foreground">{c.text}</p>
-                    </div>
-                  </div>
-                ))}
-                <div className="flex items-center gap-2 mt-2">
-                  <input
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleAddComment()}
-                    onClick={(e) => e.stopPropagation()}
-                    placeholder="Add a comment..."
-                    className="flex-1 text-xs px-3 py-2 rounded-lg bg-muted border-none text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/30"
-                  />
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleAddComment();
-                    }}
-                    className="p-1.5 rounded-lg bg-primary text-primary-foreground"
-                  >
-                    <Send className="w-3.5 h-3.5" />
-                  </button>
-                </div>
+                <CommentThread
+                  quest={quest}
+                  highlightCommentId={highlightCommentId}
+                  onInteract={(e) => e.stopPropagation()}
+                />
               </div>
             </motion.div>
           )}
