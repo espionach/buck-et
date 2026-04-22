@@ -2,11 +2,12 @@ import { useAppStore } from "@/data/appState";
 import QuestCard from "@/components/QuestCard";
 import UserAvatar from "@/components/UserAvatar";
 import { ArrowLeft, X, Users as UsersIcon, Lock, UserPlus, Clock, UserMinus, Check, ShieldOff } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePopup } from "@/hooks/use-popup";
-import { User, isQuestCompleted } from "@/data/mockData";
+import { User, isQuestCompleted, placeholderUser } from "@/data/mockData";
 import UserMenu from "@/components/UserMenu";
+import { supabase } from "@/integrations/supabase/client";
 
 interface UserProfileViewProps {
   user: User;
@@ -20,6 +21,7 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
   const [tab, setTab] = useState<"current" | "past">("current");
   const [showFriends, setShowFriends] = useState(false);
   const [showUnfriendConfirm, setShowUnfriendConfirm] = useState(false);
+  const [viewedUserFriends, setViewedUserFriends] = useState<User[]>([]);
   usePopup(showFriends || showUnfriendConfirm);
 
   const isBlocked = blockedUserIds.includes(user.id);
@@ -40,8 +42,39 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
   );
   const shownQuests = tab === "current" ? activeQuests : completedQuests;
 
-  // Mock friend count for other users
-  const userFriendsList = friends.filter((f) => f.id !== user.id).slice(0, 3);
+  // Fetch the viewed user's actual friends (visible to them and their friends).
+  useEffect(() => {
+    let cancelled = false;
+    if (isBlocked) { setViewedUserFriends([]); return; }
+    (async () => {
+      const { data: ids, error } = await supabase.rpc("get_user_friend_ids", { _user_id: user.id });
+      if (cancelled || error || !ids || ids.length === 0) {
+        if (!cancelled) setViewedUserFriends([]);
+        return;
+      }
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("user_id, display_name, username, avatar_url, bio")
+        .in("user_id", ids as string[]);
+      if (cancelled) return;
+      const list: User[] = (ids as string[]).map((id) => {
+        const p = profiles?.find((pp) => pp.user_id === id);
+        if (!p) return placeholderUser(id);
+        return {
+          id: p.user_id,
+          name: p.display_name || p.username,
+          username: p.username,
+          avatar: "👤",
+          bio: p.bio || "",
+          profilePicture: p.avatar_url || undefined,
+        };
+      });
+      setViewedUserFriends(list);
+    })();
+    return () => { cancelled = true; };
+  }, [user.id, isBlocked, isFriend]);
+
+  const userFriendsList = viewedUserFriends;
 
   return (
     <div className="min-h-screen pb-24 px-5 pt-14">
