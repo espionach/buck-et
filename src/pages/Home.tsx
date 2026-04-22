@@ -1,5 +1,5 @@
 import { useAppStore } from "@/data/appState";
-import { User } from "@/data/mockData";
+import { User, isQuestCompleted } from "@/data/mockData";
 import GroupCard from "@/components/GroupCard";
 import { GroupIconDisplay } from "@/components/GroupIcon";
 import QuestList from "@/components/QuestList";

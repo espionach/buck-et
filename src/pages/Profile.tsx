@@ -7,7 +7,7 @@ import { GroupIconDisplay } from "@/components/GroupIcon";
 import UserProfileView from "@/components/UserProfileView";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Quest, User } from "@/data/mockData";
+import { Quest, User, isQuestCompleted } from "@/data/mockData";
 import { useLocation, useSearchParams, useNavigate } from "react-router-dom";
 import { usePopup } from "@/hooks/use-popup";
 import { uploadAvatar, uploadSidequestPhotos } from "@/lib/uploads";
@@ -159,7 +159,7 @@ const Profile = () => {
   );
 
   const currentAll = myQuests
-    .filter((q) => !q.completedByUserIds.includes(currentUser.id));
+    .filter((q) => !isQuestCompleted(q));
 
   const datedQuests = currentAll
     .filter((q) => q.logistics?.date)
@@ -176,7 +176,7 @@ const Profile = () => {
     const currentIds = quests
       .filter(
         (q) =>
-          !q.completedByUserIds.includes(currentUser.id) &&
+          !isQuestCompleted(q) &&
           (q.createdBy.id === currentUser.id ||
             q.participants.some((p) => p.id === currentUser.id))
       )
@@ -185,7 +185,7 @@ const Profile = () => {
   }, [location.pathname]);
 
   const past = myQuests
-    .filter((q) => q.completedByUserIds.includes(currentUser.id))
+    .filter((q) => isQuestCompleted(q))
     .sort((a, b) => {
       const aDate = a.completedAt || a.createdAt;
       const bDate = b.completedAt || b.createdAt;
