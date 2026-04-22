@@ -286,7 +286,7 @@ export function useQuests() {
           participants,
           completedByUserIds,
           createdAt: q.created_at.split("T")[0],
-          completedAt: myCompletedAt ? myCompletedAt.split("T")[0] : undefined,
+          completedAt: finishedAt ? finishedAt.split("T")[0] : undefined,
           photos: q.photos && q.photos.length > 0 ? q.photos : undefined,
           notes: q.notes || undefined,
           links: q.links && q.links.length > 0 ? q.links : undefined,
