@@ -115,3 +115,13 @@ export interface AppNotification {
 export function placeholderUser(id: string): User {
   return { id, name: "Loading...", avatar: "👤", bio: "" };
 }
+
+/**
+ * A sidequest is considered finished only when its OWNER has marked it done.
+ * Other participants are added to `completedByUserIds` as a snapshot of who
+ * was joined when the owner finished the quest, so we can later decide whose
+ * profile shows it as completed and who can attach photos/videos to it.
+ */
+export function isQuestCompleted(q: Quest): boolean {
+  return q.completedByUserIds.includes(q.createdBy.id);
+}
