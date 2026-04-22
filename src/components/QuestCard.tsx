@@ -375,7 +375,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
               {showComments ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
             </button>
 
-            {!quest.completedByUserIds.includes(currentUser.id) && isIn && !hideActions && canToggleStatus && (
+            {!isFinished && isOwner && !hideActions && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -388,7 +388,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
               </button>
             )}
 
-            {quest.completedByUserIds.includes(currentUser.id) && isIn && !hideActions && canToggleStatus && (
+            {isFinished && isOwner && !hideActions && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
