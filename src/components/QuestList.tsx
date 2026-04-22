@@ -96,6 +96,7 @@ const QuestList = ({
             highlightCommentId={q.id === autoOpenCommentsId ? highlightCommentId : undefined}
             justAdded={q.id === justAdded}
             isPinned={pinnedQuestIds.includes(q.id)}
+            hidePin={hidePin}
           />
         </div>
       ))}
