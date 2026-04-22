@@ -576,26 +576,24 @@ const Profile = () => {
       {/* Profile Header */}
       <div className="flex flex-col items-center mb-6">
         <UserAvatar user={currentUser} size="xl" />
-        <div className="flex items-center gap-4 mt-3">
-          <h1 className="text-xl font-bold text-foreground">{currentUser.name}</h1>
-          <button
-            onClick={() => {
-              setEditName(currentUser.name);
-              setEditUsername(currentUser.username || "");
-              setUsernameError(null);
-              setEditBio(currentUser.bio);
-              setEditProfilePic(currentUser.profilePicture || "");
-              setShowEditProfile(true);
-            }}
-            className="px-2.5 py-0 h-6 rounded-md bg-muted text-muted-foreground text-xs font-medium flex items-center gap-1"
-          >
-            <Edit className="w-3 h-3" />
-            Edit
-          </button>
-        </div>
+        <h1 className="text-xl font-bold text-foreground mt-3">{currentUser.name}</h1>
         {currentUser.username && (
           <p className="text-xs text-muted-foreground/70 mt-0.5">@{currentUser.username}</p>
         )}
+        <button
+          onClick={() => {
+            setEditName(currentUser.name);
+            setEditUsername(currentUser.username || "");
+            setUsernameError(null);
+            setEditBio(currentUser.bio);
+            setEditProfilePic(currentUser.profilePicture || "");
+            setShowEditProfile(true);
+          }}
+          className="mt-2 px-2.5 py-0 h-6 rounded-md bg-muted text-muted-foreground text-xs font-medium flex items-center gap-1"
+        >
+          <Edit className="w-3 h-3" />
+          Edit
+        </button>
         <p className="text-sm text-muted-foreground mt-1 text-center">{currentUser.bio}</p>
         <div className="flex items-center justify-center gap-4 mt-3">
           <button
