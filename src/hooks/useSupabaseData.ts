@@ -240,10 +240,11 @@ export function useQuests() {
           .map((p) => getUser(p.user_id));
         const questCompletions = (completionsRes.data || []).filter((c) => c.sidequest_id === q.id);
         const completedByUserIds = questCompletions.map((c) => c.user_id);
-        // Per-user completion timestamp — fall back to the quest-level
-        // completed_at for legacy data that predates per-user completions.
-        const myCompletion = user ? questCompletions.find((c) => c.user_id === user.id) : undefined;
-        const myCompletedAt = myCompletion?.completed_at || q.completed_at || null;
+        // Completion is owner-driven: a quest is "finished" when its owner
+        // marks it done. Use the owner's completion timestamp so every viewer
+        // (friend, group member, participant) sees the same finished date.
+        const ownerCompletion = questCompletions.find((c) => c.user_id === q.created_by);
+        const finishedAt = ownerCompletion?.completed_at || q.completed_at || null;
         const volunteers: QuestVolunteer[] = (volunteersRes.data || [])
           .filter((v) => v.sidequest_id === q.id)
           .map((v) => ({ userId: v.user_id, user: getUser(v.user_id), role: v.role }));
