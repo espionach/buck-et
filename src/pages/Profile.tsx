@@ -869,9 +869,6 @@ const Profile = () => {
                     </div>
                   )}
                 </div>
-                <p className="text-[11px] text-muted-foreground mt-1.5">
-                  Switch between Friends Only and any of your groups.
-                </p>
               </div>
 
               {/* Logistics fields */}
