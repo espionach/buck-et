@@ -4,6 +4,7 @@ import { ALL_CONTRIBUTION_ROLES } from "@/data/contributionRoles";
 import UserAvatar from "@/components/UserAvatar";
 import { GroupIconDisplay } from "@/components/GroupIcon";
 import SidequestPhoto from "@/components/SidequestPhoto";
+import CommentThread from "@/components/CommentThread";
 import { ArrowLeft, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send, ExternalLink, HandMetal, Check, Globe, StickyNote, MoreVertical, Pencil, Pin, Trash2 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -347,41 +348,14 @@ const QuestDetail = () => {
         {/* Comments Section */}
         <div className="p-4 rounded-xl border border-border/50 bg-card space-y-3">
           <h3 className="text-sm font-bold text-foreground">
-            Comments {quest.comments.length > 0 && `(${quest.comments.length})`}
+            Comments {(() => {
+              const tally = (list: typeof quest.comments): number =>
+                list.reduce((n, c) => n + 1 + (c.replies ? tally(c.replies) : 0), 0);
+              const count = tally(quest.comments);
+              return count > 0 ? `(${count})` : "";
+            })()}
           </h3>
-
-          {quest.comments.length === 0 && (
-            <p className="text-xs text-muted-foreground text-center py-3">No comments yet — start the conversation!</p>
-          )}
-
-          <div className="space-y-2">
-            {quest.comments.map((c) => (
-              <div key={c.id} className="flex items-start gap-2 p-2 rounded-xl">
-                <UserAvatar user={c.user} size="xs" />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-xs font-semibold text-foreground">{c.user.name}</span>
-                    <span className="text-[10px] text-muted-foreground">{c.createdAt}</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-0.5">{c.text}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Comment input */}
-          <div className="flex items-center gap-2 pt-2 border-t border-border/30">
-            <input
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleAddComment()}
-              placeholder="Add a comment..."
-              className="flex-1 text-xs px-3 py-2.5 rounded-lg bg-muted border-none text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/30"
-            />
-            <button onClick={handleAddComment} className="p-2 rounded-lg bg-primary text-primary-foreground">
-              <Send className="w-3.5 h-3.5" />
-            </button>
-          </div>
+          <CommentThread quest={quest} />
         </div>
       </div>
 

@@ -75,6 +75,7 @@ interface AppState {
   sendFriendRequest: (toUser: User) => void;
   unfriend: (userId: string) => void;
   addComment: (questId: string, comment: Comment) => void;
+  deleteComment: (questId: string, commentId: string) => void;
   updateQuest: (questId: string, updates: Partial<Quest>) => void;
   deleteQuest: (questId: string) => void;
   updateProfile: (updates: Partial<User>) => void;
@@ -602,9 +603,20 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   addComment: (questId, comment) => {
     set((s) => ({
-      quests: s.quests.map((q) =>
-        q.id === questId ? { ...q, comments: [...q.comments, comment] } : q
-      ),
+      quests: s.quests.map((q) => {
+        if (q.id !== questId) return q;
+        if (comment.parentId) {
+          // Insert as a reply under the parent (top-level or nested).
+          const insertReply = (list: Comment[]): Comment[] =>
+            list.map((c) =>
+              c.id === comment.parentId
+                ? { ...c, replies: [...(c.replies || []), comment] }
+                : { ...c, replies: c.replies ? insertReply(c.replies) : c.replies }
+            );
+          return { ...q, comments: insertReply(q.comments) };
+        }
+        return { ...q, comments: [...q.comments, comment] };
+      }),
     }));
     const { currentUser, _invalidate } = get();
     (async () => {
@@ -612,7 +624,26 @@ export const useAppStore = create<AppState>((set, get) => ({
         sidequest_id: questId,
         user_id: currentUser.id,
         text: comment.text,
+        parent_comment_id: comment.parentId || null,
       });
+      _invalidate(["quests"]);
+    })();
+  },
+
+  deleteComment: (questId, commentId) => {
+    set((s) => ({
+      quests: s.quests.map((q) => {
+        if (q.id !== questId) return q;
+        const removeFrom = (list: Comment[]): Comment[] =>
+          list
+            .filter((c) => c.id !== commentId)
+            .map((c) => ({ ...c, replies: c.replies ? removeFrom(c.replies) : c.replies }));
+        return { ...q, comments: removeFrom(q.comments) };
+      }),
+    }));
+    const { _invalidate } = get();
+    (async () => {
+      await supabase.from("comments").delete().eq("id", commentId);
       _invalidate(["quests"]);
     })();
   },

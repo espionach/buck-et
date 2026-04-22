@@ -248,7 +248,8 @@ export function useQuests() {
         const volunteers: QuestVolunteer[] = (volunteersRes.data || [])
           .filter((v) => v.sidequest_id === q.id)
           .map((v) => ({ userId: v.user_id, user: getUser(v.user_id), role: v.role }));
-        const comments: Comment[] = (commentsRes.data || [])
+        // Build threaded comments: top-level entries with `replies` nested.
+        const flat: Comment[] = (commentsRes.data || [])
           .filter((c) => c.sidequest_id === q.id)
           .map((c) => ({
             id: c.id,
@@ -256,7 +257,18 @@ export function useQuests() {
             user: getUser(c.user_id),
             text: c.text,
             createdAt: c.created_at.split("T")[0],
+            parentId: (c as any).parent_comment_id || undefined,
+            replies: [],
           }));
+        const byId = new Map(flat.map((c) => [c.id, c]));
+        const comments: Comment[] = [];
+        for (const c of flat) {
+          if (c.parentId && byId.has(c.parentId)) {
+            byId.get(c.parentId)!.replies!.push(c);
+          } else {
+            comments.push(c);
+          }
+        }
 
         const contributionRoles = (q as any).contribution_roles as string[] | null;
         const hasLogistics = q.logistics_date || q.logistics_time || q.logistics_location ||

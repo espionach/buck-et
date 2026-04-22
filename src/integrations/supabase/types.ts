@@ -39,6 +39,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          parent_comment_id: string | null
           sidequest_id: string
           text: string
           user_id: string
@@ -46,6 +47,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          parent_comment_id?: string | null
           sidequest_id: string
           text: string
           user_id: string
@@ -53,11 +55,19 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          parent_comment_id?: string | null
           sidequest_id?: string
           text?: string
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "comments_parent_comment_id_fkey"
+            columns: ["parent_comment_id"]
+            isOneToOne: false
+            referencedRelation: "comments"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "comments_sidequest_id_fkey"
             columns: ["sidequest_id"]

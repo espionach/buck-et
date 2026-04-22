@@ -3,6 +3,7 @@ import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
 import { GroupIconDisplay } from "@/components/GroupIcon";
 import SidequestPhoto from "@/components/SidequestPhoto";
+import CommentThread from "@/components/CommentThread";
 
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, MessageCircle, ChevronDown, ChevronUp, Send, MoreVertical, Plus, Undo2, ExternalLink, X, Calendar, Globe, Pin, Pencil, Trash2 } from "lucide-react";
@@ -49,7 +50,6 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
   const pinned = pinnedQuestIds.includes(quest.id);
 
   const [showComments, setShowComments] = useState(autoOpenComments);
-  const [newComment, setNewComment] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showOwnerLeave, setShowOwnerLeave] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
@@ -72,19 +72,6 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
   const pendingTransfer = transferRequests.find(
     (tr) => tr.type === "quest" && tr.entityId === quest.id && tr.toUserId === currentUser.id
   );
-
-  const handleAddComment = () => {
-    if (!newComment.trim()) return;
-    const comment: Comment = {
-      id: `c${Date.now()}`,
-      userId: currentUser.id,
-      user: currentUser,
-      text: newComment.trim(),
-      createdAt: new Date().toISOString().split("T")[0],
-    };
-    addComment(quest.id, comment);
-    setNewComment("");
-  };
 
   const handleToggleImIn = () => {
     if (!canJoin) return;
@@ -372,7 +359,12 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
               className="flex items-center gap-1 text-xs text-muted-foreground"
             >
               <MessageCircle className="w-3.5 h-3.5" />
-              {quest.comments.length > 0 && <span>{quest.comments.length}</span>}
+              {(() => {
+                const count = (function tally(list: Comment[]): number {
+                  return list.reduce((n, c) => n + 1 + (c.replies ? tally(c.replies) : 0), 0);
+                })(quest.comments);
+                return count > 0 ? <span>{count}</span> : null;
+              })()}
               {showComments ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
             </button>
 
@@ -414,42 +406,11 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
               className="overflow-hidden"
             >
               <div className="mt-3 pt-3 border-t border-border/30 space-y-2">
-                {quest.comments.length === 0 && (
-                  <p className="text-xs text-muted-foreground text-center py-2">No comments yet</p>
-                )}
-                {quest.comments.map((c) => (
-                  <div
-                    key={c.id}
-                    className={`flex items-start gap-2 p-1.5 rounded-lg transition-colors ${
-                      highlightCommentId === c.id ? "bg-primary/10 ring-1 ring-primary/30" : ""
-                    }`}
-                  >
-                    <UserAvatar user={c.user} size="xs" />
-                    <div>
-                      <span className="text-xs font-semibold text-foreground">{c.user.name}</span>
-                      <p className="text-xs text-muted-foreground">{c.text}</p>
-                    </div>
-                  </div>
-                ))}
-                <div className="flex items-center gap-2 mt-2">
-                  <input
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleAddComment()}
-                    onClick={(e) => e.stopPropagation()}
-                    placeholder="Add a comment..."
-                    className="flex-1 text-xs px-3 py-2 rounded-lg bg-muted border-none text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/30"
-                  />
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleAddComment();
-                    }}
-                    className="p-1.5 rounded-lg bg-primary text-primary-foreground"
-                  >
-                    <Send className="w-3.5 h-3.5" />
-                  </button>
-                </div>
+                <CommentThread
+                  quest={quest}
+                  highlightCommentId={highlightCommentId}
+                  onInteract={(e) => e.stopPropagation()}
+                />
               </div>
             </motion.div>
           )}
