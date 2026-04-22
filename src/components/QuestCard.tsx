@@ -73,19 +73,6 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
     (tr) => tr.type === "quest" && tr.entityId === quest.id && tr.toUserId === currentUser.id
   );
 
-  const handleAddComment = () => {
-    if (!newComment.trim()) return;
-    const comment: Comment = {
-      id: `c${Date.now()}`,
-      userId: currentUser.id,
-      user: currentUser,
-      text: newComment.trim(),
-      createdAt: new Date().toISOString().split("T")[0],
-    };
-    addComment(quest.id, comment);
-    setNewComment("");
-  };
-
   const handleToggleImIn = () => {
     if (!canJoin) return;
       if (isOwner && isIn) {
