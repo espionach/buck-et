@@ -362,6 +362,7 @@ const Feed = () => {
                 onMarkDone={() => navigate("/profile?tab=past")}
                 onMarkUndone={() => navigate("/profile?tab=current")}
                 onViewProfile={(user) => setSelectedProfile(user)}
+                hidePin={true}
               />
             </div>
           </motion.div>
