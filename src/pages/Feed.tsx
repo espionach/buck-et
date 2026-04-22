@@ -3,7 +3,7 @@ import { User } from "@/data/mockData";
 import QuestList from "@/components/QuestList";
 import UserAvatar from "@/components/UserAvatar";
 import NotificationPanel from "@/components/NotificationPanel";
-import { Search, Lock, UserPlus, Mail, X, Globe } from "lucide-react";
+import { Search, Lock, UserPlus, Mail, X, Globe, UserSearch } from "lucide-react";
 import { GroupIconDisplay } from "@/components/GroupIcon";
 import UserProfileView from "@/components/UserProfileView";
 import { useState, useEffect, useRef } from "react";
@@ -293,7 +293,7 @@ const Feed = () => {
                 <div className="divide-y divide-border/50">
                   {filteredPeople.length === 0 ? (
                     <div className="text-center py-16 text-muted-foreground">
-                      <p className="text-4xl mb-3">👤</p>
+                      <UserSearch className="w-10 h-10 mx-auto mb-3 text-muted-foreground" strokeWidth={1.5} />
                       <p className="font-semibold">No people found</p>
                     </div>
                   ) : (
