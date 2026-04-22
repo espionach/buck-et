@@ -287,6 +287,7 @@ const Feed = () => {
                       }
                       setSelectedProfile(user);
                     }}
+                    hidePin={true}
                   />
                 </div>
               ) : (
