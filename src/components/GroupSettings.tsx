@@ -210,47 +210,13 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
                 Members ({group.memberRoles.length})
               </h3>
               <button
-                onClick={() => setShowAddMembers(!showAddMembers)}
+                onClick={() => { setMemberSearch(""); setShowAddMembers(true); }}
                 className="flex items-center gap-1 text-xs font-semibold text-primary"
               >
                 <UserPlus className="w-3.5 h-3.5" />
                 Add
               </button>
             </div>
-
-            {/* Add members panel */}
-            <AnimatePresence>
-              {showAddMembers && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="overflow-hidden mb-2"
-                >
-                  {availableToInvite.length === 0 ? (
-                    <p className="text-xs text-muted-foreground py-2">
-                      All your friends are already in this group
-                    </p>
-                  ) : (
-                    <div className="space-y-1 pb-2">
-                      {availableToInvite.map((user) => (
-                        <button
-                          key={user.id}
-                          onClick={() => handleInvite(user)}
-                          className="w-full flex items-center gap-2 p-2 rounded-xl bg-muted/50 border border-border/50 text-left active:scale-[0.98] transition-transform"
-                        >
-                          <UserAvatar user={user} size="sm" />
-                          <span className="text-sm font-medium text-foreground flex-1">
-                            {user.name}
-                          </span>
-                          <UserPlus className="w-4 h-4 text-primary" />
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
 
             {/* Member rows */}
             <div className="space-y-1">
