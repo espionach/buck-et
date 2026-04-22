@@ -1,5 +1,5 @@
 import { useAppStore } from "@/data/appState";
-import { QuestVolunteer } from "@/data/mockData";
+import { QuestVolunteer, isQuestCompleted } from "@/data/mockData";
 import { ALL_CONTRIBUTION_ROLES } from "@/data/contributionRoles";
 import UserAvatar from "@/components/UserAvatar";
 import { GroupIconDisplay } from "@/components/GroupIcon";
@@ -63,9 +63,10 @@ const QuestDetail = () => {
     );
   }
 
-  // Only joined participants can view
+  // Only joined participants can view; once the owner finishes the quest,
+  // the detail view is no longer accessible (the quest moves to history).
   const isIn = quest.participants.some((p) => p.id === currentUser.id);
-  if (!isIn || quest.completedByUserIds.includes(currentUser.id)) {
+  if (!isIn || isQuestCompleted(quest)) {
     navigate(-1);
     return null;
   }

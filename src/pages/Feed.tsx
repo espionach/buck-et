@@ -1,5 +1,5 @@
 import { useAppStore } from "@/data/appState";
-import { User } from "@/data/mockData";
+import { User, isQuestCompleted } from "@/data/mockData";
 import QuestList from "@/components/QuestList";
 import UserAvatar from "@/components/UserAvatar";
 import NotificationPanel from "@/components/NotificationPanel";
@@ -37,7 +37,7 @@ const Feed = () => {
   const userGroupIds = groups.map((g) => g.id);
   const friendIds = new Set(friendsList.map((f) => f.id));
   const feedQuests = quests.filter((q) => {
-    if (q.completedByUserIds.includes(currentUser.id)) return false;
+    if (isQuestCompleted(q)) return false;
     // Never show user's own quests on the feed
     if (q.createdBy.id === currentUser.id) return false;
     // Friends-only quests: show if creator is a friend (independent of group membership)

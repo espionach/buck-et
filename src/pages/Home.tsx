@@ -1,5 +1,5 @@
 import { useAppStore } from "@/data/appState";
-import { User } from "@/data/mockData";
+import { User, isQuestCompleted } from "@/data/mockData";
 import GroupCard from "@/components/GroupCard";
 import { GroupIconDisplay } from "@/components/GroupIcon";
 import QuestList from "@/components/QuestList";
@@ -69,8 +69,8 @@ const Boards = () => {
     ? quests.filter((q) => q.groupId === selectedGroup)
     : [];
 
-  const activeGroupQuests = allGroupQuests.filter((q) => !q.completedByUserIds.includes(currentUser.id));
-  const completedGroupQuests = allGroupQuests.filter((q) => q.completedByUserIds.includes(currentUser.id)).sort((a, b) => {
+  const activeGroupQuests = allGroupQuests.filter((q) => !isQuestCompleted(q));
+  const completedGroupQuests = allGroupQuests.filter((q) => isQuestCompleted(q)).sort((a, b) => {
     const aDate = a.completedAt || a.createdAt;
     const bDate = b.completedAt || b.createdAt;
     return new Date(bDate).getTime() - new Date(aDate).getTime();

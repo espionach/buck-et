@@ -5,7 +5,7 @@ import { ArrowLeft, X, Users as UsersIcon, Lock, UserPlus, Clock, UserMinus, Che
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePopup } from "@/hooks/use-popup";
-import { User } from "@/data/mockData";
+import { User, isQuestCompleted } from "@/data/mockData";
 import UserMenu from "@/components/UserMenu";
 
 interface UserProfileViewProps {
@@ -32,8 +32,12 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
       q.createdBy.id === user.id ||
       q.participants.some((p) => p.id === user.id)
   );
-  const activeQuests = profileQuests.filter((q) => !q.completedByUserIds.includes(user.id));
-  const completedQuests = profileQuests.filter((q) => q.completedByUserIds.includes(user.id));
+  const activeQuests = profileQuests.filter((q) => !isQuestCompleted(q));
+  // For another user's "completed" tab, show finished quests where they were
+  // joined when the owner finished it (or quests they themselves owned & finished).
+  const completedQuests = profileQuests.filter(
+    (q) => isQuestCompleted(q) && q.completedByUserIds.includes(user.id)
+  );
   const shownQuests = tab === "current" ? activeQuests : completedQuests;
 
   // Mock friend count for other users
