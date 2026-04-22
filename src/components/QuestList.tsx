@@ -21,6 +21,7 @@ interface QuestListProps {
   highlightCommentId?: string;
   scrollToQuestId?: string;
   pinnedQuestIds?: string[];
+  hidePin?: boolean;
 }
 
 const QuestList = ({
