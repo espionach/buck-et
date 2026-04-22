@@ -373,7 +373,7 @@ export const useAppStore = create<AppState>((set, get) => ({
           ? {
               ...g,
               members: [...g.members, user],
-              memberRoles: [...g.memberRoles, { user, role: "member" as const }],
+              memberRoles: [...g.memberRoles, { user, role: "invited" as const }],
             }
           : g
       ),
