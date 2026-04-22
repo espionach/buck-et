@@ -2,7 +2,7 @@ import { useAppStore } from "@/data/appState";
 import { Group, User } from "@/data/mockData";
 import UserAvatar from "@/components/UserAvatar";
 import OwnerLeaveDialog from "@/components/OwnerLeaveDialog";
-import { UserPlus, LogOut, Crown, Clock, Trash2, Pencil, Check, Bell, BellOff } from "lucide-react";
+import { UserPlus, LogOut, Crown, Clock, Trash2, Pencil, Check, Bell, BellOff, Search, X, UserSearch } from "lucide-react";
 import GroupIconPicker from "@/components/GroupIconPicker";
 import { useEffect, useState } from "react";
 import { usePopup } from "@/hooks/use-popup";
@@ -26,11 +26,12 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
   const [editColor, setEditColor] = useState(group.color || "sky");
   const [isEditingName, setIsEditingName] = useState(false);
   const [showAddMembers, setShowAddMembers] = useState(false);
+  const [memberSearch, setMemberSearch] = useState("");
   const [showOwnerLeave, setShowOwnerLeave] = useState(false);
   const [confirmRemoveUser, setConfirmRemoveUser] = useState<{ userId: string; userName: string } | null>(null);
   const [muted, setMuted] = useState(false);
   const [muteLoading, setMuteLoading] = useState(true);
-  usePopup(showOwnerLeave || !!confirmRemoveUser);
+  usePopup(showOwnerLeave || !!confirmRemoveUser || showAddMembers);
 
   const isOwner = group.ownerId === currentUser.id;
 
