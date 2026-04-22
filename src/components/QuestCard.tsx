@@ -3,6 +3,7 @@ import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
 import { GroupIconDisplay } from "@/components/GroupIcon";
 import SidequestPhoto from "@/components/SidequestPhoto";
+import CommentThread from "@/components/CommentThread";
 
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, MessageCircle, ChevronDown, ChevronUp, Send, MoreVertical, Plus, Undo2, ExternalLink, X, Calendar, Globe, Pin, Pencil, Trash2 } from "lucide-react";
@@ -49,7 +50,6 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
   const pinned = pinnedQuestIds.includes(quest.id);
 
   const [showComments, setShowComments] = useState(autoOpenComments);
-  const [newComment, setNewComment] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showOwnerLeave, setShowOwnerLeave] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
