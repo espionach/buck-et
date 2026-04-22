@@ -1,8 +1,9 @@
 import { useAppStore } from "@/data/appState";
 import QuestList from "@/components/QuestList";
 import UserAvatar from "@/components/UserAvatar";
-import { Edit, X, Check, Users as UsersIcon, UserPlus, Trash2, ImagePlus, Camera, Link as LinkIcon, Plus, ArrowLeft, Map, ScrollText, Pin, Settings as SettingsIcon, User as UserIcon } from "lucide-react";
+import { Edit, X, Check, Users as UsersIcon, UserPlus, Trash2, ImagePlus, Camera, Link as LinkIcon, Plus, ArrowLeft, Map, ScrollText, Pin, Settings as SettingsIcon, User as UserIcon, Globe, ChevronDown } from "lucide-react";
 import { ALL_CONTRIBUTION_ROLES } from "@/data/contributionRoles";
+import { GroupIconDisplay } from "@/components/GroupIcon";
 import UserProfileView from "@/components/UserProfileView";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -27,6 +28,7 @@ const Profile = () => {
     cleanupEmptyQuests,
     setHideGlobalFab,
     pinnedQuestIds,
+    groups,
   } = useAppStore();
   const location = useLocation();
   const nav = useNavigate();
@@ -75,6 +77,10 @@ const Profile = () => {
   const [editCarpoolSlots, setEditCarpoolSlots] = useState("");
   const [editCustomNotes, setEditCustomNotes] = useState("");
   const [editContributionRoles, setEditContributionRoles] = useState<string[]>([]);
+
+  // Quest type (Friends Only vs Group) editing state
+  const [editGroupId, setEditGroupId] = useState<string | null>(null);
+  const [showEditGroupDropdown, setShowEditGroupDropdown] = useState(false);
 
   // Past quest editing state
   const [editingPastQuest, setEditingPastQuest] = useState<Quest | null>(null);
@@ -254,6 +260,8 @@ const Profile = () => {
     setEditCarpoolSlots(quest.logistics?.carpoolSlots?.toString() || "");
     setEditCustomNotes(quest.logistics?.customNotes || "");
     setEditContributionRoles(quest.logistics?.contributionRoles || []);
+    setEditGroupId(quest.groupId || null);
+    setShowEditGroupDropdown(false);
   };
 
   const handleSaveCurrentQuest = () => {
@@ -269,6 +277,8 @@ const Profile = () => {
         description: editQuestDescription.trim() || undefined,
         links: editQuestLinks.length > 0 ? editQuestLinks : undefined,
         photos: editQuestPhotos.length > 0 ? editQuestPhotos : undefined,
+        groupId: editGroupId || undefined,
+        isFollowerOnly: !editGroupId,
         logistics: hasLogistics ? {
           ...(editingCurrentQuest.logistics || {}),
           date: editDate || undefined,
@@ -799,6 +809,69 @@ const Profile = () => {
                   rows={3}
                   className="w-full px-3 py-2.5 rounded-xl bg-muted border border-border text-sm text-foreground resize-none focus:outline-none focus:ring-2 focus:ring-primary/30"
                 />
+              </div>
+
+              {/* Quest type: Friends Only or a Group */}
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1.5 block">Shared with</label>
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setShowEditGroupDropdown((v) => !v)}
+                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-muted border border-border text-sm"
+                  >
+                    <span className="text-foreground font-medium">
+                      {editGroupId
+                        ? (() => {
+                            const g = groups.find((gr) => gr.id === editGroupId);
+                            return g ? (
+                              <span className="flex items-center gap-1.5">
+                                <GroupIconDisplay icon={g.emoji} size={14} className="text-foreground" />
+                                {g.name}
+                              </span>
+                            ) : (
+                              <span className="flex items-center gap-1.5"><Globe className="w-4 h-4" />Friends Only</span>
+                            );
+                          })()
+                        : <span className="flex items-center gap-1.5"><Globe className="w-4 h-4" />Friends Only</span>}
+                    </span>
+                    <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${showEditGroupDropdown ? "rotate-180" : ""}`} />
+                  </button>
+                  {showEditGroupDropdown && (
+                    <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-lg overflow-hidden">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditGroupId(null);
+                          setShowEditGroupDropdown(false);
+                        }}
+                        className={`w-full text-left px-3 py-2.5 text-sm transition-colors ${
+                          !editGroupId ? "bg-primary/5 text-primary font-semibold" : "text-foreground hover:bg-muted"
+                        }`}
+                      >
+                        <span className="flex items-center gap-1.5"><Globe className="w-4 h-4" />Friends Only</span>
+                      </button>
+                      {groups.map((g) => (
+                        <button
+                          key={g.id}
+                          type="button"
+                          onClick={() => {
+                            setEditGroupId(g.id);
+                            setShowEditGroupDropdown(false);
+                          }}
+                          className={`w-full text-left px-3 py-2.5 text-sm transition-colors ${
+                            editGroupId === g.id ? "bg-primary/5 text-primary font-semibold" : "text-foreground hover:bg-muted"
+                          }`}
+                        >
+                          <span className="flex items-center gap-1.5"><GroupIconDisplay icon={g.emoji} size={14} className="text-foreground" />{g.name}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <p className="text-[11px] text-muted-foreground mt-1.5">
+                  Switch between Friends Only and any of your groups.
+                </p>
               </div>
 
               {/* Logistics fields */}
