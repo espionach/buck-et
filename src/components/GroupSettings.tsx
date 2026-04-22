@@ -344,15 +344,15 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[70] bg-foreground/40 flex items-end sm:items-center justify-center p-0 sm:p-5"
+            className="fixed inset-0 z-[70] bg-foreground/40 flex items-start sm:items-center justify-center p-4 pt-20 sm:p-5"
             onClick={() => setShowAddMembers(false)}
           >
             <motion.div
-              initial={{ y: 40, opacity: 0 }}
+              initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 40, opacity: 0 }}
+              exit={{ y: 20, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-md bg-card rounded-t-2xl sm:rounded-2xl p-5 space-y-4 shadow-lg max-h-[80vh] flex flex-col"
+              className="w-full max-w-md bg-card rounded-2xl p-5 space-y-4 shadow-lg max-h-[70vh] sm:max-h-[80vh] flex flex-col"
             >
               <div className="flex items-center justify-between">
                 <h3 className="text-base font-bold text-foreground">Add Members</h3>
