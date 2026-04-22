@@ -82,7 +82,7 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
         <button
           onClick={onBack}
           aria-label="Back"
-          className="p-2 rounded-xl bg-muted text-muted-foreground"
+          className="p-2 -ml-2 text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
