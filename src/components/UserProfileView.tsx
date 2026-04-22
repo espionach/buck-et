@@ -100,7 +100,7 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
           </p>
         </div>
       ) : !friendsLoaded ? null : (
-      <>
+      <div className="animate-fade-in">
 
       <div className="flex flex-col items-center mb-4">
         <UserAvatar user={user} size="lg" />
@@ -294,7 +294,7 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
           </div>
         </>
       )}
-      </>
+      </div>
       )}
     </div>
   );
