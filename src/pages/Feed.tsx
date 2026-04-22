@@ -40,10 +40,10 @@ const Feed = () => {
     if (q.completedByUserIds.includes(currentUser.id)) return false;
     // Never show user's own quests on the feed
     if (q.createdBy.id === currentUser.id) return false;
+    // Friends-only quests: show if creator is a friend (independent of group membership)
+    if (q.isFollowerOnly && friendIds.has(q.createdBy.id)) return true;
     // Group quests: show if user is in that group
     if (q.groupId && userGroupIds.includes(q.groupId)) return true;
-    // Friends-only quests: only show if creator is a friend
-    if (q.isFollowerOnly && friendIds.has(q.createdBy.id)) return true;
     return false;
   });
 
