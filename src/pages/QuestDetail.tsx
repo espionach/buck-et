@@ -4,6 +4,7 @@ import { ALL_CONTRIBUTION_ROLES } from "@/data/contributionRoles";
 import UserAvatar from "@/components/UserAvatar";
 import { GroupIconDisplay } from "@/components/GroupIcon";
 import SidequestPhoto from "@/components/SidequestPhoto";
+import CommentThread from "@/components/CommentThread";
 import { ArrowLeft, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send, ExternalLink, HandMetal, Check, Globe, StickyNote, MoreVertical, Pencil, Pin, Trash2 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
