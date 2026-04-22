@@ -227,8 +227,9 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
           </div>
         )}
 
-        {/* Plus icon for past quests — right side, inside card */}
-        {quest.completedByUserIds.includes(currentUser.id) && onEditPast && (
+        {/* Plus icon for finished quests — only the owner or someone who was
+            joined when the owner finished it can attach photos/videos. */}
+        {isFinished && (isOwner || wasJoinedWhenFinished) && onEditPast && (
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -263,7 +264,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
         <div className="flex items-center justify-between gap-3">
           <h4 className="font-display font-bold text-foreground leading-snug text-[15px] flex-1 min-w-0">{quest.title}</h4>
 
-          {!quest.completedByUserIds.includes(currentUser.id) && (
+          {!isFinished && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -323,14 +324,14 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
 
         {/* Completed timestamp — shown below photos/videos so it stays
             visible after the user marks the quest done. */}
-        {quest.completedByUserIds.includes(currentUser.id) && quest.completedAt && (
+        {isFinished && quest.completedAt && (
           <p className="text-[11px] text-muted-foreground mt-2">
             Completed {quest.completedAt}
           </p>
         )}
 
         {/* Date */}
-        {!quest.completedByUserIds.includes(currentUser.id) && quest.logistics?.date && (
+        {!isFinished && quest.logistics?.date && (
           <div className="flex items-center gap-1.5 mt-2 text-xs text-muted-foreground">
             <Calendar className="w-3.5 h-3.5 shrink-0" />
             <span>
