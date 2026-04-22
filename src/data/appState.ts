@@ -504,12 +504,97 @@ export const useAppStore = create<AppState>((set, get) => ({
     const { currentUser, _invalidate } = get();
     set((s) => ({
       friends: s.friends.filter((f) => f.id !== userId),
+      // Remove each other from friends-only quests (only when not still connected via a shared group)
+      quests: s.quests.map((q) => {
+        if (!q.isFollowerOnly) return q;
+        // Quest by other user, current user is participant
+        if (q.createdBy.id === userId && q.participants.some((p) => p.id === currentUser.id)) {
+          return { ...q, participants: q.participants.filter((p) => p.id !== currentUser.id) };
+        }
+        // Quest by current user, other user is participant
+        if (q.createdBy.id === currentUser.id && q.participants.some((p) => p.id === userId)) {
+          return { ...q, participants: q.participants.filter((p) => p.id !== userId) };
+        }
+        return q;
+      }),
+      // Remove each user from groups owned by the other
+      groups: s.groups
+        // If other user owns a group current user is in → drop the group from local state
+        .filter((g) => !(g.ownerId === userId && g.members.some((m) => m.id === currentUser.id)))
+        .map((g) => {
+          // If current user owns and other user is a member → remove the other user
+          if (g.ownerId === currentUser.id && g.members.some((m) => m.id === userId)) {
+            return {
+              ...g,
+              members: g.members.filter((m) => m.id !== userId),
+              memberRoles: g.memberRoles.filter((mr) => mr.user.id !== userId),
+            };
+          }
+          return g;
+        }),
     }));
     (async () => {
       await supabase.from("friendships")
         .delete()
         .or(`and(user_id.eq.${currentUser.id},friend_id.eq.${userId}),and(user_id.eq.${userId},friend_id.eq.${currentUser.id})`);
-      _invalidate(["friends", "quests"]);
+
+      // 1. Remove each user as participant from the OTHER user's friends-only quests.
+      // Find friends-only quest IDs created by the other user where current user participates.
+      const { data: theirFriendsOnly } = await supabase
+        .from("sidequests")
+        .select("id")
+        .eq("created_by", userId)
+        .eq("is_friends_only", true);
+      const theirIds = (theirFriendsOnly || []).map((q: any) => q.id);
+      if (theirIds.length > 0) {
+        await supabase
+          .from("sidequest_participants")
+          .delete()
+          .in("sidequest_id", theirIds)
+          .eq("user_id", currentUser.id);
+      }
+      // Same for current user's friends-only quests where the other user participates.
+      const { data: myFriendsOnly } = await supabase
+        .from("sidequests")
+        .select("id")
+        .eq("created_by", currentUser.id)
+        .eq("is_friends_only", true);
+      const myIds = (myFriendsOnly || []).map((q: any) => q.id);
+      if (myIds.length > 0) {
+        await supabase
+          .from("sidequest_participants")
+          .delete()
+          .in("sidequest_id", myIds)
+          .eq("user_id", userId);
+      }
+
+      // 2. Remove each user from groups owned by the other.
+      const { data: theirGroups } = await supabase
+        .from("groups")
+        .select("id")
+        .eq("owner_id", userId);
+      const theirGroupIds = (theirGroups || []).map((g: any) => g.id);
+      if (theirGroupIds.length > 0) {
+        await supabase
+          .from("group_members")
+          .delete()
+          .in("group_id", theirGroupIds)
+          .eq("user_id", currentUser.id);
+      }
+      const { data: myGroups } = await supabase
+        .from("groups")
+        .select("id")
+        .eq("owner_id", currentUser.id);
+      const myGroupIds = (myGroups || []).map((g: any) => g.id);
+      if (myGroupIds.length > 0) {
+        await supabase
+          .from("group_members")
+          .delete()
+          .in("group_id", myGroupIds)
+          .eq("user_id", userId);
+      }
+
+      _invalidate(["friends", "quests", "groups"]);
     })();
   },
 

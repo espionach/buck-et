@@ -117,7 +117,7 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
             >
               <h3 className="font-bold text-foreground text-sm mb-2">Unfriend {user.name}?</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                You'll no longer be able to see each other's quests and profile.
+                You'll no longer see each other's profiles or friends-only quests, and you'll be removed from each other's friends-only quests. You'll also be removed from any groups owned by {user.name} (and they'll be removed from groups you own). Shared groups owned by someone else will not be affected.
               </p>
               <div className="flex gap-2 justify-end">
                 <button
