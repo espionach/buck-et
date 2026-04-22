@@ -44,7 +44,7 @@ const UserMenu = ({ user, onBlocked }: UserMenuProps) => {
         <DropdownMenuTrigger asChild>
           <button
             aria-label="More options"
-            className="p-2 rounded-xl bg-muted text-muted-foreground hover:bg-muted/80 transition-colors"
+            className="p-2 -mr-2 text-muted-foreground hover:text-foreground transition-colors"
           >
             <MoreVertical className="w-5 h-5" />
           </button>
