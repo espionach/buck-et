@@ -1,6 +1,6 @@
 import { useAppStore } from "@/data/appState";
 import { Group, GroupMember } from "@/data/mockData";
-import { ArrowLeft, Plus, Check } from "lucide-react";
+import { ArrowLeft, Plus, Check, Search, UserSearch, UserPlus } from "lucide-react";
 import GroupIconPicker from "@/components/GroupIconPicker";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
