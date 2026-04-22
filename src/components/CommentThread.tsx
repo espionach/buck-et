@@ -73,7 +73,7 @@ const CommentThread = ({ quest, highlightCommentId, onInteract }: CommentThreadP
                     onInteract?.(e);
                     setConfirmDelete(c.id);
                   }}
-                  className="text-[10px] font-semibold text-destructive hover:opacity-80 transition-opacity"
+                  className="text-[10px] font-medium text-muted-foreground/70 hover:text-destructive transition-colors"
                 >
                   Delete
                 </button>
