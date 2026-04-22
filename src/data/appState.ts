@@ -502,99 +502,87 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   unfriend: (userId) => {
     const { currentUser, _invalidate } = get();
+    const state = get();
+    const theirFriendsOnlyQuestIds = state.quests
+      .filter((q) => q.isFollowerOnly && q.createdBy.id === userId && q.participants.some((p) => p.id === currentUser.id))
+      .map((q) => q.id);
+    const myFriendsOnlyQuestIds = state.quests
+      .filter((q) => q.isFollowerOnly && q.createdBy.id === currentUser.id && q.participants.some((p) => p.id === userId))
+      .map((q) => q.id);
+    const theirOwnedGroupIds = state.groups
+      .filter((g) => g.ownerId === userId && g.members.some((m) => m.id === currentUser.id))
+      .map((g) => g.id);
+    const myOwnedGroupIds = state.groups
+      .filter((g) => g.ownerId === currentUser.id && g.members.some((m) => m.id === userId))
+      .map((g) => g.id);
+    const pendingInviteIds = state.groupInvitations
+      .filter((i) => i.status === "pending" && i.invitedBy.id === userId)
+      .map((i) => i.id);
+
     set((s) => ({
       friends: s.friends.filter((f) => f.id !== userId),
-      // Remove each other from friends-only quests (only when not still connected via a shared group)
       quests: s.quests.map((q) => {
-        if (!q.isFollowerOnly) return q;
-        // Quest by other user, current user is participant
-        if (q.createdBy.id === userId && q.participants.some((p) => p.id === currentUser.id)) {
+        if (theirFriendsOnlyQuestIds.includes(q.id)) {
           return { ...q, participants: q.participants.filter((p) => p.id !== currentUser.id) };
         }
-        // Quest by current user, other user is participant
-        if (q.createdBy.id === currentUser.id && q.participants.some((p) => p.id === userId)) {
+        if (myFriendsOnlyQuestIds.includes(q.id)) {
           return { ...q, participants: q.participants.filter((p) => p.id !== userId) };
         }
         return q;
       }),
-      // Remove each user from groups owned by the other
       groups: s.groups
-        // If other user owns a group current user is in → drop the group from local state
-        .filter((g) => !(g.ownerId === userId && g.members.some((m) => m.id === currentUser.id)))
-        .map((g) => {
-          // If current user owns and other user is a member → remove the other user
-          if (g.ownerId === currentUser.id && g.members.some((m) => m.id === userId)) {
-            return {
+        .filter((g) => !theirOwnedGroupIds.includes(g.id))
+        .map((g) => myOwnedGroupIds.includes(g.id)
+          ? {
               ...g,
               members: g.members.filter((m) => m.id !== userId),
               memberRoles: g.memberRoles.filter((mr) => mr.user.id !== userId),
-            };
-          }
-          return g;
-        }),
+            }
+          : g),
+      groupInvitations: s.groupInvitations.filter((i) => !pendingInviteIds.includes(i.id)),
+      notifications: s.notifications.filter((n) => !(n.type === "board_invitation" && n.entityId && pendingInviteIds.includes(n.entityId))),
     }));
     (async () => {
       await supabase.from("friendships")
         .delete()
         .or(`and(user_id.eq.${currentUser.id},friend_id.eq.${userId}),and(user_id.eq.${userId},friend_id.eq.${currentUser.id})`);
 
-      // 1. Remove each user as participant from the OTHER user's friends-only quests.
-      // Find friends-only quest IDs created by the other user where current user participates.
-      const { data: theirFriendsOnly } = await supabase
-        .from("sidequests")
-        .select("id")
-        .eq("created_by", userId)
-        .eq("is_friends_only", true);
-      const theirIds = (theirFriendsOnly || []).map((q: any) => q.id);
-      if (theirIds.length > 0) {
+      if (theirFriendsOnlyQuestIds.length > 0) {
         await supabase
           .from("sidequest_participants")
           .delete()
-          .in("sidequest_id", theirIds)
+          .in("sidequest_id", theirFriendsOnlyQuestIds)
           .eq("user_id", currentUser.id);
       }
-      // Same for current user's friends-only quests where the other user participates.
-      const { data: myFriendsOnly } = await supabase
-        .from("sidequests")
-        .select("id")
-        .eq("created_by", currentUser.id)
-        .eq("is_friends_only", true);
-      const myIds = (myFriendsOnly || []).map((q: any) => q.id);
-      if (myIds.length > 0) {
+      if (myFriendsOnlyQuestIds.length > 0) {
         await supabase
           .from("sidequest_participants")
           .delete()
-          .in("sidequest_id", myIds)
+          .in("sidequest_id", myFriendsOnlyQuestIds)
           .eq("user_id", userId);
       }
 
-      // 2. Remove each user from groups owned by the other.
-      const { data: theirGroups } = await supabase
-        .from("groups")
-        .select("id")
-        .eq("owner_id", userId);
-      const theirGroupIds = (theirGroups || []).map((g: any) => g.id);
-      if (theirGroupIds.length > 0) {
+      if (theirOwnedGroupIds.length > 0) {
         await supabase
           .from("group_members")
           .delete()
-          .in("group_id", theirGroupIds)
+          .in("group_id", theirOwnedGroupIds)
           .eq("user_id", currentUser.id);
       }
-      const { data: myGroups } = await supabase
-        .from("groups")
-        .select("id")
-        .eq("owner_id", currentUser.id);
-      const myGroupIds = (myGroups || []).map((g: any) => g.id);
-      if (myGroupIds.length > 0) {
+      if (myOwnedGroupIds.length > 0) {
         await supabase
           .from("group_members")
           .delete()
-          .in("group_id", myGroupIds)
+          .in("group_id", myOwnedGroupIds)
           .eq("user_id", userId);
       }
 
-      _invalidate(["friends", "quests", "groups"]);
+      await supabase.from("group_invitations")
+        .delete()
+        .eq("status", "pending")
+        .or(`and(invited_by.eq.${userId},invited_user_id.eq.${currentUser.id}),and(invited_by.eq.${currentUser.id},invited_user_id.eq.${userId})`);
+
+      _invalidate(["friends", "quests", "groups", "group_invitations", "notifications"]);
     })();
   },
 
