@@ -538,6 +538,8 @@ export const useAppStore = create<AppState>((set, get) => ({
       if (updates.photos !== undefined) dbUpdates.photos = updates.photos || [];
       if (updates.links !== undefined) dbUpdates.links = updates.links || [];
       if (updates.completedAt !== undefined) dbUpdates.completed_at = updates.completedAt || null;
+      if (updates.groupId !== undefined) dbUpdates.group_id = updates.groupId || null;
+      if (updates.isFollowerOnly !== undefined) dbUpdates.is_friends_only = !!updates.isFollowerOnly;
       if (updates.logistics !== undefined) {
         const l = updates.logistics;
         if (l) {
