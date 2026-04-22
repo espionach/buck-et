@@ -16,6 +16,7 @@ const CreateGroup = () => {
   const [emoji, setEmoji] = useState("target");
   const [color, setColor] = useState("sky");
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+  const [memberSearch, setMemberSearch] = useState("");
 
   const toggleMember = (id: string) => {
     setSelectedMembers((prev) =>
