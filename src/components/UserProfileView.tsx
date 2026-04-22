@@ -21,7 +21,7 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
   const [tab, setTab] = useState<"current" | "past">("current");
   const [showFriends, setShowFriends] = useState(false);
   const [showUnfriendConfirm, setShowUnfriendConfirm] = useState(false);
-  const [viewedUserFriends, setViewedUserFriends] = useState<User[]>([]);
+  const [viewedUserFriends, setViewedUserFriends] = useState<User[] | null>(null);
   usePopup(showFriends || showUnfriendConfirm);
 
   const isBlocked = blockedUserIds.includes(user.id);
@@ -46,6 +46,7 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
   useEffect(() => {
     let cancelled = false;
     if (isBlocked) { setViewedUserFriends([]); return; }
+    setViewedUserFriends(null);
     (async () => {
       const { data: ids, error } = await supabase.rpc("get_user_friend_ids", { _user_id: user.id });
       if (cancelled || error || !ids || ids.length === 0) {
@@ -74,7 +75,8 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
     return () => { cancelled = true; };
   }, [user.id, isBlocked, isFriend]);
 
-  const userFriendsList = viewedUserFriends;
+  const userFriendsList = viewedUserFriends ?? [];
+  const friendsLoaded = viewedUserFriends !== null;
 
   return (
     <div className="min-h-screen pb-24 px-5 pt-14">
@@ -111,15 +113,16 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
           {isFriend ? (
             <button
               onClick={() => setShowFriends(true)}
+              disabled={!friendsLoaded}
               className="flex items-center gap-1.5 text-sm font-semibold text-foreground"
             >
               <UsersIcon className="w-4 h-4" />
-              {userFriendsList.length} Friends
+              {friendsLoaded ? `${userFriendsList.length} Friends` : "— Friends"}
             </button>
           ) : (
             <div className="flex items-center gap-1.5 text-sm font-semibold text-muted-foreground">
               <UsersIcon className="w-4 h-4" />
-              {userFriendsList.length} Friends
+              {friendsLoaded ? `${userFriendsList.length} Friends` : "— Friends"}
             </div>
           )}
 
