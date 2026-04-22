@@ -232,7 +232,7 @@ const Feed = () => {
                   <button
                     onClick={() => {
                       setRecentSearches([]);
-                      localStorage.removeItem("recentSearches");
+                      if (recentSearchesKey) localStorage.removeItem(recentSearchesKey);
                     }}
                     className="text-[10px] font-semibold text-destructive"
                   >
@@ -262,7 +262,7 @@ const Feed = () => {
                       <button
                         onClick={() => setRecentSearches((prev) => {
                           const next = prev.filter((_, idx) => idx !== i);
-                          localStorage.setItem("recentSearches", JSON.stringify(next));
+                          if (recentSearchesKey) localStorage.setItem(recentSearchesKey, JSON.stringify(next));
                           return next;
                         })}
                         className="shrink-0"
