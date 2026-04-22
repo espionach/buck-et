@@ -109,8 +109,9 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
     onMarkUndone?.();
   };
 
-  // Should we show the three-dots menu?
-  const showThreeDots = !isFinished && (isOwner || isIn);
+  // Three-dots menu only contains owner actions (Edit, Pin, Delete). For
+  // joiners there's nothing actionable, so hide the menu entirely for them.
+  const showThreeDots = !isFinished && isOwner;
 
   return (
     <>
