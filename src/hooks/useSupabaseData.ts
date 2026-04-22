@@ -141,8 +141,19 @@ export function useGroups() {
         .from("group_members")
         .select("*")
         .in("group_id", groupIds);
-      // Get all member user profiles
-      const memberUserIds = [...new Set((allMembers || []).map((m) => m.user_id))];
+      // Fetch all pending invitations for these groups
+      const { data: allInvites } = await supabase
+        .from("group_invitations")
+        .select("*")
+        .in("group_id", groupIds)
+        .eq("status", "pending");
+      // Get all member + invited user profiles
+      const memberUserIds = [
+        ...new Set([
+          ...(allMembers || []).map((m) => m.user_id),
+          ...(allInvites || []).map((i) => i.invited_user_id),
+        ]),
+      ];
       const { data: profiles } = await supabase
         .from("profiles")
         .select("*")
@@ -151,11 +162,23 @@ export function useGroups() {
 
       return (groups || []).map((g): Group => {
         const gMembers = (allMembers || []).filter((m) => m.group_id === g.id);
+        const gInvites = (allInvites || []).filter((i) => i.group_id === g.id);
+        // Don't double-count: skip invites for users already in members
+        const memberIds = new Set(gMembers.map((m) => m.user_id));
+        const filteredInvites = gInvites.filter((i) => !memberIds.has(i.invited_user_id));
+        // `members` = accepted members only (used for counts, group-quest access, ownership transfer)
         const members = gMembers.map((m) => profileMap.get(m.user_id) || placeholderUser(m.user_id));
-        const memberRoles: GroupMember[] = gMembers.map((m) => ({
-          user: profileMap.get(m.user_id) || placeholderUser(m.user_id),
-          role: m.role as GroupMember["role"],
-        }));
+        // `memberRoles` includes invited users so the settings UI can show their pending status
+        const memberRoles: GroupMember[] = [
+          ...gMembers.map((m) => ({
+            user: profileMap.get(m.user_id) || placeholderUser(m.user_id),
+            role: m.role as GroupMember["role"],
+          })),
+          ...filteredInvites.map((i) => ({
+            user: profileMap.get(i.invited_user_id) || placeholderUser(i.invited_user_id),
+            role: "invited" as const,
+          })),
+        ];
         return {
           id: g.id,
           name: g.name,

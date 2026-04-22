@@ -97,7 +97,8 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
   };
 
   const handleRemove = (userId: string) => {
-    const user = group.members.find((m) => m.id === userId);
+    const user = group.memberRoles.find((mr) => mr.user.id === userId)?.user
+      || group.members.find((m) => m.id === userId);
     setConfirmRemoveUser({ userId, userName: user?.name || "this user" });
   };
 
@@ -114,7 +115,7 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
   };
 
   const availableToInvite = friendsList.filter(
-    (f) => !group.members.some((m) => m.id === f.id)
+    (f) => !group.memberRoles.some((mr) => mr.user.id === f.id)
   );
 
   const getRoleLabel = (userId: string) => {
@@ -205,7 +206,7 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
           <div>
             <div className="flex items-center justify-between mb-2">
               <h3 className="font-bold text-foreground text-sm">
-                Members ({group.members.length})
+                Members ({group.memberRoles.length})
               </h3>
               <button
                 onClick={() => setShowAddMembers(!showAddMembers)}
