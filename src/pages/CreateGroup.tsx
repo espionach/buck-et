@@ -1,6 +1,6 @@
 import { useAppStore } from "@/data/appState";
 import { Group, GroupMember } from "@/data/mockData";
-import { ArrowLeft, Plus, Check } from "lucide-react";
+import { ArrowLeft, Plus, Check, Search, UserSearch, UserPlus } from "lucide-react";
 import GroupIconPicker from "@/components/GroupIconPicker";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -16,6 +16,7 @@ const CreateGroup = () => {
   const [emoji, setEmoji] = useState("target");
   const [color, setColor] = useState("sky");
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+  const [memberSearch, setMemberSearch] = useState("");
 
   const toggleMember = (id: string) => {
     setSelectedMembers((prev) =>
@@ -116,29 +117,68 @@ const CreateGroup = () => {
           <label className="text-sm font-semibold text-foreground mb-2 block">
             Add Members ({selectedMembers.length} selected)
           </label>
-          <div className="rounded-xl border border-border bg-card overflow-hidden">
-            {friendsList.map((user) => (
-              <button
-                key={user.id}
-                onClick={() => toggleMember(user.id)}
-                className="w-full flex items-center gap-3 px-4 py-3 transition-colors hover:bg-muted/30"
-              >
-                <UserAvatar user={user} size="sm" />
-                <span className="text-sm font-semibold text-foreground flex-1 text-left">{user.name}</span>
-                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
-                  selectedMembers.includes(user.id)
-                    ? "border-primary bg-primary"
-                    : "border-muted-foreground/40 bg-transparent"
-                }`}>
-                  {selectedMembers.includes(user.id) && (
-                    <svg className="w-3 h-3 text-primary-foreground" viewBox="0 0 12 12" fill="none">
-                      <path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  )}
-                </div>
-              </button>
-            ))}
+
+          <div className="relative mb-3">
+            <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              value={memberSearch}
+              onChange={(e) => setMemberSearch(e.target.value)}
+              placeholder="Search friends by name"
+              className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-muted/50 border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+            />
           </div>
+
+          {(() => {
+            const q = memberSearch.trim().toLowerCase();
+            const matches = q
+              ? friendsList.filter((u) => u.name.toLowerCase().includes(q))
+              : friendsList;
+            const sectionLabel = q ? "Results" : "Suggested";
+            const visible = q ? matches : matches.slice(0, 5);
+            return (
+              <div>
+                {friendsList.length === 0 ? (
+                  <p className="text-xs text-muted-foreground py-6 text-center">
+                    You don't have any friends yet to add.
+                  </p>
+                ) : visible.length === 0 ? (
+                  <div className="py-6 flex flex-col items-center gap-2 text-muted-foreground">
+                    <UserSearch className="w-5 h-5" />
+                    <p className="text-xs">No friends match "{memberSearch}"</p>
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+                      {sectionLabel}
+                    </p>
+                    <div className="space-y-1">
+                      {visible.map((user) => {
+                        const isSelected = selectedMembers.includes(user.id);
+                        return (
+                          <button
+                            key={user.id}
+                            type="button"
+                            onClick={() => toggleMember(user.id)}
+                            className="w-full flex items-center gap-2 p-2 rounded-xl bg-muted/40 hover:bg-muted/70 border border-border/50 text-left active:scale-[0.98] transition-all"
+                          >
+                            <UserAvatar user={user} size="sm" />
+                            <span className="text-sm font-medium text-foreground flex-1 truncate">
+                              {user.name}
+                            </span>
+                            {isSelected ? (
+                              <Check className="w-4 h-4 text-primary" />
+                            ) : (
+                              <UserPlus className="w-4 h-4 text-primary" />
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
+              </div>
+            );
+          })()}
         </div>
 
         <button
