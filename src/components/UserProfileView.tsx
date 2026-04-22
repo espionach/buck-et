@@ -107,7 +107,7 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
           <p className="text-xs text-muted-foreground/70 mt-0.5">@{user.username}</p>
         )}
         <p className="text-sm text-muted-foreground mt-1 text-center">{user.bio}</p>
-        <div className="flex items-center gap-4 mt-3">
+        <div className="flex flex-col items-center gap-2 mt-3">
           {isFriend ? (
             <button
               onClick={() => setShowFriends(true)}
@@ -126,9 +126,9 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
           {isFriend && (
             <button
               onClick={() => setShowUnfriendConfirm(true)}
-              className="px-4 py-2 rounded-xl bg-muted text-muted-foreground font-semibold text-sm flex items-center gap-2"
+              className="px-3 py-1.5 rounded-lg bg-muted text-muted-foreground font-medium text-xs flex items-center gap-1.5"
             >
-              <UserMinus className="w-4 h-4" />
+              <UserMinus className="w-3.5 h-3.5" />
               Unfriend
             </button>
           )}
