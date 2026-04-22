@@ -166,10 +166,9 @@ export function useGroups() {
         // Don't double-count: skip invites for users already in members
         const memberIds = new Set(gMembers.map((m) => m.user_id));
         const filteredInvites = gInvites.filter((i) => !memberIds.has(i.invited_user_id));
-        const members = [
-          ...gMembers.map((m) => profileMap.get(m.user_id) || placeholderUser(m.user_id)),
-          ...filteredInvites.map((i) => profileMap.get(i.invited_user_id) || placeholderUser(i.invited_user_id)),
-        ];
+        // `members` = accepted members only (used for counts, group-quest access, ownership transfer)
+        const members = gMembers.map((m) => profileMap.get(m.user_id) || placeholderUser(m.user_id));
+        // `memberRoles` includes invited users so the settings UI can show their pending status
         const memberRoles: GroupMember[] = [
           ...gMembers.map((m) => ({
             user: profileMap.get(m.user_id) || placeholderUser(m.user_id),

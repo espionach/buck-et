@@ -378,7 +378,6 @@ export const useAppStore = create<AppState>((set, get) => ({
         g.id === groupId
           ? {
               ...g,
-              members: [...g.members, user],
               memberRoles: [...g.memberRoles, { user, role: "invited" as const }],
             }
           : g
