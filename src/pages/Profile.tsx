@@ -811,6 +811,69 @@ const Profile = () => {
                 />
               </div>
 
+              {/* Quest type: Friends Only or a Group */}
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1.5 block">Shared with</label>
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setShowEditGroupDropdown((v) => !v)}
+                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-muted border border-border text-sm"
+                  >
+                    <span className="text-foreground font-medium">
+                      {editGroupId
+                        ? (() => {
+                            const g = groups.find((gr) => gr.id === editGroupId);
+                            return g ? (
+                              <span className="flex items-center gap-1.5">
+                                <GroupIconDisplay icon={g.emoji} size={14} className="text-foreground" />
+                                {g.name}
+                              </span>
+                            ) : (
+                              <span className="flex items-center gap-1.5"><Globe className="w-4 h-4" />Friends Only</span>
+                            );
+                          })()
+                        : <span className="flex items-center gap-1.5"><Globe className="w-4 h-4" />Friends Only</span>}
+                    </span>
+                    <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${showEditGroupDropdown ? "rotate-180" : ""}`} />
+                  </button>
+                  {showEditGroupDropdown && (
+                    <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-lg overflow-hidden">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditGroupId(null);
+                          setShowEditGroupDropdown(false);
+                        }}
+                        className={`w-full text-left px-3 py-2.5 text-sm transition-colors ${
+                          !editGroupId ? "bg-primary/5 text-primary font-semibold" : "text-foreground hover:bg-muted"
+                        }`}
+                      >
+                        <span className="flex items-center gap-1.5"><Globe className="w-4 h-4" />Friends Only</span>
+                      </button>
+                      {groups.map((g) => (
+                        <button
+                          key={g.id}
+                          type="button"
+                          onClick={() => {
+                            setEditGroupId(g.id);
+                            setShowEditGroupDropdown(false);
+                          }}
+                          className={`w-full text-left px-3 py-2.5 text-sm transition-colors ${
+                            editGroupId === g.id ? "bg-primary/5 text-primary font-semibold" : "text-foreground hover:bg-muted"
+                          }`}
+                        >
+                          <span className="flex items-center gap-1.5"><GroupIconDisplay icon={g.emoji} size={14} className="text-foreground" />{g.name}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <p className="text-[11px] text-muted-foreground mt-1.5">
+                  Switch between Friends Only and any of your groups.
+                </p>
+              </div>
+
               {/* Logistics fields */}
               <div className="space-y-3">
                 <label className="text-sm font-semibold text-foreground block">Sidequest Details</label>
