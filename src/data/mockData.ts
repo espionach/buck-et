@@ -15,6 +15,8 @@ export interface Comment {
   user: User;
   text: string;
   createdAt: string;
+  parentId?: string;
+  replies?: Comment[];
 }
 
 export type GroupMemberRole = "owner" | "member" | "invited";
