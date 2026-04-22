@@ -21,6 +21,7 @@ interface QuestListProps {
   highlightCommentId?: string;
   scrollToQuestId?: string;
   pinnedQuestIds?: string[];
+  hidePin?: boolean;
 }
 
 const QuestList = ({
@@ -41,6 +42,7 @@ const QuestList = ({
   highlightCommentId,
   scrollToQuestId,
   pinnedQuestIds = [],
+  hidePin = false,
 }: QuestListProps) => {
   const [visibleCount, setVisibleCount] = useState(pageSize);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -94,6 +96,7 @@ const QuestList = ({
             highlightCommentId={q.id === autoOpenCommentsId ? highlightCommentId : undefined}
             justAdded={q.id === justAdded}
             isPinned={pinnedQuestIds.includes(q.id)}
+            hidePin={hidePin}
           />
         </div>
       ))}
