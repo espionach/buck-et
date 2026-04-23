@@ -11,6 +11,7 @@ import { GROUP_COLORS, GROUP_ICON_COLORS } from "@/data/groupColors";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { validateContent } from "@/lib/contentFilter";
 
 interface GroupSettingsProps {
   group: Group;
@@ -103,6 +104,11 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
 
   const handleSave = () => {
     if (editName.trim()) {
+      const violation = validateContent(editName);
+      if (violation) {
+        toast({ title: violation, variant: "destructive" });
+        return;
+      }
       updateGroup(group.id, { name: editName.trim(), emoji: editEmoji, color: editColor, iconColor: editIconColor });
     }
     setIsEditingName(false);

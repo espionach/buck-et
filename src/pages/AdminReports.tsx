@@ -12,6 +12,8 @@ interface ReportRow {
   description: string | null;
   status: string;
   created_at: string;
+  target_type: string | null;
+  target_id: string | null;
   reporter_name?: string;
   reported_name?: string;
 }
@@ -104,6 +106,13 @@ const AdminReports = () => {
                 <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   {r.reason}
                 </span>
+                <span className="text-[10px] font-semibold uppercase text-muted-foreground/80 ml-auto mr-2">
+                  {r.target_type === "sidequest"
+                    ? "Sidequest"
+                    : r.target_type === "comment"
+                    ? "Comment"
+                    : "User"}
+                </span>
                 <span
                   className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
                     r.status === "pending"
@@ -120,6 +129,11 @@ const AdminReports = () => {
                 <span className="font-semibold">{r.reporter_name}</span>
                 <span className="text-muted-foreground"> reported </span>
                 <span className="font-semibold">{r.reported_name}</span>
+                {r.target_type && r.target_type !== "user" && (
+                  <span className="text-muted-foreground">
+                    's {r.target_type === "sidequest" ? "sidequest" : "comment"}
+                  </span>
+                )}
               </p>
               {r.description && (
                 <p className="text-sm text-muted-foreground mb-2">{r.description}</p>

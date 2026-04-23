@@ -210,6 +210,21 @@ const Settings = () => {
         <Row icon={Bug} label="Report a Bug" onClick={handleReportBug} />
       </Section>
 
+      <Section title="Contact Us">
+        <div className="px-4 py-3.5">
+          <p className="text-xs text-muted-foreground mb-1">Reach our support team at:</p>
+          <a
+            href="mailto:support@buck-et.app"
+            className="text-sm font-semibold text-primary break-all"
+          >
+            support@buck-et.app
+          </a>
+          <p className="text-[11px] text-muted-foreground mt-2 leading-snug">
+            We typically reply within a couple of business days.
+          </p>
+        </div>
+      </Section>
+
       <Section title="Legal">
         <Row icon={FileText} label="Terms of Service" onClick={() => window.open("/terms", "_blank")} />
         <Row icon={ShieldCheck} label="Privacy Policy" onClick={() => window.open("/privacy", "_blank")} />

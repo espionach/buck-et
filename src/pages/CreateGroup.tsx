@@ -29,6 +29,13 @@ const CreateGroup = () => {
 
   const handleCreate = async () => {
     if (!name.trim() || submitting) return;
+    const { validateContent } = await import("@/lib/contentFilter");
+    const violation = validateContent(name, description);
+    if (violation) {
+      const { toast } = await import("sonner");
+      toast.error(violation);
+      return;
+    }
     setSubmitting(true);
     const members = [
       currentUser,
