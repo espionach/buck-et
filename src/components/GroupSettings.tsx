@@ -24,6 +24,7 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
   const [editName, setEditName] = useState(group.name);
   const [editEmoji, setEditEmoji] = useState(group.emoji);
   const [editColor, setEditColor] = useState(group.color || "sky");
+  const [editIconColor, setEditIconColor] = useState(group.iconColor || "slate");
   const [isEditingName, setIsEditingName] = useState(false);
   const [showAddMembers, setShowAddMembers] = useState(false);
   const [memberSearch, setMemberSearch] = useState("");
