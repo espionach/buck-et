@@ -336,13 +336,14 @@ export const useAppStore = create<AppState>((set, get) => ({
     }));
     const { _invalidate } = get();
     (async () => {
-      const dbUpdates: any = {};
+      const dbUpdates: Record<string, unknown> = {};
       if (updates.name) dbUpdates.name = updates.name;
       if (updates.emoji) dbUpdates.emoji = updates.emoji;
       if (updates.color !== undefined) dbUpdates.color = updates.color;
+      if (updates.iconColor !== undefined) dbUpdates.icon_color = updates.iconColor;
       if (updates.description !== undefined) dbUpdates.description = updates.description || null;
       if (Object.keys(dbUpdates).length > 0) {
-        await supabase.from("groups").update(dbUpdates).eq("id", groupId);
+        await supabase.from("groups").update(dbUpdates as never).eq("id", groupId);
       }
       _invalidate(["groups"]);
     })();
