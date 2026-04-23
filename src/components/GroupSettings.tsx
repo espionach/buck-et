@@ -82,9 +82,14 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
     updateGroup(group.id, { color: colorId });
   };
 
+  const handleIconColorChange = (colorId: string) => {
+    setEditIconColor(colorId);
+    updateGroup(group.id, { iconColor: colorId });
+  };
+
   const handleSave = () => {
     if (editName.trim()) {
-      updateGroup(group.id, { name: editName.trim(), emoji: editEmoji, color: editColor });
+      updateGroup(group.id, { name: editName.trim(), emoji: editEmoji, color: editColor, iconColor: editIconColor });
     }
     setIsEditingName(false);
   };
