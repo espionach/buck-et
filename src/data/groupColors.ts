@@ -30,14 +30,14 @@ export interface GroupIconColorOption {
  * intended to read clearly against the lighter card gradients.
  */
 export const GROUP_ICON_COLORS: GroupIconColorOption[] = [
-  { id: "slate", label: "Slate", text: "text-slate-700", swatch: "bg-slate-700" },
   { id: "sky", label: "Sky", text: "text-sky-700", swatch: "bg-sky-700" },
   { id: "rose", label: "Rose", text: "text-rose-700", swatch: "bg-rose-700" },
   { id: "amber", label: "Amber", text: "text-amber-700", swatch: "bg-amber-700" },
   { id: "emerald", label: "Emerald", text: "text-emerald-700", swatch: "bg-emerald-700" },
   { id: "violet", label: "Violet", text: "text-violet-700", swatch: "bg-violet-700" },
-  { id: "indigo", label: "Indigo", text: "text-indigo-700", swatch: "bg-indigo-700" },
-  { id: "stone", label: "Stone", text: "text-stone-800", swatch: "bg-stone-800" },
+  { id: "slate", label: "Slate", text: "text-slate-700", swatch: "bg-slate-700" },
+  { id: "black", label: "Black", text: "text-neutral-900", swatch: "bg-neutral-900" },
+  { id: "white", label: "White", text: "text-white", swatch: "bg-white border border-border" },
 ];
 
 export const iconColorClassFor = (id?: string) =>

@@ -36,6 +36,15 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
 
   const isOwner = group.ownerId === currentUser.id;
 
+  // Re-sync local edit state whenever the upstream group prop changes
+  // (e.g. after an optimistic update propagates). Without this, stale
+  // local state can overwrite a fresh selection on the next save.
+  useEffect(() => {
+    setEditEmoji(group.emoji);
+    setEditColor(group.color || "sky");
+    setEditIconColor(group.iconColor || "slate");
+  }, [group.id, group.emoji, group.color, group.iconColor]);
+
   // Load mute state
   useEffect(() => {
     let cancelled = false;
