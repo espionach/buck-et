@@ -1,9 +1,10 @@
 import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Bell, MessageCircle, UserPlus, ArrowRightLeft, Check, Users } from "lucide-react";
+import { X, Bell, MessageCircle, UserPlus, ArrowRightLeft, Check, Users, Camera, HandMetal, UserMinus, CalendarClock, Ban, Clock, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { usePopup } from "@/hooks/use-popup";
+import { SECTION_ORDER, SECTION_LABEL, TYPE_TO_SECTION, NotificationType, NotifSection } from "@/data/notificationCategories";
 
 interface NotificationPanelProps {
   open: boolean;
@@ -22,11 +23,32 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
       case "transfer_declined":
         return <ArrowRightLeft className="w-4 h-4 text-primary" />;
       case "new_comment":
+      case "comment_reply":
         return <MessageCircle className="w-4 h-4 text-secondary" />;
       case "new_participant":
         return <UserPlus className="w-4 h-4 text-secondary" />;
+      case "new_contribution":
+        return <HandMetal className="w-4 h-4 text-primary" />;
+      case "photo_added":
+        return <Camera className="w-4 h-4 text-primary" />;
       case "board_invitation":
         return <Users className="w-4 h-4 text-primary" />;
+      case "removed_from_group":
+      case "removed_from_quest":
+        return <UserMinus className="w-4 h-4 text-destructive" />;
+      case "friend_accepted":
+      case "friend_request":
+        return <UserPlus className="w-4 h-4 text-primary" />;
+      case "friend_new_quest":
+        return <Sparkles className="w-4 h-4 text-primary" />;
+      case "new_quest_in_group":
+        return <Sparkles className="w-4 h-4 text-secondary" />;
+      case "quest_updated":
+        return <CalendarClock className="w-4 h-4 text-primary" />;
+      case "quest_canceled":
+        return <Ban className="w-4 h-4 text-destructive" />;
+      case "quest_reminder":
+        return <Clock className="w-4 h-4 text-primary" />;
       default:
         return <Bell className="w-4 h-4 text-muted-foreground" />;
     }
@@ -35,14 +57,32 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
   const handleNotificationClick = (notification: typeof notifications[0]) => {
     markNotificationRead(notification.id);
 
-    if (notification.type === "new_comment" && notification.groupId) {
+    if ((notification.type === "new_comment" || notification.type === "comment_reply") && notification.groupId) {
       const params = new URLSearchParams({ open: notification.groupId, highlightQuest: notification.entityId || "" });
       if (notification.commentId) params.set("commentId", notification.commentId);
       navigate(`/groups?${params.toString()}`);
+    } else if ((notification.type === "new_comment" || notification.type === "comment_reply") && notification.entityId) {
+      navigate(`/quest/${notification.entityId}`);
     } else if (notification.type === "transfer_quest" && notification.groupId) {
       navigate(`/groups?open=${notification.groupId}`);
     } else if (notification.type === "transfer_group") {
       navigate("/groups");
+    } else if (
+      (notification.type === "new_participant" ||
+        notification.type === "new_contribution" ||
+        notification.type === "photo_added" ||
+        notification.type === "quest_updated" ||
+        notification.type === "quest_canceled" ||
+        notification.type === "quest_reminder" ||
+        notification.type === "friend_new_quest" ||
+        notification.type === "new_quest_in_group") &&
+      notification.entityId
+    ) {
+      navigate(`/quest/${notification.entityId}`);
+    } else if (notification.type === "removed_from_group" && notification.groupId) {
+      navigate("/groups");
+    } else if (notification.type === "friend_accepted" && notification.fromUser?.id) {
+      navigate(`/profile/${notification.fromUser.id}`);
     } else if (notification.type === "new_participant" && notification.groupId) {
       navigate(`/groups?open=${notification.groupId}`);
     } else {
