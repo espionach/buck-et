@@ -45,6 +45,7 @@ const CreateGroup = () => {
       name: name.trim(),
       emoji,
       color,
+      iconColor,
       description: description.trim() || undefined,
       members,
       memberRoles,
