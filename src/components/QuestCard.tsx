@@ -99,9 +99,31 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
     onMarkUndone?.();
   };
 
-  // Three-dots menu only contains owner actions (Edit, Pin, Delete). For
-  // joiners there's nothing actionable, so hide the menu entirely for them.
-  const showThreeDots = !isFinished && isOwner;
+  // Three-dots menu: owners get Edit/Pin/Delete; non-owners get Share/Report.
+  const showThreeDots = !isFinished;
+
+  const handleShare = async () => {
+    const url = `${window.location.origin}/quest/${quest.id}`;
+    const shareData = {
+      title: quest.title,
+      text: `Check out this sidequest: ${quest.title}`,
+      url,
+    };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+        return;
+      }
+    } catch {
+      // user canceled share; fall through to clipboard fallback only on real errors
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success("Link copied to clipboard");
+    } catch {
+      toast.error("Couldn't copy link");
+    }
+  };
 
   return (
     <>
