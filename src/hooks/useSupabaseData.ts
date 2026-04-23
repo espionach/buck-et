@@ -184,6 +184,7 @@ export function useGroups() {
           name: g.name,
           emoji: g.emoji,
           color: g.color || "sky",
+          iconColor: (g as { icon_color?: string }).icon_color || "slate",
           description: g.description || undefined,
           members,
           memberRoles,
