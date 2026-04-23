@@ -174,28 +174,16 @@ export const SETTINGS_TOGGLES: Record<NotifSection, SettingsToggle[]> = {
   your_quests: [
     { key: "notify_quest_join", label: "Someone joined your quest" },
     { key: "notify_new_contribution", label: "New contribution on your quest" },
-    {
-      key: "notify_photo_added",
-      label: "Photo added",
-      hint: "When someone adds a photo to a completed quest you joined.",
-    },
+    { key: "notify_photo_added", label: "Photo added" },
   ],
   activity: [
     { key: "notify_comment_reply", label: "Replies to your comments" },
   ],
   updates: [
     { key: "notify_new_quest_in_group", label: "New quest in a group" },
-    {
-      key: "notify_quest_updated",
-      label: "Quest updates",
-      hint: "Time, location, or details change on a quest you joined.",
-    },
+    { key: "notify_quest_updated", label: "Quest updates" },
     { key: "notify_quest_canceled", label: "Quest canceled" },
-    {
-      key: "notify_quest_reminder",
-      label: "Reminders",
-      hint: "When a quest you joined is starting soon.",
-    },
+    { key: "notify_quest_reminder", label: "Reminders" },
   ],
 };
 
