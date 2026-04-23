@@ -13,6 +13,7 @@ import { usePopup } from "@/hooks/use-popup";
 import { uploadAvatar, uploadSidequestPhotos } from "@/lib/uploads";
 import SidequestPhoto from "@/components/SidequestPhoto";
 import { toast } from "sonner";
+import { validateContent } from "@/lib/contentFilter";
 const Profile = () => {
   const {
     currentUser,
@@ -198,6 +199,12 @@ const Profile = () => {
     const trimmedUsername = editUsername.trim();
     setUsernameError(null);
 
+    const violation = validateContent(editName, editBio, trimmedUsername);
+    if (violation) {
+      toast.error(violation);
+      return;
+    }
+
     if (trimmedUsername && trimmedUsername !== (currentUser.username || "")) {
       // Validate format
       if (!/^[a-zA-Z0-9_]{2,30}$/.test(trimmedUsername)) {
@@ -266,6 +273,11 @@ const Profile = () => {
 
   const handleSaveCurrentQuest = () => {
     if (editingCurrentQuest) {
+      const violation = validateContent(editQuestTitle, editQuestDescription, editCustomNotes, ...editQuestLinks);
+      if (violation) {
+        toast.error(violation);
+        return;
+      }
       const removedUsers = editingCurrentQuest.participants.filter(
         (p) => !editQuestParticipants.some((ep) => ep.id === p.id)
       );

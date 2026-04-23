@@ -103,6 +103,11 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
 
   const handleSave = () => {
     if (editName.trim()) {
+      const violation = require("@/lib/contentFilter").validateContent(editName);
+      if (violation) {
+        toast({ title: violation, variant: "destructive" });
+        return;
+      }
       updateGroup(group.id, { name: editName.trim(), emoji: editEmoji, color: editColor, iconColor: editIconColor });
     }
     setIsEditingName(false);
