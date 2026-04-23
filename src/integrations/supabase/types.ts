@@ -255,33 +255,60 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          notify_comment_reply: boolean
+          notify_friend_accepted: boolean
+          notify_friend_new_quest: boolean
           notify_group_invitation: boolean
+          notify_new_contribution: boolean
           notify_new_quest_from_friend: boolean
           notify_new_quest_in_group: boolean
           notify_ownership_transfer: boolean
+          notify_photo_added: boolean
+          notify_quest_canceled: boolean
           notify_quest_join: boolean
+          notify_quest_reminder: boolean
+          notify_quest_updated: boolean
+          notify_removed_from_group_or_quest: boolean
           updated_at: string
           user_id: string
         }
         Insert: {
           created_at?: string
           id?: string
+          notify_comment_reply?: boolean
+          notify_friend_accepted?: boolean
+          notify_friend_new_quest?: boolean
           notify_group_invitation?: boolean
+          notify_new_contribution?: boolean
           notify_new_quest_from_friend?: boolean
           notify_new_quest_in_group?: boolean
           notify_ownership_transfer?: boolean
+          notify_photo_added?: boolean
+          notify_quest_canceled?: boolean
           notify_quest_join?: boolean
+          notify_quest_reminder?: boolean
+          notify_quest_updated?: boolean
+          notify_removed_from_group_or_quest?: boolean
           updated_at?: string
           user_id: string
         }
         Update: {
           created_at?: string
           id?: string
+          notify_comment_reply?: boolean
+          notify_friend_accepted?: boolean
+          notify_friend_new_quest?: boolean
           notify_group_invitation?: boolean
+          notify_new_contribution?: boolean
           notify_new_quest_from_friend?: boolean
           notify_new_quest_in_group?: boolean
           notify_ownership_transfer?: boolean
+          notify_photo_added?: boolean
+          notify_quest_canceled?: boolean
           notify_quest_join?: boolean
+          notify_quest_reminder?: boolean
+          notify_quest_updated?: boolean
+          notify_removed_from_group_or_quest?: boolean
           updated_at?: string
           user_id?: string
         }
