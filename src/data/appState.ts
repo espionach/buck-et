@@ -1152,6 +1152,7 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   declineTransfer: (transferId) => {
     const { currentUser, _invalidate } = get();
+    const transferLocal = get().transferRequests.find((tr) => tr.id === transferId);
     set((s) => {
       const transfer = s.transferRequests.find((tr) => tr.id === transferId);
       if (!transfer) return { transferRequests: s.transferRequests.filter((tr) => tr.id !== transferId) };
@@ -1166,6 +1167,16 @@ export const useAppStore = create<AppState>((set, get) => ({
       await supabase.from("transfer_requests")
         .update({ status: "declined" })
         .eq("id", transferId);
+      // Notify the original sender that the transfer was declined
+      if (transferLocal) {
+        await notifyUsers({
+          recipientIds: [transferLocal.fromUser.id],
+          fromUserId: currentUser.id,
+          type: "transfer_declined",
+          message: `declined your ${transferLocal.type} ownership transfer`,
+          entityId: transferLocal.entityId,
+        });
+      }
       _invalidate(["transfer_requests", "notifications"]);
     })();
   },
