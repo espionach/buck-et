@@ -526,6 +526,17 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
           />
         )}
       </AnimatePresence>
+
+      {/* Report sidequest modal (non-owners) */}
+      {!isOwner && (
+        <ReportContentModal
+          targetType="sidequest"
+          targetId={quest.id}
+          reportedUserId={quest.createdBy.id}
+          open={showReport}
+          onOpenChange={setShowReport}
+        />
+      )}
     </>
   );
 };
