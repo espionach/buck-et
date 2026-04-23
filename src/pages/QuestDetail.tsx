@@ -11,6 +11,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePopup } from "@/hooks/use-popup";
 import ReportContentModal from "@/components/ReportContentModal";
+import { validateContent } from "@/lib/contentFilter";
+import { toast } from "sonner";
 
 const transportIcons = {
   car: Car,
@@ -83,13 +85,8 @@ const QuestDetail = () => {
 
   const handleAddComment = () => {
     if (!newComment.trim()) return;
-    // Use sync import so we don't need to await; contentFilter is small.
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { validateContent } = require("@/lib/contentFilter");
     const violation = validateContent(newComment);
     if (violation) {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const { toast } = require("sonner");
       toast.error(violation);
       return;
     }
