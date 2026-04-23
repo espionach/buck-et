@@ -397,7 +397,8 @@ export const useAppStore = create<AppState>((set, get) => ({
           : g
       ),
     }));
-    const { _invalidate } = get();
+    const { _invalidate, currentUser, groups } = get();
+    const groupName = groups.find((g) => g.id === groupId)?.name;
     (async () => {
       await supabase.from("group_members")
         .delete()
@@ -409,6 +410,15 @@ export const useAppStore = create<AppState>((set, get) => ({
         .eq("group_id", groupId)
         .eq("invited_user_id", userId)
         .eq("status", "pending");
+      // Notify the removed user
+      await notifyUsers({
+        recipientIds: [userId],
+        fromUserId: currentUser.id,
+        type: "removed_from_group",
+        message: `removed you from `,
+        groupId,
+        groupName: groupName || null,
+      });
       _invalidate(["groups"]);
     })();
   },
