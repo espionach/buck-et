@@ -395,6 +395,38 @@ export type Database = {
         }
         Relationships: []
       }
+      quest_reminders_sent: {
+        Row: {
+          id: string
+          kind: string
+          sent_at: string
+          sidequest_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          kind: string
+          sent_at?: string
+          sidequest_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          kind?: string
+          sent_at?: string
+          sidequest_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quest_reminders_sent_sidequest_id_fkey"
+            columns: ["sidequest_id"]
+            isOneToOne: false
+            referencedRelation: "sidequests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sidequest_completions: {
         Row: {
           completed_at: string
