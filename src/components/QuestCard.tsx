@@ -218,6 +218,28 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
                       {!pinned && pinnedQuestIds.length >= 3 && <span className="text-[10px] text-muted-foreground ml-auto">Max 3</span>}
                     </button>
                   )}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowMenu(false);
+                      handleShare();
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-muted transition-colors"
+                  >
+                    <Share2 className="w-3.5 h-3.5" /> Share
+                  </button>
+                  {!isOwner && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowMenu(false);
+                        setShowReport(true);
+                      }}
+                      className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-muted transition-colors"
+                    >
+                      <Flag className="w-3.5 h-3.5" /> Report
+                    </button>
+                  )}
                   {isOwner && (
                     <button
                       onClick={(e) => {
