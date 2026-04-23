@@ -415,6 +415,14 @@ const QuestDetail = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <ReportContentModal
+        targetType="sidequest"
+        targetId={quest.id}
+        reportedUserId={quest.createdBy.id}
+        open={showReport}
+        onOpenChange={setShowReport}
+      />
     </div>
   );
 };
