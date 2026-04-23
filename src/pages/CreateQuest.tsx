@@ -88,6 +88,12 @@ const CreateQuest = () => {
 
   const handleCreate = async () => {
     if (!title.trim() || submitting) return;
+    const { validateContent } = await import("@/lib/contentFilter");
+    const violation = validateContent(title, description, customNotes, ...links);
+    if (violation) {
+      toast.error(violation);
+      return;
+    }
     setSubmitting(true);
     const hasDate = !!(date || time || location || meetupSpot || transportation || customNotes || contributionRoles.length > 0);
     try {
