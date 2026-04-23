@@ -116,6 +116,25 @@ const CreateGroup = () => {
         </div>
 
         <div>
+          <label className="text-sm font-semibold text-foreground mb-2 block">Icon Color</label>
+          <div className="flex flex-wrap gap-2">
+            {GROUP_ICON_COLORS.map((c) => (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => setIconColor(c.id)}
+                aria-label={c.label}
+                className={`w-9 h-9 rounded-full ${c.swatch} flex items-center justify-center transition-transform active:scale-90 ${
+                  iconColor === c.id ? "ring-2 ring-foreground ring-offset-2 ring-offset-background" : ""
+                }`}
+              >
+                {iconColor === c.id && <Check className="w-4 h-4 text-background" />}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div>
           <label className="text-sm font-semibold text-foreground mb-2 block">
             Add Members ({selectedMembers.length} selected)
           </label>
