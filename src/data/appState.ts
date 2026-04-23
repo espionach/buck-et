@@ -345,7 +345,15 @@ export const useAppStore = create<AppState>((set, get) => ({
       if (Object.keys(dbUpdates).length > 0) {
         await supabase.from("groups").update(dbUpdates as never).eq("id", groupId);
       }
-      _invalidate(["groups"]);
+      // Skip refetch for purely visual updates — the optimistic Zustand state is
+      // authoritative and a refetch race here causes the picker to "glitch back"
+      // to the previous value. Only invalidate when fields other queries depend on
+      // (name, description) change.
+      const isPurelyVisual =
+        updates.name === undefined && updates.description === undefined;
+      if (!isPurelyVisual) {
+        _invalidate(["groups"]);
+      }
     })();
   },
 
