@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Pencil } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { GROUP_ICON_OPTIONS, GroupIconDisplay } from "@/components/GroupIcon";
-import { iconColorClassFor } from "@/data/groupColors";
+import { iconColorClassFor, GROUP_COLORS } from "@/data/groupColors";
 
 interface GroupIconPickerProps {
   value: string;
@@ -10,9 +10,11 @@ interface GroupIconPickerProps {
   size?: "sm" | "md" | "lg";
   /** Icon color id from GROUP_ICON_COLORS — used to render the preview & picker. */
   iconColor?: string;
+  /** Card color id from GROUP_COLORS — fills the preview swatch with the card's gradient. */
+  cardColor?: string;
 }
 
-const GroupIconPicker = ({ value, onChange, size = "md", iconColor }: GroupIconPickerProps) => {
+const GroupIconPicker = ({ value, onChange, size = "md", iconColor, cardColor }: GroupIconPickerProps) => {
   const [open, setOpen] = useState(false);
 
   const sizeClasses = {
@@ -22,13 +24,15 @@ const GroupIconPicker = ({ value, onChange, size = "md", iconColor }: GroupIconP
   };
 
   const colorClass = iconColorClassFor(iconColor);
+  const gradientClass =
+    GROUP_COLORS.find((c) => c.id === cardColor)?.gradient || GROUP_COLORS[0].gradient;
 
   return (
     <div className="relative">
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className={`${sizeClasses[size]} rounded-xl bg-muted border border-border flex items-center justify-center relative group transition-colors hover:bg-muted/80`}
+        className={`${sizeClasses[size]} rounded-xl bg-gradient-to-br ${gradientClass} border border-border flex items-center justify-center relative group transition-colors`}
       >
         <GroupIconDisplay icon={value} size={size === "lg" ? 28 : size === "md" ? 24 : 20} className={colorClass} />
         <div className="absolute inset-0 rounded-xl bg-foreground/0 group-hover:bg-foreground/10 transition-colors flex items-center justify-center">
