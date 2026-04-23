@@ -5,11 +5,12 @@ import UserAvatar from "@/components/UserAvatar";
 import { GroupIconDisplay } from "@/components/GroupIcon";
 import SidequestPhoto from "@/components/SidequestPhoto";
 import CommentThread from "@/components/CommentThread";
-import { ArrowLeft, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send, ExternalLink, HandMetal, Check, Globe, StickyNote, MoreVertical, Pencil, Pin, Trash2 } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send, ExternalLink, HandMetal, Check, Globe, StickyNote, MoreVertical, Pencil, Pin, Trash2, Flag } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePopup } from "@/hooks/use-popup";
+import ReportContentModal from "@/components/ReportContentModal";
 
 const transportIcons = {
   car: Car,
@@ -36,6 +37,7 @@ const QuestDetail = () => {
   const { quests, groups, addComment, volunteerForQuest, unvolunteerFromQuest, currentUser, pinQuest, unpinQuest, pinnedQuestIds, deleteQuest } = useAppStore();
   const [showMenu, setShowMenu] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showReport, setShowReport] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   usePopup(showDeleteConfirm);
 
@@ -163,6 +165,17 @@ const QuestDetail = () => {
                 })()}
               </AnimatePresence>
             </div>
+          )}
+
+          {/* Non-owner report menu */}
+          {!isOwner && (
+            <button
+              onClick={() => setShowReport(true)}
+              className="p-1 -m-1 text-muted-foreground hover:text-foreground transition-colors"
+              aria-label="Report sidequest"
+            >
+              <Flag className="w-5 h-5" />
+            </button>
           )}
         </div>
       </div>
