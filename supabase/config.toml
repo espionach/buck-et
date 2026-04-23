@@ -1,1 +1,4 @@
 project_id = "jbsvghehyvptmvjwiqfe"
+
+[functions.quest-reminders]
+verify_jwt = false
