@@ -5,7 +5,7 @@ import UserAvatar from "@/components/UserAvatar";
 import { GroupIconDisplay } from "@/components/GroupIcon";
 import SidequestPhoto from "@/components/SidequestPhoto";
 import CommentThread from "@/components/CommentThread";
-import { ArrowLeft, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send, ExternalLink, HandMetal, Check, Globe, StickyNote, MoreVertical, Pencil, Pin, Trash2, Flag } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send, ExternalLink, HandMetal, Check, Globe, StickyNote, MoreVertical, Pencil, Pin, Trash2, Flag, Share2 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -100,6 +100,29 @@ const QuestDetail = () => {
     setNewComment("");
   };
 
+  const handleShare = async () => {
+    const url = `${window.location.origin}/quest/${quest.id}`;
+    const shareData = {
+      title: quest.title,
+      text: `Check out this sidequest: ${quest.title}`,
+      url,
+    };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+        return;
+      }
+    } catch {
+      // user canceled — fall through
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success("Link copied to clipboard");
+    } catch {
+      toast.error("Couldn't copy link");
+    }
+  };
+
 
   return (
     <div className="min-h-screen pb-28">
@@ -161,6 +184,15 @@ const QuestDetail = () => {
                       <button
                         onClick={() => {
                           setShowMenu(false);
+                          handleShare();
+                        }}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-muted transition-colors"
+                      >
+                        <Share2 className="w-3.5 h-3.5" /> Share
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowMenu(false);
                           setShowDeleteConfirm(true);
                         }}
                         className="w-full flex items-center gap-2 px-3 py-2 text-xs text-destructive hover:bg-destructive/10 transition-colors"
@@ -174,15 +206,46 @@ const QuestDetail = () => {
             </div>
           )}
 
-          {/* Non-owner report menu */}
+          {/* Non-owner actions: Share + Report */}
           {!isOwner && (
-            <button
-              onClick={() => setShowReport(true)}
-              className="p-1 -m-1 text-muted-foreground hover:text-foreground transition-colors"
-              aria-label="Report sidequest"
-            >
-              <Flag className="w-5 h-5" />
-            </button>
+            <div className="relative" ref={menuRef}>
+              <button
+                onClick={() => setShowMenu((s) => !s)}
+                className="p-1 -m-1 text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Sidequest actions"
+              >
+                <MoreVertical className="w-5 h-5" />
+              </button>
+              <AnimatePresence>
+                {showMenu && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    className="absolute right-0 top-11 bg-card border border-border rounded-xl shadow-lg py-1 min-w-[160px] z-20"
+                  >
+                    <button
+                      onClick={() => {
+                        setShowMenu(false);
+                        handleShare();
+                      }}
+                      className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-muted transition-colors"
+                    >
+                      <Share2 className="w-3.5 h-3.5" /> Share
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowMenu(false);
+                        setShowReport(true);
+                      }}
+                      className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-muted transition-colors"
+                    >
+                      <Flag className="w-3.5 h-3.5" /> Report
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           )}
         </div>
       </div>

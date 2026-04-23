@@ -6,12 +6,14 @@ import SidequestPhoto from "@/components/SidequestPhoto";
 import CommentThread from "@/components/CommentThread";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, MessageCircle, ChevronDown, ChevronUp, Send, MoreVertical, Plus, Undo2, ExternalLink, X, Calendar, Globe, Pin, Pencil, Trash2 } from "lucide-react";
+import { Check, MessageCircle, ChevronDown, ChevronUp, Send, MoreVertical, Plus, Undo2, ExternalLink, X, Calendar, Globe, Pin, Pencil, Trash2, Share2, Flag } from "lucide-react";
 import OwnerLeaveDialog from "@/components/OwnerLeaveDialog";
+import ReportContentModal from "@/components/ReportContentModal";
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { usePopup } from "@/hooks/use-popup";
 import { format, parseISO } from "date-fns";
+import { toast } from "sonner";
 
 interface QuestCardProps {
   quest: Quest;
@@ -53,6 +55,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showOwnerLeave, setShowOwnerLeave] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const [showReport, setShowReport] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   usePopup(showDeleteConfirm || showOwnerLeave);
 
@@ -96,9 +99,31 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
     onMarkUndone?.();
   };
 
-  // Three-dots menu only contains owner actions (Edit, Pin, Delete). For
-  // joiners there's nothing actionable, so hide the menu entirely for them.
-  const showThreeDots = !isFinished && isOwner;
+  // Three-dots menu: owners get Edit/Pin/Delete; non-owners get Share/Report.
+  const showThreeDots = !isFinished;
+
+  const handleShare = async () => {
+    const url = `${window.location.origin}/quest/${quest.id}`;
+    const shareData = {
+      title: quest.title,
+      text: `Check out this sidequest: ${quest.title}`,
+      url,
+    };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+        return;
+      }
+    } catch {
+      // user canceled share; fall through to clipboard fallback only on real errors
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success("Link copied to clipboard");
+    } catch {
+      toast.error("Couldn't copy link");
+    }
+  };
 
   return (
     <>
@@ -191,6 +216,28 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
                     >
                       <Pin className="w-3.5 h-3.5" /> {pinned ? "Unpin" : "Pin"}
                       {!pinned && pinnedQuestIds.length >= 3 && <span className="text-[10px] text-muted-foreground ml-auto">Max 3</span>}
+                    </button>
+                  )}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowMenu(false);
+                      handleShare();
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-muted transition-colors"
+                  >
+                    <Share2 className="w-3.5 h-3.5" /> Share
+                  </button>
+                  {!isOwner && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowMenu(false);
+                        setShowReport(true);
+                      }}
+                      className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-muted transition-colors"
+                    >
+                      <Flag className="w-3.5 h-3.5" /> Report
                     </button>
                   )}
                   {isOwner && (
@@ -479,6 +526,17 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
           />
         )}
       </AnimatePresence>
+
+      {/* Report sidequest modal (non-owners) */}
+      {!isOwner && (
+        <ReportContentModal
+          targetType="sidequest"
+          targetId={quest.id}
+          reportedUserId={quest.createdBy.id}
+          open={showReport}
+          onOpenChange={setShowReport}
+        />
+      )}
     </>
   );
 };
