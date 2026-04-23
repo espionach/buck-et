@@ -6,12 +6,14 @@ import SidequestPhoto from "@/components/SidequestPhoto";
 import CommentThread from "@/components/CommentThread";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, MessageCircle, ChevronDown, ChevronUp, Send, MoreVertical, Plus, Undo2, ExternalLink, X, Calendar, Globe, Pin, Pencil, Trash2 } from "lucide-react";
+import { Check, MessageCircle, ChevronDown, ChevronUp, Send, MoreVertical, Plus, Undo2, ExternalLink, X, Calendar, Globe, Pin, Pencil, Trash2, Share2, Flag } from "lucide-react";
 import OwnerLeaveDialog from "@/components/OwnerLeaveDialog";
+import ReportContentModal from "@/components/ReportContentModal";
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { usePopup } from "@/hooks/use-popup";
 import { format, parseISO } from "date-fns";
+import { toast } from "sonner";
 
 interface QuestCardProps {
   quest: Quest;
