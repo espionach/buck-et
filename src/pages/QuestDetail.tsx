@@ -184,6 +184,15 @@ const QuestDetail = () => {
                       <button
                         onClick={() => {
                           setShowMenu(false);
+                          handleShare();
+                        }}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-muted transition-colors"
+                      >
+                        <Share2 className="w-3.5 h-3.5" /> Share
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowMenu(false);
                           setShowDeleteConfirm(true);
                         }}
                         className="w-full flex items-center gap-2 px-3 py-2 text-xs text-destructive hover:bg-destructive/10 transition-colors"
