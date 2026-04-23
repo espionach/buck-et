@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import UserAvatar from "@/components/UserAvatar";
-import { GROUP_COLORS } from "@/data/groupColors";
+import { GROUP_COLORS, GROUP_ICON_COLORS } from "@/data/groupColors";
 
 const CreateGroup = () => {
   const navigate = useNavigate();
