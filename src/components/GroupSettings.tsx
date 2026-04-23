@@ -7,7 +7,7 @@ import GroupIconPicker from "@/components/GroupIconPicker";
 import { useEffect, useState } from "react";
 import { usePopup } from "@/hooks/use-popup";
 import { motion, AnimatePresence } from "framer-motion";
-import { GROUP_COLORS } from "@/data/groupColors";
+import { GROUP_COLORS, GROUP_ICON_COLORS } from "@/data/groupColors";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -24,6 +24,7 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
   const [editName, setEditName] = useState(group.name);
   const [editEmoji, setEditEmoji] = useState(group.emoji);
   const [editColor, setEditColor] = useState(group.color || "sky");
+  const [editIconColor, setEditIconColor] = useState(group.iconColor || "slate");
   const [isEditingName, setIsEditingName] = useState(false);
   const [showAddMembers, setShowAddMembers] = useState(false);
   const [memberSearch, setMemberSearch] = useState("");
@@ -81,9 +82,14 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
     updateGroup(group.id, { color: colorId });
   };
 
+  const handleIconColorChange = (colorId: string) => {
+    setEditIconColor(colorId);
+    updateGroup(group.id, { iconColor: colorId });
+  };
+
   const handleSave = () => {
     if (editName.trim()) {
-      updateGroup(group.id, { name: editName.trim(), emoji: editEmoji, color: editColor });
+      updateGroup(group.id, { name: editName.trim(), emoji: editEmoji, color: editColor, iconColor: editIconColor });
     }
     setIsEditingName(false);
   };
@@ -143,7 +149,7 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
 
           {/* Edit name/emoji */}
           <div className="flex gap-2 items-end">
-            <GroupIconPicker value={editEmoji} onChange={setEditEmoji} size="md" />
+            <GroupIconPicker value={editEmoji} onChange={setEditEmoji} size="md" iconColor={editIconColor} />
             <div className="flex-1 flex items-center gap-1.5">
               <input
                 value={editName}
@@ -176,6 +182,25 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
                   }`}
                 >
                   {editColor === c.id && <Check className="w-4 h-4 text-foreground" />}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Icon color */}
+          <div>
+            <h3 className="font-bold text-foreground text-sm mb-2">Icon Color</h3>
+            <div className="flex flex-wrap gap-2">
+              {GROUP_ICON_COLORS.map((c) => (
+                <button
+                  key={c.id}
+                  onClick={() => handleIconColorChange(c.id)}
+                  aria-label={c.label}
+                  className={`w-9 h-9 rounded-full ${c.swatch} flex items-center justify-center transition-transform active:scale-90 ${
+                    editIconColor === c.id ? "ring-2 ring-foreground ring-offset-2 ring-offset-background" : ""
+                  }`}
+                >
+                  {editIconColor === c.id && <Check className="w-4 h-4 text-background" />}
                 </button>
               ))}
             </div>

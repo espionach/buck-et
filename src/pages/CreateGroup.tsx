@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import UserAvatar from "@/components/UserAvatar";
-import { GROUP_COLORS } from "@/data/groupColors";
+import { GROUP_COLORS, GROUP_ICON_COLORS } from "@/data/groupColors";
 
 const CreateGroup = () => {
   const navigate = useNavigate();
@@ -15,6 +15,7 @@ const CreateGroup = () => {
   const [description, setDescription] = useState("");
   const [emoji, setEmoji] = useState("target");
   const [color, setColor] = useState("sky");
+  const [iconColor, setIconColor] = useState("slate");
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
   const [memberSearch, setMemberSearch] = useState("");
 
@@ -44,6 +45,7 @@ const CreateGroup = () => {
       name: name.trim(),
       emoji,
       color,
+      iconColor,
       description: description.trim() || undefined,
       members,
       memberRoles,
@@ -69,7 +71,7 @@ const CreateGroup = () => {
         <div className="flex gap-3">
           <div>
             <label className="text-sm font-semibold text-foreground mb-2 block">Icon</label>
-            <GroupIconPicker value={emoji} onChange={setEmoji} size="md" />
+            <GroupIconPicker value={emoji} onChange={setEmoji} size="md" iconColor={iconColor} />
           </div>
           <div className="flex-1">
             <label className="text-sm font-semibold text-foreground mb-2 block">Group Name</label>
@@ -108,6 +110,25 @@ const CreateGroup = () => {
                 }`}
               >
                 {color === c.id && <Check className="w-4 h-4 text-foreground" />}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <label className="text-sm font-semibold text-foreground mb-2 block">Icon Color</label>
+          <div className="flex flex-wrap gap-2">
+            {GROUP_ICON_COLORS.map((c) => (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => setIconColor(c.id)}
+                aria-label={c.label}
+                className={`w-9 h-9 rounded-full ${c.swatch} flex items-center justify-center transition-transform active:scale-90 ${
+                  iconColor === c.id ? "ring-2 ring-foreground ring-offset-2 ring-offset-background" : ""
+                }`}
+              >
+                {iconColor === c.id && <Check className="w-4 h-4 text-background" />}
               </button>
             ))}
           </div>

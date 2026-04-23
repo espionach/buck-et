@@ -61,5 +61,15 @@ export const GroupIconDisplay = ({ icon, size = 24, className }: GroupIconDispla
     return <span style={{ fontSize: size * 0.85 }}>{icon}</span>;
   }
 
-  return <IconComponent size={size} className={className || "text-foreground"} />;
+  // strokeWidth 2.5 matches the line weight of the SideQuest bucket logo,
+  // giving all group icons a consistent hand-drawn outline look.
+  return (
+    <IconComponent
+      size={size}
+      strokeWidth={2.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className || "text-foreground"}
+    />
+  );
 };

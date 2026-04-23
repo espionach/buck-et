@@ -224,6 +224,7 @@ export type Database = {
           created_at: string
           description: string | null
           emoji: string
+          icon_color: string
           id: string
           name: string
           owner_id: string
@@ -233,6 +234,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           emoji?: string
+          icon_color?: string
           id?: string
           name: string
           owner_id: string
@@ -242,6 +244,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           emoji?: string
+          icon_color?: string
           id?: string
           name?: string
           owner_id?: string

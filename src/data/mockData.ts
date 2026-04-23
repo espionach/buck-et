@@ -31,6 +31,8 @@ export interface Group {
   name: string;
   emoji: string;
   color?: string;
+  /** Color of the icon itself (separate from card color). */
+  iconColor?: string;
   description?: string;
   members: User[];
   memberRoles: GroupMember[];
