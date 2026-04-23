@@ -7,7 +7,7 @@ import GroupIconPicker from "@/components/GroupIconPicker";
 import { useEffect, useState } from "react";
 import { usePopup } from "@/hooks/use-popup";
 import { motion, AnimatePresence } from "framer-motion";
-import { GROUP_COLORS } from "@/data/groupColors";
+import { GROUP_COLORS, GROUP_ICON_COLORS } from "@/data/groupColors";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
