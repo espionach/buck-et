@@ -299,9 +299,10 @@ export const useAppStore = create<AppState>((set, get) => ({
       name: group.name,
       emoji: group.emoji,
       color: group.color || "sky",
+      icon_color: group.iconColor || "slate",
       description: group.description || null,
       owner_id: currentUser.id,
-    }).select().single();
+    } as never).select().single();
     if (!data) {
       _invalidate(["groups", "group_invitations"]);
       return null;
