@@ -747,10 +747,11 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   updateQuest: (questId, updates) => {
+    const prevQuest = get().quests.find((q) => q.id === questId);
     set((s) => ({
       quests: s.quests.map((q) => (q.id === questId ? { ...q, ...updates } : q)),
     }));
-    const { _invalidate } = get();
+    const { _invalidate, currentUser } = get();
     (async () => {
       const dbUpdates: any = {};
       if (updates.title !== undefined) dbUpdates.title = updates.title;
@@ -786,17 +787,77 @@ export const useAppStore = create<AppState>((set, get) => ({
       if (Object.keys(dbUpdates).length > 0) {
         await supabase.from("sidequests").update(dbUpdates).eq("id", questId);
       }
+
+      // ---- Notifications ----
+      if (prevQuest) {
+        const otherParticipantIds = prevQuest.participants
+          .map((p) => p.id)
+          .filter((id) => id !== currentUser.id);
+
+        // a) photo_added — only fire when NEW photos appear on a completed quest
+        if (
+          updates.photos !== undefined &&
+          (prevQuest.completedAt || updates.completedAt)
+        ) {
+          const prevPhotos = new Set(prevQuest.photos || []);
+          const added = (updates.photos || []).filter((p) => !prevPhotos.has(p));
+          if (added.length > 0 && otherParticipantIds.length > 0) {
+            await notifyUsers({
+              recipientIds: otherParticipantIds,
+              fromUserId: currentUser.id,
+              type: "photo_added",
+              message: `added a photo to '${prevQuest.title}'`,
+              entityId: questId,
+              groupId: prevQuest.groupId || null,
+            });
+          }
+        }
+
+        // b) quest_updated — title/desc/logistics changed (but NOT just photos/notes/links/completion)
+        const meaningfulChange =
+          (updates.title !== undefined && updates.title !== prevQuest.title) ||
+          (updates.description !== undefined && updates.description !== prevQuest.description) ||
+          updates.logistics !== undefined;
+        if (meaningfulChange && otherParticipantIds.length > 0) {
+          await notifyUsers({
+            recipientIds: otherParticipantIds,
+            fromUserId: currentUser.id,
+            type: "quest_updated",
+            message: `updated '${prevQuest.title}'`,
+            entityId: questId,
+            groupId: prevQuest.groupId || null,
+          });
+        }
+      }
+
       _invalidate(["quests"]);
     })();
   },
 
   deleteQuest: (questId) => {
+    const prevQuest = get().quests.find((q) => q.id === questId);
     set((s) => ({
       quests: s.quests.filter((q) => q.id !== questId),
       transferRequests: s.transferRequests.filter((tr) => !(tr.type === "quest" && tr.entityId === questId)),
     }));
-    const { _invalidate } = get();
+    const { _invalidate, currentUser } = get();
     (async () => {
+      // Notify other participants that the quest was canceled
+      if (prevQuest) {
+        const others = prevQuest.participants
+          .map((p) => p.id)
+          .filter((id) => id !== currentUser.id);
+        if (others.length > 0) {
+          await notifyUsers({
+            recipientIds: others,
+            fromUserId: currentUser.id,
+            type: "quest_canceled",
+            message: `canceled '${prevQuest.title}'`,
+            entityId: questId,
+            groupId: prevQuest.groupId || null,
+          });
+        }
+      }
       await supabase.from("sidequests").delete().eq("id", questId);
       _invalidate(["quests", "transfer_requests"]);
     })();
