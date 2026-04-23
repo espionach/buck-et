@@ -149,7 +149,7 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
 
           {/* Edit name/emoji */}
           <div className="flex gap-2 items-end">
-            <GroupIconPicker value={editEmoji} onChange={setEditEmoji} size="md" />
+            <GroupIconPicker value={editEmoji} onChange={setEditEmoji} size="md" iconColor={editIconColor} />
             <div className="flex-1 flex items-center gap-1.5">
               <input
                 value={editName}
