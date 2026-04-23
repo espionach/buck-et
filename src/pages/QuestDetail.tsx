@@ -100,6 +100,29 @@ const QuestDetail = () => {
     setNewComment("");
   };
 
+  const handleShare = async () => {
+    const url = `${window.location.origin}/quest/${quest.id}`;
+    const shareData = {
+      title: quest.title,
+      text: `Check out this sidequest: ${quest.title}`,
+      url,
+    };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+        return;
+      }
+    } catch {
+      // user canceled — fall through
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success("Link copied to clipboard");
+    } catch {
+      toast.error("Couldn't copy link");
+    }
+  };
+
 
   return (
     <div className="min-h-screen pb-28">
