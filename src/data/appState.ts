@@ -528,6 +528,13 @@ export const useAppStore = create<AppState>((set, get) => ({
           user_id: currentUser.id,
           friend_id: req.from_user_id,
         });
+        // Notify the requester that you accepted
+        await notifyUsers({
+          recipientIds: [req.from_user_id],
+          fromUserId: currentUser.id,
+          type: "friend_accepted",
+          message: `accepted your friend request`,
+        });
       }
       _invalidate(["friends", "friend_requests"]);
     })();
