@@ -675,12 +675,55 @@ export const useAppStore = create<AppState>((set, get) => ({
     }));
     const { currentUser, _invalidate } = get();
     (async () => {
-      await supabase.from("comments").insert({
+      const { data: inserted } = await supabase.from("comments").insert({
         sidequest_id: questId,
         user_id: currentUser.id,
         text: comment.text,
         parent_comment_id: comment.parentId || null,
-      });
+      }).select().single();
+
+      // ---- Notifications ----
+      const quest = get().quests.find((q) => q.id === questId);
+      if (quest) {
+        const insertedId = inserted?.id || null;
+        if (comment.parentId) {
+          // Reply → notify the parent comment's author
+          const findCommentAuthor = (list: Comment[]): string | null => {
+            for (const c of list) {
+              if (c.id === comment.parentId) return c.user.id;
+              if (c.replies) {
+                const r = findCommentAuthor(c.replies);
+                if (r) return r;
+              }
+            }
+            return null;
+          };
+          const parentAuthor = findCommentAuthor(quest.comments);
+          if (parentAuthor && parentAuthor !== currentUser.id) {
+            await notifyUsers({
+              recipientIds: [parentAuthor],
+              fromUserId: currentUser.id,
+              type: "comment_reply",
+              message: `replied to your comment on '${quest.title}'`,
+              entityId: questId,
+              groupId: quest.groupId || null,
+              commentId: insertedId,
+            });
+          }
+        }
+        // Always notify the quest owner of new comments (unless owner is commenter)
+        if (quest.createdBy.id !== currentUser.id) {
+          await notifyUsers({
+            recipientIds: [quest.createdBy.id],
+            fromUserId: currentUser.id,
+            type: "new_comment",
+            message: `commented on '${quest.title}'`,
+            entityId: questId,
+            groupId: quest.groupId || null,
+            commentId: insertedId,
+          });
+        }
+      }
       _invalidate(["quests"]);
     })();
   },
