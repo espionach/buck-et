@@ -459,12 +459,23 @@ export const useAppStore = create<AppState>((set, get) => ({
           : g
       ),
     }));
-    const { currentUser, _invalidate } = get();
+    const { currentUser, _invalidate, groups } = get();
+    const groupName = groups.find((g) => g.id === groupId)?.name;
     (async () => {
-      await supabase.from("group_invitations").insert({
+      const { data: inv } = await supabase.from("group_invitations").insert({
         group_id: groupId,
         invited_user_id: user.id,
         invited_by: currentUser.id,
+      }).select().single();
+      // Notify the invited user
+      await notifyUsers({
+        recipientIds: [user.id],
+        fromUserId: currentUser.id,
+        type: "board_invitation",
+        message: `invited you to `,
+        entityId: inv?.id || null,
+        groupId,
+        groupName: groupName || null,
       });
       _invalidate(["groups", "group_invitations"]);
     })();
