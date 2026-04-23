@@ -1,8 +1,11 @@
 import { Comment, User, Quest } from "@/data/mockData";
 import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
-import { Send, Trash2, CornerDownRight } from "lucide-react";
+import { Send, Trash2, CornerDownRight, Flag } from "lucide-react";
 import { useState } from "react";
+import { validateContent } from "@/lib/contentFilter";
+import { toast } from "sonner";
+import ReportContentModal from "@/components/ReportContentModal";
 
 interface CommentThreadProps {
   quest: Quest;
@@ -17,12 +20,18 @@ const CommentThread = ({ quest, highlightCommentId, onInteract }: CommentThreadP
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [reportTarget, setReportTarget] = useState<Comment | null>(null);
 
   const isQuestOwner = quest.createdBy.id === currentUser.id;
 
   const submit = (text: string, parentId?: string) => {
     const trimmed = text.trim();
     if (!trimmed) return;
+    const violation = validateContent(trimmed);
+    if (violation) {
+      toast.error(violation);
+      return;
+    }
     const comment: Comment = {
       id: `c${Date.now()}`,
       userId: currentUser.id,
@@ -76,6 +85,19 @@ const CommentThread = ({ quest, highlightCommentId, onInteract }: CommentThreadP
                   className="text-[10px] font-medium text-muted-foreground/70 hover:text-destructive transition-colors"
                 >
                   Delete
+                </button>
+              )}
+              {!canDelete && c.userId !== currentUser.id && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onInteract?.(e);
+                    setReportTarget(c);
+                  }}
+                  className="text-[10px] font-medium text-muted-foreground/70 hover:text-destructive transition-colors flex items-center gap-1"
+                  aria-label="Report comment"
+                >
+                  <Flag className="w-2.5 h-2.5" /> Report
                 </button>
               )}
             </div>
@@ -182,6 +204,16 @@ const CommentThread = ({ quest, highlightCommentId, onInteract }: CommentThreadP
           <Send className="w-3.5 h-3.5" />
         </button>
       </div>
+
+      {reportTarget && (
+        <ReportContentModal
+          targetType="comment"
+          targetId={reportTarget.id}
+          reportedUserId={reportTarget.userId}
+          open={!!reportTarget}
+          onOpenChange={(o) => { if (!o) setReportTarget(null); }}
+        />
+      )}
     </div>
   );
 };
