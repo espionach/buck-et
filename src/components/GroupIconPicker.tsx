@@ -2,14 +2,17 @@ import { useState } from "react";
 import { Pencil } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { GROUP_ICON_OPTIONS, GroupIconDisplay } from "@/components/GroupIcon";
+import { iconColorClassFor } from "@/data/groupColors";
 
 interface GroupIconPickerProps {
   value: string;
   onChange: (icon: string) => void;
   size?: "sm" | "md" | "lg";
+  /** Icon color id from GROUP_ICON_COLORS — used to render the preview & picker. */
+  iconColor?: string;
 }
 
-const GroupIconPicker = ({ value, onChange, size = "md" }: GroupIconPickerProps) => {
+const GroupIconPicker = ({ value, onChange, size = "md", iconColor }: GroupIconPickerProps) => {
   const [open, setOpen] = useState(false);
 
   const sizeClasses = {
@@ -18,6 +21,8 @@ const GroupIconPicker = ({ value, onChange, size = "md" }: GroupIconPickerProps)
     lg: "w-16 h-16",
   };
 
+  const colorClass = iconColorClassFor(iconColor);
+
   return (
     <div className="relative">
       <button
@@ -25,7 +30,7 @@ const GroupIconPicker = ({ value, onChange, size = "md" }: GroupIconPickerProps)
         onClick={() => setOpen(!open)}
         className={`${sizeClasses[size]} rounded-xl bg-muted border border-border flex items-center justify-center relative group transition-colors hover:bg-muted/80`}
       >
-        <GroupIconDisplay icon={value} size={size === "lg" ? 28 : size === "md" ? 24 : 20} />
+        <GroupIconDisplay icon={value} size={size === "lg" ? 28 : size === "md" ? 24 : 20} className={colorClass} />
         <div className="absolute inset-0 rounded-xl bg-foreground/0 group-hover:bg-foreground/10 transition-colors flex items-center justify-center">
           <Pencil className="w-3.5 h-3.5 text-foreground opacity-0 group-hover:opacity-70 transition-opacity" />
         </div>
@@ -55,7 +60,7 @@ const GroupIconPicker = ({ value, onChange, size = "md" }: GroupIconPickerProps)
                       : "hover:bg-muted"
                   }`}
                 >
-                  <GroupIconDisplay icon={iconName} size={18} />
+                  <GroupIconDisplay icon={iconName} size={18} className={colorClass} />
                 </button>
               ))}
             </motion.div>
