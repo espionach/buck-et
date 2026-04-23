@@ -890,12 +890,23 @@ export const useAppStore = create<AppState>((set, get) => ({
           : q
       ),
     }));
-    const { _invalidate } = get();
+    const { _invalidate, currentUser, quests } = get();
+    const removedFromQuest = quests.find((q) => q.id === questId);
     (async () => {
       await supabase.from("sidequest_participants")
         .delete()
         .eq("sidequest_id", questId)
         .eq("user_id", userId);
+      if (removedFromQuest) {
+        await notifyUsers({
+          recipientIds: [userId],
+          fromUserId: currentUser.id,
+          type: "removed_from_quest",
+          message: `removed you from '${removedFromQuest.title}'`,
+          entityId: questId,
+          groupId: removedFromQuest.groupId || null,
+        });
+      }
       _invalidate(["quests"]);
     })();
   },
@@ -1137,6 +1148,7 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   volunteerForQuest: (questId, role) => {
     const { currentUser, _invalidate } = get();
+    const quest = get().quests.find((q) => q.id === questId);
     set((s) => ({
       quests: s.quests.map((q) => {
         if (q.id !== questId) return q;
@@ -1157,6 +1169,17 @@ export const useAppStore = create<AppState>((set, get) => ({
         user_id: currentUser.id,
         role,
       });
+      // Notify the quest owner that someone volunteered
+      if (quest && quest.createdBy.id !== currentUser.id) {
+        await notifyUsers({
+          recipientIds: [quest.createdBy.id],
+          fromUserId: currentUser.id,
+          type: "new_contribution",
+          message: `signed up as ${role} on '${quest.title}'`,
+          entityId: questId,
+          groupId: quest.groupId || null,
+        });
+      }
       _invalidate(["quests"]);
     })();
   },
