@@ -198,6 +198,33 @@ export const useAppStore = create<AppState>((set, get) => ({
             q.id === quest.id ? { ...q, id: data.id } : q
           ),
         }));
+
+        // ---- Notifications ----
+        // a) New quest in a group → notify all other group members
+        if (data.group_id) {
+          const { data: members } = await supabase
+            .from("group_members")
+            .select("user_id")
+            .eq("group_id", data.group_id);
+          // Find group name for message
+          const groupName = get().groups.find((g) => g.id === data.group_id)?.name;
+          await notifyUsers({
+            recipientIds: (members || []).map((m) => m.user_id),
+            fromUserId: currentUser.id,
+            type: "new_quest_in_group",
+            message: `started a new quest in `,
+            entityId: data.id,
+            groupId: data.group_id,
+            groupName: groupName || null,
+          });
+        } else {
+          // b) Friend started a new quest (occasional, top 5 friends, throttled)
+          await notifyFriendNewQuest({
+            fromUserId: currentUser.id,
+            questId: data.id,
+            questTitle: quest.title,
+          });
+        }
       }
       _invalidate(["quests"]);
     })();
