@@ -630,6 +630,8 @@ export type Database = {
           reported_user_id: string
           reporter_id: string
           status: string
+          target_id: string | null
+          target_type: string
         }
         Insert: {
           created_at?: string
@@ -639,6 +641,8 @@ export type Database = {
           reported_user_id: string
           reporter_id: string
           status?: string
+          target_id?: string | null
+          target_type?: string
         }
         Update: {
           created_at?: string
@@ -648,6 +652,8 @@ export type Database = {
           reported_user_id?: string
           reporter_id?: string
           status?: string
+          target_id?: string | null
+          target_type?: string
         }
         Relationships: []
       }
