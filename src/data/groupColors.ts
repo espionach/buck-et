@@ -15,3 +15,30 @@ export const GROUP_COLORS: GroupColorOption[] = [
   { id: "violet", label: "Violet", gradient: "from-violet-200/60 to-purple-100/40", swatch: "bg-violet-300" },
   { id: "slate", label: "Slate", gradient: "from-slate-200/60 to-zinc-100/40", swatch: "bg-slate-300" },
 ];
+
+export interface GroupIconColorOption {
+  id: string;
+  label: string;
+  /** Tailwind text color class for icon stroke */
+  text: string;
+  /** Solid swatch color used in the picker */
+  swatch: string;
+}
+
+/**
+ * Darker, saturated color options for the group icon itself,
+ * intended to read clearly against the lighter card gradients.
+ */
+export const GROUP_ICON_COLORS: GroupIconColorOption[] = [
+  { id: "slate", label: "Slate", text: "text-slate-700", swatch: "bg-slate-700" },
+  { id: "sky", label: "Sky", text: "text-sky-700", swatch: "bg-sky-700" },
+  { id: "rose", label: "Rose", text: "text-rose-700", swatch: "bg-rose-700" },
+  { id: "amber", label: "Amber", text: "text-amber-700", swatch: "bg-amber-700" },
+  { id: "emerald", label: "Emerald", text: "text-emerald-700", swatch: "bg-emerald-700" },
+  { id: "violet", label: "Violet", text: "text-violet-700", swatch: "bg-violet-700" },
+  { id: "indigo", label: "Indigo", text: "text-indigo-700", swatch: "bg-indigo-700" },
+  { id: "stone", label: "Stone", text: "text-stone-800", swatch: "bg-stone-800" },
+];
+
+export const iconColorClassFor = (id?: string) =>
+  GROUP_ICON_COLORS.find((c) => c.id === id)?.text || GROUP_ICON_COLORS[0].text;
