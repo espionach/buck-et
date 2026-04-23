@@ -104,7 +104,26 @@ export interface TransferRequest {
 
 export interface AppNotification {
   id: string;
-  type: "transfer_quest" | "transfer_group" | "transfer_declined" | "new_comment" | "new_participant" | "follow_request" | "friend_request" | "board_invitation";
+  type:
+    | "transfer_quest"
+    | "transfer_group"
+    | "transfer_declined"
+    | "new_comment"
+    | "comment_reply"
+    | "new_participant"
+    | "new_contribution"
+    | "photo_added"
+    | "follow_request"
+    | "friend_request"
+    | "friend_accepted"
+    | "friend_new_quest"
+    | "board_invitation"
+    | "removed_from_group"
+    | "removed_from_quest"
+    | "new_quest_in_group"
+    | "quest_updated"
+    | "quest_canceled"
+    | "quest_reminder";
   message: string;
   entityId?: string;
   groupId?: string;

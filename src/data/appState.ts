@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { supabase } from "@/integrations/supabase/client";
+import { notifyUsers, notifyFriendNewQuest } from "@/lib/notifications";
 import {
   Quest,
   Group,
@@ -197,6 +198,33 @@ export const useAppStore = create<AppState>((set, get) => ({
             q.id === quest.id ? { ...q, id: data.id } : q
           ),
         }));
+
+        // ---- Notifications ----
+        // a) New quest in a group → notify all other group members
+        if (data.group_id) {
+          const { data: members } = await supabase
+            .from("group_members")
+            .select("user_id")
+            .eq("group_id", data.group_id);
+          // Find group name for message
+          const groupName = get().groups.find((g) => g.id === data.group_id)?.name;
+          await notifyUsers({
+            recipientIds: (members || []).map((m) => m.user_id),
+            fromUserId: currentUser.id,
+            type: "new_quest_in_group",
+            message: `started a new quest in `,
+            entityId: data.id,
+            groupId: data.group_id,
+            groupName: groupName || null,
+          });
+        } else {
+          // b) Friend started a new quest (occasional, top 5 friends, throttled)
+          await notifyFriendNewQuest({
+            fromUserId: currentUser.id,
+            questId: data.id,
+            questTitle: quest.title,
+          });
+        }
       }
       _invalidate(["quests"]);
     })();
@@ -204,6 +232,8 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   toggleImIn: (questId) => {
     const { currentUser, _invalidate } = get();
+    const questBefore = get().quests.find((q) => q.id === questId);
+    const wasIn = !!questBefore?.participants.some((p) => p.id === currentUser.id);
     set((s) => ({
       quests: s.quests.map((q) => {
         if (q.id !== questId) return q;
@@ -225,6 +255,17 @@ export const useAppStore = create<AppState>((set, get) => ({
           sidequest_id: questId,
           user_id: currentUser.id,
         });
+        // Notify the owner that someone joined (if it wasn't already them)
+        if (!wasIn && questBefore && questBefore.createdBy.id !== currentUser.id) {
+          await notifyUsers({
+            recipientIds: [questBefore.createdBy.id],
+            fromUserId: currentUser.id,
+            type: "new_participant",
+            message: `joined your quest '${questBefore.title}'`,
+            entityId: questId,
+            groupId: questBefore.groupId || null,
+          });
+        }
       } else {
         // We just removed — delete
         await supabase.from("sidequest_participants")
@@ -369,7 +410,8 @@ export const useAppStore = create<AppState>((set, get) => ({
           : g
       ),
     }));
-    const { _invalidate } = get();
+    const { _invalidate, currentUser, groups } = get();
+    const groupName = groups.find((g) => g.id === groupId)?.name;
     (async () => {
       await supabase.from("group_members")
         .delete()
@@ -381,6 +423,15 @@ export const useAppStore = create<AppState>((set, get) => ({
         .eq("group_id", groupId)
         .eq("invited_user_id", userId)
         .eq("status", "pending");
+      // Notify the removed user
+      await notifyUsers({
+        recipientIds: [userId],
+        fromUserId: currentUser.id,
+        type: "removed_from_group",
+        message: `removed you from `,
+        groupId,
+        groupName: groupName || null,
+      });
       _invalidate(["groups"]);
     })();
   },
@@ -408,12 +459,23 @@ export const useAppStore = create<AppState>((set, get) => ({
           : g
       ),
     }));
-    const { currentUser, _invalidate } = get();
+    const { currentUser, _invalidate, groups } = get();
+    const groupName = groups.find((g) => g.id === groupId)?.name;
     (async () => {
-      await supabase.from("group_invitations").insert({
+      const { data: inv } = await supabase.from("group_invitations").insert({
         group_id: groupId,
         invited_user_id: user.id,
         invited_by: currentUser.id,
+      }).select().single();
+      // Notify the invited user
+      await notifyUsers({
+        recipientIds: [user.id],
+        fromUserId: currentUser.id,
+        type: "board_invitation",
+        message: `invited you to `,
+        entityId: inv?.id || null,
+        groupId,
+        groupName: groupName || null,
       });
       _invalidate(["groups", "group_invitations"]);
     })();
@@ -489,6 +551,13 @@ export const useAppStore = create<AppState>((set, get) => ({
         await supabase.from("friendships").insert({
           user_id: currentUser.id,
           friend_id: req.from_user_id,
+        });
+        // Notify the requester that you accepted
+        await notifyUsers({
+          recipientIds: [req.from_user_id],
+          fromUserId: currentUser.id,
+          type: "friend_accepted",
+          message: `accepted your friend request`,
         });
       }
       _invalidate(["friends", "friend_requests"]);
@@ -630,12 +699,55 @@ export const useAppStore = create<AppState>((set, get) => ({
     }));
     const { currentUser, _invalidate } = get();
     (async () => {
-      await supabase.from("comments").insert({
+      const { data: inserted } = await supabase.from("comments").insert({
         sidequest_id: questId,
         user_id: currentUser.id,
         text: comment.text,
         parent_comment_id: comment.parentId || null,
-      });
+      }).select().single();
+
+      // ---- Notifications ----
+      const quest = get().quests.find((q) => q.id === questId);
+      if (quest) {
+        const insertedId = inserted?.id || null;
+        if (comment.parentId) {
+          // Reply → notify the parent comment's author
+          const findCommentAuthor = (list: Comment[]): string | null => {
+            for (const c of list) {
+              if (c.id === comment.parentId) return c.user.id;
+              if (c.replies) {
+                const r = findCommentAuthor(c.replies);
+                if (r) return r;
+              }
+            }
+            return null;
+          };
+          const parentAuthor = findCommentAuthor(quest.comments);
+          if (parentAuthor && parentAuthor !== currentUser.id) {
+            await notifyUsers({
+              recipientIds: [parentAuthor],
+              fromUserId: currentUser.id,
+              type: "comment_reply",
+              message: `replied to your comment on '${quest.title}'`,
+              entityId: questId,
+              groupId: quest.groupId || null,
+              commentId: insertedId,
+            });
+          }
+        }
+        // Always notify the quest owner of new comments (unless owner is commenter)
+        if (quest.createdBy.id !== currentUser.id) {
+          await notifyUsers({
+            recipientIds: [quest.createdBy.id],
+            fromUserId: currentUser.id,
+            type: "new_comment",
+            message: `commented on '${quest.title}'`,
+            entityId: questId,
+            groupId: quest.groupId || null,
+            commentId: insertedId,
+          });
+        }
+      }
       _invalidate(["quests"]);
     })();
   },
@@ -659,10 +771,11 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   updateQuest: (questId, updates) => {
+    const prevQuest = get().quests.find((q) => q.id === questId);
     set((s) => ({
       quests: s.quests.map((q) => (q.id === questId ? { ...q, ...updates } : q)),
     }));
-    const { _invalidate } = get();
+    const { _invalidate, currentUser } = get();
     (async () => {
       const dbUpdates: any = {};
       if (updates.title !== undefined) dbUpdates.title = updates.title;
@@ -698,17 +811,77 @@ export const useAppStore = create<AppState>((set, get) => ({
       if (Object.keys(dbUpdates).length > 0) {
         await supabase.from("sidequests").update(dbUpdates).eq("id", questId);
       }
+
+      // ---- Notifications ----
+      if (prevQuest) {
+        const otherParticipantIds = prevQuest.participants
+          .map((p) => p.id)
+          .filter((id) => id !== currentUser.id);
+
+        // a) photo_added — only fire when NEW photos appear on a completed quest
+        if (
+          updates.photos !== undefined &&
+          (prevQuest.completedAt || updates.completedAt)
+        ) {
+          const prevPhotos = new Set(prevQuest.photos || []);
+          const added = (updates.photos || []).filter((p) => !prevPhotos.has(p));
+          if (added.length > 0 && otherParticipantIds.length > 0) {
+            await notifyUsers({
+              recipientIds: otherParticipantIds,
+              fromUserId: currentUser.id,
+              type: "photo_added",
+              message: `added a photo to '${prevQuest.title}'`,
+              entityId: questId,
+              groupId: prevQuest.groupId || null,
+            });
+          }
+        }
+
+        // b) quest_updated — title/desc/logistics changed (but NOT just photos/notes/links/completion)
+        const meaningfulChange =
+          (updates.title !== undefined && updates.title !== prevQuest.title) ||
+          (updates.description !== undefined && updates.description !== prevQuest.description) ||
+          updates.logistics !== undefined;
+        if (meaningfulChange && otherParticipantIds.length > 0) {
+          await notifyUsers({
+            recipientIds: otherParticipantIds,
+            fromUserId: currentUser.id,
+            type: "quest_updated",
+            message: `updated '${prevQuest.title}'`,
+            entityId: questId,
+            groupId: prevQuest.groupId || null,
+          });
+        }
+      }
+
       _invalidate(["quests"]);
     })();
   },
 
   deleteQuest: (questId) => {
+    const prevQuest = get().quests.find((q) => q.id === questId);
     set((s) => ({
       quests: s.quests.filter((q) => q.id !== questId),
       transferRequests: s.transferRequests.filter((tr) => !(tr.type === "quest" && tr.entityId === questId)),
     }));
-    const { _invalidate } = get();
+    const { _invalidate, currentUser } = get();
     (async () => {
+      // Notify other participants that the quest was canceled
+      if (prevQuest) {
+        const others = prevQuest.participants
+          .map((p) => p.id)
+          .filter((id) => id !== currentUser.id);
+        if (others.length > 0) {
+          await notifyUsers({
+            recipientIds: others,
+            fromUserId: currentUser.id,
+            type: "quest_canceled",
+            message: `canceled '${prevQuest.title}'`,
+            entityId: questId,
+            groupId: prevQuest.groupId || null,
+          });
+        }
+      }
       await supabase.from("sidequests").delete().eq("id", questId);
       _invalidate(["quests", "transfer_requests"]);
     })();
@@ -741,12 +914,23 @@ export const useAppStore = create<AppState>((set, get) => ({
           : q
       ),
     }));
-    const { _invalidate } = get();
+    const { _invalidate, currentUser, quests } = get();
+    const removedFromQuest = quests.find((q) => q.id === questId);
     (async () => {
       await supabase.from("sidequest_participants")
         .delete()
         .eq("sidequest_id", questId)
         .eq("user_id", userId);
+      if (removedFromQuest) {
+        await notifyUsers({
+          recipientIds: [userId],
+          fromUserId: currentUser.id,
+          type: "removed_from_quest",
+          message: `removed you from '${removedFromQuest.title}'`,
+          entityId: questId,
+          groupId: removedFromQuest.groupId || null,
+        });
+      }
       _invalidate(["quests"]);
     })();
   },
@@ -968,6 +1152,7 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   declineTransfer: (transferId) => {
     const { currentUser, _invalidate } = get();
+    const transferLocal = get().transferRequests.find((tr) => tr.id === transferId);
     set((s) => {
       const transfer = s.transferRequests.find((tr) => tr.id === transferId);
       if (!transfer) return { transferRequests: s.transferRequests.filter((tr) => tr.id !== transferId) };
@@ -982,12 +1167,23 @@ export const useAppStore = create<AppState>((set, get) => ({
       await supabase.from("transfer_requests")
         .update({ status: "declined" })
         .eq("id", transferId);
+      // Notify the original sender that the transfer was declined
+      if (transferLocal) {
+        await notifyUsers({
+          recipientIds: [transferLocal.fromUser.id],
+          fromUserId: currentUser.id,
+          type: "transfer_declined",
+          message: `declined your ${transferLocal.type} ownership transfer`,
+          entityId: transferLocal.entityId,
+        });
+      }
       _invalidate(["transfer_requests", "notifications"]);
     })();
   },
 
   volunteerForQuest: (questId, role) => {
     const { currentUser, _invalidate } = get();
+    const quest = get().quests.find((q) => q.id === questId);
     set((s) => ({
       quests: s.quests.map((q) => {
         if (q.id !== questId) return q;
@@ -1008,6 +1204,17 @@ export const useAppStore = create<AppState>((set, get) => ({
         user_id: currentUser.id,
         role,
       });
+      // Notify the quest owner that someone volunteered
+      if (quest && quest.createdBy.id !== currentUser.id) {
+        await notifyUsers({
+          recipientIds: [quest.createdBy.id],
+          fromUserId: currentUser.id,
+          type: "new_contribution",
+          message: `signed up as ${role} on '${quest.title}'`,
+          entityId: questId,
+          groupId: quest.groupId || null,
+        });
+      }
       _invalidate(["quests"]);
     })();
   },

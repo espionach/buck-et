@@ -1,9 +1,10 @@
 import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Bell, MessageCircle, UserPlus, ArrowRightLeft, Check, Users } from "lucide-react";
+import { X, Bell, MessageCircle, UserPlus, ArrowRightLeft, Check, Users, Camera, HandMetal, UserMinus, CalendarClock, Ban, Clock, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { usePopup } from "@/hooks/use-popup";
+import { SECTION_ORDER, SECTION_LABEL, TYPE_TO_SECTION, NotificationType, NotifSection } from "@/data/notificationCategories";
 
 interface NotificationPanelProps {
   open: boolean;
@@ -22,11 +23,32 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
       case "transfer_declined":
         return <ArrowRightLeft className="w-4 h-4 text-primary" />;
       case "new_comment":
+      case "comment_reply":
         return <MessageCircle className="w-4 h-4 text-secondary" />;
       case "new_participant":
         return <UserPlus className="w-4 h-4 text-secondary" />;
+      case "new_contribution":
+        return <HandMetal className="w-4 h-4 text-primary" />;
+      case "photo_added":
+        return <Camera className="w-4 h-4 text-primary" />;
       case "board_invitation":
         return <Users className="w-4 h-4 text-primary" />;
+      case "removed_from_group":
+      case "removed_from_quest":
+        return <UserMinus className="w-4 h-4 text-destructive" />;
+      case "friend_accepted":
+      case "friend_request":
+        return <UserPlus className="w-4 h-4 text-primary" />;
+      case "friend_new_quest":
+        return <Sparkles className="w-4 h-4 text-primary" />;
+      case "new_quest_in_group":
+        return <Sparkles className="w-4 h-4 text-secondary" />;
+      case "quest_updated":
+        return <CalendarClock className="w-4 h-4 text-primary" />;
+      case "quest_canceled":
+        return <Ban className="w-4 h-4 text-destructive" />;
+      case "quest_reminder":
+        return <Clock className="w-4 h-4 text-primary" />;
       default:
         return <Bell className="w-4 h-4 text-muted-foreground" />;
     }
@@ -35,14 +57,32 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
   const handleNotificationClick = (notification: typeof notifications[0]) => {
     markNotificationRead(notification.id);
 
-    if (notification.type === "new_comment" && notification.groupId) {
+    if ((notification.type === "new_comment" || notification.type === "comment_reply") && notification.groupId) {
       const params = new URLSearchParams({ open: notification.groupId, highlightQuest: notification.entityId || "" });
       if (notification.commentId) params.set("commentId", notification.commentId);
       navigate(`/groups?${params.toString()}`);
+    } else if ((notification.type === "new_comment" || notification.type === "comment_reply") && notification.entityId) {
+      navigate(`/quest/${notification.entityId}`);
     } else if (notification.type === "transfer_quest" && notification.groupId) {
       navigate(`/groups?open=${notification.groupId}`);
     } else if (notification.type === "transfer_group") {
       navigate("/groups");
+    } else if (
+      (notification.type === "new_participant" ||
+        notification.type === "new_contribution" ||
+        notification.type === "photo_added" ||
+        notification.type === "quest_updated" ||
+        notification.type === "quest_canceled" ||
+        notification.type === "quest_reminder" ||
+        notification.type === "friend_new_quest" ||
+        notification.type === "new_quest_in_group") &&
+      notification.entityId
+    ) {
+      navigate(`/quest/${notification.entityId}`);
+    } else if (notification.type === "removed_from_group" && notification.groupId) {
+      navigate("/groups");
+    } else if (notification.type === "friend_accepted" && notification.fromUser?.id) {
+      navigate(`/profile/${notification.fromUser.id}`);
     } else if (notification.type === "new_participant" && notification.groupId) {
       navigate(`/groups?open=${notification.groupId}`);
     } else {
@@ -95,120 +135,151 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
               </div>
             </div>
 
-            <div className="max-h-[60vh] overflow-y-auto">
-              {/* Friend Requests */}
-              {friendRequests.length > 0 && (
-                <div className="border-b border-border/50">
-                  {friendRequests.map((req) => (
-                    <div
-                      key={req.id}
-                      className="flex items-center gap-3 p-4 border-b border-border/30 last:border-b-0 bg-primary/5"
-                    >
-                      <div className="shrink-0">
-                        <UserAvatar user={req.from} size="sm" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs text-foreground leading-relaxed">
-                          <span className="font-bold">{req.from.name}</span> sent you a friend request
-                        </p>
-                      </div>
-                      <div className="flex gap-1.5 shrink-0">
-                        <button
-                          onClick={() => acceptFriendRequest(req.id)}
-                          className="p-1.5 rounded-lg bg-secondary text-secondary-foreground"
-                        >
-                          <Check className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          onClick={() => declineFriendRequest(req.id)}
-                          className="p-1.5 rounded-lg bg-muted text-muted-foreground"
-                        >
-                          <X className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+            {(() => {
+              // Group notifications by section. Friend requests are pseudo-items
+              // that live in "social".
+              const grouped: Record<NotifSection, React.ReactNode[]> = {
+                social: [],
+                groups: [],
+                your_quests: [],
+                activity: [],
+                updates: [],
+              };
 
-              {/* Regular Notifications */}
-              {notifications.length === 0 && friendRequests.length === 0 ? (
-                <div className="text-center py-10 text-muted-foreground">
-                  <Bell className="w-6 h-6 mx-auto mb-2 opacity-40" />
-                  <p className="text-sm">No notifications yet</p>
-                </div>
-              ) : (
-                notifications.map((n) => {
-                  // Board invitation with pending invite - show accept/decline
-                  const pendingInvite = n.type === "board_invitation" && n.entityId
+              // 1. Friend requests → social
+              friendRequests.forEach((req) => {
+                grouped.social.push(
+                  <div
+                    key={`fr-${req.id}`}
+                    className="flex items-center gap-3 p-4 border-b border-border/30 last:border-b-0 bg-primary/5"
+                  >
+                    <div className="shrink-0">
+                      <UserAvatar user={req.from} size="sm" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-foreground leading-relaxed">
+                        <span className="font-bold">{req.from.name}</span> sent you a friend request
+                      </p>
+                    </div>
+                    <div className="flex gap-1.5 shrink-0">
+                      <button
+                        onClick={() => acceptFriendRequest(req.id)}
+                        className="p-1.5 rounded-lg bg-secondary text-secondary-foreground"
+                        aria-label="Accept friend request"
+                      >
+                        <Check className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => declineFriendRequest(req.id)}
+                        className="p-1.5 rounded-lg bg-muted text-muted-foreground"
+                        aria-label="Decline friend request"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                );
+              });
+
+              // 2. Real notifications → routed to their section
+              notifications.forEach((n) => {
+                const section = TYPE_TO_SECTION[n.type as NotificationType] || "social";
+                const pendingInvite =
+                  n.type === "board_invitation" && n.entityId
                     ? groupInvitations.find((gi) => gi.id === n.entityId)
                     : null;
 
-                  if (pendingInvite) {
-                    return (
-                      <div
-                        key={n.id}
-                        className={`flex items-center gap-3 p-4 border-b border-border/30 ${
-                          n.read ? "opacity-60" : "bg-primary/5"
-                        }`}
-                      >
-                        <div className="shrink-0">
-                          <UserAvatar user={n.fromUser} size="sm" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          {renderMessage(n)}
-                          <p className="text-[10px] text-muted-foreground mt-1">{n.createdAt}</p>
-                        </div>
-                        <div className="flex gap-1.5 shrink-0">
-                          <button
-                            onClick={() => {
-                              acceptGroupInvitation(pendingInvite.id);
-                              clearNotification(n.id);
-                              onClose();
-                              navigate("/groups");
-                            }}
-                            className="p-1.5 rounded-lg bg-secondary text-secondary-foreground"
-                          >
-                            <Check className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            onClick={() => {
-                              declineGroupInvitation(pendingInvite.id);
-                              clearNotification(n.id);
-                            }}
-                            className="p-1.5 rounded-lg bg-muted text-muted-foreground"
-                          >
-                            <X className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  }
-
-                  return (
-                    <button
+                if (pendingInvite) {
+                  grouped[section].push(
+                    <div
                       key={n.id}
-                      onClick={() => handleNotificationClick(n)}
-                      className={`w-full text-left flex items-start gap-3 p-4 border-b border-border/30 transition-colors active:scale-[0.99] ${
+                      className={`flex items-center gap-3 p-4 border-b border-border/30 ${
                         n.read ? "opacity-60" : "bg-primary/5"
                       }`}
                     >
-                      <div className="shrink-0 mt-0.5">
+                      <div className="shrink-0">
                         <UserAvatar user={n.fromUser} size="sm" />
                       </div>
                       <div className="flex-1 min-w-0">
                         {renderMessage(n)}
                         <p className="text-[10px] text-muted-foreground mt-1">{n.createdAt}</p>
                       </div>
-                      <div className="shrink-0 mt-1">{getIcon(n.type)}</div>
-                      {!n.read && (
-                        <div className="w-2 h-2 rounded-full bg-primary shrink-0 mt-1.5" />
-                      )}
-                    </button>
+                      <div className="flex gap-1.5 shrink-0">
+                        <button
+                          onClick={() => {
+                            acceptGroupInvitation(pendingInvite.id);
+                            clearNotification(n.id);
+                            onClose();
+                            navigate("/groups");
+                          }}
+                          className="p-1.5 rounded-lg bg-secondary text-secondary-foreground"
+                          aria-label="Accept invitation"
+                        >
+                          <Check className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            declineGroupInvitation(pendingInvite.id);
+                            clearNotification(n.id);
+                          }}
+                          className="p-1.5 rounded-lg bg-muted text-muted-foreground"
+                          aria-label="Decline invitation"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
                   );
-                })
-              )}
-            </div>
+                  return;
+                }
+
+                grouped[section].push(
+                  <button
+                    key={n.id}
+                    onClick={() => handleNotificationClick(n)}
+                    className={`w-full text-left flex items-start gap-3 p-4 border-b border-border/30 transition-colors active:scale-[0.99] ${
+                      n.read ? "opacity-60" : "bg-primary/5"
+                    }`}
+                  >
+                    <div className="shrink-0 mt-0.5">
+                      <UserAvatar user={n.fromUser} size="sm" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      {renderMessage(n)}
+                      <p className="text-[10px] text-muted-foreground mt-1">{n.createdAt}</p>
+                    </div>
+                    <div className="shrink-0 mt-1">{getIcon(n.type)}</div>
+                    {!n.read && (
+                      <div className="w-2 h-2 rounded-full bg-primary shrink-0 mt-1.5" />
+                    )}
+                  </button>
+                );
+              });
+
+              const isEmpty = SECTION_ORDER.every((s) => grouped[s].length === 0);
+
+              return (
+                <div className="max-h-[60vh] overflow-y-auto">
+                  {isEmpty ? (
+                    <div className="text-center py-10 text-muted-foreground">
+                      <Bell className="w-6 h-6 mx-auto mb-2 opacity-40" />
+                      <p className="text-sm">No notifications yet</p>
+                    </div>
+                  ) : (
+                    SECTION_ORDER.filter((s) => grouped[s].length > 0).map((s) => (
+                      <div key={s}>
+                        <div className="px-4 pt-3 pb-1.5 bg-muted/30 border-b border-border/30">
+                          <h4 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                            {SECTION_LABEL[s]}
+                          </h4>
+                        </div>
+                        {grouped[s]}
+                      </div>
+                    ))
+                  )}
+                </div>
+              );
+            })()}
           </motion.div>
         </motion.div>
       )}

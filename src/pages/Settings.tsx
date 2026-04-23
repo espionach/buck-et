@@ -9,30 +9,20 @@ import { toast } from "@/hooks/use-toast";
 import { usePopup } from "@/hooks/use-popup";
 import { useAppStore } from "@/data/appState";
 import { resetOnboarding } from "@/hooks/useOnboarding";
+import {
+  DB_PREF_KEYS,
+  DbPrefKey,
+  SETTINGS_TOGGLES,
+  SECTION_ORDER,
+  SECTION_LABEL,
+} from "@/data/notificationCategories";
 
-type NotifPrefs = {
-  notify_ownership_transfer: boolean;
-  notify_group_invitation: boolean;
-  notify_quest_join: boolean;
-  notify_new_quest_in_group: boolean;
-  notify_new_quest_from_friend: boolean;
-};
+type NotifPrefs = Record<DbPrefKey, boolean>;
 
-const DEFAULT_PREFS: NotifPrefs = {
-  notify_ownership_transfer: true,
-  notify_group_invitation: true,
-  notify_quest_join: true,
-  notify_new_quest_in_group: true,
-  notify_new_quest_from_friend: true,
-};
-
-const NOTIF_ROWS: { key: keyof NotifPrefs; label: string }[] = [
-  { key: "notify_ownership_transfer", label: "Ownership transfer of a group or quest" },
-  { key: "notify_group_invitation", label: "Invitations to a group" },
-  { key: "notify_quest_join", label: "Someone joins your quest" },
-  { key: "notify_new_quest_in_group", label: "New quest started in a group" },
-  { key: "notify_new_quest_from_friend", label: "New quest started by a friend" },
-];
+const DEFAULT_PREFS: NotifPrefs = DB_PREF_KEYS.reduce(
+  (acc, k) => ({ ...acc, [k]: true }),
+  {} as NotifPrefs
+);
 
 const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
   <div className="mb-6">
@@ -99,18 +89,18 @@ const Settings = () => {
         .eq("user_id", user.id)
         .maybeSingle();
       if (data) {
-        setPrefs({
-          notify_ownership_transfer: data.notify_ownership_transfer,
-          notify_group_invitation: data.notify_group_invitation,
-          notify_quest_join: data.notify_quest_join,
-          notify_new_quest_in_group: data.notify_new_quest_in_group,
-          notify_new_quest_from_friend: data.notify_new_quest_from_friend,
-        });
+        const next = { ...DEFAULT_PREFS };
+        for (const k of DB_PREF_KEYS) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const v = (data as any)[k];
+          if (typeof v === "boolean") next[k] = v;
+        }
+        setPrefs(next);
       }
     })();
   }, [user]);
 
-  const togglePref = async (key: keyof NotifPrefs) => {
+  const togglePref = async (key: DbPrefKey) => {
     if (!user) return;
     const next = { ...prefs, [key]: !prefs[key] };
     setPrefs(next);
@@ -249,14 +239,30 @@ const Settings = () => {
             >
               <h3 className="font-bold text-foreground text-base mb-1">Notification Settings</h3>
               <p className="text-xs text-muted-foreground mb-4">Choose what we should ping you about.</p>
-              <div className="space-y-3">
-                {NOTIF_ROWS.map((row) => (
-                  <div key={row.key} className="flex items-center justify-between gap-3">
-                    <span className="text-sm text-foreground flex-1">{row.label}</span>
-                    <Switch
-                      checked={prefs[row.key]}
-                      onCheckedChange={() => togglePref(row.key)}
-                    />
+              <div className="max-h-[60vh] overflow-y-auto -mx-1 px-1 space-y-5">
+                {SECTION_ORDER.map((section) => (
+                  <div key={section}>
+                    <h4 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2">
+                      {SECTION_LABEL[section]}
+                    </h4>
+                    <div className="space-y-3">
+                      {SETTINGS_TOGGLES[section].map((row) => (
+                        <div key={row.key} className="flex items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm text-foreground">{row.label}</div>
+                            {row.hint && (
+                              <div className="text-[11px] text-muted-foreground mt-0.5 leading-snug">
+                                {row.hint}
+                              </div>
+                            )}
+                          </div>
+                          <Switch
+                            checked={prefs[row.key]}
+                            onCheckedChange={() => togglePref(row.key)}
+                          />
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 ))}
               </div>
