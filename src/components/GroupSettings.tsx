@@ -86,6 +86,11 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
     }
   };
 
+  const handleEmojiChange = (icon: string) => {
+    setEditEmoji(icon);
+    updateGroup(group.id, { emoji: icon });
+  };
+
   const handleColorChange = (colorId: string) => {
     setEditColor(colorId);
     updateGroup(group.id, { color: colorId });
@@ -158,7 +163,13 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
 
           {/* Edit name/emoji */}
           <div className="flex gap-2 items-end">
-            <GroupIconPicker value={editEmoji} onChange={setEditEmoji} size="md" iconColor={editIconColor} />
+            <GroupIconPicker
+              value={editEmoji}
+              onChange={handleEmojiChange}
+              size="md"
+              iconColor={editIconColor}
+              cardColor={editColor}
+            />
             <div className="flex-1 flex items-center gap-1.5">
               <input
                 value={editName}

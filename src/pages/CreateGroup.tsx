@@ -71,7 +71,7 @@ const CreateGroup = () => {
         <div className="flex gap-3">
           <div>
             <label className="text-sm font-semibold text-foreground mb-2 block">Icon</label>
-            <GroupIconPicker value={emoji} onChange={setEmoji} size="md" iconColor={iconColor} />
+            <GroupIconPicker value={emoji} onChange={setEmoji} size="md" iconColor={iconColor} cardColor={color} />
           </div>
           <div className="flex-1">
             <label className="text-sm font-semibold text-foreground mb-2 block">Group Name</label>
