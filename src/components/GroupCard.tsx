@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Users, Check, X, ArrowRightLeft } from "lucide-react";
 import { useState } from "react";
 import { usePopup } from "@/hooks/use-popup";
-import { GROUP_COLORS } from "@/data/groupColors";
+import { GROUP_COLORS, iconColorClassFor } from "@/data/groupColors";
 
 interface GroupCardProps {
   group: Group;
