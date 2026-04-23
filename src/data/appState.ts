@@ -232,6 +232,8 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   toggleImIn: (questId) => {
     const { currentUser, _invalidate } = get();
+    const questBefore = get().quests.find((q) => q.id === questId);
+    const wasIn = !!questBefore?.participants.some((p) => p.id === currentUser.id);
     set((s) => ({
       quests: s.quests.map((q) => {
         if (q.id !== questId) return q;
@@ -253,6 +255,17 @@ export const useAppStore = create<AppState>((set, get) => ({
           sidequest_id: questId,
           user_id: currentUser.id,
         });
+        // Notify the owner that someone joined (if it wasn't already them)
+        if (!wasIn && questBefore && questBefore.createdBy.id !== currentUser.id) {
+          await notifyUsers({
+            recipientIds: [questBefore.createdBy.id],
+            fromUserId: currentUser.id,
+            type: "new_participant",
+            message: `joined your quest '${questBefore.title}'`,
+            entityId: questId,
+            groupId: questBefore.groupId || null,
+          });
+        }
       } else {
         // We just removed — delete
         await supabase.from("sidequest_participants")
