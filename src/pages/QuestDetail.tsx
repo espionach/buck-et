@@ -41,6 +41,8 @@ const QuestDetail = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showReport, setShowReport] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const [menuPosition, setMenuPosition] = useState<{ top: number; left: number } | null>(null);
   usePopup(showDeleteConfirm);
 
   // Close menu on outside click
@@ -53,6 +55,17 @@ const QuestDetail = () => {
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
+  }, [showMenu]);
+
+  // Position menu when opened
+  useEffect(() => {
+    if (showMenu && menuButtonRef.current) {
+      const rect = menuButtonRef.current.getBoundingClientRect();
+      setMenuPosition({
+        top: rect.bottom + 8,
+        left: rect.right - 160, // align right edge of menu with right edge of button
+      });
+    }
   }, [showMenu]);
 
   useEffect(() => { window.scrollTo(0, 0); }, [questId]);
@@ -143,6 +156,7 @@ const QuestDetail = () => {
           {isOwner && (
             <div className="relative" ref={menuRef}>
               <button
+                ref={menuButtonRef}
                 onClick={() => setShowMenu((s) => !s)}
                 className="p-1 -m-1 text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Sidequest actions"
@@ -158,7 +172,8 @@ const QuestDetail = () => {
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.95 }}
-                      className="absolute right-0 top-11 bg-card border border-border rounded-xl shadow-lg py-1 min-w-[160px] z-20"
+                      style={{ position: 'fixed', top: menuPosition?.top ?? 0, left: menuPosition?.left ?? 0 }}
+                      className="bg-card border border-border rounded-xl shadow-lg py-1 min-w-[160px] z-[100]"
                     >
                       <button
                         onClick={() => {
@@ -210,6 +225,7 @@ const QuestDetail = () => {
           {!isOwner && (
             <div className="relative" ref={menuRef}>
               <button
+                ref={menuButtonRef}
                 onClick={() => setShowMenu((s) => !s)}
                 className="p-1 -m-1 text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Sidequest actions"
@@ -217,12 +233,13 @@ const QuestDetail = () => {
                 <MoreVertical className="w-5 h-5" />
               </button>
               <AnimatePresence>
-                {showMenu && (
+                {showMenu && menuPosition && (
                   <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
-                    className="absolute right-0 top-11 bg-card border border-border rounded-xl shadow-lg py-1 min-w-[160px] z-20"
+                    style={{ position: 'fixed', top: menuPosition.top, left: menuPosition.left }}
+                    className="bg-card border border-border rounded-xl shadow-lg py-1 min-w-[160px] z-[100]"
                   >
                     <button
                       onClick={() => {

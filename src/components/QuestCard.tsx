@@ -57,6 +57,8 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
   const [showMenu, setShowMenu] = useState(false);
   const [showReport, setShowReport] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const [menuPosition, setMenuPosition] = useState<{ top: number; left: number } | null>(null);
   usePopup(showDeleteConfirm || showOwnerLeave);
 
   // Close menu on outside click
@@ -69,6 +71,17 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
+  }, [showMenu]);
+
+  // Position menu when opened
+  useEffect(() => {
+    if (showMenu && menuButtonRef.current) {
+      const rect = menuButtonRef.current.getBoundingClientRect();
+      setMenuPosition({
+        top: rect.bottom + 8,
+        left: rect.right - 140, // align right edge of menu with right edge of button
+      });
+    }
   }, [showMenu]);
 
   // Check for pending transfer request for this quest targeting current user
@@ -132,7 +145,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
         animate={{ opacity: 1 }}
         transition={{ delay: index * 0.06 }}
         onClick={() => { if (canNavigateToDetail) { onQuestClick?.(); navigate(`/quest/${quest.id}`); } }}
-        className={`relative p-4 overflow-hidden ${isFinished ? "opacity-60" : ""} ${canNavigateToDetail ? "cursor-pointer active:scale-[0.99] transition-transform" : ""} ${justAdded ? "animate-just-added rounded-xl" : ""} ${isPinned ? "rounded-xl border-2 border-primary/30 bg-primary/[0.03]" : ""}`}
+        className={`relative p-4 ${isFinished ? "opacity-60" : ""} ${canNavigateToDetail ? "cursor-pointer active:scale-[0.99] transition-transform" : ""} ${justAdded ? "animate-just-added rounded-xl" : ""} ${isPinned ? "rounded-xl border-2 border-primary/30 bg-primary/[0.03]" : ""}`}
       >
         {/* Pin icon for pinned quests */}
         {isPinned && (
@@ -172,6 +185,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
         {showThreeDots && (
           <div className="absolute top-3 right-3 z-10" ref={menuRef}>
             <button
+              ref={menuButtonRef}
               onClick={(e) => {
                 e.stopPropagation();
                 setShowMenu(!showMenu);
@@ -181,12 +195,13 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
               <MoreVertical className="w-4 h-4" />
             </button>
             <AnimatePresence>
-              {showMenu && (
+              {showMenu && menuPosition && (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  className="absolute right-0 top-8 bg-card border border-border rounded-xl shadow-lg py-1 min-w-[140px] z-20"
+                  style={{ position: 'fixed', top: menuPosition.top, left: menuPosition.left }}
+                  className="bg-card border border-border rounded-xl shadow-lg py-1 min-w-[140px] z-[100]"
                 >
                   {isOwner && onEditCurrent && (
                     <button
