@@ -41,33 +41,7 @@ const QuestDetail = () => {
   const [showMenu, setShowMenu] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showReport, setShowReport] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-  const menuButtonRef = useRef<HTMLButtonElement>(null);
-  const [menuPosition, setMenuPosition] = useState<{ top: number; left: number } | null>(null);
   usePopup(showDeleteConfirm);
-
-  // Close menu on outside click
-  useEffect(() => {
-    if (!showMenu) return;
-    const handler = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setShowMenu(false);
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [showMenu]);
-
-  // Position menu when opened
-  useEffect(() => {
-    if (showMenu && menuButtonRef.current) {
-      const rect = menuButtonRef.current.getBoundingClientRect();
-      setMenuPosition({
-        top: rect.bottom + 8,
-        left: rect.right - 160, // align right edge of menu with right edge of button
-      });
-    }
-  }, [showMenu]);
 
   useEffect(() => { window.scrollTo(0, 0); }, [questId]);
 
