@@ -195,12 +195,12 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
               <MoreVertical className="w-4 h-4" />
             </button>
             <AnimatePresence>
-              {showMenu && (
+              {showMenu && menuPosition && (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  style={{ position: 'fixed' }}
+                  style={{ position: 'fixed', top: menuPosition.top, left: menuPosition.left }}
                   className="bg-card border border-border rounded-xl shadow-lg py-1 min-w-[140px] z-[100]"
                 >
                   {isOwner && onEditCurrent && (
