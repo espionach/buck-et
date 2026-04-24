@@ -36,6 +36,17 @@ const Welcome = () => {
       >
         Continue
       </button>
+      <p className="text-center text-xs text-muted-foreground mt-3">
+        By continuing, you agree to follow our{" "}
+        <button
+          type="button"
+          onClick={() => navigate("/settings/community-guidelines")}
+          className="text-primary font-semibold underline-offset-2 hover:underline"
+        >
+          Community Guidelines
+        </button>
+        .
+      </p>
     </OnboardingLayout>
   );
 };
