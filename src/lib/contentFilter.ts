@@ -15,6 +15,8 @@ const BANNED_WORD_STEMS: string[] = [
   "asshole",
   "bastard",
   "dickhead",
+  "dick",
+  "ass",
   "motherfucker",
   "cunt",
   // slurs (kept short — extend as needed)
@@ -33,6 +35,13 @@ const BANNED_WORD_STEMS: string[] = [
   "rape",
   "molest",
   "kys", // "kill yourself"
+  // sexual / explicit
+  "porn",
+  "sexvideo",
+  "nudes",
+  "blowjob",
+  "handjob",
+  "sex",
 ];
 
 const normalize = (text: string): string =>
