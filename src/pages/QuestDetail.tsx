@@ -225,6 +225,7 @@ const QuestDetail = () => {
           {!isOwner && (
             <div className="relative" ref={menuRef}>
               <button
+                ref={menuButtonRef}
                 onClick={() => setShowMenu((s) => !s)}
                 className="p-1 -m-1 text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Sidequest actions"
@@ -232,12 +233,13 @@ const QuestDetail = () => {
                 <MoreVertical className="w-5 h-5" />
               </button>
               <AnimatePresence>
-                {showMenu && (
+                {showMenu && menuPosition && (
                   <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
-                    className="absolute right-0 top-11 bg-card border border-border rounded-xl shadow-lg py-1 min-w-[160px] z-20"
+                    style={{ position: 'fixed', top: menuPosition.top, left: menuPosition.left }}
+                    className="bg-card border border-border rounded-xl shadow-lg py-1 min-w-[160px] z-[100]"
                   >
                     <button
                       onClick={() => {
