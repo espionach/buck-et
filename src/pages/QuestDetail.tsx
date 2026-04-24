@@ -156,6 +156,7 @@ const QuestDetail = () => {
           {isOwner && (
             <div className="relative" ref={menuRef}>
               <button
+                ref={menuButtonRef}
                 onClick={() => setShowMenu((s) => !s)}
                 className="p-1 -m-1 text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Sidequest actions"
