@@ -127,117 +127,72 @@ const QuestDetail = () => {
             </p>
           </div>
 
-          {/* Owner actions menu (Edit, Pin, Delete) */}
-          {isOwner && (
-            <div className="relative" ref={menuRef}>
-              <button
-                ref={menuButtonRef}
-                onClick={() => setShowMenu((s) => !s)}
-                className="p-1 -m-1 text-muted-foreground hover:text-foreground transition-colors"
-                aria-label="Sidequest actions"
-              >
-                <MoreVertical className="w-5 h-5" />
-              </button>
-              <AnimatePresence>
-                {showMenu && (() => {
-                  const pinned = pinnedQuestIds.includes(quest.id);
-                  const pinDisabled = !pinned && pinnedQuestIds.length >= 3;
-                  return (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
-                      style={{ position: 'fixed', top: menuPosition?.top ?? 0, left: menuPosition?.left ?? 0 }}
-                      className="bg-card border border-border rounded-xl shadow-lg py-1 min-w-[160px] z-[100]"
-                    >
-                      <button
-                        onClick={() => {
-                          setShowMenu(false);
-                          navigate(`/profile?editQuest=${quest.id}`);
-                        }}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-muted transition-colors"
-                      >
-                        <Pencil className="w-3.5 h-3.5" /> Edit
-                      </button>
-                      <button
-                        onClick={() => {
-                          setShowMenu(false);
-                          if (pinned) unpinQuest(quest.id);
-                          else pinQuest(quest.id);
-                        }}
-                        disabled={pinDisabled}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-muted transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                      >
-                        <Pin className="w-3.5 h-3.5" /> {pinned ? "Unpin" : "Pin"}
-                        {pinDisabled && <span className="text-[10px] text-muted-foreground ml-auto">Max 3</span>}
-                      </button>
-                      <button
-                        onClick={() => {
-                          setShowMenu(false);
-                          handleShare();
-                        }}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-muted transition-colors"
-                      >
-                        <Share2 className="w-3.5 h-3.5" /> Share
-                      </button>
-                      <button
-                        onClick={() => {
-                          setShowMenu(false);
-                          setShowDeleteConfirm(true);
-                        }}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-xs text-destructive hover:bg-destructive/10 transition-colors"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" /> Delete
-                      </button>
-                    </motion.div>
-                  );
-                })()}
-              </AnimatePresence>
-            </div>
-          )}
+          {/* Owner actions menu (Edit, Pin, Share, Delete) */}
+          {isOwner && (() => {
+            const pinned = pinnedQuestIds.includes(quest.id);
+            const pinDisabled = !pinned && pinnedQuestIds.length >= 3;
+            return (
+              <DropdownMenu open={showMenu} onOpenChange={setShowMenu}>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    className="p-1 -m-1 text-muted-foreground hover:text-foreground transition-colors"
+                    aria-label="Sidequest actions"
+                  >
+                    <MoreVertical className="w-5 h-5" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" sideOffset={4} className="min-w-[160px]">
+                  <DropdownMenuItem
+                    onSelect={() => navigate(`/profile?editQuest=${quest.id}`)}
+                    className="gap-2 text-xs"
+                  >
+                    <Pencil className="w-3.5 h-3.5" /> Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onSelect={() => {
+                      if (pinned) unpinQuest(quest.id);
+                      else pinQuest(quest.id);
+                    }}
+                    disabled={pinDisabled}
+                    className="gap-2 text-xs"
+                  >
+                    <Pin className="w-3.5 h-3.5" /> {pinned ? "Unpin" : "Pin"}
+                    {pinDisabled && <span className="text-[10px] text-muted-foreground ml-auto">Max 3</span>}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => handleShare()} className="gap-2 text-xs">
+                    <Share2 className="w-3.5 h-3.5" /> Share
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onSelect={() => setShowDeleteConfirm(true)}
+                    className="gap-2 text-xs text-destructive focus:text-destructive"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" /> Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            );
+          })()}
 
           {/* Non-owner actions: Share + Report */}
           {!isOwner && (
-            <div className="relative" ref={menuRef}>
-              <button
-                ref={menuButtonRef}
-                onClick={() => setShowMenu((s) => !s)}
-                className="p-1 -m-1 text-muted-foreground hover:text-foreground transition-colors"
-                aria-label="Sidequest actions"
-              >
-                <MoreVertical className="w-5 h-5" />
-              </button>
-              <AnimatePresence>
-                {showMenu && menuPosition && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    style={{ position: 'fixed', top: menuPosition.top, left: menuPosition.left }}
-                    className="bg-card border border-border rounded-xl shadow-lg py-1 min-w-[160px] z-[100]"
-                  >
-                    <button
-                      onClick={() => {
-                        setShowMenu(false);
-                        handleShare();
-                      }}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-muted transition-colors"
-                    >
-                      <Share2 className="w-3.5 h-3.5" /> Share
-                    </button>
-                    <button
-                      onClick={() => {
-                        setShowMenu(false);
-                        setShowReport(true);
-                      }}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-muted transition-colors"
-                    >
-                      <Flag className="w-3.5 h-3.5" /> Report
-                    </button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+            <DropdownMenu open={showMenu} onOpenChange={setShowMenu}>
+              <DropdownMenuTrigger asChild>
+                <button
+                  className="p-1 -m-1 text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label="Sidequest actions"
+                >
+                  <MoreVertical className="w-5 h-5" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" sideOffset={4} className="min-w-[160px]">
+                <DropdownMenuItem onSelect={() => handleShare()} className="gap-2 text-xs">
+                  <Share2 className="w-3.5 h-3.5" /> Share
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setShowReport(true)} className="gap-2 text-xs">
+                  <Flag className="w-3.5 h-3.5" /> Report
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
         </div>
       </div>
