@@ -11,6 +11,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePopup } from "@/hooks/use-popup";
 import ReportContentModal from "@/components/ReportContentModal";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { validateContent } from "@/lib/contentFilter";
 import { toast } from "sonner";
 
