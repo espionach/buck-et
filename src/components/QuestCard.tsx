@@ -185,6 +185,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
         {showThreeDots && (
           <div className="absolute top-3 right-3 z-10" ref={menuRef}>
             <button
+              ref={menuButtonRef}
               onClick={(e) => {
                 e.stopPropagation();
                 setShowMenu(!showMenu);
