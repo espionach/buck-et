@@ -158,97 +158,62 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
 
         {/* Three-dots menu for owned/joined current quests */}
         {showThreeDots && (
-          <div className="absolute top-3 right-3 z-10" ref={menuRef}>
-            <button
-              ref={menuButtonRef}
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowMenu(!showMenu);
-              }}
-              className="p-1.5 text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <MoreVertical className="w-4 h-4" />
-            </button>
-            <AnimatePresence>
-              {showMenu && menuPosition && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  style={{ position: 'fixed', top: menuPosition.top, left: menuPosition.left }}
-                  className="bg-card border border-border rounded-xl shadow-lg py-1 min-w-[140px] z-[100]"
+          <div className="absolute top-3 right-3 z-10" onClick={(e) => e.stopPropagation()}>
+            <DropdownMenu open={showMenu} onOpenChange={setShowMenu}>
+              <DropdownMenuTrigger asChild>
+                <button
+                  onClick={(e) => e.stopPropagation()}
+                  className="p-1.5 text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label="Sidequest actions"
                 >
-                  {isOwner && onEditCurrent && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowMenu(false);
-                        onEditCurrent(quest);
-                      }}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-muted transition-colors"
-                    >
-                      <Pencil className="w-3.5 h-3.5" /> Edit
-                    </button>
-                  )}
-                  {!hidePin && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowMenu(false);
-                        if (pinned) {
-                          unpinQuest(quest.id);
-                        } else {
-                          pinQuest(quest.id);
-                        }
-                      }}
-                      disabled={!pinned && pinnedQuestIds.length >= 3}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-muted transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                    >
-                      <Pin className="w-3.5 h-3.5" /> {pinned ? "Unpin" : "Pin"}
-                      {!pinned && pinnedQuestIds.length >= 3 && <span className="text-[10px] text-muted-foreground ml-auto">Max 3</span>}
-                    </button>
-                  )}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowMenu(false);
-                      handleShare();
-                    }}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-muted transition-colors"
+                  <MoreVertical className="w-4 h-4" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" sideOffset={4} className="min-w-[140px]">
+                {isOwner && onEditCurrent && (
+                  <DropdownMenuItem
+                    onSelect={() => onEditCurrent(quest)}
+                    className="gap-2 text-xs"
                   >
-                    <Share2 className="w-3.5 h-3.5" /> Share
-                  </button>
-                  {!isOwner && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowMenu(false);
-                        setShowReport(true);
-                      }}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-muted transition-colors"
-                    >
-                      <Flag className="w-3.5 h-3.5" /> Report
-                    </button>
-                  )}
-                  {isOwner && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowMenu(false);
-                        if (group && !isFollowersOnly) {
-                          setShowOwnerLeave(true);
-                        } else {
-                          setShowDeleteConfirm(true);
-                        }
-                      }}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-xs text-destructive hover:bg-destructive/10 transition-colors"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" /> Delete
-                    </button>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
+                    <Pencil className="w-3.5 h-3.5" /> Edit
+                  </DropdownMenuItem>
+                )}
+                {!hidePin && (
+                  <DropdownMenuItem
+                    onSelect={() => {
+                      if (pinned) unpinQuest(quest.id);
+                      else pinQuest(quest.id);
+                    }}
+                    disabled={!pinned && pinnedQuestIds.length >= 3}
+                    className="gap-2 text-xs"
+                  >
+                    <Pin className="w-3.5 h-3.5" /> {pinned ? "Unpin" : "Pin"}
+                    {!pinned && pinnedQuestIds.length >= 3 && (
+                      <span className="text-[10px] text-muted-foreground ml-auto">Max 3</span>
+                    )}
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem onSelect={() => handleShare()} className="gap-2 text-xs">
+                  <Share2 className="w-3.5 h-3.5" /> Share
+                </DropdownMenuItem>
+                {!isOwner && (
+                  <DropdownMenuItem onSelect={() => setShowReport(true)} className="gap-2 text-xs">
+                    <Flag className="w-3.5 h-3.5" /> Report
+                  </DropdownMenuItem>
+                )}
+                {isOwner && (
+                  <DropdownMenuItem
+                    onSelect={() => {
+                      if (group && !isFollowersOnly) setShowOwnerLeave(true);
+                      else setShowDeleteConfirm(true);
+                    }}
+                    className="gap-2 text-xs text-destructive focus:text-destructive"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" /> Delete
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         )}
 
