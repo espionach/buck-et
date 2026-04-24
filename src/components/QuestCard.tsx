@@ -186,7 +186,8 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  className="absolute right-0 top-8 bg-card border border-border rounded-xl shadow-lg py-1 min-w-[140px] z-20"
+                  style={{ position: 'fixed' }}
+                  className="bg-card border border-border rounded-xl shadow-lg py-1 min-w-[140px] z-[100]"
                 >
                   {isOwner && onEditCurrent && (
                     <button
