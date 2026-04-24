@@ -11,6 +11,7 @@ import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import BlockedUsers from "./pages/BlockedUsers";
 import AdminReports from "./pages/AdminReports";
+import CommunityGuidelines from "./pages/CommunityGuidelines";
 import CreateQuest from "./pages/CreateQuest";
 import CreateGroup from "./pages/CreateGroup";
 import QuestDetail from "./pages/QuestDetail";
