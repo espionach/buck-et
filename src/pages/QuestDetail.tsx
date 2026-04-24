@@ -172,7 +172,8 @@ const QuestDetail = () => {
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.95 }}
-                      className="absolute right-0 top-11 bg-card border border-border rounded-xl shadow-lg py-1 min-w-[160px] z-20"
+                      style={{ position: 'fixed', top: menuPosition?.top ?? 0, left: menuPosition?.left ?? 0 }}
+                      className="bg-card border border-border rounded-xl shadow-lg py-1 min-w-[160px] z-[100]"
                     >
                       <button
                         onClick={() => {
