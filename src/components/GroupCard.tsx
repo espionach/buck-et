@@ -1,12 +1,12 @@
 import { Group } from "@/data/mockData";
-import { GroupIconDisplay } from "@/components/GroupIcon";
+import GlassIconTile from "@/components/GlassIconTile";
 import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
 import { motion, AnimatePresence } from "framer-motion";
 import { Users, Check, X, ArrowRightLeft } from "lucide-react";
 import { useState } from "react";
 import { usePopup } from "@/hooks/use-popup";
-import { GROUP_COLORS, iconColorClassFor } from "@/data/groupColors";
+import { GROUP_COLORS } from "@/data/groupColors";
 
 interface GroupCardProps {
   group: Group;
@@ -52,7 +52,7 @@ const GroupCard = ({ group, onClick, index }: GroupCardProps) => {
           )}
 
           <div className="flex items-start justify-between mb-3">
-            <GroupIconDisplay icon={group.emoji} size={28} className={iconColorClassFor(group.iconColor)} />
+            <GlassIconTile icon={group.emoji} iconColor={group.iconColor} cardColor={group.color} size="md" />
           </div>
           <h3 className="font-display font-bold text-sm text-foreground mb-1 line-clamp-1">{group.name}</h3>
           <div className="flex items-center gap-1.5 text-muted-foreground ml-0">
