@@ -183,6 +183,28 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
     if (user && profile.data) store.setInitialized(true);
   }, [user, profile.data]);
 
+  // Sync the user's device timezone to their profile so server-side reminders
+  // can fire at 9 AM in their local time (especially for timeless quests).
+  useEffect(() => {
+    if (!user || !profile.data) return;
+    let tz: string | undefined;
+    try {
+      tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    } catch {
+      return;
+    }
+    if (!tz) return;
+    if ((profile.data as any).timezone === tz) return;
+    (async () => {
+      try {
+        const { supabase } = await import("@/integrations/supabase/client");
+        await supabase.from("profiles").update({ timezone: tz }).eq("user_id", user.id);
+      } catch (err) {
+        console.error("Failed to sync timezone", err);
+      }
+    })();
+  }, [user, profile.data]);
+
   // Process invite ref captured at signup: send a friend request to the inviter once we know the current user.
   useEffect(() => {
     if (!user || !profile.data) return;
