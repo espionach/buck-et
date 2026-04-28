@@ -365,6 +365,7 @@ export type Database = {
           id: string
           onboarded_at: string | null
           onboarding_step: string | null
+          timezone: string | null
           updated_at: string
           user_id: string
           username: string
@@ -377,6 +378,7 @@ export type Database = {
           id?: string
           onboarded_at?: string | null
           onboarding_step?: string | null
+          timezone?: string | null
           updated_at?: string
           user_id: string
           username: string
@@ -389,6 +391,7 @@ export type Database = {
           id?: string
           onboarded_at?: string | null
           onboarding_step?: string | null
+          timezone?: string | null
           updated_at?: string
           user_id?: string
           username?: string
