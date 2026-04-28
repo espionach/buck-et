@@ -31,7 +31,6 @@ Deno.serve(async (req) => {
   const now = Date.now();
   // Look ahead up to 25h so we catch both 24h and 1h windows.
   const horizon = new Date(now + 26 * 60 * 60 * 1000).toISOString().slice(0, 10);
-  const today = new Date(now).toISOString().slice(0, 10);
 
   // Fetch all upcoming dated quests (timed AND timeless).
   // For "day_of" we need to consider any user's TZ, so widen the lower bound
