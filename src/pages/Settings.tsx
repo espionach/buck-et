@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Mail, Lock, Bell, LifeBuoy, Bug, FileText, ShieldCheck, LogOut, Trash2, ChevronRight, Flag, ShieldOff, Compass, BookOpen } from "lucide-react";
+import { ArrowLeft, Mail, Lock, Bell, LifeBuoy, Bug, FileText, ShieldCheck, LogOut, Trash2, ChevronRight, Flag, ShieldOff, Compass, BookOpen, Shield } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/contexts/AuthContext";
@@ -66,6 +66,7 @@ const Settings = () => {
   const { user, signOut } = useAuth();
   const currentUserRoles = useAppStore((s) => s.currentUserRoles);
   const isMod = currentUserRoles.includes("admin") || currentUserRoles.includes("moderator");
+  const isAdmin = currentUserRoles.includes("admin");
   const [prefs, setPrefs] = useState<NotifPrefs>(DEFAULT_PREFS);
   const [showNotif, setShowNotif] = useState(false);
   const [showEmail, setShowEmail] = useState(false);
@@ -201,6 +202,9 @@ const Settings = () => {
 
       {isMod && (
         <Section title="Moderation">
+          {isAdmin && (
+            <Row icon={Shield} label="Admin Dashboard" onClick={() => nav("/admin")} />
+          )}
           <Row icon={Flag} label="User Reports" onClick={() => nav("/admin/reports")} />
         </Section>
       )}
