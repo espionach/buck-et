@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_actions: {
+        Row: {
+          action_type: string
+          admin_id: string
+          created_at: string
+          id: string
+          metadata: Json | null
+          reason: string | null
+          target_id: string | null
+          target_type: string
+          target_user_id: string | null
+        }
+        Insert: {
+          action_type: string
+          admin_id: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          target_id?: string | null
+          target_type: string
+          target_user_id?: string | null
+        }
+        Update: {
+          action_type?: string
+          admin_id?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          target_id?: string | null
+          target_type?: string
+          target_user_id?: string | null
+        }
+        Relationships: []
+      }
       blocked_users: {
         Row: {
           blocked_id: string
@@ -530,6 +566,7 @@ export type Database = {
           group_id: string | null
           id: string
           is_friends_only: boolean
+          is_hidden: boolean
           links: string[] | null
           logistics_carpool_slots: number | null
           logistics_custom_notes: string | null
@@ -551,6 +588,7 @@ export type Database = {
           group_id?: string | null
           id?: string
           is_friends_only?: boolean
+          is_hidden?: boolean
           links?: string[] | null
           logistics_carpool_slots?: number | null
           logistics_custom_notes?: string | null
@@ -572,6 +610,7 @@ export type Database = {
           group_id?: string | null
           id?: string
           is_friends_only?: boolean
+          is_hidden?: boolean
           links?: string[] | null
           logistics_carpool_slots?: number | null
           logistics_custom_notes?: string | null
@@ -621,6 +660,42 @@ export type Database = {
           status?: string
           to_user_id?: string
           type?: string
+        }
+        Relationships: []
+      }
+      user_flags: {
+        Row: {
+          created_at: string
+          id: string
+          is_banned: boolean
+          is_suspended: boolean
+          notes: string | null
+          strike_count: number
+          suspended_until: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_banned?: boolean
+          is_suspended?: boolean
+          notes?: string | null
+          strike_count?: number
+          suspended_until?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_banned?: boolean
+          is_suspended?: boolean
+          notes?: string | null
+          strike_count?: number
+          suspended_until?: string | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -710,6 +785,7 @@ export type Database = {
         Args: { _sidequest_id: string; _user_id: string }
         Returns: boolean
       }
+      user_can_act: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
