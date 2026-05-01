@@ -18,18 +18,16 @@ interface GroupSettingsProps {
   onClose: () => void;
   onLeave: () => void;
   onViewProfile: (user: User) => void;
-  /** When set to "addMembers", the add-members panel opens automatically. */
-  initialView?: "addMembers";
 }
 
-const GroupSettings = ({ group, onClose, onLeave, onViewProfile, initialView }: GroupSettingsProps) => {
+const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettingsProps) => {
   const { updateGroup, removeMemberFromGroup, leaveGroup, inviteToGroup, friends: friendsList, requestGroupTransfer, deleteGroup, currentUser } = useAppStore();
   const [editName, setEditName] = useState(group.name);
   const [editEmoji, setEditEmoji] = useState(group.emoji);
   const [editColor, setEditColor] = useState(group.color || "sky");
   const [editIconColor, setEditIconColor] = useState(group.iconColor || "slate");
   const [isEditingName, setIsEditingName] = useState(false);
-  const [showAddMembers, setShowAddMembers] = useState(initialView === "addMembers");
+  const [showAddMembers, setShowAddMembers] = useState(false);
   const [memberSearch, setMemberSearch] = useState("");
   const [showOwnerLeave, setShowOwnerLeave] = useState(false);
   const [confirmRemoveUser, setConfirmRemoveUser] = useState<{ userId: string; userName: string } | null>(null);
