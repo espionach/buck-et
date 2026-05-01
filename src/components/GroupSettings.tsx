@@ -2,7 +2,7 @@ import { useAppStore } from "@/data/appState";
 import { Group, User } from "@/data/mockData";
 import UserAvatar from "@/components/UserAvatar";
 import OwnerLeaveDialog from "@/components/OwnerLeaveDialog";
-import { UserPlus, LogOut, Crown, Clock, Trash2, Pencil, Check, Bell, BellOff, Search, X, UserSearch } from "lucide-react";
+import { UserPlus, LogOut, Crown, Clock, Trash2, Pencil, Check, Bell, BellOff, Search, X, UserSearch, Share2 } from "lucide-react";
 import GroupIconPicker from "@/components/GroupIconPicker";
 import { useEffect, useState } from "react";
 import { usePopup } from "@/hooks/use-popup";
@@ -260,13 +260,31 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
               <h3 className="font-bold text-foreground text-sm">
                 Members ({group.memberRoles.length})
               </h3>
-              <button
-                onClick={() => { setMemberSearch(""); setShowAddMembers(true); }}
-                className="flex items-center gap-1 text-xs font-semibold text-primary"
-              >
-                <UserPlus className="w-3.5 h-3.5" />
-                Add
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={async () => {
+                    const url = `${window.location.origin}/g/${group.id}/invite`;
+                    try {
+                      await navigator.clipboard.writeText(url);
+                      toast({ title: "Invite link copied!" });
+                    } catch {
+                      toast({ title: "Couldn't copy link.", variant: "destructive" });
+                    }
+                  }}
+                  className="flex items-center gap-1 text-xs font-semibold text-muted-foreground"
+                  aria-label="Copy invite link"
+                >
+                  <Share2 className="w-3.5 h-3.5" />
+                  Share
+                </button>
+                <button
+                  onClick={() => { setMemberSearch(""); setShowAddMembers(true); }}
+                  className="flex items-center gap-1 text-xs font-semibold text-primary"
+                >
+                  <UserPlus className="w-3.5 h-3.5" />
+                  Add
+                </button>
+              </div>
             </div>
 
             {/* Member rows */}
