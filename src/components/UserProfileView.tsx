@@ -1,13 +1,14 @@
 import { useAppStore } from "@/data/appState";
 import QuestCard from "@/components/QuestCard";
 import UserAvatar from "@/components/UserAvatar";
-import { ArrowLeft, X, Users as UsersIcon, Lock, UserPlus, Clock, UserMinus, Check, ShieldOff } from "lucide-react";
+import { ArrowLeft, X, Users as UsersIcon, Lock, UserPlus, Clock, UserMinus, Check, ShieldOff, Share2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePopup } from "@/hooks/use-popup";
 import { User, isQuestCompleted, placeholderUser } from "@/data/mockData";
 import UserMenu from "@/components/UserMenu";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface UserProfileViewProps {
   user: User;
@@ -88,7 +89,26 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <UserMenu user={user} onBlocked={onBack} />
+        <div className="flex items-center gap-1">
+          {user.username && (
+            <button
+              onClick={async () => {
+                const url = `${window.location.origin}/u/${user.username}`;
+                try {
+                  await navigator.clipboard.writeText(url);
+                  toast.success("Profile link copied!");
+                } catch {
+                  toast.error("Couldn't copy link.");
+                }
+              }}
+              aria-label="Copy profile link"
+              className="p-2 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Share2 className="w-5 h-5" />
+            </button>
+          )}
+          <UserMenu user={user} onBlocked={onBack} />
+        </div>
       </div>
 
       {isBlocked ? (
