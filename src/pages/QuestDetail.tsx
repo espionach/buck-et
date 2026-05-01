@@ -37,7 +37,7 @@ const volunteerRoles = ALL_CONTRIBUTION_ROLES;
 const QuestDetail = () => {
   const navigate = useNavigate();
   const { questId } = useParams<{ questId: string }>();
-  const { quests, groups, addComment, volunteerForQuest, unvolunteerFromQuest, currentUser, pinQuest, unpinQuest, pinnedQuestIds, deleteQuest } = useAppStore();
+  const { quests, groups, addComment, volunteerForQuest, unvolunteerFromQuest, currentUser, pinQuest, unpinQuest, pinnedQuestIds, deleteQuest, toggleImIn } = useAppStore();
   const [showMenu, setShowMenu] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showReport, setShowReport] = useState(false);
@@ -50,19 +50,34 @@ const QuestDetail = () => {
 
   if (!quest) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Sidequest not found</p>
+      <div className="min-h-screen flex flex-col">
+        <div className="px-5 pt-14 pb-3">
+          <button onClick={() => navigate("/")} className="p-2 rounded-xl bg-muted text-muted-foreground" aria-label="Back">
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+        </div>
+        <div className="flex-1 flex items-center justify-center px-8 -mt-12">
+          <div className="text-center max-w-xs">
+            <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+              <Globe className="w-6 h-6 text-muted-foreground" />
+            </div>
+            <h2 className="text-base font-bold text-foreground mb-1.5">You don't have access</h2>
+            <p className="text-sm text-muted-foreground">
+              This sidequest is private. You need to be friends with the owner or a member of the group to view it.
+            </p>
+          </div>
+        </div>
       </div>
     );
   }
 
-  // Only joined participants can view; once the owner finishes the quest,
-  // the detail view is no longer accessible (the quest moves to history).
-  const isIn = quest.participants.some((p) => p.id === currentUser.id);
-  if (!isIn || isQuestCompleted(quest)) {
+  // Once the owner finishes the quest, the detail view is no longer
+  // accessible (the quest moves to history).
+  if (isQuestCompleted(quest)) {
     navigate(-1);
     return null;
   }
+  const isIn = quest.participants.some((p) => p.id === currentUser.id);
 
   const group = quest.groupId ? groups.find((g) => g.id === quest.groupId) : null;
   const isOwner = quest.createdBy.id === currentUser.id;
@@ -127,7 +142,16 @@ const QuestDetail = () => {
             </p>
           </div>
 
-          {/* Owner actions menu (Edit, Pin, Share, Delete) */}
+          {/* Share button (always visible) */}
+          <button
+            onClick={handleShare}
+            className="p-1 -m-1 text-muted-foreground hover:text-foreground transition-colors"
+            aria-label="Share sidequest"
+          >
+            <Share2 className="w-5 h-5" />
+          </button>
+
+          {/* Owner actions menu (Edit, Pin, Delete) */}
           {isOwner && (() => {
             const pinned = pinnedQuestIds.includes(quest.id);
             const pinDisabled = !pinned && pinnedQuestIds.length >= 3;
@@ -159,9 +183,6 @@ const QuestDetail = () => {
                     <Pin className="w-3.5 h-3.5" /> {pinned ? "Unpin" : "Pin"}
                     {pinDisabled && <span className="text-[10px] text-muted-foreground ml-auto">Max 3</span>}
                   </DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => handleShare()} className="gap-2 text-xs">
-                    <Share2 className="w-3.5 h-3.5" /> Share
-                  </DropdownMenuItem>
                   <DropdownMenuItem
                     onSelect={() => setShowDeleteConfirm(true)}
                     className="gap-2 text-xs text-destructive focus:text-destructive"
@@ -173,28 +194,29 @@ const QuestDetail = () => {
             );
           })()}
 
-          {/* Non-owner actions: Share + Report */}
+          {/* Non-owner: Report button */}
           {!isOwner && (
-            <DropdownMenu open={showMenu} onOpenChange={setShowMenu}>
-              <DropdownMenuTrigger asChild>
-                <button
-                  className="p-1 -m-1 text-muted-foreground hover:text-foreground transition-colors"
-                  aria-label="Sidequest actions"
-                >
-                  <MoreVertical className="w-5 h-5" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" sideOffset={4} className="min-w-[160px]">
-                <DropdownMenuItem onSelect={() => handleShare()} className="gap-2 text-xs">
-                  <Share2 className="w-3.5 h-3.5" /> Share
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setShowReport(true)} className="gap-2 text-xs">
-                  <Flag className="w-3.5 h-3.5" /> Report
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <button
+              onClick={() => setShowReport(true)}
+              className="p-1 -m-1 text-muted-foreground hover:text-foreground transition-colors"
+              aria-label="Report sidequest"
+            >
+              <Flag className="w-5 h-5" />
+            </button>
           )}
         </div>
+
+        {/* Join CTA for non-owners who haven't joined yet */}
+        {!isOwner && !isIn && (
+          <div className="mt-3">
+            <button
+              onClick={() => toggleImIn(quest.id)}
+              className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition-colors"
+            >
+              Join sidequest
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="px-5 space-y-4 mt-2">
