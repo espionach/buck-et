@@ -152,11 +152,13 @@ const Boards = () => {
             {pendingInvitations.length > 0 && !search && (
               <div className="space-y-1.5 mb-3">
                 {/* Always show first invitation */}
-                <motion.div
+                <motion.button
                   key={pendingInvitations[0].id}
+                  type="button"
+                  onClick={() => navigate(`/g/${pendingInvitations[0].groupId}/invite`)}
                   initial={{ opacity: 0, y: -8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="px-3 py-2.5 rounded-lg border border-border/40 bg-card/50 opacity-75"
+                  className="w-full text-left px-3 py-2.5 rounded-lg border border-border/40 bg-card/50 opacity-75 active:opacity-60 transition-opacity"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -170,20 +172,20 @@ const Boards = () => {
                     </div>
                     <div className="flex items-center gap-1.5">
                       <button
-                        onClick={() => acceptGroupInvitation(pendingInvitations[0].id)}
+                        onClick={(e) => { e.stopPropagation(); acceptGroupInvitation(pendingInvitations[0].id); }}
                         className="p-1.5 rounded-full bg-secondary text-secondary-foreground"
                       >
                         <Check className="w-3.5 h-3.5" />
                       </button>
                       <button
-                        onClick={() => declineGroupInvitation(pendingInvitations[0].id)}
+                        onClick={(e) => { e.stopPropagation(); declineGroupInvitations[0]; declineGroupInvitation(pendingInvitations[0].id); }}
                         className="p-1.5 rounded-full bg-muted text-muted-foreground"
                       >
                         <X className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </div>
-                </motion.div>
+                </motion.button>
 
                 {/* View All / collapse for 2+ invitations */}
                 {pendingInvitations.length > 1 && (
