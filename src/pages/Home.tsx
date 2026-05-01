@@ -357,6 +357,15 @@ const Boards = () => {
               </div>
             )}
 
+            {/* Add members overlay (from group page) */}
+            {selectedGroupData && (
+              <AddMembersModal
+                group={selectedGroupData}
+                open={showAddMembers}
+                onClose={() => setShowAddMembers(false)}
+              />
+            )}
+
             {/* Active / Completed tabs */}
             <div className="flex bg-muted rounded-2xl p-1 mb-4">
               {(["active", "completed"] as const).map((t) => (
