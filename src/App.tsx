@@ -10,6 +10,7 @@ import Home from "./pages/Feed";
 import Profile from "./pages/Profile";
 import PublicProfile from "./pages/PublicProfile";
 import Settings from "./pages/Settings";
+import GroupInvite from "./pages/GroupInvite";
 import BlockedUsers from "./pages/BlockedUsers";
 import AdminReports from "./pages/AdminReports";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -81,6 +82,7 @@ const AppLayout = () => {
         <Route path="/groups" element={<ProtectedRoute><Boards /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="/u/:username" element={<ProtectedRoute><PublicProfile /></ProtectedRoute>} />
+        <Route path="/g/:groupId/invite" element={<ProtectedRoute><GroupInvite /></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
         <Route path="/settings/blocked" element={<ProtectedRoute><BlockedUsers /></ProtectedRoute>} />
         <Route path="/settings/community-guidelines" element={<ProtectedRoute><CommunityGuidelines /></ProtectedRoute>} />
