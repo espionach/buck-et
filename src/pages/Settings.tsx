@@ -200,13 +200,16 @@ const Settings = () => {
     setSubmitting(false);
     toast({
       title: "Password updated",
-      description: "Other devices have been signed out for your safety.",
+      description: "For your security, please sign in again.",
     });
     setShowPassword(false);
     setCurrentPassword("");
     setNewPassword("");
     setConfirmPassword("");
     setShowPwErrors(false);
+    // Sign out the current session and force re-login
+    await signOut();
+    nav("/login", { replace: true });
   };
 
   const handleDeleteAccount = async () => {
