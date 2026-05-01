@@ -4,6 +4,7 @@ import GroupCard from "@/components/GroupCard";
 import { GroupIconDisplay } from "@/components/GroupIcon";
 import QuestList from "@/components/QuestList";
 import GroupSettings from "@/components/GroupSettings";
+import AddMembersModal from "@/components/AddMembersModal";
 import UserAvatar from "@/components/UserAvatar";
 import UserProfileView from "@/components/UserProfileView";
 import { Plus, Search, Check, X, Settings, ArrowLeft, Map, ScrollText, Share2, UserPlus } from "lucide-react";
