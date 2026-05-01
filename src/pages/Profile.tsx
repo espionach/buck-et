@@ -1,7 +1,7 @@
 import { useAppStore } from "@/data/appState";
 import QuestList from "@/components/QuestList";
 import UserAvatar from "@/components/UserAvatar";
-import { Edit, X, Check, Users as UsersIcon, UserPlus, Trash2, ImagePlus, Camera, Link as LinkIcon, Plus, ArrowLeft, Map, ScrollText, Pin, Settings as SettingsIcon, User as UserIcon, Globe, ChevronDown } from "lucide-react";
+import { Edit, X, Check, Users as UsersIcon, UserPlus, Trash2, ImagePlus, Camera, Link as LinkIcon, Plus, ArrowLeft, Map, ScrollText, Pin, Settings as SettingsIcon, User as UserIcon, Globe, ChevronDown, Share2 } from "lucide-react";
 import { ALL_CONTRIBUTION_ROLES } from "@/data/contributionRoles";
 import { GroupIconDisplay } from "@/components/GroupIcon";
 import UserProfileView from "@/components/UserProfileView";
@@ -592,6 +592,7 @@ const Profile = () => {
         {currentUser.username && (
           <p className="text-xs text-muted-foreground/70 mt-0.5">@{currentUser.username}</p>
         )}
+        <div className="mt-2 flex items-center gap-2">
         <button
           onClick={() => {
             setEditName(currentUser.name);
@@ -601,11 +602,30 @@ const Profile = () => {
             setEditProfilePic(currentUser.profilePicture || "");
             setShowEditProfile(true);
           }}
-          className="mt-2 px-2.5 py-0 h-6 rounded-md bg-muted text-muted-foreground text-xs font-medium flex items-center gap-1"
+          className="px-2.5 py-0 h-6 rounded-md bg-muted text-muted-foreground text-xs font-medium flex items-center gap-1"
         >
           <Edit className="w-3 h-3" />
           Edit
         </button>
+        {currentUser.username && (
+          <button
+            onClick={async () => {
+              const url = `${window.location.origin}/u/${currentUser.username}`;
+              try {
+                await navigator.clipboard.writeText(url);
+                toast.success("Profile link copied!");
+              } catch {
+                toast.error("Couldn't copy link.");
+              }
+            }}
+            className="px-2.5 py-0 h-6 rounded-md bg-muted text-muted-foreground text-xs font-medium flex items-center gap-1"
+            aria-label="Copy profile link"
+          >
+            <Share2 className="w-3 h-3" />
+            Share
+          </button>
+        )}
+        </div>
         <p className="text-sm text-muted-foreground mt-1 text-center">{currentUser.bio}</p>
         <div className="flex items-center justify-center gap-4 mt-3">
           <button

@@ -142,7 +142,7 @@ const AdminDashboard = () => {
     desc: string;
     confirmLabel: string;
     destructive?: boolean;
-    onConfirm: () => Promise<void> | void;
+    onConfirm: () => Promise<unknown> | unknown;
   }>(null);
   const [reportDetail, setReportDetail] = useState<AdminReport | null>(null);
   const [reportContent, setReportContent] = useState<{ kind: string; preview: string } | null>(null);
@@ -168,10 +168,10 @@ const AdminDashboard = () => {
       admin_id: user.id,
       action_type: entry.action_type,
       target_type: entry.target_type,
-      target_id: entry.target_id ?? null,
-      target_user_id: entry.target_user_id ?? null,
-      reason: entry.reason ?? null,
-      metadata: entry.metadata ?? null,
+      target_id: entry.target_id ?? undefined,
+      target_user_id: entry.target_user_id ?? undefined,
+      reason: entry.reason ?? undefined,
+      metadata: (entry.metadata ?? undefined) as never,
     });
   };
 
