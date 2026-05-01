@@ -6,7 +6,7 @@ import QuestList from "@/components/QuestList";
 import GroupSettings from "@/components/GroupSettings";
 import UserAvatar from "@/components/UserAvatar";
 import UserProfileView from "@/components/UserProfileView";
-import { Plus, Search, Check, X, Settings, ArrowLeft, Map, ScrollText, Share2 } from "lucide-react";
+import { Plus, Search, Check, X, Settings, ArrowLeft, Map, ScrollText, Share2, UserPlus } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -25,6 +25,7 @@ const Boards = () => {
   const [selectedGroup, setSelectedGroup] = useState<string | null>(openGroup);
   const [search, setSearch] = useState("");
   const [showSettings, setShowSettings] = useState(false);
+  const [settingsInitialView, setSettingsInitialView] = useState<"addMembers" | undefined>(undefined);
   const [showAllInvites, setShowAllInvites] = useState(false);
   const [viewingProfile, setViewingProfile] = useState<User | null>(null);
   const [activeHighlight, setActiveHighlight] = useState<string | null>(highlightQuestId);
@@ -91,6 +92,7 @@ const Boards = () => {
   const selectedGroupData = groups.find((g) => g.id === selectedGroup);
 
   const handleOpenSettings = () => {
+    setSettingsInitialView(undefined);
     setShowSettings(true);
   };
 
@@ -291,9 +293,21 @@ const Boards = () => {
                 <GroupIconDisplay icon={selectedGroupData?.emoji || "target"} size={32} />
                 <div>
                   <h2 className="text-xl font-bold text-foreground">{selectedGroupData?.name}</h2>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedGroupData?.members.length} members
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm text-muted-foreground">
+                      {selectedGroupData?.members.length} members
+                    </p>
+                    <button
+                      onClick={() => {
+                        setSettingsInitialView("addMembers");
+                        setShowSettings(true);
+                      }}
+                      aria-label="Add members"
+                      className="text-orange-500 hover:text-orange-600 transition-colors"
+                    >
+                      <UserPlus className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               </div>
           <div className="flex items-center gap-1">
@@ -340,6 +354,7 @@ const Boards = () => {
                     setShowSettings(false);
                   }}
                   onViewProfile={handleViewProfile}
+                  initialView={settingsInitialView}
                 />
               </div>
             )}
