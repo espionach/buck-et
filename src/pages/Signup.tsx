@@ -14,6 +14,7 @@ const Signup = () => {
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPwErrors, setShowPwErrors] = useState(false);
 
   // Capture invite ref so we can send a friend request once the new user lands in the app.
   useEffect(() => {
@@ -31,9 +32,15 @@ const Signup = () => {
     e.preventDefault();
     const pwError = validatePassword(password);
     if (pwError) {
-      toast({ title: "Password doesn't meet requirements", description: pwError, variant: "destructive" });
+      setShowPwErrors(true);
+      toast({
+        title: "Password doesn't meet requirements",
+        description: "Check the highlighted rules below the password field.",
+        variant: "destructive",
+      });
       return;
     }
+    setShowPwErrors(false);
     setLoading(true);
 
     const { error } = await supabase.auth.signUp({
@@ -96,11 +103,14 @@ const Signup = () => {
               type="password"
               placeholder="••••••••"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                if (showPwErrors && !validatePassword(e.target.value)) setShowPwErrors(false);
+              }}
               required
               minLength={8}
             />
-            <PasswordRequirements value={password} />
+            <PasswordRequirements value={password} showErrors={showPwErrors} />
           </div>
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Creating account..." : "Sign up"}
