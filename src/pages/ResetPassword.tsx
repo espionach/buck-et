@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
+import PasswordRequirements from "@/components/PasswordRequirements";
+import { validatePassword, isLeakedPasswordError } from "@/lib/passwordPolicy";
 
 const ResetPassword = () => {
   const [password, setPassword] = useState("");
@@ -32,10 +34,11 @@ const ResetPassword = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (password.length < 6) {
+    const pwError = validatePassword(password);
+    if (pwError) {
       toast({
-        title: "Password too short",
-        description: "Use at least 6 characters.",
+        title: "Password doesn't meet requirements",
+        description: pwError,
         variant: "destructive",
       });
       return;
@@ -54,9 +57,12 @@ const ResetPassword = () => {
     setLoading(false);
 
     if (error) {
+      const description = isLeakedPasswordError(error.message)
+        ? "This password has appeared in a data breach. Please choose another."
+        : "The reset link may have expired. Request a new one.";
       toast({
         title: "Couldn't update password",
-        description: "The reset link may have expired. Request a new one.",
+        description,
         variant: "destructive",
       });
     } else {
@@ -94,6 +100,7 @@ const ResetPassword = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
+              <PasswordRequirements value={password} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="confirm">Confirm password</Label>
