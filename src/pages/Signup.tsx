@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
+import PasswordRequirements from "@/components/PasswordRequirements";
+import { validatePassword, isLeakedPasswordError } from "@/lib/passwordPolicy";
 
 const Signup = () => {
   const [searchParams] = useSearchParams();
@@ -27,8 +29,9 @@ const Signup = () => {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password.length < 6) {
-      toast({ title: "Password too short", description: "Must be at least 6 characters", variant: "destructive" });
+    const pwError = validatePassword(password);
+    if (pwError) {
+      toast({ title: "Password doesn't meet requirements", description: pwError, variant: "destructive" });
       return;
     }
     setLoading(true);
@@ -43,7 +46,10 @@ const Signup = () => {
     });
 
     if (error) {
-      toast({ title: "Signup failed", description: error.message, variant: "destructive" });
+      const description = isLeakedPasswordError(error.message)
+        ? "This password has appeared in a data breach. Please choose another."
+        : error.message;
+      toast({ title: "Signup failed", description, variant: "destructive" });
     } else {
       toast({ title: "Check your email", description: "We sent you a confirmation link to verify your account." });
     }
@@ -92,8 +98,9 @@ const Signup = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              minLength={6}
+              minLength={8}
             />
+            <PasswordRequirements value={password} />
           </div>
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Creating account..." : "Sign up"}
