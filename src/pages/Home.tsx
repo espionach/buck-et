@@ -4,6 +4,7 @@ import GroupCard from "@/components/GroupCard";
 import { GroupIconDisplay } from "@/components/GroupIcon";
 import QuestList from "@/components/QuestList";
 import GroupSettings from "@/components/GroupSettings";
+import AddMembersModal from "@/components/AddMembersModal";
 import UserAvatar from "@/components/UserAvatar";
 import UserProfileView from "@/components/UserProfileView";
 import { Plus, Search, Check, X, Settings, ArrowLeft, Map, ScrollText, Share2, UserPlus } from "lucide-react";
@@ -25,7 +26,7 @@ const Boards = () => {
   const [selectedGroup, setSelectedGroup] = useState<string | null>(openGroup);
   const [search, setSearch] = useState("");
   const [showSettings, setShowSettings] = useState(false);
-  const [settingsInitialView, setSettingsInitialView] = useState<"addMembers" | undefined>(undefined);
+  const [showAddMembers, setShowAddMembers] = useState(false);
   const [showAllInvites, setShowAllInvites] = useState(false);
   const [viewingProfile, setViewingProfile] = useState<User | null>(null);
   const [activeHighlight, setActiveHighlight] = useState<string | null>(highlightQuestId);
@@ -92,7 +93,6 @@ const Boards = () => {
   const selectedGroupData = groups.find((g) => g.id === selectedGroup);
 
   const handleOpenSettings = () => {
-    setSettingsInitialView(undefined);
     setShowSettings(true);
   };
 
@@ -299,8 +299,7 @@ const Boards = () => {
                     </p>
                     <button
                       onClick={() => {
-                        setSettingsInitialView("addMembers");
-                        setShowSettings(true);
+                        setShowAddMembers(true);
                       }}
                       aria-label="Add members"
                       className="text-orange-500 hover:text-orange-600 transition-colors"
@@ -354,9 +353,17 @@ const Boards = () => {
                     setShowSettings(false);
                   }}
                   onViewProfile={handleViewProfile}
-                  initialView={settingsInitialView}
                 />
               </div>
+            )}
+
+            {/* Add members overlay (from group page) */}
+            {selectedGroupData && (
+              <AddMembersModal
+                group={selectedGroupData}
+                open={showAddMembers}
+                onClose={() => setShowAddMembers(false)}
+              />
             )}
 
             {/* Active / Completed tabs */}
