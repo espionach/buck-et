@@ -6,10 +6,11 @@ import QuestList from "@/components/QuestList";
 import GroupSettings from "@/components/GroupSettings";
 import UserAvatar from "@/components/UserAvatar";
 import UserProfileView from "@/components/UserProfileView";
-import { Plus, Search, Check, X, Settings, ArrowLeft, Map, ScrollText } from "lucide-react";
+import { Plus, Search, Check, X, Settings, ArrowLeft, Map, ScrollText, Share2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
 
 const Boards = () => {
   const { groups, quests, groupInvitations, acceptGroupInvitation, declineGroupInvitation, cleanupEmptyQuests, setHideGlobalFab, currentUser } = useAppStore();
@@ -295,13 +296,31 @@ const Boards = () => {
                   </p>
                 </div>
               </div>
-          <button
-            onClick={handleOpenSettings}
-            aria-label="Group settings"
-            className="p-2 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <Settings className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={async () => {
+                if (!selectedGroupData) return;
+                const url = `${window.location.origin}/g/${selectedGroupData.id}/invite`;
+                try {
+                  await navigator.clipboard.writeText(url);
+                  toast.success("Invite link copied!");
+                } catch {
+                  toast.error("Couldn't copy link.");
+                }
+              }}
+              aria-label="Copy invite link"
+              className="p-2 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Share2 className="w-5 h-5" />
+            </button>
+            <button
+              onClick={handleOpenSettings}
+              aria-label="Group settings"
+              className="p-2 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Settings className="w-5 h-5" />
+            </button>
+          </div>
             </div>
 
             {/* Settings - full page */}
