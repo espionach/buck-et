@@ -25,7 +25,7 @@ const Boards = () => {
   const [selectedGroup, setSelectedGroup] = useState<string | null>(openGroup);
   const [search, setSearch] = useState("");
   const [showSettings, setShowSettings] = useState(false);
-  const [settingsInitialView, setSettingsInitialView] = useState<"addMembers" | undefined>(undefined);
+  const [showAddMembers, setShowAddMembers] = useState(false);
   const [showAllInvites, setShowAllInvites] = useState(false);
   const [viewingProfile, setViewingProfile] = useState<User | null>(null);
   const [activeHighlight, setActiveHighlight] = useState<string | null>(highlightQuestId);
@@ -92,7 +92,6 @@ const Boards = () => {
   const selectedGroupData = groups.find((g) => g.id === selectedGroup);
 
   const handleOpenSettings = () => {
-    setSettingsInitialView(undefined);
     setShowSettings(true);
   };
 
@@ -299,8 +298,7 @@ const Boards = () => {
                     </p>
                     <button
                       onClick={() => {
-                        setSettingsInitialView("addMembers");
-                        setShowSettings(true);
+                        setShowAddMembers(true);
                       }}
                       aria-label="Add members"
                       className="text-orange-500 hover:text-orange-600 transition-colors"
@@ -354,7 +352,6 @@ const Boards = () => {
                     setShowSettings(false);
                   }}
                   onViewProfile={handleViewProfile}
-                  initialView={settingsInitialView}
                 />
               </div>
             )}
