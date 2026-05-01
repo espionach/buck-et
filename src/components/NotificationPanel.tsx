@@ -200,10 +200,16 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
                       <div className="shrink-0">
                         <UserAvatar user={n.fromUser} size="sm" />
                       </div>
-                      <div className="flex-1 min-w-0">
+                      <button
+                        onClick={() => {
+                          onClose();
+                          navigate(`/g/${pendingInvite.groupId}/invite`);
+                        }}
+                        className="flex-1 min-w-0 text-left active:opacity-70"
+                      >
                         {renderMessage(n)}
                         <p className="text-[10px] text-muted-foreground mt-1">{n.createdAt}</p>
-                      </div>
+                      </button>
                       <div className="flex gap-1.5 shrink-0">
                         <button
                           onClick={() => {
