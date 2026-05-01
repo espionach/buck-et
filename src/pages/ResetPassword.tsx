@@ -13,6 +13,7 @@ const ResetPassword = () => {
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
   const [ready, setReady] = useState(false);
+  const [showPwErrors, setShowPwErrors] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -36,13 +37,15 @@ const ResetPassword = () => {
 
     const pwError = validatePassword(password);
     if (pwError) {
+      setShowPwErrors(true);
       toast({
         title: "Password doesn't meet requirements",
-        description: pwError,
+        description: "Check the highlighted rules below the password field.",
         variant: "destructive",
       });
       return;
     }
+    setShowPwErrors(false);
     if (password !== confirm) {
       toast({
         title: "Passwords don't match",
@@ -97,10 +100,13 @@ const ResetPassword = () => {
                 type="password"
                 placeholder="••••••••"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (showPwErrors && !validatePassword(e.target.value)) setShowPwErrors(false);
+                }}
                 required
               />
-              <PasswordRequirements value={password} />
+              <PasswordRequirements value={password} showErrors={showPwErrors} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="confirm">Confirm password</Label>
