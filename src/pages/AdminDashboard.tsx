@@ -142,7 +142,7 @@ const AdminDashboard = () => {
     desc: string;
     confirmLabel: string;
     destructive?: boolean;
-    onConfirm: () => Promise<void> | void;
+    onConfirm: () => Promise<unknown> | unknown;
   }>(null);
   const [reportDetail, setReportDetail] = useState<AdminReport | null>(null);
   const [reportContent, setReportContent] = useState<{ kind: string; preview: string } | null>(null);
