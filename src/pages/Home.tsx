@@ -178,7 +178,7 @@ const Boards = () => {
                         <Check className="w-3.5 h-3.5" />
                       </button>
                       <button
-                        onClick={(e) => { e.stopPropagation(); declineGroupInvitations[0]; declineGroupInvitation(pendingInvitations[0].id); }}
+                        onClick={(e) => { e.stopPropagation(); declineGroupInvitation(pendingInvitations[0].id); }}
                         className="p-1.5 rounded-full bg-muted text-muted-foreground"
                       >
                         <X className="w-3.5 h-3.5" />
