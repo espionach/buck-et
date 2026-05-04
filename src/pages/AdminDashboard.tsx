@@ -609,6 +609,7 @@ const AdminDashboard = () => {
         <TabButton active={tab === "users"} onClick={() => setTab("users")} icon={UsersIcon} label="Users" count={users.length} />
         <TabButton active={tab === "quests"} onClick={() => setTab("quests")} icon={ScrollText} label="Quests" count={quests.length} />
         <TabButton active={tab === "comments"} onClick={() => setTab("comments")} icon={MessageSquare} label="Comments" />
+        <TabButton active={tab === "appeals"} onClick={() => setTab("appeals")} icon={Inbox} label="Appeals" count={pendingAppealCount} />
         <TabButton active={tab === "audit"} onClick={() => setTab("audit")} icon={History} label="Audit" />
       </div>
 
@@ -640,13 +641,21 @@ const AdminDashboard = () => {
                   </button>
                 ))}
               </div>
+              <div className="flex gap-1.5 mb-3 flex-wrap">
+                {(["all", "flagged", "warned", "suspended", "banned"] as const).map((f) => (
+                  <button key={f} onClick={() => setUserFilter(f)}
+                    className={`px-3 py-1 rounded-full text-[11px] font-semibold capitalize ${userFilter === f ? "bg-foreground text-background" : "bg-muted text-muted-foreground"}`}>
+                    {f}
+                  </button>
+                ))}
+              </div>
 
               <div className="bg-card border border-border rounded-2xl overflow-hidden divide-y divide-border">
                 {filteredUsers.length === 0 ? (
                   <p className="text-sm text-muted-foreground text-center py-8">No users found.</p>
                 ) : filteredUsers.map((u) => (
                   <div key={u.user_id} className="p-3">
-                    <div className="flex items-center gap-3">
+                    <button onClick={() => setDetailUser(u)} className="w-full text-left flex items-center gap-3">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <p className="text-sm font-semibold text-foreground truncate">{u.display_name || u.username}</p>
@@ -658,7 +667,7 @@ const AdminDashboard = () => {
                         <p className="text-xs text-muted-foreground truncate">@{u.username}</p>
                         <p className="text-[10px] text-muted-foreground/70 mt-0.5">Joined {new Date(u.created_at).toLocaleDateString()}</p>
                       </div>
-                    </div>
+                    </button>
                     <div className="flex flex-wrap gap-1.5 mt-2">
                       <button
                         onClick={() => toggleAdmin(u)}
