@@ -903,7 +903,9 @@ const AdminDashboard = () => {
                       <div className="flex gap-1.5 flex-wrap mt-2">
                         {r.status === "pending" && (
                           <>
-                            <button onClick={() => updateReportStatus(r.id, "resolved")} className="px-2.5 py-1 rounded-lg bg-primary/10 text-primary text-[11px] font-semibold">Resolve</button>
+                            <button onClick={() => setResolveReport(r)} className="px-2.5 py-1 rounded-lg bg-primary/10 text-primary text-[11px] font-semibold flex items-center gap-1">
+                              <Gavel className="w-3 h-3" /> Take action
+                            </button>
                             <button onClick={() => updateReportStatus(r.id, "dismissed")} className="px-2.5 py-1 rounded-lg bg-muted text-muted-foreground text-[11px] font-semibold">Dismiss</button>
                           </>
                         )}
