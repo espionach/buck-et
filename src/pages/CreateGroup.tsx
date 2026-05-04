@@ -1,21 +1,20 @@
 import { useAppStore } from "@/data/appState";
 import { Group, GroupMember } from "@/data/mockData";
 import { ArrowLeft, Plus, Check, Search, UserSearch, UserPlus } from "lucide-react";
-import GroupIconPicker from "@/components/GroupIconPicker";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import UserAvatar from "@/components/UserAvatar";
-import { GROUP_COLORS, GROUP_ICON_COLORS } from "@/data/groupColors";
+import { GROUP_COLORS } from "@/data/groupColors";
 
 const CreateGroup = () => {
   const navigate = useNavigate();
   const { addGroup, friends: friendsList, currentUser } = useAppStore();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [emoji, setEmoji] = useState("target");
   const [color, setColor] = useState("sky");
-  const [iconColor, setIconColor] = useState("slate");
+  const [emoji] = useState("target");
+  const [iconColor] = useState("slate");
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
   const [memberSearch, setMemberSearch] = useState("");
 
@@ -75,21 +74,15 @@ const CreateGroup = () => {
       </div>
 
       <div className="space-y-5">
-        <div className="flex gap-3">
-          <div>
-            <label className="text-sm font-semibold text-foreground mb-2 block">Icon</label>
-            <GroupIconPicker value={emoji} onChange={setEmoji} size="md" iconColor={iconColor} cardColor={color} />
-          </div>
-          <div className="flex-1">
-            <label className="text-sm font-semibold text-foreground mb-2 block">Group Name</label>
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Adventure Squad"
-              className="w-full px-4 py-3.5 rounded-xl bg-card border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 text-base"
-              autoFocus
-            />
-          </div>
+        <div>
+          <label className="text-sm font-semibold text-foreground mb-2 block">Group Name</label>
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="e.g. Adventure Squad"
+            className="w-full px-4 py-3.5 rounded-xl bg-card border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 text-base"
+            autoFocus
+          />
         </div>
 
         <div>
@@ -104,38 +97,27 @@ const CreateGroup = () => {
         </div>
 
         <div>
-          <label className="text-sm font-semibold text-foreground mb-2 block">Card Color</label>
-          <div className="flex flex-wrap gap-2">
+          <label className="text-sm font-semibold text-foreground mb-2 block">Card Style</label>
+          <div className="grid grid-cols-4 gap-2">
             {GROUP_COLORS.map((c) => (
               <button
                 key={c.id}
                 type="button"
                 onClick={() => setColor(c.id)}
                 aria-label={c.label}
-                className={`w-9 h-9 rounded-full ${c.swatch} flex items-center justify-center transition-transform active:scale-90 ${
-                  color === c.id ? "ring-2 ring-foreground ring-offset-2 ring-offset-background" : ""
+                title={c.label}
+                className={`relative h-14 rounded-xl border bg-gradient-to-br ${c.gradient} overflow-hidden transition-transform active:scale-95 ${
+                  color === c.id ? "ring-2 ring-foreground border-transparent" : "border-border/50"
                 }`}
               >
-                {color === c.id && <Check className="w-4 h-4 text-foreground" />}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <label className="text-sm font-semibold text-foreground mb-2 block">Icon Color</label>
-          <div className="flex flex-wrap gap-2">
-            {GROUP_ICON_COLORS.map((c) => (
-              <button
-                key={c.id}
-                type="button"
-                onClick={() => setIconColor(c.id)}
-                aria-label={c.label}
-                className={`w-9 h-9 rounded-full ${c.swatch} flex items-center justify-center transition-transform active:scale-90 ${
-                  iconColor === c.id ? "ring-2 ring-foreground ring-offset-2 ring-offset-background" : ""
-                }`}
-              >
-                {iconColor === c.id && <Check className="w-4 h-4 text-background" />}
+                {c.patternStyle && (
+                  <span className="absolute inset-0 opacity-70" style={c.patternStyle} aria-hidden />
+                )}
+                {color === c.id && (
+                  <span className="absolute inset-0 flex items-center justify-center">
+                    <Check className="w-4 h-4 text-foreground drop-shadow" />
+                  </span>
+                )}
               </button>
             ))}
           </div>
