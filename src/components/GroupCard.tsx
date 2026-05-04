@@ -1,5 +1,4 @@
 import { Group } from "@/data/mockData";
-import GlassIconTile from "@/components/GlassIconTile";
 import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
 import { motion, AnimatePresence } from "framer-motion";
@@ -14,8 +13,8 @@ interface GroupCardProps {
   index: number;
 }
 
-const gradientFor = (id?: string) =>
-  GROUP_COLORS.find((c) => c.id === id)?.gradient || GROUP_COLORS[0].gradient;
+const styleFor = (id?: string) =>
+  GROUP_COLORS.find((c) => c.id === id) || GROUP_COLORS[0];
 
 const GroupCard = ({ group, onClick, index }: GroupCardProps) => {
   const { transferRequests, acceptTransfer, declineTransfer, currentUser } = useAppStore();
@@ -36,8 +35,15 @@ const GroupCard = ({ group, onClick, index }: GroupCardProps) => {
       >
         <button
           onClick={onClick}
-          className={`w-full text-left p-5 rounded-xl bg-gradient-to-br ${gradientFor(group.color)} border border-border/50 active:scale-[0.98] transition-transform flex flex-col`}
+          className={`relative w-full text-left p-5 rounded-xl bg-gradient-to-br ${styleFor(group.color).gradient} border border-border/50 active:scale-[0.98] transition-transform flex flex-col overflow-hidden`}
         >
+          {styleFor(group.color).patternStyle && (
+            <div
+              aria-hidden
+              className="absolute inset-0 pointer-events-none opacity-70"
+              style={styleFor(group.color).patternStyle}
+            />
+          )}
           {/* Transfer icon badge */}
           {pendingTransfer && (
             <div
@@ -51,15 +57,12 @@ const GroupCard = ({ group, onClick, index }: GroupCardProps) => {
             </div>
           )}
 
-          <div className="flex items-start justify-between mb-3">
-            <GlassIconTile icon={group.emoji} iconColor={group.iconColor} cardColor={group.color} size="md" />
-          </div>
-          <h3 className="font-display font-bold text-sm text-foreground mb-1 line-clamp-1">{group.name}</h3>
-          <div className="flex items-center gap-1.5 text-muted-foreground ml-0">
+          <h3 className="relative font-display font-bold text-sm text-foreground mb-1 line-clamp-1">{group.name}</h3>
+          <div className="relative flex items-center gap-1.5 text-muted-foreground ml-0">
             <Users className="w-3.5 h-3.5" />
             <span className="text-xs">{group.members.length} members</span>
           </div>
-          <div className="flex -space-x-1.5 mt-3">
+          <div className="relative flex -space-x-1.5 mt-3">
             {group.members.slice(0, 4).map((m) => (
               <UserAvatar
                 key={m.id}
