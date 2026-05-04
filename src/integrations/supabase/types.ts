@@ -50,6 +50,36 @@ export type Database = {
         }
         Relationships: []
       }
+      appeals: {
+        Row: {
+          created_at: string
+          id: string
+          reason: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reason: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reason?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       blocked_users: {
         Row: {
           blocked_id: string
@@ -632,6 +662,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      strike_history: {
+        Row: {
+          admin_id: string
+          created_at: string
+          id: string
+          reason: string | null
+          report_id: string | null
+          user_id: string
+        }
+        Insert: {
+          admin_id: string
+          created_at?: string
+          id?: string
+          reason?: string | null
+          report_id?: string | null
+          user_id: string
+        }
+        Update: {
+          admin_id?: string
+          created_at?: string
+          id?: string
+          reason?: string | null
+          report_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       transfer_requests: {
         Row: {
