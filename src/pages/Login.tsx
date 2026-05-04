@@ -18,13 +18,30 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
       toast({ title: "Login failed", description: error.message, variant: "destructive" });
-    } else {
-      navigate(redirectTo, { replace: true });
+      setLoading(false);
+      return;
     }
+    // Block banned users
+    if (data.user) {
+      const { data: flag } = await supabase
+        .from("user_flags").select("is_banned").eq("user_id", data.user.id).maybeSingle();
+      if (flag?.is_banned) {
+        await supabase.auth.signOut();
+        toast({
+          title: "Account banned",
+          description: "Your account has been banned. You can request a review from the sign-in page.",
+          variant: "destructive",
+        });
+        navigate("/appeal", { replace: true });
+        setLoading(false);
+        return;
+      }
+    }
+    navigate(redirectTo, { replace: true });
     setLoading(false);
   };
 
