@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft, Shield, Users as UsersIcon, ScrollText, Flag, Search, Trash2,
   ShieldCheck, ShieldOff, ChevronUp, ChevronDown, MessageSquare, History,
-  AlertTriangle, EyeOff, Eye, Ban, Clock, X,
+  AlertTriangle, EyeOff, Eye, Ban, Clock, X, Gavel, MinusCircle, PlusCircle, Inbox,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAppStore } from "@/data/appState";
@@ -17,7 +17,8 @@ import {
   Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 
-type Tab = "users" | "quests" | "comments" | "reports" | "audit";
+type Tab = "users" | "quests" | "comments" | "reports" | "appeals" | "audit";
+type UserFilter = "all" | "flagged" | "warned" | "suspended" | "banned";
 
 interface UserFlag {
   user_id: string;
@@ -87,6 +88,27 @@ interface AuditEntry {
   target_name?: string;
 }
 
+interface StrikeEntry {
+  id: string;
+  user_id: string;
+  admin_id: string;
+  report_id: string | null;
+  reason: string | null;
+  created_at: string;
+  admin_name?: string;
+}
+
+interface Appeal {
+  id: string;
+  user_id: string;
+  reason: string;
+  status: string;
+  created_at: string;
+  reviewed_at: string | null;
+  reviewed_by: string | null;
+  user_name?: string;
+}
+
 const TabButton = ({ active, onClick, icon: Icon, label, count }: { active: boolean; onClick: () => void; icon: React.ComponentType<{ className?: string }>; label: string; count?: number }) => (
   <button
     onClick={onClick}
@@ -126,10 +148,13 @@ const AdminDashboard = () => {
   const [comments, setComments] = useState<AdminComment[]>([]);
   const [reports, setReports] = useState<AdminReport[]>([]);
   const [audit, setAudit] = useState<AuditEntry[]>([]);
+  const [appeals, setAppeals] = useState<Appeal[]>([]);
+  const [strikes, setStrikes] = useState<StrikeEntry[]>([]);
 
   // Filters
   const [userSearch, setUserSearch] = useState("");
   const [userSort, setUserSort] = useState<"recent" | "reports">("recent");
+  const [userFilter, setUserFilter] = useState<UserFilter>("all");
   const [questSearch, setQuestSearch] = useState("");
   const [questFilter, setQuestFilter] = useState<"all" | "active" | "completed" | "hidden">("all");
   const [commentSearch, setCommentSearch] = useState("");
@@ -148,6 +173,8 @@ const AdminDashboard = () => {
   const [reportContent, setReportContent] = useState<{ kind: string; preview: string } | null>(null);
   const [suspendUser, setSuspendUser] = useState<AdminUser | null>(null);
   const [suspendDays, setSuspendDays] = useState(7);
+  const [detailUser, setDetailUser] = useState<AdminUser | null>(null);
+  const [resolveReport, setResolveReport] = useState<AdminReport | null>(null);
 
   // Bulk
   const [selectedReports, setSelectedReports] = useState<Set<string>>(new Set());
@@ -178,6 +205,7 @@ const AdminDashboard = () => {
   const loadAll = async () => {
     setLoading(true);
     await Promise.all([loadUsers(), loadQuests(), loadComments(), loadReports(), loadAudit()]);
+    await Promise.all([loadAppeals(), loadStrikes()]);
     setLoading(false);
   };
 
@@ -286,6 +314,28 @@ const AdminDashboard = () => {
     })));
   };
 
+  const loadAppeals = async () => {
+    const { data } = await supabase.from("appeals").select("*").order("created_at", { ascending: false });
+    const rows = (data || []) as Appeal[];
+    const ids = Array.from(new Set(rows.map((r) => r.user_id)));
+    const { data: profiles } = ids.length
+      ? await supabase.from("profiles").select("user_id, display_name, username").in("user_id", ids)
+      : { data: [] };
+    const nameMap = new Map((profiles || []).map((p) => [p.user_id, p.display_name || (p.username ? `@${p.username}` : "User")]));
+    setAppeals(rows.map((r) => ({ ...r, user_name: nameMap.get(r.user_id) || "User" })));
+  };
+
+  const loadStrikes = async () => {
+    const { data } = await supabase.from("strike_history").select("*").order("created_at", { ascending: false });
+    const rows = (data || []) as StrikeEntry[];
+    const ids = Array.from(new Set(rows.map((r) => r.admin_id)));
+    const { data: profiles } = ids.length
+      ? await supabase.from("profiles").select("user_id, display_name, username").in("user_id", ids)
+      : { data: [] };
+    const nameMap = new Map((profiles || []).map((p) => [p.user_id, p.display_name || (p.username ? `@${p.username}` : "Admin")]));
+    setStrikes(rows.map((r) => ({ ...r, admin_name: nameMap.get(r.admin_id) || "Admin" })));
+  };
+
   // ----- User actions
   const toggleAdmin = async (u: AdminUser) => {
     if (u.user_id === user?.id) { toast.error("You can't change your own admin role."); return; }
@@ -315,15 +365,44 @@ const AdminDashboard = () => {
     }
   };
 
-  const warnUser = async (u: AdminUser) => {
-    try {
-      const newCount = (u.flag?.strike_count || 0) + 1;
-      await upsertFlag(u.user_id, { strike_count: newCount });
-      await logAction({ action_type: "warn", target_type: "user", target_user_id: u.user_id, metadata: { strike_count: newCount } });
-      toast.success(`Warned ${u.display_name || u.username} (${newCount} strike${newCount > 1 ? "s" : ""})`);
-      loadUsers(); loadAudit();
-    } catch (e) { toast.error((e as Error).message); }
+  const addStrike = async (u: AdminUser, reason: string, reportId?: string | null) => {
+    if (!user) return;
+    const newCount = (u.flag?.strike_count || 0) + 1;
+    const patch: Partial<UserFlag> = { strike_count: newCount };
+    let escalation = "";
+    // Auto-escalation: 2 → suspend 48h, 4 → ban
+    if (newCount >= 4) {
+      patch.is_banned = true;
+      patch.is_suspended = false;
+      patch.suspended_until = null;
+      escalation = " · auto-banned";
+    } else if (newCount >= 2 && !u.flag?.is_banned) {
+      patch.is_suspended = true;
+      patch.suspended_until = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
+      escalation = " · auto-suspended 48h";
+    }
+    await upsertFlag(u.user_id, patch);
+    await supabase.from("strike_history").insert({
+      user_id: u.user_id, admin_id: user.id, reason, report_id: reportId ?? null,
+    });
+    await logAction({
+      action_type: "strike", target_type: "user", target_user_id: u.user_id,
+      reason, metadata: { strike_count: newCount },
+    });
+    toast.success(`Strike added (${newCount}${escalation})`);
+    loadUsers(); loadAudit(); loadStrikes();
   };
+
+  const removeStrike = async (u: AdminUser, strikeId: string) => {
+    const newCount = Math.max(0, (u.flag?.strike_count || 0) - 1);
+    await supabase.from("strike_history").delete().eq("id", strikeId);
+    await upsertFlag(u.user_id, { strike_count: newCount });
+    await logAction({ action_type: "remove_strike", target_type: "user", target_user_id: u.user_id, metadata: { strike_count: newCount } });
+    toast.success("Strike removed");
+    loadUsers(); loadStrikes(); loadAudit();
+  };
+
+  const warnUser = async (u: AdminUser) => addStrike(u, "Warning issued");
 
   const suspendUserFor = async (u: AdminUser, days: number) => {
     try {
@@ -443,12 +522,24 @@ const AdminDashboard = () => {
   // ----- Filtered views
   const filteredUsers = useMemo(() => {
     const q = userSearch.trim().toLowerCase();
-    const list = users.filter((u) => !q || (u.display_name || "").toLowerCase().includes(q) || u.username.toLowerCase().includes(q));
+    const list = users.filter((u) => {
+      if (q && !((u.display_name || "").toLowerCase().includes(q) || u.username.toLowerCase().includes(q))) return false;
+      const f = u.flag;
+      if (userFilter === "flagged" && !((f?.strike_count || 0) > 0)) return false;
+      if (userFilter === "warned" && (f?.strike_count || 0) !== 1) return false;
+      if (userFilter === "suspended" && !(f?.is_suspended && (!f.suspended_until || new Date(f.suspended_until) > new Date()))) return false;
+      if (userFilter === "banned" && !f?.is_banned) return false;
+      return true;
+    });
     return [...list].sort((a, b) => {
       if (userSort === "reports") return (b.report_count || 0) - (a.report_count || 0);
+      // Default: highest strike count first
+      const sa = a.flag?.strike_count || 0;
+      const sb = b.flag?.strike_count || 0;
+      if (sa !== sb) return sb - sa;
       return sortDir === "desc" ? b.created_at.localeCompare(a.created_at) : a.created_at.localeCompare(b.created_at);
     });
-  }, [users, userSearch, sortDir, userSort]);
+  }, [users, userSearch, sortDir, userSort, userFilter]);
 
   const filteredQuests = useMemo(() => {
     const q = questSearch.trim().toLowerCase();
@@ -485,6 +576,10 @@ const AdminDashboard = () => {
   }
 
   const pendingReportCount = reports.filter((r) => r.status === "pending").length;
+  const pendingAppealCount = appeals.filter((a) => a.status === "pending").length;
+  const userStrikes = (uid: string) => strikes.filter((s) => s.user_id === uid);
+  const userQuests = (uid: string) => quests.filter((q) => q.created_by === uid);
+  const userReports = (uid: string) => reports.filter((r) => r.reported_user_id === uid);
 
   const userStatusBadge = (u: AdminUser) => {
     if (u.flag?.is_banned) return <StatusBadge tone="destructive">Banned</StatusBadge>;
