@@ -278,6 +278,21 @@ const Settings = () => {
         <Row icon={Lock} label="Change Password" onClick={() => setShowPassword(true)} />
       </Section>
 
+      {restriction && (
+        <Section title={restriction === "banned" ? "Account banned" : "Account suspended"}>
+          <div className="px-4 py-3 text-xs text-muted-foreground">
+            {restriction === "banned"
+              ? "Your account is banned. You can request a review."
+              : "Your account is suspended. You can request a review."}
+          </div>
+          <Row
+            icon={Inbox}
+            label={hasPendingAppeal ? "Appeal pending review" : "Request Review"}
+            onClick={hasPendingAppeal ? undefined : () => setShowAppeal(true)}
+          />
+        </Section>
+      )}
+
       <Section title="Preferences">
         <Row icon={Bell} label="Notification Settings" onClick={() => setShowNotif(true)} />
         <Row icon={ShieldOff} label="Blocked Users" onClick={() => nav("/settings/blocked")} />
