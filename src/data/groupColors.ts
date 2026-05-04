@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+
 export interface GroupColorOption {
   id: string;
   label: string;
@@ -6,23 +8,23 @@ export interface GroupColorOption {
   /** Solid swatch color used in the picker */
   swatch: string;
   /** Optional inline style for a decorative pattern overlay (CSS background). */
-  patternStyle?: React.CSSProperties;
+  patternStyle?: CSSProperties;
 }
 
 // A reusable set of decorative pattern overlays (rendered as a second layer
 // on top of the gradient). Kept lightweight so cards stay fast to render.
-const stripes = (color: string): React.CSSProperties => ({
+const stripes = (color: string): CSSProperties => ({
   backgroundImage: `repeating-linear-gradient(45deg, ${color} 0 6px, transparent 6px 14px)`,
 });
-const dots = (color: string): React.CSSProperties => ({
+const dots = (color: string): CSSProperties => ({
   backgroundImage: `radial-gradient(${color} 1.4px, transparent 1.6px)`,
   backgroundSize: "12px 12px",
 });
-const grid = (color: string): React.CSSProperties => ({
+const grid = (color: string): CSSProperties => ({
   backgroundImage: `linear-gradient(${color} 1px, transparent 1px), linear-gradient(90deg, ${color} 1px, transparent 1px)`,
   backgroundSize: "16px 16px",
 });
-const waves = (color: string): React.CSSProperties => ({
+const waves = (color: string): CSSProperties => ({
   backgroundImage: `radial-gradient(circle at 10px 10px, ${color} 2px, transparent 2.5px), radial-gradient(circle at 0 0, ${color} 2px, transparent 2.5px)`,
   backgroundSize: "20px 20px",
   backgroundPosition: "0 0, 10px 10px",
