@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Mail, Lock, Bell, LifeBuoy, Bug, FileText, ShieldCheck, LogOut, Trash2, ChevronRight, Flag, ShieldOff, Compass, BookOpen, Shield } from "lucide-react";
+import { ArrowLeft, Mail, Lock, Bell, LifeBuoy, Bug, FileText, ShieldCheck, LogOut, Trash2, ChevronRight, Flag, ShieldOff, Compass, BookOpen, Shield, Inbox } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/contexts/AuthContext";
@@ -84,8 +84,30 @@ const Settings = () => {
   const [showPwErrors, setShowPwErrors] = useState(false);
   const [pwError, setPwError] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
+  const [restriction, setRestriction] = useState<null | "banned" | "suspended">(null);
+  const [hasPendingAppeal, setHasPendingAppeal] = useState(false);
+  const [showAppeal, setShowAppeal] = useState(false);
+  const [appealReason, setAppealReason] = useState("");
 
   usePopup(showNotif || showEmail || showPassword || showDelete);
+
+  // Load restriction status + pending appeal
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const { data: flag } = await supabase
+        .from("user_flags")
+        .select("is_banned, is_suspended, suspended_until")
+        .eq("user_id", user.id).maybeSingle();
+      const stillSuspended = flag?.is_suspended && (!flag.suspended_until || new Date(flag.suspended_until) > new Date());
+      if (flag?.is_banned) setRestriction("banned");
+      else if (stillSuspended) setRestriction("suspended");
+      else setRestriction(null);
+      const { data: appeals } = await supabase
+        .from("appeals").select("id").eq("user_id", user.id).eq("status", "pending").limit(1);
+      setHasPendingAppeal((appeals || []).length > 0);
+    })();
+  }, [user]);
 
   // Load notif prefs
   useEffect(() => {
@@ -255,6 +277,21 @@ const Settings = () => {
         <Row icon={Mail} label="Change Email" onClick={() => setShowEmail(true)} />
         <Row icon={Lock} label="Change Password" onClick={() => setShowPassword(true)} />
       </Section>
+
+      {restriction && (
+        <Section title={restriction === "banned" ? "Account banned" : "Account suspended"}>
+          <div className="px-4 py-3 text-xs text-muted-foreground">
+            {restriction === "banned"
+              ? "Your account is banned. You can request a review."
+              : "Your account is suspended. You can request a review."}
+          </div>
+          <Row
+            icon={Inbox}
+            label={hasPendingAppeal ? "Appeal pending review" : "Request Review"}
+            onClick={hasPendingAppeal ? undefined : () => setShowAppeal(true)}
+          />
+        </Section>
+      )}
 
       <Section title="Preferences">
         <Row icon={Bell} label="Notification Settings" onClick={() => setShowNotif(true)} />
@@ -554,6 +591,52 @@ const Settings = () => {
                 >
                   Delete
                 </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Appeal Modal */}
+      <AnimatePresence>
+        {showAppeal && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-foreground/40 flex items-center justify-center p-5"
+            onClick={() => setShowAppeal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-sm bg-card rounded-2xl p-5 shadow-lg"
+            >
+              <h3 className="font-bold text-foreground text-base mb-2">Request review</h3>
+              <p className="text-sm text-muted-foreground mb-3">
+                Tell us why your account should be reviewed. An admin will look at your request.
+              </p>
+              <textarea
+                value={appealReason} onChange={(e) => setAppealReason(e.target.value)}
+                rows={4} placeholder="Explain your situation…"
+                className="w-full p-3 rounded-xl bg-muted text-sm text-foreground outline-none mb-3"
+              />
+              <div className="flex gap-2 justify-end">
+                <button onClick={() => setShowAppeal(false)} className="px-4 py-2 rounded-xl bg-muted text-muted-foreground font-semibold text-sm">Cancel</button>
+                <button
+                  disabled={!appealReason.trim()}
+                  onClick={async () => {
+                    if (!user) return;
+                    const { error } = await supabase.from("appeals").insert({ user_id: user.id, reason: appealReason.trim() });
+                    if (error) {
+                      toast({ title: "Couldn't submit", description: error.message, variant: "destructive" });
+                      return;
+                    }
+                    toast({ title: "Appeal submitted", description: "An admin will review your request." });
+                    setShowAppeal(false);
+                    setAppealReason("");
+                    setHasPendingAppeal(true);
+                  }}
+                  className="px-4 py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-sm disabled:opacity-50"
+                >Submit</button>
               </div>
             </motion.div>
           </motion.div>

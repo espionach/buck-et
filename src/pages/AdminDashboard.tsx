@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft, Shield, Users as UsersIcon, ScrollText, Flag, Search, Trash2,
   ShieldCheck, ShieldOff, ChevronUp, ChevronDown, MessageSquare, History,
-  AlertTriangle, EyeOff, Eye, Ban, Clock, X,
+  AlertTriangle, EyeOff, Eye, Ban, Clock, X, Gavel, MinusCircle, PlusCircle, Inbox,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAppStore } from "@/data/appState";
@@ -17,7 +17,8 @@ import {
   Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 
-type Tab = "users" | "quests" | "comments" | "reports" | "audit";
+type Tab = "users" | "quests" | "comments" | "reports" | "appeals" | "audit";
+type UserFilter = "all" | "flagged" | "warned" | "suspended" | "banned";
 
 interface UserFlag {
   user_id: string;
@@ -87,6 +88,27 @@ interface AuditEntry {
   target_name?: string;
 }
 
+interface StrikeEntry {
+  id: string;
+  user_id: string;
+  admin_id: string;
+  report_id: string | null;
+  reason: string | null;
+  created_at: string;
+  admin_name?: string;
+}
+
+interface Appeal {
+  id: string;
+  user_id: string;
+  reason: string;
+  status: string;
+  created_at: string;
+  reviewed_at: string | null;
+  reviewed_by: string | null;
+  user_name?: string;
+}
+
 const TabButton = ({ active, onClick, icon: Icon, label, count }: { active: boolean; onClick: () => void; icon: React.ComponentType<{ className?: string }>; label: string; count?: number }) => (
   <button
     onClick={onClick}
@@ -126,10 +148,13 @@ const AdminDashboard = () => {
   const [comments, setComments] = useState<AdminComment[]>([]);
   const [reports, setReports] = useState<AdminReport[]>([]);
   const [audit, setAudit] = useState<AuditEntry[]>([]);
+  const [appeals, setAppeals] = useState<Appeal[]>([]);
+  const [strikes, setStrikes] = useState<StrikeEntry[]>([]);
 
   // Filters
   const [userSearch, setUserSearch] = useState("");
   const [userSort, setUserSort] = useState<"recent" | "reports">("recent");
+  const [userFilter, setUserFilter] = useState<UserFilter>("all");
   const [questSearch, setQuestSearch] = useState("");
   const [questFilter, setQuestFilter] = useState<"all" | "active" | "completed" | "hidden">("all");
   const [commentSearch, setCommentSearch] = useState("");
@@ -148,6 +173,8 @@ const AdminDashboard = () => {
   const [reportContent, setReportContent] = useState<{ kind: string; preview: string } | null>(null);
   const [suspendUser, setSuspendUser] = useState<AdminUser | null>(null);
   const [suspendDays, setSuspendDays] = useState(7);
+  const [detailUser, setDetailUser] = useState<AdminUser | null>(null);
+  const [resolveReport, setResolveReport] = useState<AdminReport | null>(null);
 
   // Bulk
   const [selectedReports, setSelectedReports] = useState<Set<string>>(new Set());
@@ -178,6 +205,7 @@ const AdminDashboard = () => {
   const loadAll = async () => {
     setLoading(true);
     await Promise.all([loadUsers(), loadQuests(), loadComments(), loadReports(), loadAudit()]);
+    await Promise.all([loadAppeals(), loadStrikes()]);
     setLoading(false);
   };
 
@@ -286,6 +314,28 @@ const AdminDashboard = () => {
     })));
   };
 
+  const loadAppeals = async () => {
+    const { data } = await supabase.from("appeals").select("*").order("created_at", { ascending: false });
+    const rows = (data || []) as Appeal[];
+    const ids = Array.from(new Set(rows.map((r) => r.user_id)));
+    const { data: profiles } = ids.length
+      ? await supabase.from("profiles").select("user_id, display_name, username").in("user_id", ids)
+      : { data: [] };
+    const nameMap = new Map((profiles || []).map((p) => [p.user_id, p.display_name || (p.username ? `@${p.username}` : "User")]));
+    setAppeals(rows.map((r) => ({ ...r, user_name: nameMap.get(r.user_id) || "User" })));
+  };
+
+  const loadStrikes = async () => {
+    const { data } = await supabase.from("strike_history").select("*").order("created_at", { ascending: false });
+    const rows = (data || []) as StrikeEntry[];
+    const ids = Array.from(new Set(rows.map((r) => r.admin_id)));
+    const { data: profiles } = ids.length
+      ? await supabase.from("profiles").select("user_id, display_name, username").in("user_id", ids)
+      : { data: [] };
+    const nameMap = new Map((profiles || []).map((p) => [p.user_id, p.display_name || (p.username ? `@${p.username}` : "Admin")]));
+    setStrikes(rows.map((r) => ({ ...r, admin_name: nameMap.get(r.admin_id) || "Admin" })));
+  };
+
   // ----- User actions
   const toggleAdmin = async (u: AdminUser) => {
     if (u.user_id === user?.id) { toast.error("You can't change your own admin role."); return; }
@@ -315,15 +365,44 @@ const AdminDashboard = () => {
     }
   };
 
-  const warnUser = async (u: AdminUser) => {
-    try {
-      const newCount = (u.flag?.strike_count || 0) + 1;
-      await upsertFlag(u.user_id, { strike_count: newCount });
-      await logAction({ action_type: "warn", target_type: "user", target_user_id: u.user_id, metadata: { strike_count: newCount } });
-      toast.success(`Warned ${u.display_name || u.username} (${newCount} strike${newCount > 1 ? "s" : ""})`);
-      loadUsers(); loadAudit();
-    } catch (e) { toast.error((e as Error).message); }
+  const addStrike = async (u: AdminUser, reason: string, reportId?: string | null) => {
+    if (!user) return;
+    const newCount = (u.flag?.strike_count || 0) + 1;
+    const patch: Partial<UserFlag> = { strike_count: newCount };
+    let escalation = "";
+    // Auto-escalation: 2 → suspend 48h, 4 → ban
+    if (newCount >= 4) {
+      patch.is_banned = true;
+      patch.is_suspended = false;
+      patch.suspended_until = null;
+      escalation = " · auto-banned";
+    } else if (newCount >= 2 && !u.flag?.is_banned) {
+      patch.is_suspended = true;
+      patch.suspended_until = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
+      escalation = " · auto-suspended 48h";
+    }
+    await upsertFlag(u.user_id, patch);
+    await supabase.from("strike_history").insert({
+      user_id: u.user_id, admin_id: user.id, reason, report_id: reportId ?? null,
+    });
+    await logAction({
+      action_type: "strike", target_type: "user", target_user_id: u.user_id,
+      reason, metadata: { strike_count: newCount },
+    });
+    toast.success(`Strike added (${newCount}${escalation})`);
+    loadUsers(); loadAudit(); loadStrikes();
   };
+
+  const removeStrike = async (u: AdminUser, strikeId: string) => {
+    const newCount = Math.max(0, (u.flag?.strike_count || 0) - 1);
+    await supabase.from("strike_history").delete().eq("id", strikeId);
+    await upsertFlag(u.user_id, { strike_count: newCount });
+    await logAction({ action_type: "remove_strike", target_type: "user", target_user_id: u.user_id, metadata: { strike_count: newCount } });
+    toast.success("Strike removed");
+    loadUsers(); loadStrikes(); loadAudit();
+  };
+
+  const warnUser = async (u: AdminUser) => addStrike(u, "Warning issued");
 
   const suspendUserFor = async (u: AdminUser, days: number) => {
     try {
@@ -443,12 +522,24 @@ const AdminDashboard = () => {
   // ----- Filtered views
   const filteredUsers = useMemo(() => {
     const q = userSearch.trim().toLowerCase();
-    const list = users.filter((u) => !q || (u.display_name || "").toLowerCase().includes(q) || u.username.toLowerCase().includes(q));
+    const list = users.filter((u) => {
+      if (q && !((u.display_name || "").toLowerCase().includes(q) || u.username.toLowerCase().includes(q))) return false;
+      const f = u.flag;
+      if (userFilter === "flagged" && !((f?.strike_count || 0) > 0)) return false;
+      if (userFilter === "warned" && (f?.strike_count || 0) !== 1) return false;
+      if (userFilter === "suspended" && !(f?.is_suspended && (!f.suspended_until || new Date(f.suspended_until) > new Date()))) return false;
+      if (userFilter === "banned" && !f?.is_banned) return false;
+      return true;
+    });
     return [...list].sort((a, b) => {
       if (userSort === "reports") return (b.report_count || 0) - (a.report_count || 0);
+      // Default: highest strike count first
+      const sa = a.flag?.strike_count || 0;
+      const sb = b.flag?.strike_count || 0;
+      if (sa !== sb) return sb - sa;
       return sortDir === "desc" ? b.created_at.localeCompare(a.created_at) : a.created_at.localeCompare(b.created_at);
     });
-  }, [users, userSearch, sortDir, userSort]);
+  }, [users, userSearch, sortDir, userSort, userFilter]);
 
   const filteredQuests = useMemo(() => {
     const q = questSearch.trim().toLowerCase();
@@ -485,6 +576,10 @@ const AdminDashboard = () => {
   }
 
   const pendingReportCount = reports.filter((r) => r.status === "pending").length;
+  const pendingAppealCount = appeals.filter((a) => a.status === "pending").length;
+  const userStrikes = (uid: string) => strikes.filter((s) => s.user_id === uid);
+  const userQuests = (uid: string) => quests.filter((q) => q.created_by === uid);
+  const userReports = (uid: string) => reports.filter((r) => r.reported_user_id === uid);
 
   const userStatusBadge = (u: AdminUser) => {
     if (u.flag?.is_banned) return <StatusBadge tone="destructive">Banned</StatusBadge>;
@@ -514,6 +609,7 @@ const AdminDashboard = () => {
         <TabButton active={tab === "users"} onClick={() => setTab("users")} icon={UsersIcon} label="Users" count={users.length} />
         <TabButton active={tab === "quests"} onClick={() => setTab("quests")} icon={ScrollText} label="Quests" count={quests.length} />
         <TabButton active={tab === "comments"} onClick={() => setTab("comments")} icon={MessageSquare} label="Comments" />
+        <TabButton active={tab === "appeals"} onClick={() => setTab("appeals")} icon={Inbox} label="Appeals" count={pendingAppealCount} />
         <TabButton active={tab === "audit"} onClick={() => setTab("audit")} icon={History} label="Audit" />
       </div>
 
@@ -545,13 +641,21 @@ const AdminDashboard = () => {
                   </button>
                 ))}
               </div>
+              <div className="flex gap-1.5 mb-3 flex-wrap">
+                {(["all", "flagged", "warned", "suspended", "banned"] as const).map((f) => (
+                  <button key={f} onClick={() => setUserFilter(f)}
+                    className={`px-3 py-1 rounded-full text-[11px] font-semibold capitalize ${userFilter === f ? "bg-foreground text-background" : "bg-muted text-muted-foreground"}`}>
+                    {f}
+                  </button>
+                ))}
+              </div>
 
               <div className="bg-card border border-border rounded-2xl overflow-hidden divide-y divide-border">
                 {filteredUsers.length === 0 ? (
                   <p className="text-sm text-muted-foreground text-center py-8">No users found.</p>
                 ) : filteredUsers.map((u) => (
                   <div key={u.user_id} className="p-3">
-                    <div className="flex items-center gap-3">
+                    <button onClick={() => setDetailUser(u)} className="w-full text-left flex items-center gap-3">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <p className="text-sm font-semibold text-foreground truncate">{u.display_name || u.username}</p>
@@ -563,7 +667,7 @@ const AdminDashboard = () => {
                         <p className="text-xs text-muted-foreground truncate">@{u.username}</p>
                         <p className="text-[10px] text-muted-foreground/70 mt-0.5">Joined {new Date(u.created_at).toLocaleDateString()}</p>
                       </div>
-                    </div>
+                    </button>
                     <div className="flex flex-wrap gap-1.5 mt-2">
                       <button
                         onClick={() => toggleAdmin(u)}
@@ -799,7 +903,9 @@ const AdminDashboard = () => {
                       <div className="flex gap-1.5 flex-wrap mt-2">
                         {r.status === "pending" && (
                           <>
-                            <button onClick={() => updateReportStatus(r.id, "resolved")} className="px-2.5 py-1 rounded-lg bg-primary/10 text-primary text-[11px] font-semibold">Resolve</button>
+                            <button onClick={() => setResolveReport(r)} className="px-2.5 py-1 rounded-lg bg-primary/10 text-primary text-[11px] font-semibold flex items-center gap-1">
+                              <Gavel className="w-3 h-3" /> Take action
+                            </button>
                             <button onClick={() => updateReportStatus(r.id, "dismissed")} className="px-2.5 py-1 rounded-lg bg-muted text-muted-foreground text-[11px] font-semibold">Dismiss</button>
                           </>
                         )}
@@ -823,7 +929,53 @@ const AdminDashboard = () => {
             </div>
           )}
 
-          {/* AUDIT */}
+          {/* APPEALS */}
+          {tab === "appeals" && (
+            <div>
+              <p className="text-xs text-muted-foreground mb-3">User-submitted requests to lift restrictions.</p>
+              <div className="bg-card border border-border rounded-2xl overflow-hidden divide-y divide-border">
+                {appeals.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-8">No appeals yet.</p>
+                ) : appeals.map((a) => {
+                  const u = users.find((x) => x.user_id === a.user_id);
+                  return (
+                    <div key={a.id} className="p-3">
+                      <div className="flex items-center gap-2 flex-wrap mb-1">
+                        <p className="text-sm font-semibold text-foreground">{a.user_name}</p>
+                        <StatusBadge tone={a.status === "pending" ? "primary" : a.status === "approved" ? "muted" : "destructive"}>{a.status}</StatusBadge>
+                        {u && userStatusBadge(u)}
+                        <span className="text-[10px] text-muted-foreground/70 ml-auto">{new Date(a.created_at).toLocaleString()}</span>
+                      </div>
+                      <p className="text-sm text-foreground bg-muted rounded-lg p-2 whitespace-pre-wrap mb-2">{a.reason}</p>
+                      {a.status === "pending" && (
+                        <div className="flex gap-1.5">
+                          <button
+                            onClick={async () => {
+                              if (!user) return;
+                              await supabase.from("appeals").update({ status: "approved", reviewed_by: user.id, reviewed_at: new Date().toISOString() }).eq("id", a.id);
+                              if (u) await upsertFlag(u.user_id, { is_banned: false, is_suspended: false, suspended_until: null, strike_count: 0 });
+                              await logAction({ action_type: "approve_appeal", target_type: "appeal", target_id: a.id, target_user_id: a.user_id });
+                              toast.success("Appeal approved · restrictions lifted");
+                              loadAppeals(); loadUsers(); loadAudit();
+                            }}
+                            className="px-2.5 py-1 rounded-lg bg-primary text-primary-foreground text-[11px] font-semibold">Approve & lift</button>
+                          <button
+                            onClick={async () => {
+                              if (!user) return;
+                              await supabase.from("appeals").update({ status: "denied", reviewed_by: user.id, reviewed_at: new Date().toISOString() }).eq("id", a.id);
+                              await logAction({ action_type: "deny_appeal", target_type: "appeal", target_id: a.id, target_user_id: a.user_id });
+                              toast.success("Appeal denied");
+                              loadAppeals(); loadAudit();
+                            }}
+                            className="px-2.5 py-1 rounded-lg bg-destructive/10 text-destructive text-[11px] font-semibold">Deny</button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
           {tab === "audit" && (
             <div>
               <p className="text-xs text-muted-foreground mb-3">Last 200 moderation actions.</p>
@@ -929,6 +1081,205 @@ const AdminDashboard = () => {
               Suspend
             </button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* User detail */}
+      <Dialog open={!!detailUser} onOpenChange={(o) => !o && setDetailUser(null)}>
+        <DialogContent className="max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{detailUser?.display_name || detailUser?.username}</DialogTitle>
+            <DialogDescription>@{detailUser?.username}</DialogDescription>
+          </DialogHeader>
+          {detailUser && (
+            <div className="space-y-4 text-sm">
+              <div className="flex flex-wrap gap-1.5">
+                {userStatusBadge(detailUser)}
+                {(detailUser.report_count || 0) > 0 && <StatusBadge tone="warn">{detailUser.report_count} report{detailUser.report_count! > 1 ? "s" : ""}</StatusBadge>}
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                <button
+                  onClick={() => addStrike(detailUser, "Manual strike")}
+                  disabled={detailUser.user_id === user?.id}
+                  className="px-2.5 py-1 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[11px] font-semibold flex items-center gap-1 disabled:opacity-40">
+                  <PlusCircle className="w-3 h-3" /> Add strike
+                </button>
+                <button
+                  onClick={() => { setSuspendUser(detailUser); setSuspendDays(2); }}
+                  disabled={detailUser.user_id === user?.id}
+                  className="px-2.5 py-1 rounded-lg bg-muted text-foreground text-[11px] font-semibold flex items-center gap-1 disabled:opacity-40">
+                  <Clock className="w-3 h-3" /> Suspend
+                </button>
+                {detailUser.flag?.is_banned ? (
+                  <button
+                    onClick={() => unbanUser(detailUser)}
+                    className="px-2.5 py-1 rounded-lg bg-primary/10 text-primary text-[11px] font-semibold flex items-center gap-1">
+                    <ShieldCheck className="w-3 h-3" /> Unban
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setConfirmAction({
+                      title: "Ban user?", desc: `Permanently ban ${detailUser.display_name || detailUser.username}.`,
+                      confirmLabel: "Ban", destructive: true, onConfirm: () => banUser(detailUser),
+                    })}
+                    disabled={detailUser.user_id === user?.id}
+                    className="px-2.5 py-1 rounded-lg bg-destructive/10 text-destructive text-[11px] font-semibold flex items-center gap-1 disabled:opacity-40">
+                    <Ban className="w-3 h-3" /> Ban
+                  </button>
+                )}
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">Strike history</p>
+                {userStrikes(detailUser.user_id).length === 0 ? (
+                  <p className="text-xs text-muted-foreground">No strikes.</p>
+                ) : (
+                  <div className="space-y-1.5">
+                    {userStrikes(detailUser.user_id).map((s) => (
+                      <div key={s.id} className="flex items-start gap-2 bg-muted rounded-lg p-2">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-foreground">{s.reason || "—"}</p>
+                          <p className="text-[10px] text-muted-foreground/70">by {s.admin_name} · {new Date(s.created_at).toLocaleString()}</p>
+                        </div>
+                        <button onClick={() => removeStrike(detailUser, s.id)} className="p-1 text-muted-foreground hover:text-destructive" aria-label="Remove">
+                          <MinusCircle className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">Quests created ({userQuests(detailUser.user_id).length})</p>
+                <div className="space-y-1 max-h-32 overflow-y-auto">
+                  {userQuests(detailUser.user_id).slice(0, 10).map((q) => (
+                    <button key={q.id} onClick={() => { setDetailUser(null); nav(`/quest/${q.id}`); }}
+                      className="block w-full text-left text-xs text-foreground hover:underline truncate">• {q.title}</button>
+                  ))}
+                  {userQuests(detailUser.user_id).length === 0 && <p className="text-xs text-muted-foreground">None.</p>}
+                </div>
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">Reports against ({userReports(detailUser.user_id).length})</p>
+                <div className="space-y-1 max-h-32 overflow-y-auto">
+                  {userReports(detailUser.user_id).slice(0, 10).map((r) => (
+                    <p key={r.id} className="text-xs text-muted-foreground truncate">{r.reason} — {r.status}</p>
+                  ))}
+                  {userReports(detailUser.user_id).length === 0 && <p className="text-xs text-muted-foreground">None.</p>}
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Resolve report modal */}
+      <Dialog open={!!resolveReport} onOpenChange={(o) => !o && setResolveReport(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Take action on report</DialogTitle>
+            <DialogDescription>
+              {resolveReport?.reporter_name} reported {resolveReport?.reported_name}
+              {resolveReport?.target_type && resolveReport.target_type !== "user" ? `'s ${resolveReport.target_type}` : ""}
+            </DialogDescription>
+          </DialogHeader>
+          {resolveReport && (
+            <div className="space-y-2">
+              {resolveReport.target_preview && (
+                <p className="text-xs text-muted-foreground bg-muted rounded-lg p-2 line-clamp-3">"{resolveReport.target_preview}"</p>
+              )}
+              <div className="grid gap-1.5">
+                {resolveReport.target_type === "sidequest" && resolveReport.target_id && (
+                  <>
+                    <button
+                      onClick={async () => {
+                        const q = quests.find((x) => x.id === resolveReport.target_id);
+                        if (q) await deleteQuest(q);
+                        await updateReportStatus(resolveReport.id, "resolved");
+                        setResolveReport(null);
+                      }}
+                      className="px-3 py-2 rounded-lg bg-destructive/10 text-destructive text-xs font-semibold text-left">
+                      Delete content
+                    </button>
+                    <button
+                      onClick={async () => {
+                        const q = quests.find((x) => x.id === resolveReport.target_id);
+                        const reported = users.find((u) => u.user_id === resolveReport.reported_user_id);
+                        if (q) await deleteQuest(q);
+                        if (reported) await addStrike(reported, `Report: ${resolveReport.reason}`, resolveReport.id);
+                        await updateReportStatus(resolveReport.id, "resolved");
+                        setResolveReport(null);
+                      }}
+                      className="px-3 py-2 rounded-lg bg-destructive/10 text-destructive text-xs font-semibold text-left">
+                      Delete content + add strike
+                    </button>
+                  </>
+                )}
+                {resolveReport.target_type === "comment" && resolveReport.target_id && (
+                  <>
+                    <button
+                      onClick={async () => {
+                        const c = comments.find((x) => x.id === resolveReport.target_id);
+                        if (c) await deleteComment(c);
+                        await updateReportStatus(resolveReport.id, "resolved");
+                        setResolveReport(null);
+                      }}
+                      className="px-3 py-2 rounded-lg bg-destructive/10 text-destructive text-xs font-semibold text-left">
+                      Delete content
+                    </button>
+                    <button
+                      onClick={async () => {
+                        const c = comments.find((x) => x.id === resolveReport.target_id);
+                        const reported = users.find((u) => u.user_id === resolveReport.reported_user_id);
+                        if (c) await deleteComment(c);
+                        if (reported) await addStrike(reported, `Report: ${resolveReport.reason}`, resolveReport.id);
+                        await updateReportStatus(resolveReport.id, "resolved");
+                        setResolveReport(null);
+                      }}
+                      className="px-3 py-2 rounded-lg bg-destructive/10 text-destructive text-xs font-semibold text-left">
+                      Delete content + add strike
+                    </button>
+                  </>
+                )}
+                <button
+                  onClick={async () => {
+                    const reported = users.find((u) => u.user_id === resolveReport.reported_user_id);
+                    if (reported) await addStrike(reported, `Warning: ${resolveReport.reason}`, resolveReport.id);
+                    await updateReportStatus(resolveReport.id, "resolved");
+                    setResolveReport(null);
+                  }}
+                  className="px-3 py-2 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 text-xs font-semibold text-left">
+                  Warn user (adds strike)
+                </button>
+                <button
+                  onClick={() => {
+                    const reported = users.find((u) => u.user_id === resolveReport.reported_user_id);
+                    if (reported) { setSuspendUser(reported); setSuspendDays(2); }
+                    setResolveReport(null);
+                  }}
+                  className="px-3 py-2 rounded-lg bg-muted text-foreground text-xs font-semibold text-left">
+                  Suspend user…
+                </button>
+                <button
+                  onClick={() => {
+                    const reported = users.find((u) => u.user_id === resolveReport.reported_user_id);
+                    if (reported) setConfirmAction({
+                      title: "Ban user?", desc: `Permanently ban ${reported.display_name || reported.username}.`,
+                      confirmLabel: "Ban", destructive: true,
+                      onConfirm: async () => { await banUser(reported); await updateReportStatus(resolveReport.id, "resolved"); },
+                    });
+                    setResolveReport(null);
+                  }}
+                  className="px-3 py-2 rounded-lg bg-destructive/10 text-destructive text-xs font-semibold text-left">
+                  Ban user
+                </button>
+                <button
+                  onClick={async () => { await updateReportStatus(resolveReport.id, "dismissed"); setResolveReport(null); }}
+                  className="px-3 py-2 rounded-lg bg-muted text-muted-foreground text-xs font-semibold text-left">
+                  Dismiss report
+                </button>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>

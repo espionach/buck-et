@@ -5,11 +5,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [appealOpen, setAppealOpen] = useState(false);
+  const [appealReason, setAppealReason] = useState("");
+  const [restrictedUserId, setRestrictedUserId] = useState<string | null>(null);
+  const [restrictionLabel, setRestrictionLabel] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
   const redirectTo = (location.state as { from?: string } | null)?.from || "/";
@@ -18,13 +24,29 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
       toast({ title: "Login failed", description: error.message, variant: "destructive" });
-    } else {
-      navigate(redirectTo, { replace: true });
+      setLoading(false);
+      return;
     }
+    // Block banned users
+    if (data.user) {
+      const { data: flag } = await supabase
+        .from("user_flags")
+        .select("is_banned, is_suspended, suspended_until")
+        .eq("user_id", data.user.id).maybeSingle();
+      const stillSuspended = flag?.is_suspended && (!flag.suspended_until || new Date(flag.suspended_until) > new Date());
+      if (flag?.is_banned || stillSuspended) {
+        setRestrictedUserId(data.user.id);
+        setRestrictionLabel(flag?.is_banned ? "banned" : "suspended");
+        setAppealOpen(true);
+        setLoading(false);
+        return;
+      }
+    }
+    navigate(redirectTo, { replace: true });
     setLoading(false);
   };
 
@@ -81,6 +103,48 @@ const Login = () => {
           </Link>
         </p>
       </div>
+      <Dialog open={appealOpen} onOpenChange={async (o) => {
+        if (!o) {
+          setAppealOpen(false);
+          await supabase.auth.signOut();
+          setRestrictedUserId(null);
+          setAppealReason("");
+        }
+      }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Account {restrictionLabel}</DialogTitle>
+            <DialogDescription>
+              Your account is {restrictionLabel}. You can submit a request for review and an admin will respond.
+            </DialogDescription>
+          </DialogHeader>
+          <Textarea
+            value={appealReason} onChange={(e) => setAppealReason(e.target.value)}
+            placeholder="Explain why this should be reviewed…" rows={4}
+          />
+          <div className="flex gap-2 justify-end">
+            <Button variant="outline" onClick={async () => {
+              setAppealOpen(false);
+              await supabase.auth.signOut();
+            }}>Close</Button>
+            <Button
+              disabled={!appealReason.trim() || !restrictedUserId}
+              onClick={async () => {
+                if (!restrictedUserId) return;
+                const { error } = await supabase.from("appeals").insert({ user_id: restrictedUserId, reason: appealReason.trim() });
+                if (error) {
+                  toast({ title: "Could not submit", description: error.message, variant: "destructive" });
+                  return;
+                }
+                toast({ title: "Appeal submitted", description: "An admin will review your request." });
+                setAppealOpen(false);
+                setAppealReason("");
+                await supabase.auth.signOut();
+              }}
+            >Submit appeal</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
