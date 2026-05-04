@@ -596,6 +596,52 @@ const Settings = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Appeal Modal */}
+      <AnimatePresence>
+        {showAppeal && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-foreground/40 flex items-center justify-center p-5"
+            onClick={() => setShowAppeal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-sm bg-card rounded-2xl p-5 shadow-lg"
+            >
+              <h3 className="font-bold text-foreground text-base mb-2">Request review</h3>
+              <p className="text-sm text-muted-foreground mb-3">
+                Tell us why your account should be reviewed. An admin will look at your request.
+              </p>
+              <textarea
+                value={appealReason} onChange={(e) => setAppealReason(e.target.value)}
+                rows={4} placeholder="Explain your situation…"
+                className="w-full p-3 rounded-xl bg-muted text-sm text-foreground outline-none mb-3"
+              />
+              <div className="flex gap-2 justify-end">
+                <button onClick={() => setShowAppeal(false)} className="px-4 py-2 rounded-xl bg-muted text-muted-foreground font-semibold text-sm">Cancel</button>
+                <button
+                  disabled={!appealReason.trim()}
+                  onClick={async () => {
+                    if (!user) return;
+                    const { error } = await supabase.from("appeals").insert({ user_id: user.id, reason: appealReason.trim() });
+                    if (error) {
+                      toast({ title: "Couldn't submit", description: error.message, variant: "destructive" });
+                      return;
+                    }
+                    toast({ title: "Appeal submitted", description: "An admin will review your request." });
+                    setShowAppeal(false);
+                    setAppealReason("");
+                    setHasPendingAppeal(true);
+                  }}
+                  className="px-4 py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-sm disabled:opacity-50"
+                >Submit</button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
