@@ -929,10 +929,7 @@ const AdminDashboard = () => {
             </div>
           )}
 
-          {/* AUDIT */}
-          {tab === "audit" && (
-            <div></div>
-          )}
+          {/* APPEALS */}
           {tab === "appeals" && (
             <div>
               <p className="text-xs text-muted-foreground mb-3">User-submitted requests to lift restrictions.</p>
