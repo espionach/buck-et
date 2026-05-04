@@ -1083,6 +1083,205 @@ const AdminDashboard = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* User detail */}
+      <Dialog open={!!detailUser} onOpenChange={(o) => !o && setDetailUser(null)}>
+        <DialogContent className="max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{detailUser?.display_name || detailUser?.username}</DialogTitle>
+            <DialogDescription>@{detailUser?.username}</DialogDescription>
+          </DialogHeader>
+          {detailUser && (
+            <div className="space-y-4 text-sm">
+              <div className="flex flex-wrap gap-1.5">
+                {userStatusBadge(detailUser)}
+                {(detailUser.report_count || 0) > 0 && <StatusBadge tone="warn">{detailUser.report_count} report{detailUser.report_count! > 1 ? "s" : ""}</StatusBadge>}
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                <button
+                  onClick={() => addStrike(detailUser, "Manual strike")}
+                  disabled={detailUser.user_id === user?.id}
+                  className="px-2.5 py-1 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[11px] font-semibold flex items-center gap-1 disabled:opacity-40">
+                  <PlusCircle className="w-3 h-3" /> Add strike
+                </button>
+                <button
+                  onClick={() => { setSuspendUser(detailUser); setSuspendDays(2); }}
+                  disabled={detailUser.user_id === user?.id}
+                  className="px-2.5 py-1 rounded-lg bg-muted text-foreground text-[11px] font-semibold flex items-center gap-1 disabled:opacity-40">
+                  <Clock className="w-3 h-3" /> Suspend
+                </button>
+                {detailUser.flag?.is_banned ? (
+                  <button
+                    onClick={() => unbanUser(detailUser)}
+                    className="px-2.5 py-1 rounded-lg bg-primary/10 text-primary text-[11px] font-semibold flex items-center gap-1">
+                    <ShieldCheck className="w-3 h-3" /> Unban
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setConfirmAction({
+                      title: "Ban user?", desc: `Permanently ban ${detailUser.display_name || detailUser.username}.`,
+                      confirmLabel: "Ban", destructive: true, onConfirm: () => banUser(detailUser),
+                    })}
+                    disabled={detailUser.user_id === user?.id}
+                    className="px-2.5 py-1 rounded-lg bg-destructive/10 text-destructive text-[11px] font-semibold flex items-center gap-1 disabled:opacity-40">
+                    <Ban className="w-3 h-3" /> Ban
+                  </button>
+                )}
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">Strike history</p>
+                {userStrikes(detailUser.user_id).length === 0 ? (
+                  <p className="text-xs text-muted-foreground">No strikes.</p>
+                ) : (
+                  <div className="space-y-1.5">
+                    {userStrikes(detailUser.user_id).map((s) => (
+                      <div key={s.id} className="flex items-start gap-2 bg-muted rounded-lg p-2">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-foreground">{s.reason || "—"}</p>
+                          <p className="text-[10px] text-muted-foreground/70">by {s.admin_name} · {new Date(s.created_at).toLocaleString()}</p>
+                        </div>
+                        <button onClick={() => removeStrike(detailUser, s.id)} className="p-1 text-muted-foreground hover:text-destructive" aria-label="Remove">
+                          <MinusCircle className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">Quests created ({userQuests(detailUser.user_id).length})</p>
+                <div className="space-y-1 max-h-32 overflow-y-auto">
+                  {userQuests(detailUser.user_id).slice(0, 10).map((q) => (
+                    <button key={q.id} onClick={() => { setDetailUser(null); nav(`/quest/${q.id}`); }}
+                      className="block w-full text-left text-xs text-foreground hover:underline truncate">• {q.title}</button>
+                  ))}
+                  {userQuests(detailUser.user_id).length === 0 && <p className="text-xs text-muted-foreground">None.</p>}
+                </div>
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">Reports against ({userReports(detailUser.user_id).length})</p>
+                <div className="space-y-1 max-h-32 overflow-y-auto">
+                  {userReports(detailUser.user_id).slice(0, 10).map((r) => (
+                    <p key={r.id} className="text-xs text-muted-foreground truncate">{r.reason} — {r.status}</p>
+                  ))}
+                  {userReports(detailUser.user_id).length === 0 && <p className="text-xs text-muted-foreground">None.</p>}
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Resolve report modal */}
+      <Dialog open={!!resolveReport} onOpenChange={(o) => !o && setResolveReport(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Take action on report</DialogTitle>
+            <DialogDescription>
+              {resolveReport?.reporter_name} reported {resolveReport?.reported_name}
+              {resolveReport?.target_type && resolveReport.target_type !== "user" ? `'s ${resolveReport.target_type}` : ""}
+            </DialogDescription>
+          </DialogHeader>
+          {resolveReport && (
+            <div className="space-y-2">
+              {resolveReport.target_preview && (
+                <p className="text-xs text-muted-foreground bg-muted rounded-lg p-2 line-clamp-3">"{resolveReport.target_preview}"</p>
+              )}
+              <div className="grid gap-1.5">
+                {resolveReport.target_type === "sidequest" && resolveReport.target_id && (
+                  <>
+                    <button
+                      onClick={async () => {
+                        const q = quests.find((x) => x.id === resolveReport.target_id);
+                        if (q) await deleteQuest(q);
+                        await updateReportStatus(resolveReport.id, "resolved");
+                        setResolveReport(null);
+                      }}
+                      className="px-3 py-2 rounded-lg bg-destructive/10 text-destructive text-xs font-semibold text-left">
+                      Delete content
+                    </button>
+                    <button
+                      onClick={async () => {
+                        const q = quests.find((x) => x.id === resolveReport.target_id);
+                        const reported = users.find((u) => u.user_id === resolveReport.reported_user_id);
+                        if (q) await deleteQuest(q);
+                        if (reported) await addStrike(reported, `Report: ${resolveReport.reason}`, resolveReport.id);
+                        await updateReportStatus(resolveReport.id, "resolved");
+                        setResolveReport(null);
+                      }}
+                      className="px-3 py-2 rounded-lg bg-destructive/10 text-destructive text-xs font-semibold text-left">
+                      Delete content + add strike
+                    </button>
+                  </>
+                )}
+                {resolveReport.target_type === "comment" && resolveReport.target_id && (
+                  <>
+                    <button
+                      onClick={async () => {
+                        const c = comments.find((x) => x.id === resolveReport.target_id);
+                        if (c) await deleteComment(c);
+                        await updateReportStatus(resolveReport.id, "resolved");
+                        setResolveReport(null);
+                      }}
+                      className="px-3 py-2 rounded-lg bg-destructive/10 text-destructive text-xs font-semibold text-left">
+                      Delete content
+                    </button>
+                    <button
+                      onClick={async () => {
+                        const c = comments.find((x) => x.id === resolveReport.target_id);
+                        const reported = users.find((u) => u.user_id === resolveReport.reported_user_id);
+                        if (c) await deleteComment(c);
+                        if (reported) await addStrike(reported, `Report: ${resolveReport.reason}`, resolveReport.id);
+                        await updateReportStatus(resolveReport.id, "resolved");
+                        setResolveReport(null);
+                      }}
+                      className="px-3 py-2 rounded-lg bg-destructive/10 text-destructive text-xs font-semibold text-left">
+                      Delete content + add strike
+                    </button>
+                  </>
+                )}
+                <button
+                  onClick={async () => {
+                    const reported = users.find((u) => u.user_id === resolveReport.reported_user_id);
+                    if (reported) await addStrike(reported, `Warning: ${resolveReport.reason}`, resolveReport.id);
+                    await updateReportStatus(resolveReport.id, "resolved");
+                    setResolveReport(null);
+                  }}
+                  className="px-3 py-2 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 text-xs font-semibold text-left">
+                  Warn user (adds strike)
+                </button>
+                <button
+                  onClick={() => {
+                    const reported = users.find((u) => u.user_id === resolveReport.reported_user_id);
+                    if (reported) { setSuspendUser(reported); setSuspendDays(2); }
+                    setResolveReport(null);
+                  }}
+                  className="px-3 py-2 rounded-lg bg-muted text-foreground text-xs font-semibold text-left">
+                  Suspend user…
+                </button>
+                <button
+                  onClick={() => {
+                    const reported = users.find((u) => u.user_id === resolveReport.reported_user_id);
+                    if (reported) setConfirmAction({
+                      title: "Ban user?", desc: `Permanently ban ${reported.display_name || reported.username}.`,
+                      confirmLabel: "Ban", destructive: true,
+                      onConfirm: async () => { await banUser(reported); await updateReportStatus(resolveReport.id, "resolved"); },
+                    });
+                    setResolveReport(null);
+                  }}
+                  className="px-3 py-2 rounded-lg bg-destructive/10 text-destructive text-xs font-semibold text-left">
+                  Ban user
+                </button>
+                <button
+                  onClick={async () => { await updateReportStatus(resolveReport.id, "dismissed"); setResolveReport(null); }}
+                  className="px-3 py-2 rounded-lg bg-muted text-muted-foreground text-xs font-semibold text-left">
+                  Dismiss report
+                </button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
