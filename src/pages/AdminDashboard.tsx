@@ -931,6 +931,55 @@ const AdminDashboard = () => {
 
           {/* AUDIT */}
           {tab === "audit" && (
+            <div></div>
+          )}
+          {tab === "appeals" && (
+            <div>
+              <p className="text-xs text-muted-foreground mb-3">User-submitted requests to lift restrictions.</p>
+              <div className="bg-card border border-border rounded-2xl overflow-hidden divide-y divide-border">
+                {appeals.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-8">No appeals yet.</p>
+                ) : appeals.map((a) => {
+                  const u = users.find((x) => x.user_id === a.user_id);
+                  return (
+                    <div key={a.id} className="p-3">
+                      <div className="flex items-center gap-2 flex-wrap mb-1">
+                        <p className="text-sm font-semibold text-foreground">{a.user_name}</p>
+                        <StatusBadge tone={a.status === "pending" ? "primary" : a.status === "approved" ? "muted" : "destructive"}>{a.status}</StatusBadge>
+                        {u && userStatusBadge(u)}
+                        <span className="text-[10px] text-muted-foreground/70 ml-auto">{new Date(a.created_at).toLocaleString()}</span>
+                      </div>
+                      <p className="text-sm text-foreground bg-muted rounded-lg p-2 whitespace-pre-wrap mb-2">{a.reason}</p>
+                      {a.status === "pending" && (
+                        <div className="flex gap-1.5">
+                          <button
+                            onClick={async () => {
+                              if (!user) return;
+                              await supabase.from("appeals").update({ status: "approved", reviewed_by: user.id, reviewed_at: new Date().toISOString() }).eq("id", a.id);
+                              if (u) await upsertFlag(u.user_id, { is_banned: false, is_suspended: false, suspended_until: null, strike_count: 0 });
+                              await logAction({ action_type: "approve_appeal", target_type: "appeal", target_id: a.id, target_user_id: a.user_id });
+                              toast.success("Appeal approved · restrictions lifted");
+                              loadAppeals(); loadUsers(); loadAudit();
+                            }}
+                            className="px-2.5 py-1 rounded-lg bg-primary text-primary-foreground text-[11px] font-semibold">Approve & lift</button>
+                          <button
+                            onClick={async () => {
+                              if (!user) return;
+                              await supabase.from("appeals").update({ status: "denied", reviewed_by: user.id, reviewed_at: new Date().toISOString() }).eq("id", a.id);
+                              await logAction({ action_type: "deny_appeal", target_type: "appeal", target_id: a.id, target_user_id: a.user_id });
+                              toast.success("Appeal denied");
+                              loadAppeals(); loadAudit();
+                            }}
+                            className="px-2.5 py-1 rounded-lg bg-destructive/10 text-destructive text-[11px] font-semibold">Deny</button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+          {tab === "audit" && (
             <div>
               <p className="text-xs text-muted-foreground mb-3">Last 200 moderation actions.</p>
               <div className="bg-card border border-border rounded-2xl overflow-hidden divide-y divide-border">
