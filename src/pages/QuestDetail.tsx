@@ -2,7 +2,7 @@ import { useAppStore } from "@/data/appState";
 import { QuestVolunteer, isQuestCompleted } from "@/data/mockData";
 import { ALL_CONTRIBUTION_ROLES } from "@/data/contributionRoles";
 import UserAvatar from "@/components/UserAvatar";
-import { GroupIconDisplay } from "@/components/GroupIcon";
+import GroupSwatch from "@/components/GroupSwatch";
 import SidequestPhoto from "@/components/SidequestPhoto";
 import CommentThread from "@/components/CommentThread";
 import { ArrowLeft, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send, ExternalLink, HandMetal, Check, Globe, StickyNote, MoreVertical, Pencil, Pin, Trash2, Flag, Share2 } from "lucide-react";
@@ -138,7 +138,7 @@ const QuestDetail = () => {
           <div className="flex-1 min-w-0">
             <h1 className="text-lg font-bold text-foreground">{quest.title}</h1>
             <p className="text-xs text-muted-foreground">
-              {group ? <span className="flex items-center gap-1"><GroupIconDisplay icon={group.emoji} size={12} className="text-muted-foreground" />{group.name}</span> : <span className="flex items-center gap-1"><Globe className="w-3 h-3" />Friends only</span>}
+              {group ? <span className="flex items-center gap-1"><GroupSwatch color={group.color} size={12} />{group.name}</span> : <span className="flex items-center gap-1"><Globe className="w-3 h-3" />Friends only</span>}
             </p>
           </div>
 
