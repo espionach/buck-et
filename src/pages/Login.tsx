@@ -103,6 +103,48 @@ const Login = () => {
           </Link>
         </p>
       </div>
+      <Dialog open={appealOpen} onOpenChange={async (o) => {
+        if (!o) {
+          setAppealOpen(false);
+          await supabase.auth.signOut();
+          setRestrictedUserId(null);
+          setAppealReason("");
+        }
+      }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Account {restrictionLabel}</DialogTitle>
+            <DialogDescription>
+              Your account is {restrictionLabel}. You can submit a request for review and an admin will respond.
+            </DialogDescription>
+          </DialogHeader>
+          <Textarea
+            value={appealReason} onChange={(e) => setAppealReason(e.target.value)}
+            placeholder="Explain why this should be reviewed…" rows={4}
+          />
+          <div className="flex gap-2 justify-end">
+            <Button variant="outline" onClick={async () => {
+              setAppealOpen(false);
+              await supabase.auth.signOut();
+            }}>Close</Button>
+            <Button
+              disabled={!appealReason.trim() || !restrictedUserId}
+              onClick={async () => {
+                if (!restrictedUserId) return;
+                const { error } = await supabase.from("appeals").insert({ user_id: restrictedUserId, reason: appealReason.trim() });
+                if (error) {
+                  toast({ title: "Could not submit", description: error.message, variant: "destructive" });
+                  return;
+                }
+                toast({ title: "Appeal submitted", description: "An admin will review your request." });
+                setAppealOpen(false);
+                setAppealReason("");
+                await supabase.auth.signOut();
+              }}
+            >Submit appeal</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
