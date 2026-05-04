@@ -5,11 +5,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [appealOpen, setAppealOpen] = useState(false);
+  const [appealReason, setAppealReason] = useState("");
+  const [restrictedUserId, setRestrictedUserId] = useState<string | null>(null);
+  const [restrictionLabel, setRestrictionLabel] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
   const redirectTo = (location.state as { from?: string } | null)?.from || "/";
@@ -28,15 +34,14 @@ const Login = () => {
     // Block banned users
     if (data.user) {
       const { data: flag } = await supabase
-        .from("user_flags").select("is_banned").eq("user_id", data.user.id).maybeSingle();
-      if (flag?.is_banned) {
-        await supabase.auth.signOut();
-        toast({
-          title: "Account banned",
-          description: "Your account has been banned. You can request a review from the sign-in page.",
-          variant: "destructive",
-        });
-        navigate("/appeal", { replace: true });
+        .from("user_flags")
+        .select("is_banned, is_suspended, suspended_until")
+        .eq("user_id", data.user.id).maybeSingle();
+      const stillSuspended = flag?.is_suspended && (!flag.suspended_until || new Date(flag.suspended_until) > new Date());
+      if (flag?.is_banned || stillSuspended) {
+        setRestrictedUserId(data.user.id);
+        setRestrictionLabel(flag?.is_banned ? "banned" : "suspended");
+        setAppealOpen(true);
         setLoading(false);
         return;
       }
