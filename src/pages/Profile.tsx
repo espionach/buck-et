@@ -3,7 +3,7 @@ import QuestList from "@/components/QuestList";
 import UserAvatar from "@/components/UserAvatar";
 import { Edit, X, Check, Users as UsersIcon, UserPlus, Trash2, ImagePlus, Camera, Link as LinkIcon, Plus, ArrowLeft, Map, ScrollText, Pin, Settings as SettingsIcon, User as UserIcon, Globe, ChevronDown, Share2 } from "lucide-react";
 import { ALL_CONTRIBUTION_ROLES } from "@/data/contributionRoles";
-import { GroupIconDisplay } from "@/components/GroupIcon";
+import GroupSwatch from "@/components/GroupSwatch";
 import UserProfileView from "@/components/UserProfileView";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -857,7 +857,7 @@ const Profile = () => {
                             const g = groups.find((gr) => gr.id === editGroupId);
                             return g ? (
                               <span className="flex items-center gap-1.5">
-                                <GroupIconDisplay icon={g.emoji} size={14} className="text-foreground" />
+                                <GroupSwatch color={g.color} size={14} />
                                 {g.name}
                               </span>
                             ) : (
@@ -894,7 +894,7 @@ const Profile = () => {
                             editGroupId === g.id ? "bg-primary/5 text-primary font-semibold" : "text-foreground hover:bg-muted"
                           }`}
                         >
-                          <span className="flex items-center gap-1.5"><GroupIconDisplay icon={g.emoji} size={14} className="text-foreground" />{g.name}</span>
+                          <span className="flex items-center gap-1.5"><GroupSwatch color={g.color} size={14} />{g.name}</span>
                         </button>
                       ))}
                     </div>

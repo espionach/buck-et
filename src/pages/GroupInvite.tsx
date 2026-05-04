@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Check, X, Lock, Users as UsersIcon } from "lucide-react";
 import { useAppStore } from "@/data/appState";
-import { GroupIconDisplay } from "@/components/GroupIcon";
+import GroupSwatch from "@/components/GroupSwatch";
 import { supabase } from "@/integrations/supabase/client";
 import { Group } from "@/data/mockData";
 
@@ -95,7 +95,7 @@ const GroupInvite = () => {
         </div>
       ) : (
         <div className="flex flex-col items-center text-center">
-          <GroupIconDisplay icon={previewGroup.emoji} size={64} />
+          <GroupSwatch color={previewGroup.color} size={64} className="rounded-2xl" />
           <h1 className="text-xl font-bold text-foreground mt-3">{previewGroup.name}</h1>
           {previewGroup.description && (
             <p className="text-sm text-muted-foreground mt-1 max-w-xs">{previewGroup.description}</p>

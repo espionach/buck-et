@@ -4,7 +4,7 @@ import { completeOnboarding } from "@/hooks/useOnboarding";
 import { Quest } from "@/data/mockData";
 import { ALL_CONTRIBUTION_ROLES } from "@/data/contributionRoles";
 import { ArrowLeft, Sparkles, ChevronDown, ImagePlus, Link as LinkIcon, X, Globe, Check } from "lucide-react";
-import { GroupIconDisplay } from "@/components/GroupIcon";
+import GroupSwatch from "@/components/GroupSwatch";
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -248,7 +248,7 @@ const CreateQuest = () => {
         >
           <span className="text-foreground font-medium">
             {selectedGroupData
-              ? <span className="flex items-center gap-1.5"><GroupIconDisplay icon={selectedGroupData.emoji} size={16} className="text-foreground" />{selectedGroupData.name}</span>
+              ? <span className="flex items-center gap-1.5"><GroupSwatch color={selectedGroupData.color} size={16} />{selectedGroupData.name}</span>
               : <span className="flex items-center gap-1.5"><Globe className="w-4 h-4" />Friends Only</span>}
           </span>
           <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${showGroupDropdown ? "rotate-180" : ""}`} />
@@ -280,7 +280,7 @@ const CreateQuest = () => {
                   selectedGroup === g.id ? "bg-primary/5 text-primary font-semibold" : "text-foreground hover:bg-muted"
                 }`}
               >
-                <span className="flex items-center gap-1.5"><GroupIconDisplay icon={g.emoji} size={14} className="text-foreground" />{g.name}</span>
+                <span className="flex items-center gap-1.5"><GroupSwatch color={g.color} size={14} />{g.name}</span>
               </button>
             ))}
           </div>

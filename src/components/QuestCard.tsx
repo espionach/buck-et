@@ -1,7 +1,7 @@
 import { Quest, Comment, User, isQuestCompleted } from "@/data/mockData";
 import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
-import { GroupIconDisplay } from "@/components/GroupIcon";
+import GroupSwatch from "@/components/GroupSwatch";
 import SidequestPhoto from "@/components/SidequestPhoto";
 import CommentThread from "@/components/CommentThread";
 
@@ -245,7 +245,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
               {quest.createdBy.name}
             </button>
             <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">
-              {group ? <><GroupIconDisplay icon={group.emoji} size={12} className="text-muted-foreground inline-block mr-1" />{group.name}</> : <span className="inline-flex items-center gap-1"><Globe className="w-3 h-3" />Friends only</span>}
+              {group ? <span className="inline-flex items-center gap-1"><GroupSwatch color={group.color} size={12} />{group.name}</span> : <span className="inline-flex items-center gap-1"><Globe className="w-3 h-3" />Friends only</span>}
             </p>
           </div>
         </div>
