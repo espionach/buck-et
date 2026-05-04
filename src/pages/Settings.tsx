@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Mail, Lock, Bell, LifeBuoy, Bug, FileText, ShieldCheck, LogOut, Trash2, ChevronRight, Flag, ShieldOff, Compass, BookOpen, Shield } from "lucide-react";
+import { ArrowLeft, Mail, Lock, Bell, LifeBuoy, Bug, FileText, ShieldCheck, LogOut, Trash2, ChevronRight, Flag, ShieldOff, Compass, BookOpen, Shield, Inbox } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/contexts/AuthContext";
@@ -84,8 +84,30 @@ const Settings = () => {
   const [showPwErrors, setShowPwErrors] = useState(false);
   const [pwError, setPwError] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
+  const [restriction, setRestriction] = useState<null | "banned" | "suspended">(null);
+  const [hasPendingAppeal, setHasPendingAppeal] = useState(false);
+  const [showAppeal, setShowAppeal] = useState(false);
+  const [appealReason, setAppealReason] = useState("");
 
   usePopup(showNotif || showEmail || showPassword || showDelete);
+
+  // Load restriction status + pending appeal
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const { data: flag } = await supabase
+        .from("user_flags")
+        .select("is_banned, is_suspended, suspended_until")
+        .eq("user_id", user.id).maybeSingle();
+      const stillSuspended = flag?.is_suspended && (!flag.suspended_until || new Date(flag.suspended_until) > new Date());
+      if (flag?.is_banned) setRestriction("banned");
+      else if (stillSuspended) setRestriction("suspended");
+      else setRestriction(null);
+      const { data: appeals } = await supabase
+        .from("appeals").select("id").eq("user_id", user.id).eq("status", "pending").limit(1);
+      setHasPendingAppeal((appeals || []).length > 0);
+    })();
+  }, [user]);
 
   // Load notif prefs
   useEffect(() => {
