@@ -37,7 +37,7 @@ const BucketLoader = () => {
               fill="hsl(var(--primary))"
               opacity={0.3}
               initial={{ y: 75 }}
-              animate={{ y: 25 }}
+              animate={{ y: 50 }}
               transition={{
                 duration: 2,
                 repeat: Infinity,
@@ -53,7 +53,7 @@ const BucketLoader = () => {
               fill="hsl(var(--primary))"
               opacity={0.5}
               initial={{ cy: 75 }}
-              animate={{ cy: 28 }}
+              animate={{ cy: 52 }}
               transition={{
                 duration: 2,
                 repeat: Infinity,
