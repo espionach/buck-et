@@ -1,30 +1,59 @@
-## Password requirements
+## Goal
 
-Rules to enforce:
-- Minimum 8 characters
-- At least one uppercase and one lowercase letter
-- At least one number
-- Reject leaked passwords (Have I Been Pwned check)
+1. Make the "Join" button on quest cards (Home/Feed) orange — matching the "Join sidequest" button styling on the quest details page.
+2. On the quest details page, when the user taps "Join sidequest", animate the button morphing into the green check-circle (the same style used on the quest card after joining), then have it fade/scale out while the rest of the page content slides up to fill the space.
 
-Applied everywhere a password is set: Signup, Reset Password, and any future password-change flow.
+## Changes
 
-## Implementation
+### 1. `src/components/QuestCard.tsx` — orange Join pill
 
-1. **Server-side leaked password protection**
-   - Enable HIBP check in Cloud auth settings so the backend rejects any password found in known breach databases. This applies automatically to signup, reset, and password updates.
+In the join button (lines ~257–274), replace the muted styling for the not-joined state with the primary (orange) styling. The joined state (green check-circle using `bg-secondary`) stays exactly the same.
 
-2. **Shared validator (`src/lib/passwordPolicy.ts`)**
-   - New utility exporting:
-     - A `zod` schema enforcing the four rules above (length, upper, lower, digit).
-     - A `validatePassword(value)` helper returning the first user-friendly error, for inline form validation.
-     - A small `PasswordRequirements` checklist component showing each rule with a live check/x as the user types — used on Signup and Reset Password.
+- Joinable: `bg-primary text-primary-foreground hover:bg-primary/90` (was `bg-muted text-muted-foreground`).
+- Disabled (not in group / can't join): keep a faded primary look, e.g. `bg-primary/40 text-primary-foreground/70 cursor-not-allowed`.
+- Joined state unchanged: `w-8 h-8 rounded-full bg-secondary text-secondary-foreground` with `<Check />`.
 
-3. **Wire into existing forms**
-   - `src/pages/Signup.tsx`: validate with the shared schema before calling `signUp`; show the requirements checklist under the password field; show toast on failure.
-   - `src/pages/ResetPassword.tsx`: same validation + checklist before calling `updateUser({ password })`.
-   - Map backend "leaked password" errors to a clear inline message ("This password has appeared in a data breach. Please choose another.").
+### 2. `src/pages/QuestDetail.tsx` — join button morph + content slide-up
 
-4. **Error mapping**
-   - Extend `src/lib/errorMapping.ts` (already used in auth flows) to translate Supabase's `weak_password` / HIBP error codes into the friendly message above.
+Wrap the Join CTA region (lines ~209–219) in a Framer Motion sequence. State machine added locally:
 
-No database migration is needed — this is auth configuration plus client-side validation. Existing accounts are not affected; rules apply the next time a password is set.
+```text
+idle  ──tap──▶  morphing (pill → circle, color orange → green, label fades to Check)
+                    │
+                    └─after ~450ms──▶ exiting (circle scales/fades out, height collapses to 0)
+                                          │
+                                          └─after ~250ms──▶ done (region unmounted; isIn === true so it stays gone)
+```
+
+Implementation notes:
+- Add `const [joinAnim, setJoinAnim] = useState<"idle"|"morph"|"exit"|"done">("idle")`.
+- On click: `setJoinAnim("morph")`, immediately call `toggleImIn(quest.id)` so app state reflects the join (the rest of the page already reads `isIn`, but we suppress the natural unmount until the animation finishes by gating the CTA's render on `joinAnim !== "done"` rather than `!isIn`).
+- After 450ms → `setJoinAnim("exit")`. After another 250ms → `setJoinAnim("done")`.
+- Use `motion.div` with `layout` on the CTA container and on the `<div className="px-5 space-y-4 mt-2">` content wrapper so when the CTA collapses, the body content animates upward smoothly via Framer's shared layout transitions (`transition={{ type: "spring", stiffness: 400, damping: 32 }}`).
+- The button itself uses `motion.button` with `animate` props transitioning:
+  - width: `100%` → `32px`
+  - borderRadius: `0.75rem` → `9999px`
+  - backgroundColor: `hsl(var(--primary))` → `hsl(var(--secondary))`
+  - height stays `~40px`, then collapses to 0 on exit.
+- Inner content uses `<AnimatePresence mode="wait">` swapping the "Join sidequest" text (fade/scale-out) for a `<Check />` icon (fade/scale-in) once `joinAnim === "morph"`.
+- Exit phase animates `opacity: 0, height: 0, marginTop: 0` to remove the row and let the layout shift pull the rest of the details upward.
+
+No store/API changes; `toggleImIn` already exists. No new dependencies — `framer-motion` is already imported.
+
+## Visual reference
+
+```text
+[ Join sidequest         ]   ← orange pill, full width
+        │ tap
+        ▼
+       (●)  ← shrinks to right, turns green, shows ✓
+        │
+        ▼
+       (gone) — details below slide up to fill the gap
+```
+
+## Out of scope
+
+- No changes to the joined-state appearance on the card.
+- No changes to the disabled/finished cases on the details page (already not rendered).
+- No changes to logic in `toggleImIn`.

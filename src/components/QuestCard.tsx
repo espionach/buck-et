@@ -265,8 +265,8 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
                 isIn
                   ? "w-8 h-8 rounded-full bg-secondary text-secondary-foreground"
                   : !canJoin
-                  ? "px-3 py-1.5 rounded-full bg-muted/50 text-muted-foreground/50 cursor-not-allowed text-xs font-semibold"
-                  : "px-3 py-1.5 rounded-full bg-muted text-muted-foreground text-xs font-semibold"
+                  ? "px-3 py-1.5 rounded-full bg-primary/40 text-primary-foreground/70 cursor-not-allowed text-xs font-semibold"
+                  : "px-3 py-1.5 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-semibold"
               }`}
             >
               {isIn ? <Check className="w-4 h-4" strokeWidth={2.5} /> : "Join"}

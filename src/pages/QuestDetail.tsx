@@ -41,6 +41,7 @@ const QuestDetail = () => {
   const [showMenu, setShowMenu] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showReport, setShowReport] = useState(false);
+  const [joinAnim, setJoinAnim] = useState<"idle" | "morph" | "exit" | "done">("idle");
   usePopup(showDeleteConfirm);
 
   useEffect(() => { window.scrollTo(0, 0); }, [questId]);
@@ -207,19 +208,81 @@ const QuestDetail = () => {
         </div>
 
         {/* Join CTA for non-owners who haven't joined yet */}
-        {!isOwner && !isIn && (
-          <div className="mt-3">
-            <button
-              onClick={() => toggleImIn(quest.id)}
-              className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition-colors"
+        <AnimatePresence initial={false}>
+          {!isOwner && (!isIn || joinAnim !== "idle") && joinAnim !== "done" && (
+            <motion.div
+              key="join-cta"
+              layout
+              initial={false}
+              animate={
+                joinAnim === "exit"
+                  ? { opacity: 0, height: 0, marginTop: 0 }
+                  : { opacity: 1, height: "auto", marginTop: 12 }
+              }
+              exit={{ opacity: 0, height: 0, marginTop: 0 }}
+              transition={{ duration: 0.25, ease: "easeInOut" }}
+              className="overflow-hidden flex justify-end"
             >
-              Join sidequest
-            </button>
-          </div>
-        )}
+              <motion.button
+                layout
+                onClick={() => {
+                  if (joinAnim !== "idle") return;
+                  setJoinAnim("morph");
+                  toggleImIn(quest.id);
+                  setTimeout(() => setJoinAnim("exit"), 450);
+                  setTimeout(() => setJoinAnim("done"), 750);
+                }}
+                disabled={joinAnim !== "idle"}
+                animate={
+                  joinAnim === "idle"
+                    ? {
+                        width: "100%",
+                        borderRadius: 12,
+                        backgroundColor: "hsl(var(--primary))",
+                      }
+                    : {
+                        width: 32,
+                        height: 32,
+                        borderRadius: 9999,
+                        backgroundColor: "hsl(var(--secondary))",
+                      }
+                }
+                transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+                style={{ height: 40 }}
+                className="flex items-center justify-center font-semibold text-sm overflow-hidden"
+              >
+                <AnimatePresence mode="wait" initial={false}>
+                  {joinAnim === "idle" ? (
+                    <motion.span
+                      key="label"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      transition={{ duration: 0.15 }}
+                      className="text-primary-foreground whitespace-nowrap"
+                    >
+                      Join sidequest
+                    </motion.span>
+                  ) : (
+                    <motion.span
+                      key="check"
+                      initial={{ opacity: 0, scale: 0.4 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.6 }}
+                      transition={{ duration: 0.2, delay: 0.15 }}
+                      className="text-secondary-foreground flex"
+                    >
+                      <Check className="w-4 h-4" strokeWidth={2.5} />
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </motion.button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
-      <div className="px-5 space-y-4 mt-2">
+      <motion.div layout className="px-5 space-y-4 mt-2">
         {/* Quest Card — Expanded */}
         <div className="p-4 rounded-xl border border-border/50 bg-card space-y-4">
           {/* Creator */}
@@ -409,7 +472,7 @@ const QuestDetail = () => {
           </h3>
           <CommentThread quest={quest} />
         </div>
-      </div>
+      </motion.div>
 
       {/* Delete confirmation */}
       <AnimatePresence>
