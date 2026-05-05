@@ -39,7 +39,7 @@ const CommunityGuidelines = () => {
       </div>
 
       <p className="text-sm text-muted-foreground mb-5 leading-relaxed">
-        SideQuest is built for friends to plan adventures together. To keep it a safe, welcoming
+        Buck-et is built for friends to plan adventures together. To keep it a safe, welcoming
         place, please follow these guidelines whenever you post, comment, or interact.
       </p>
 
@@ -68,7 +68,7 @@ const CommunityGuidelines = () => {
 
       <Section icon={Sparkles} title="Keep it real">
         <p>
-          No spam, scams, or misleading content. Don't use SideQuest to advertise or solicit
+          No spam, scams, or misleading content. Don't use Buck-et to advertise or solicit
           unrelated services.
         </p>
       </Section>
