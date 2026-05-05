@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/dialog";
 
 type Tab = "users" | "quests" | "comments" | "reports" | "appeals" | "audit";
-type UserFilter = "all" | "flagged" | "warned" | "suspended" | "banned";
+type UserFilter = "all" | "struck" | "suspended" | "banned";
 
 interface UserFlag {
   user_id: string;
@@ -525,8 +525,7 @@ const AdminDashboard = () => {
     const list = users.filter((u) => {
       if (q && !((u.display_name || "").toLowerCase().includes(q) || u.username.toLowerCase().includes(q))) return false;
       const f = u.flag;
-      if (userFilter === "flagged" && !((f?.strike_count || 0) > 0)) return false;
-      if (userFilter === "warned" && (f?.strike_count || 0) !== 1) return false;
+      if (userFilter === "struck" && !((f?.strike_count || 0) > 0)) return false;
       if (userFilter === "suspended" && !(f?.is_suspended && (!f.suspended_until || new Date(f.suspended_until) > new Date()))) return false;
       if (userFilter === "banned" && !f?.is_banned) return false;
       return true;
@@ -642,10 +641,10 @@ const AdminDashboard = () => {
                 ))}
               </div>
               <div className="flex gap-1.5 mb-3 flex-wrap">
-                {(["all", "flagged", "warned", "suspended", "banned"] as const).map((f) => (
+                {(["all", "struck", "suspended", "banned"] as const).map((f) => (
                   <button key={f} onClick={() => setUserFilter(f)}
                     className={`px-3 py-1 rounded-full text-[11px] font-semibold capitalize ${userFilter === f ? "bg-foreground text-background" : "bg-muted text-muted-foreground"}`}>
-                    {f}
+                    {f === "struck" ? "Strikes" : f}
                   </button>
                 ))}
               </div>
