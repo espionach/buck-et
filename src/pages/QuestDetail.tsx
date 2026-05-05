@@ -221,7 +221,7 @@ const QuestDetail = () => {
               }
               exit={{ opacity: 0, height: 0, marginTop: 0 }}
               transition={{ duration: 0.25, ease: "easeInOut" }}
-              className="overflow-hidden flex justify-end"
+              className="overflow-hidden flex justify-center"
             >
               <motion.button
                 layout
@@ -229,8 +229,8 @@ const QuestDetail = () => {
                   if (joinAnim !== "idle") return;
                   setJoinAnim("morph");
                   toggleImIn(quest.id);
-                  setTimeout(() => setJoinAnim("exit"), 450);
-                  setTimeout(() => setJoinAnim("done"), 750);
+                  setTimeout(() => setJoinAnim("exit"), 1100);
+                  setTimeout(() => setJoinAnim("done"), 1450);
                 }}
                 disabled={joinAnim !== "idle"}
                 animate={
