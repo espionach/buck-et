@@ -246,11 +246,11 @@ const Settings = () => {
   };
 
   const handleContactSupport = () => {
-    window.location.href = "mailto:support@buck-et.app?subject=Support%20request";
+    window.location.href = "mailto:bucketapp.support@gmail.com?subject=Support%20request";
   };
 
   const handleReportBug = () => {
-    window.location.href = "mailto:support@buck-et.app?subject=Bug%20report";
+    window.location.href = "mailto:bucketapp.support@gmail.com?subject=Bug%20report";
   };
 
   const handleReplayTour = async () => {
@@ -317,10 +317,10 @@ const Settings = () => {
         <div className="px-4 py-3.5">
           <p className="text-xs text-muted-foreground mb-1">Reach our support team at:</p>
           <a
-            href="mailto:support@buck-et.app"
+            href="mailto:bucketapp.support@gmail.com"
             className="text-sm font-semibold text-primary break-all"
           >
-            support@buck-et.app
+            bucketapp.support@gmail.com
           </a>
           <p className="text-[11px] text-muted-foreground mt-2 leading-snug">
             We typically reply within a couple of business days.
