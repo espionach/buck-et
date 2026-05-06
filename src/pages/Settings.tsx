@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Mail, Lock, Bell, LifeBuoy, Bug, FileText, ShieldCheck, LogOut, Trash2, ChevronRight, Flag, ShieldOff, Compass, BookOpen, Shield, Inbox } from "lucide-react";
+import { ArrowLeft, Mail, Lock, Bell, LifeBuoy, FileText, ShieldCheck, LogOut, Trash2, ChevronRight, Flag, ShieldOff, Compass, BookOpen, Shield, Inbox } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/contexts/AuthContext";
@@ -89,7 +89,14 @@ const Settings = () => {
   const [showAppeal, setShowAppeal] = useState(false);
   const [appealReason, setAppealReason] = useState("");
 
-  usePopup(showNotif || showEmail || showPassword || showDelete);
+  // Support form state
+  const [showSupport, setShowSupport] = useState(false);
+  const [supportEmail, setSupportEmail] = useState("");
+  const [supportSubject, setSupportSubject] = useState<"general" | "bug" | "privacy">("general");
+  const [supportMessage, setSupportMessage] = useState("");
+  const [supportSubmitting, setSupportSubmitting] = useState(false);
+
+  usePopup(showNotif || showEmail || showPassword || showDelete || showSupport);
 
   // Load restriction status + pending appeal
   useEffect(() => {
@@ -245,12 +252,39 @@ const Settings = () => {
     await signOut();
   };
 
-  const handleContactSupport = () => {
-    window.location.href = "mailto:bucketapp.support@gmail.com?subject=Support%20request";
+  const openSupport = () => {
+    setSupportEmail(user?.email ?? "");
+    setSupportSubject("general");
+    setSupportMessage("");
+    setShowSupport(true);
   };
 
-  const handleReportBug = () => {
-    window.location.href = "mailto:bucketapp.support@gmail.com?subject=Bug%20report";
+  const handleSubmitSupport = async () => {
+    const email = supportEmail.trim().toLowerCase();
+    const message = supportMessage.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast({ title: "Invalid email", description: "Please enter a valid email address.", variant: "destructive" });
+      return;
+    }
+    if (message.length < 1 || message.length > 5000) {
+      toast({ title: "Message required", description: "Please write a message (max 5000 characters).", variant: "destructive" });
+      return;
+    }
+    setSupportSubmitting(true);
+    const { error } = await supabase.from("support_messages").insert({
+      user_id: user?.id ?? null,
+      email,
+      subject: supportSubject,
+      message,
+    });
+    setSupportSubmitting(false);
+    if (error) {
+      toast({ title: "Couldn't send", description: error.message, variant: "destructive" });
+      return;
+    }
+    toast({ title: "Message sent", description: "Thanks! We'll get back to you within a few business days." });
+    setShowSupport(false);
+    setSupportMessage("");
   };
 
   const handleReplayTour = async () => {
@@ -308,22 +342,23 @@ const Settings = () => {
         </Section>
       )}
 
-      <Section title="Support">
-        <Row icon={LifeBuoy} label="Contact Support" onClick={handleContactSupport} />
-        <Row icon={Bug} label="Report a Bug" onClick={handleReportBug} />
-      </Section>
-
-      <Section title="Contact Us">
+      <Section title="Support & Contact">
         <div className="px-4 py-3.5">
-          <p className="text-xs text-muted-foreground mb-1">Reach our support team at:</p>
-          <a
-            href="mailto:bucketapp.support@gmail.com"
-            className="text-sm font-semibold text-primary break-all"
+          <p className="text-xs text-muted-foreground leading-snug mb-3">
+            Need help, want to report a bug, or have a privacy-related request? Reach out to us here and we'll get back to you within a few business days.
+          </p>
+          <button
+            onClick={openSupport}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm"
           >
-            bucketapp.support@gmail.com
-          </a>
-          <p className="text-[11px] text-muted-foreground mt-2 leading-snug">
-            We typically reply within a couple of business days.
+            <LifeBuoy className="w-4 h-4" />
+            Contact Support
+          </button>
+          <p className="text-[11px] text-muted-foreground mt-3 leading-snug">
+            Prefer email? Contact us directly at:{" "}
+            <a href="mailto:bucketapp.support@gmail.com" className="text-primary font-medium break-all">
+              bucketapp.support@gmail.com
+            </a>
           </p>
         </div>
       </Section>
@@ -637,6 +672,76 @@ const Settings = () => {
                   }}
                   className="px-4 py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-sm disabled:opacity-50"
                 >Submit</button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Support Contact Modal */}
+      <AnimatePresence>
+        {showSupport && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-foreground/40 flex items-end sm:items-center justify-center p-5"
+            onClick={() => !supportSubmitting && setShowSupport(false)}
+          >
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 20, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-sm bg-card rounded-2xl p-5 shadow-lg"
+            >
+              <h3 className="font-bold text-foreground text-base mb-1">Contact Support</h3>
+              <p className="text-xs text-muted-foreground mb-4">
+                We'll get back to you within a few business days.
+              </p>
+              <label className="block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">Email</label>
+              <input
+                type="email"
+                value={supportEmail}
+                onChange={(e) => setSupportEmail(e.target.value)}
+                placeholder="you@email.com"
+                maxLength={255}
+                className="w-full px-3 py-2.5 rounded-xl bg-muted text-sm text-foreground outline-none mb-3"
+              />
+              <label className="block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">Subject</label>
+              <select
+                value={supportSubject}
+                onChange={(e) => setSupportSubject(e.target.value as "general" | "bug" | "privacy")}
+                className="w-full px-3 py-2.5 rounded-xl bg-muted text-sm text-foreground outline-none mb-3"
+              >
+                <option value="general">General Support</option>
+                <option value="bug">Report a Bug</option>
+                <option value="privacy">Privacy Request</option>
+              </select>
+              <label className="block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">Message</label>
+              <textarea
+                value={supportMessage}
+                onChange={(e) => setSupportMessage(e.target.value)}
+                placeholder="How can we help?"
+                rows={5}
+                maxLength={5000}
+                className="w-full p-3 rounded-xl bg-muted text-sm text-foreground outline-none mb-4 resize-none"
+              />
+              <div className="flex gap-2 justify-end">
+                <button
+                  onClick={() => setShowSupport(false)}
+                  disabled={supportSubmitting}
+                  className="px-4 py-2 rounded-xl bg-muted text-muted-foreground font-semibold text-sm disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSubmitSupport}
+                  disabled={supportSubmitting || !supportEmail.trim() || !supportMessage.trim()}
+                  className="px-4 py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-sm disabled:opacity-50"
+                >
+                  {supportSubmitting ? "Sending..." : "Send"}
+                </button>
               </div>
             </motion.div>
           </motion.div>
