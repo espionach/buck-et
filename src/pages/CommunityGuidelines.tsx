@@ -91,8 +91,8 @@ const CommunityGuidelines = () => {
         <p className="text-xs text-muted-foreground leading-relaxed">
           Violations of these guidelines may result in content removal, temporary restrictions, or
           permanent account suspension. Questions or concerns? Reach us at{" "}
-          <a href="mailto:support@buck-et.app" className="text-primary font-semibold">
-            support@buck-et.app
+          <a href="mailto:bucketapp.support@gmail.com" className="text-primary font-semibold">
+            bucketapp.support@gmail.com
           </a>
           .
         </p>
