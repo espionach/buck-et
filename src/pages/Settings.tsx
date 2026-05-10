@@ -348,7 +348,7 @@ const Settings = () => {
             Need help, want to report a bug, or have a privacy-related request? Reach out to us here and we'll get back to you within a few business days.
           </p>
           <button
-            onClick={openSupport}
+            onClick={() => window.open("https://forms.gle/Djrj3z6ynUxfh5FR8", "_blank")}
             className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm"
           >
             <LifeBuoy className="w-4 h-4" />
