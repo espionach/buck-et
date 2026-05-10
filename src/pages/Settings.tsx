@@ -366,7 +366,7 @@ const Settings = () => {
       <Section title="Legal">
         <Row icon={BookOpen} label="Community Guidelines" onClick={() => nav("/settings/community-guidelines")} />
         <Row icon={FileText} label="Terms of Service" onClick={() => window.open("/terms", "_blank")} />
-        <Row icon={ShieldCheck} label="Privacy Policy" onClick={() => window.open("/privacy", "_blank")} />
+        <Row icon={ShieldCheck} label="Privacy Policy" onClick={() => nav("/settings/privacy-policy")} />
       </Section>
 
       <Section title="Danger Zone">
