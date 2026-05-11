@@ -433,6 +433,257 @@ const PrivacyPolicy = () => {
         possible.
       </P>
 
+      <H2>7. How Do We Keep Your Information Safe?</H2>
+      <P>
+        <em>In Short:</em> We aim to protect your personal information through a system of
+        organizational and technical security measures.
+      </P>
+      <P>
+        We have implemented appropriate and reasonable technical and organizational security
+        measures designed to protect the security of any personal information we process. However,
+        despite our safeguards and efforts to secure your information, no electronic transmission
+        over the Internet or information storage technology can be guaranteed to be 100% secure, so
+        we cannot promise or guarantee that hackers, cybercriminals, or other unauthorized third
+        parties will not be able to defeat our security and improperly collect, access, steal, or
+        modify your information. Although we will do our best to protect your personal information,
+        transmission of personal information to and from our Services is at your own risk. You
+        should only access the Services within a secure environment.
+      </P>
+
+      <H2>8. Do We Collect Information From Minors?</H2>
+      <P>
+        <em>In Short:</em> We do not knowingly collect data from or market to children under 18
+        years of age or the equivalent age as specified by law in your jurisdiction.
+      </P>
+      <P>
+        We do not knowingly collect, solicit data from, or market to children under 18 years of age
+        or the equivalent age as specified by law in your jurisdiction, nor do we knowingly sell
+        such personal information. By using the Services, you represent that you are at least 18 or
+        the equivalent age as specified by law in your jurisdiction or that you are the parent or
+        guardian of such a minor and consent to such minor dependent's use of the Services. If we
+        learn that personal information from users less than 18 years of age or the equivalent age
+        as specified by law in your jurisdiction has been collected, we will deactivate the account
+        and take reasonable measures to promptly delete such data from our records. If you become
+        aware of any data we may have collected from children under age 18 or the equivalent age as
+        specified by law in your jurisdiction, please contact us at{" "}
+        <a href="mailto:bucketapp.support@gmail.com" className="text-primary font-semibold">
+          bucketapp.support@gmail.com
+        </a>
+        .
+      </P>
+
+      <H2>9. What Are Your Privacy Rights?</H2>
+      <P>
+        <em>In Short:</em> Depending on your state of residence in the US or in some regions, such
+        as the European Economic Area (EEA), United Kingdom (UK), Switzerland, and Canada, you have
+        rights that allow you greater access to and control over your personal information. You may
+        review, change, or terminate your account at any time, depending on your country, province,
+        or state of residence.
+      </P>
+      <P>
+        In some regions (like the EEA, UK, Switzerland, and Canada), you have certain rights under
+        applicable data protection laws. These may include the right (i) to request access and
+        obtain a copy of your personal information, (ii) to request rectification or erasure; (iii)
+        to restrict the processing of your personal information; (iv) if applicable, to data
+        portability; and (v) not to be subject to automated decision-making. If a decision that
+        produces legal or similarly significant effects is made solely by automated means, we will
+        inform you, explain the main factors, and offer a simple way to request human review. In
+        certain circumstances, you may also have the right to object to the processing of your
+        personal information. You can make such a request by contacting us by using the contact
+        details provided in the section "HOW CAN YOU CONTACT US ABOUT THIS NOTICE?" below.
+      </P>
+      <P>
+        We will consider and act upon any request in accordance with applicable data protection
+        laws.
+      </P>
+      <P>
+        If you are located in the EEA or UK and you believe we are unlawfully processing your
+        personal information, you also have the right to complain to your Member State data
+        protection authority or UK data protection authority.
+      </P>
+      <P>
+        If you are located in Switzerland, you may contact the Federal Data Protection and
+        Information Commissioner.
+      </P>
+      <P>
+        <strong className="text-foreground">Withdrawing your consent:</strong> If we are relying
+        on your consent to process your personal information, which may be express and/or implied
+        consent depending on the applicable law, you have the right to withdraw your consent at
+        any time. You can withdraw your consent at any time by contacting us by using the contact
+        details provided in the section "HOW CAN YOU CONTACT US ABOUT THIS NOTICE?" below.
+      </P>
+      <P>
+        However, please note that this will not affect the lawfulness of the processing before its
+        withdrawal nor, when applicable law allows, will it affect the processing of your personal
+        information conducted in reliance on lawful processing grounds other than consent.
+      </P>
+      <H3>Account Information</H3>
+      <P>
+        If you would at any time like to review or change the information in your account or
+        terminate your account, you can:
+      </P>
+      <UL>
+        <li>Log in to your account settings and update your user account.</li>
+      </UL>
+      <P>
+        Upon your request to terminate your account, we will deactivate or delete your account and
+        information from our active databases. However, we may retain some information in our
+        files to prevent fraud, troubleshoot problems, assist with any investigations, enforce our
+        legal terms and/or comply with applicable legal requirements.
+      </P>
+      <P>
+        If you have questions or comments about your privacy rights, you may email us at{" "}
+        <a href="mailto:bucketapp.support@gmail.com" className="text-primary font-semibold">
+          bucketapp.support@gmail.com
+        </a>
+        .
+      </P>
+
+      <H2>10. Controls for Do-Not-Track Features</H2>
+      <P>
+        Most web browsers and some mobile operating systems and mobile applications include a
+        Do-Not-Track ("DNT") feature or setting you can activate to signal your privacy preference
+        not to have data about your online browsing activities monitored and collected. At this
+        stage, no uniform technology standard for recognizing and implementing DNT signals has
+        been finalized. As such, we do not currently respond to DNT browser signals or any other
+        mechanism that automatically communicates your choice not to be tracked online. If a
+        standard for online tracking is adopted that we must follow in the future, we will inform
+        you about that practice in a revised version of this Privacy Notice.
+      </P>
+      <P>
+        California law requires us to let you know how we respond to web browser DNT signals.
+        Because there currently is not an industry or legal standard for recognizing or honoring
+        DNT signals, we do not respond to them at this time.
+      </P>
+
+      <H2>11. Do United States Residents Have Specific Privacy Rights?</H2>
+      <P>
+        <em>In Short:</em> If you are a resident of California, Colorado, Connecticut, Delaware,
+        Florida, Indiana, Iowa, Kentucky, Maryland, Minnesota, Montana, Nebraska, New Hampshire,
+        New Jersey, Oregon, Rhode Island, Tennessee, Texas, Utah, or Virginia, you may have the
+        right to request access to and receive details about the personal information we maintain
+        about you and how we have processed it, correct inaccuracies, get a copy of, or delete
+        your personal information. You may also have the right to withdraw your consent to our
+        processing of your personal information. These rights may be limited in some circumstances
+        by applicable law. More information is provided below.
+      </P>
+      <H3>Categories of Personal Information We Collect</H3>
+      <P>
+        The table below shows the categories of personal information we have collected in the past
+        twelve (12) months. The table includes illustrative examples of each category and does not
+        reflect the personal information we collect from you. For a comprehensive inventory of all
+        personal information we process, please refer to the section "WHAT INFORMATION DO WE
+        COLLECT?"
+      </P>
+      <div className="overflow-x-auto mb-3">
+        <table className="w-full text-xs text-left border border-border rounded-lg">
+          <thead className="bg-muted/50 text-foreground">
+            <tr>
+              <th className="p-2 border-b border-border font-semibold">Category</th>
+              <th className="p-2 border-b border-border font-semibold">Examples</th>
+              <th className="p-2 border-b border-border font-semibold">Collected</th>
+            </tr>
+          </thead>
+          <tbody className="text-muted-foreground">
+            {[
+              ["A. Identifiers", "Contact details, such as real name, alias, postal address, telephone or mobile contact number, unique personal identifier, online identifier, Internet Protocol address, email address, and account name"],
+              ["B. Personal information as defined in the California Customer Records statute", "Name, contact information, education, employment, employment history, and financial information"],
+              ["C. Protected classification characteristics under state or federal law", "Gender, age, date of birth, race and ethnicity, national origin, marital status, and other demographic data"],
+              ["D. Commercial information", "Transaction information, purchase history, financial details, and payment information"],
+              ["E. Biometric information", "Fingerprints and voiceprints"],
+              ["F. Internet or other similar network activity", "Browsing history, search history, online behavior, interest data, and interactions with our and other websites, applications, systems, and advertisements"],
+              ["G. Geolocation data", "Device location"],
+              ["H. Audio, electronic, sensory, or similar information", "Images and audio, video or call recordings created in connection with our business activities"],
+              ["I. Professional or employment-related information", "Business contact details in order to provide you our Services at a business level or job title, work history, and professional qualifications if you apply for a job with us"],
+              ["J. Education Information", "Student records and directory information"],
+              ["K. Inferences drawn from collected personal information", "Inferences drawn from any of the collected personal information listed above to create a profile or summary about, for example, an individual's preferences and characteristics"],
+              ["L. Sensitive personal Information", ""],
+            ].map(([cat, ex]) => (
+              <tr key={cat} className="border-t border-border align-top">
+                <td className="p-2 font-medium text-foreground">{cat}</td>
+                <td className="p-2">{ex}</td>
+                <td className="p-2">NO</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <P>
+        We may also collect other personal information outside of these categories through
+        instances where you interact with us in person, online, or by phone or mail in the context
+        of:
+      </P>
+      <UL>
+        <li>Receiving help through our customer support channels;</li>
+        <li>Participation in customer surveys or contests; and</li>
+        <li>Facilitation in the delivery of our Services and to respond to your inquiries.</li>
+      </UL>
+      <H3>Sources of Personal Information</H3>
+      <P>
+        Learn more about the sources of personal information we collect in "WHAT INFORMATION DO WE
+        COLLECT?"
+      </P>
+      <H3>How We Use and Share Personal Information</H3>
+      <P>
+        Learn more about how we use your personal information in the section, "HOW DO WE PROCESS
+        YOUR INFORMATION?"
+      </P>
+      <P>
+        <strong className="text-foreground">Will your information be shared with anyone else?</strong>
+      </P>
+      <P>
+        We may disclose your personal information with our service providers pursuant to a written
+        contract between us and each service provider. Learn more about how we disclose personal
+        information to in the section, "WHEN AND WITH WHOM DO WE SHARE YOUR PERSONAL INFORMATION?"
+      </P>
+      <P>
+        We may use your personal information for our own business purposes, such as for
+        undertaking internal research for technological development and demonstration. This is not
+        considered to be "selling" of your personal information.
+      </P>
+      <P>
+        We have not disclosed, sold, or shared any personal information to third parties for a
+        business or commercial purpose in the preceding twelve (12) months. We will not sell or
+        share personal information in the future belonging to website visitors, users, and other
+        consumers.
+      </P>
+      <H3>Your Rights</H3>
+      <P>
+        You have rights under certain US state data protection laws. However, these rights are not
+        absolute, and in certain cases, we may decline your request as permitted by law. These
+        rights include:
+      </P>
+      <UL>
+        <li>Right to know whether or not we are processing your personal data</li>
+        <li>Right to access your personal data</li>
+        <li>Right to correct inaccuracies in your personal data</li>
+        <li>Right to request the deletion of your personal data</li>
+        <li>Right to obtain a copy of the personal data you previously shared with us</li>
+        <li>Right to non-discrimination for exercising your rights</li>
+        <li>
+          Right to opt out of the processing of your personal data if it is used for targeted
+          advertising (or sharing as defined under California's privacy law), the sale of personal
+          data, or profiling in furtherance of decisions that produce legal or similarly
+          significant effects ("profiling")
+        </li>
+      </UL>
+      <P>Depending upon the state where you live, you may also have the following rights:</P>
+      <UL>
+        <li>
+          Right to access the categories of personal data being processed (as permitted by
+          applicable law, including the privacy law in Minnesota)
+        </li>
+        <li>
+          Right to obtain a list of the categories of third parties to which we have disclosed
+          personal data (as permitted by applicable law, including the privacy law in California,
+          Delaware, and Maryland)
+        </li>
+        <li>
+          Right to obtain a list of specific third parties to which we have disclosed personal
+          data (as permitted by applicable law, including the privacy law in Minnesota and Oregon)
+        </li>
+      </UL>
+
       <div className="mt-8 p-4 rounded-2xl bg-muted/50 border border-border">
         <p className="text-xs text-muted-foreground leading-relaxed">
           Questions about this Privacy Notice? Contact us at{" "}
