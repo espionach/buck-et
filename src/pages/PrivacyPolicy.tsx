@@ -254,6 +254,185 @@ const PrivacyPolicy = () => {
         </li>
       </UL>
 
+      <H2>3. What Legal Bases Do We Rely on to Process Your Information?</H2>
+      <P>
+        <em>In Short:</em> We only process your personal information when we believe it is necessary
+        and we have a valid legal reason (i.e., legal basis) to do so under applicable law, like with
+        your consent, to comply with laws, to provide you with services to enter into or fulfill our
+        contractual obligations, to protect your rights, or to fulfill our legitimate business
+        interests.
+      </P>
+      <P>
+        <em>
+          <strong>If you are located in the EU or UK, this section applies to you.</strong>
+        </em>
+      </P>
+      <P>
+        The General Data Protection Regulation (GDPR) and UK GDPR require us to explain the valid
+        legal bases we rely on in order to process your personal information. As such, we may rely
+        on the following legal bases to process your personal information:
+      </P>
+      <UL>
+        <li>
+          <strong className="text-foreground">Consent.</strong> We may process your information if
+          you have given us permission (i.e., consent) to use your personal information for a
+          specific purpose. You can withdraw your consent at any time. Learn more about
+          withdrawing your consent.
+        </li>
+        <li>
+          <strong className="text-foreground">Performance of a Contract.</strong> We may process
+          your personal information when we believe it is necessary to fulfill our contractual
+          obligations to you, including providing our Services or at your request prior to entering
+          into a contract with you.
+        </li>
+        <li>
+          <strong className="text-foreground">Legal Obligations.</strong> We may process your
+          information where we believe it is necessary for compliance with our legal obligations,
+          such as to cooperate with a law enforcement body or regulatory agency, exercise or defend
+          our legal rights, or disclose your information as evidence in litigation in which we are
+          involved.
+        </li>
+        <li>
+          <strong className="text-foreground">Vital Interests.</strong> We may process your
+          information where we believe it is necessary to protect your vital interests or the
+          vital interests of a third party, such as situations involving potential threats to the
+          safety of any person.
+        </li>
+      </UL>
+      <P>
+        <em>
+          <strong>If you are located in Canada, this section applies to you.</strong>
+        </em>
+      </P>
+      <P>
+        We may process your information if you have given us specific permission (i.e., express
+        consent) to use your personal information for a specific purpose, or in situations where
+        your permission can be inferred (i.e., implied consent). You can withdraw your consent at
+        any time.
+      </P>
+      <P>
+        In some exceptional cases, we may be legally permitted under applicable law to process your
+        information without your consent, including, for example:
+      </P>
+      <UL>
+        <li>
+          If collection is clearly in the interests of an individual and consent cannot be obtained
+          in a timely way
+        </li>
+        <li>For investigations and fraud detection and prevention</li>
+        <li>For business transactions provided certain conditions are met</li>
+        <li>
+          If it is contained in a witness statement and the collection is necessary to assess,
+          process, or settle an insurance claim
+        </li>
+        <li>
+          For identifying injured, ill, or deceased persons and communicating with next of kin
+        </li>
+        <li>
+          If we have reasonable grounds to believe an individual has been, is, or may be victim of
+          financial abuse
+        </li>
+        <li>
+          If it is reasonable to expect collection and use with consent would compromise the
+          availability or the accuracy of the information and the collection is reasonable for
+          purposes related to investigating a breach of an agreement or a contravention of the laws
+          of Canada or a province
+        </li>
+        <li>
+          If disclosure is required to comply with a subpoena, warrant, court order, or rules of
+          the court relating to the production of records
+        </li>
+        <li>
+          If it was produced by an individual in the course of their employment, business, or
+          profession and the collection is consistent with the purposes for which the information
+          was produced
+        </li>
+        <li>
+          If the collection is solely for journalistic, artistic, or literary purposes
+        </li>
+        <li>If the information is publicly available and is specified by the regulations</li>
+        <li>
+          We may disclose de-identified information for approved research or statistics projects,
+          subject to ethics oversight and confidentiality commitments
+        </li>
+      </UL>
+
+      <H2>4. When and With Whom Do We Share Your Personal Information?</H2>
+      <P>
+        <em>In Short:</em> We may share information in specific situations described in this
+        section and/or with the following third parties.
+      </P>
+      <P>We may need to share your personal information in the following situations:</P>
+      <UL>
+        <li>
+          <strong className="text-foreground">Business Transfers.</strong> We may share or
+          transfer your information in connection with, or during negotiations of, any merger,
+          sale of company assets, financing, or acquisition of all or a portion of our business to
+          another company.
+        </li>
+        <li>
+          <strong className="text-foreground">Other Users.</strong> When you share personal
+          information (for example, by posting comments, contributions, or other content to the
+          Services) or otherwise interact with public areas of the Services, such personal
+          information may be viewed by all users and may be publicly made available outside the
+          Services in perpetuity. Similarly, other users will be able to view descriptions of
+          your activity, communicate with you within our Services, and view your profile.
+        </li>
+      </UL>
+
+      <H2>5. Is Your Information Transferred Internationally?</H2>
+      <P>
+        <em>In Short:</em> We may transfer, store, and process your information in countries other
+        than your own.
+      </P>
+      <P>
+        Our servers are located in the United States. Regardless of your location, please be aware
+        that your information may be transferred to, stored by, and processed by us in our
+        facilities and in the facilities of the third parties with whom we may share your personal
+        information (see "WHEN AND WITH WHOM DO WE SHARE YOUR PERSONAL INFORMATION?" above),
+        including facilities in the United States and other countries.
+      </P>
+      <P>
+        If you are a resident in the European Economic Area (EEA), United Kingdom (UK), or
+        Switzerland, then these countries may not necessarily have data protection laws or other
+        similar laws as comprehensive as those in your country. However, we will take all necessary
+        measures to protect your personal information in accordance with this Privacy Notice and
+        applicable law.
+      </P>
+      <P>
+        <strong className="text-foreground">European Commission's Standard Contractual Clauses:</strong>
+      </P>
+      <P>
+        We have implemented measures to protect your personal information, including by using the
+        European Commission's Standard Contractual Clauses for transfers of personal information
+        between our group companies and between us and our third-party providers. These clauses
+        require all recipients to protect all personal information that they process originating
+        from the EEA or UK in accordance with European data protection laws and regulations. Our
+        Standard Contractual Clauses can be provided upon request. We have implemented similar
+        appropriate safeguards with our third-party service providers and partners and further
+        details can be provided upon request.
+      </P>
+
+      <H2>6. How Long Do We Keep Your Information?</H2>
+      <P>
+        <em>In Short:</em> We keep your information for as long as necessary to fulfill the
+        purposes outlined in this Privacy Notice unless otherwise required by law.
+      </P>
+      <P>
+        We will only keep your personal information for as long as it is necessary for the purposes
+        set out in this Privacy Notice, unless a longer retention period is required or permitted by
+        law (such as tax, accounting, or other legal requirements). No purpose in this notice will
+        require us keeping your personal information for longer than the period of time in which
+        users have an account with us.
+      </P>
+      <P>
+        When we have no ongoing legitimate business need to process your personal information, we
+        will either delete or anonymize such information, or, if this is not possible (for example,
+        because your personal information has been stored in backup archives), then we will securely
+        store your personal information and isolate it from any further processing until deletion is
+        possible.
+      </P>
+
       <div className="mt-8 p-4 rounded-2xl bg-muted/50 border border-border">
         <p className="text-xs text-muted-foreground leading-relaxed">
           Questions about this Privacy Notice? Contact us at{" "}
