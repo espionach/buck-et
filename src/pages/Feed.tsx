@@ -150,8 +150,8 @@ const Feed = () => {
             <ellipse cx="32" cy="28" rx="24" ry="6" stroke="hsl(var(--primary))" strokeWidth="2.5" fill="hsl(var(--background))" />
             <clipPath id="bucketFilled"><path d="M10 30 L15 70 C15 74, 49 74, 49 70 L54 30 Z" /></clipPath>
             <g clipPath="url(#bucketFilled)">
-              <rect x="8" y="40" width="48" height="38" fill="hsl(var(--primary))" opacity={0.35} />
-              <ellipse cx="32" cy="40" rx="26" ry="4" fill="hsl(var(--primary))" opacity={0.55} />
+              <rect x="8" y="43" width="48" height="35" fill="hsl(var(--primary))" opacity={0.35} />
+              <ellipse cx="32" cy="43" rx="26" ry="4" fill="hsl(var(--primary))" opacity={0.55} />
             </g>
           </svg>
           <div>
