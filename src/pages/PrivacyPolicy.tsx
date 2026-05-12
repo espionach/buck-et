@@ -26,7 +26,7 @@ const PrivacyPolicy = () => {
     <div className="min-h-screen pb-24 px-5 pt-14">
       <div className="flex items-center gap-3 mb-6">
         <button
-          onClick={() => nav(-1)}
+          onClick={() => nav("/settings")}
           className="p-2 -ml-2 text-muted-foreground"
           aria-label="Back"
         >
