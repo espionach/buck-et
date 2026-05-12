@@ -682,15 +682,140 @@ const PrivacyPolicy = () => {
           Right to obtain a list of specific third parties to which we have disclosed personal
           data (as permitted by applicable law, including the privacy law in Minnesota and Oregon)
         </li>
+        <li>
+          Right to obtain a list of third parties to which we have sold personal data (as permitted
+          by applicable law, including the privacy law in Connecticut)
+        </li>
+        <li>
+          Right to review, understand, question, and depending on where you live, correct how
+          personal data has been profiled (as permitted by applicable law, including the privacy law
+          in Connecticut and Minnesota)
+        </li>
+        <li>
+          Right to limit use and disclosure of sensitive personal data (as permitted by applicable
+          law, including the privacy law in California)
+        </li>
+        <li>
+          Right to opt out of the collection of sensitive data and personal data collected through
+          the operation of a voice or facial recognition feature (as permitted by applicable law,
+          including the privacy law in Florida)
+        </li>
       </UL>
+
+      <H3>How to Exercise Your Rights</H3>
+      <P>
+        To exercise these rights, you can contact us by visiting{" "}
+        <a
+          href="https://forms.gle/S8384AgTtxqYrhZ88"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-primary font-semibold"
+        >
+          https://forms.gle/S8384AgTtxqYrhZ88
+        </a>
+        , by emailing us at{" "}
+        <a href="mailto:bucketapp.support@gmail.com" className="text-primary font-semibold">
+          bucketapp.support@gmail.com
+        </a>
+        , or by referring to the contact details at the bottom of this document.
+      </P>
+      <P>
+        Under certain US state data protection laws, you can designate an authorized agent to make a
+        request on your behalf. We may deny a request from an authorized agent that does not submit
+        proof that they have been validly authorized to act on your behalf in accordance with
+        applicable laws.
+      </P>
+
+      <H3>Request Verification</H3>
+      <P>
+        Upon receiving your request, we will need to verify your identity to determine you are the
+        same person about whom we have the information in our system. We will only use personal
+        information provided in your request to verify your identity or authority to make the
+        request. However, if we cannot verify your identity from the information already maintained
+        by us, we may request that you provide additional information for the purposes of verifying
+        your identity and for security or fraud-prevention purposes.
+      </P>
+      <P>
+        If you submit the request through an authorized agent, we may need to collect additional
+        information to verify your identity before processing your request and the agent will need to
+        provide a written and signed permission from you to submit such request on your behalf.
+      </P>
+
+      <H3>Appeals</H3>
+      <P>
+        Under certain US state data protection laws, if we decline to take action regarding your
+        request, you may appeal our decision by emailing us at{" "}
+        <a href="mailto:bucketapp.support@gmail.com" className="text-primary font-semibold">
+          bucketapp.support@gmail.com
+        </a>
+        . We will inform you in writing of any action taken or not taken in response to the appeal,
+        including a written explanation of the reasons for the decisions. If your appeal is denied,
+        you may submit a complaint to your state attorney general.
+      </P>
+
+      <H3>California "Shine The Light" Law</H3>
+      <P>
+        California Civil Code Section 1798.83, also known as the "Shine The Light" law, permits
+        our users who are California residents to request and obtain from us, once a year and free
+        of charge, information about categories of personal information (if any) we disclosed to
+        third parties for direct marketing purposes and the names and addresses of all third parties
+        with which we shared personal information in the immediately preceding calendar year. If you
+        are a California resident and would like to make such a request, please submit your request
+        in writing to us by using the contact details provided in the section "HOW CAN YOU CONTACT
+        US ABOUT THIS NOTICE?"
+      </P>
+
+      <H2>12. Do We Make Updates to This Notice?</H2>
+      <P>
+        <em>In Short:</em> Yes, we will update this notice as necessary to stay compliant with
+        relevant laws.
+      </P>
+      <P>
+        We may update this Privacy Notice from time to time. The updated version will be indicated
+        by an updated "Revised" date at the top of this Privacy Notice. If we make material changes
+        to this Privacy Notice, we may notify you either by prominently posting a notice of such
+        changes or by directly sending you a notification. We encourage you to review this Privacy
+        Notice frequently to be informed of how we are protecting your information.
+      </P>
+
+      <H2>13. How Can You Contact Us About This Notice?</H2>
+      <P>
+        If you have questions or comments about this notice, you may email us at{" "}
+        <a href="mailto:bucketapp.support@gmail.com" className="text-primary font-semibold">
+          bucketapp.support@gmail.com
+        </a>{" "}
+        or contact us by post at:
+      </P>
+      <P>
+        <strong className="text-foreground">Buck-et</strong>
+        <br />
+        __________
+      </P>
+
+      <H2>
+        14. How Can You Review, Update, or Delete the Data We Collect From You?
+      </H2>
+      <P>
+        Based on the applicable laws of your country or state of residence in the US, you may have
+        the right to request access to the personal information we collect from you, details about
+        how we have processed it, correct inaccuracies, or delete your personal information. You may
+        also have the right to withdraw your consent to our processing of your personal information.
+        These rights may be limited in some circumstances by applicable law. To request to review,
+        update, or delete your personal information, please visit:{" "}
+        <a
+          href="https://forms.gle/S8384AgTtxqYrhZ88"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-primary font-semibold"
+        >
+          https://forms.gle/S8384AgTtxqYrhZ88
+        </a>
+        .
+      </P>
 
       <div className="mt-8 p-4 rounded-2xl bg-muted/50 border border-border">
         <p className="text-xs text-muted-foreground leading-relaxed">
-          Questions about this Privacy Notice? Contact us at{" "}
-          <a href="mailto:bucketapp.support@gmail.com" className="text-primary font-semibold">
-            bucketapp.support@gmail.com
-          </a>
-          .
+          This Privacy Policy was created using Termly&apos;s Privacy Policy Generator.
         </p>
       </div>
     </div>
