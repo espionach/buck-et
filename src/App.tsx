@@ -89,6 +89,7 @@ const AppLayout = () => {
         <Route path="/settings/blocked" element={<ProtectedRoute><BlockedUsers /></ProtectedRoute>} />
         <Route path="/settings/community-guidelines" element={<ProtectedRoute><CommunityGuidelines /></ProtectedRoute>} />
         <Route path="/settings/privacy-policy" element={<ProtectedRoute><PrivacyPolicy /></ProtectedRoute>} />
+        <Route path="/settings/terms" element={<ProtectedRoute><TermsAndConditions /></ProtectedRoute>} />
         <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
         <Route path="/admin/reports" element={<ProtectedRoute><AdminReports /></ProtectedRoute>} />
         <Route path="/create" element={<ProtectedRoute><CreateQuest /></ProtectedRoute>} />
