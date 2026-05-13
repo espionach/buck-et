@@ -16,6 +16,7 @@ import AdminReports from "./pages/AdminReports";
 import AdminDashboard from "./pages/AdminDashboard";
 import CommunityGuidelines from "./pages/CommunityGuidelines";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsAndConditions from "./pages/TermsAndConditions";
 import CreateQuest from "./pages/CreateQuest";
 import CreateGroup from "./pages/CreateGroup";
 import QuestDetail from "./pages/QuestDetail";
