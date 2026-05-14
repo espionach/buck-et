@@ -317,6 +317,36 @@ export type Database = {
         }
         Relationships: []
       }
+      legal_updates: {
+        Row: {
+          created_at: string
+          effective_date: string
+          id: string
+          message: string
+          title: string
+          type: string
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          effective_date: string
+          id?: string
+          message: string
+          title: string
+          type: string
+          version: number
+        }
+        Update: {
+          created_at?: string
+          effective_date?: string
+          id?: string
+          message?: string
+          title?: string
+          type?: string
+          version?: number
+        }
+        Relationships: []
+      }
       notification_preferences: {
         Row: {
           created_at: string
@@ -779,6 +809,30 @@ export type Database = {
           strike_count?: number
           suspended_until?: string | null
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_legal_acknowledgements: {
+        Row: {
+          id: string
+          last_seen_version: number
+          seen_at: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          last_seen_version: number
+          seen_at?: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          last_seen_version?: number
+          seen_at?: string
+          type?: string
           user_id?: string
         }
         Relationships: []
