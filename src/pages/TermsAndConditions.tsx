@@ -1,5 +1,7 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+
 
 const H2 = ({ children }: { children: React.ReactNode }) => (
   <h2 className="text-base font-bold text-foreground mt-6 mb-2">{children}</h2>
@@ -17,6 +19,10 @@ const UL = ({ children }: { children: React.ReactNode }) => (
 
 const TermsAndConditions = () => {
   const nav = useNavigate();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <div className="min-h-screen pb-24 px-5 pt-14">
