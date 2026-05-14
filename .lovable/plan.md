@@ -1,59 +1,42 @@
-## Goal
+# Legal Updates System
 
-1. Make the "Join" button on quest cards (Home/Feed) orange — matching the "Join sidequest" button styling on the quest details page.
-2. On the quest details page, when the user taps "Join sidequest", animate the button morphing into the green check-circle (the same style used on the quest card after joining), then have it fade/scale out while the rest of the page content slides up to fill the space.
+A simple in-app system to notify users when the Terms of Service or Privacy Policy changes, and let them review past updates from Settings.
 
-## Changes
+## What gets built
 
-### 1. `src/components/QuestCard.tsx` — orange Join pill
+1. **Database**
+   - New table `legal_updates`: `id`, `type` (`terms` | `privacy`), `version` (int), `title`, `message`, `effective_date`, `created_at`. Public read, admin-only write.
+   - New table `user_legal_acknowledgements`: `user_id`, `type`, `last_seen_version`, `seen_at`. Unique on (user_id, type). Each user can only read/write their own rows.
 
-In the join button (lines ~257–274), replace the muted styling for the not-joined state with the primary (orange) styling. The joined state (green check-circle using `bg-secondary`) stays exactly the same.
+2. **Banner**
+   - New `LegalUpdateBanner` component shown above the bottom nav on the main app screens (Home, Groups, Profile).
+   - Queries the latest `legal_updates` row per type and compares with the user's `user_legal_acknowledgements`.
+   - If anything is unseen, shows a single banner: title "We updated our Terms" / "We updated our Privacy Policy", message "Tap to review the latest changes.", and a "Review" button that navigates to `/settings/terms` or `/settings/privacy-policy`.
+   - When the user opens that page, we mark the latest version as seen, which dismisses the banner.
+   - If multiple updates are unseen, the most recent one is shown first; the next appears after acknowledging the first.
 
-- Joinable: `bg-primary text-primary-foreground hover:bg-primary/90` (was `bg-muted text-muted-foreground`).
-- Disabled (not in group / can't join): keep a faded primary look, e.g. `bg-primary/40 text-primary-foreground/70 cursor-not-allowed`.
-- Joined state unchanged: `w-8 h-8 rounded-full bg-secondary text-secondary-foreground` with `<Check />`.
+3. **Policy pages**
+   - `TermsAndConditions.tsx` and `PrivacyPolicy.tsx` already show a "Last updated" date — keep it, and on mount upsert `user_legal_acknowledgements` with the latest version of that type.
 
-### 2. `src/pages/QuestDetail.tsx` — join button morph + content slide-up
+4. **Settings → Legal Updates**
+   - New row in Settings opening `/settings/legal-updates`.
+   - Page lists past `legal_updates` (newest first) with title, date, short summary, and a button to open the corresponding policy page.
 
-Wrap the Join CTA region (lines ~209–219) in a Framer Motion sequence. State machine added locally:
+5. **Seeding current versions**
+   - Insert two initial rows so the system has a known "current" version for each policy:
+     - Terms: version 1, date May 11, 2026, title "Terms of Service Update", message "We updated our Terms of Service."
+     - Privacy: version 1, date May 06, 2026, title "Privacy Policy Update", message "We updated our Privacy Policy."
 
-```text
-idle  ──tap──▶  morphing (pill → circle, color orange → green, label fades to Check)
-                    │
-                    └─after ~450ms──▶ exiting (circle scales/fades out, height collapses to 0)
-                                          │
-                                          └─after ~250ms──▶ done (region unmounted; isIn === true so it stays gone)
-```
+## Technical details
 
-Implementation notes:
-- Add `const [joinAnim, setJoinAnim] = useState<"idle"|"morph"|"exit"|"done">("idle")`.
-- On click: `setJoinAnim("morph")`, immediately call `toggleImIn(quest.id)` so app state reflects the join (the rest of the page already reads `isIn`, but we suppress the natural unmount until the animation finishes by gating the CTA's render on `joinAnim !== "done"` rather than `!isIn`).
-- After 450ms → `setJoinAnim("exit")`. After another 250ms → `setJoinAnim("done")`.
-- Use `motion.div` with `layout` on the CTA container and on the `<div className="px-5 space-y-4 mt-2">` content wrapper so when the CTA collapses, the body content animates upward smoothly via Framer's shared layout transitions (`transition={{ type: "spring", stiffness: 400, damping: 32 }}`).
-- The button itself uses `motion.button` with `animate` props transitioning:
-  - width: `100%` → `32px`
-  - borderRadius: `0.75rem` → `9999px`
-  - backgroundColor: `hsl(var(--primary))` → `hsl(var(--secondary))`
-  - height stays `~40px`, then collapses to 0 on exit.
-- Inner content uses `<AnimatePresence mode="wait">` swapping the "Join sidequest" text (fade/scale-out) for a `<Check />` icon (fade/scale-in) once `joinAnim === "morph"`.
-- Exit phase animates `opacity: 0, height: 0, marginTop: 0` to remove the row and let the layout shift pull the rest of the details upward.
-
-No store/API changes; `toggleImIn` already exists. No new dependencies — `framer-motion` is already imported.
-
-## Visual reference
-
-```text
-[ Join sidequest         ]   ← orange pill, full width
-        │ tap
-        ▼
-       (●)  ← shrinks to right, turns green, shows ✓
-        │
-        ▼
-       (gone) — details below slide up to fill the gap
-```
+- New routes in `App.tsx`: `/settings/legal-updates`. Add to `hideNav` list.
+- Banner placement: render inside `AppLayout` just above `<BottomNav />`, hidden on the same routes `hideNav` hides the nav, plus auth/onboarding routes.
+- Hook `useLegalUpdates()` returns `{ latestByType, unseen, acknowledge(type, version) }` using Supabase queries; subscribes to realtime changes on `legal_updates` so banner appears immediately when admins publish a new update.
+- Acknowledgement uses `upsert` on (user_id, type) with `last_seen_version = greatest(existing, new)`.
+- All styling uses existing semantic tokens (`bg-card`, `text-foreground`, `text-muted-foreground`, `text-primary`); no custom colors. Lucide icons only.
+- To publish a future update: admin inserts a new `legal_updates` row with an incremented `version` for that type. (No admin UI in this pass — table writes happen via SQL/migration. Can be added later if you want.)
 
 ## Out of scope
 
-- No changes to the joined-state appearance on the card.
-- No changes to the disabled/finished cases on the details page (already not rendered).
-- No changes to logic in `toggleImIn`.
+- Push notifications, email notifications.
+- Admin UI for composing legal updates (insert directly in the DB / via migration for now).

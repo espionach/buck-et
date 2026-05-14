@@ -17,6 +17,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import CommunityGuidelines from "./pages/CommunityGuidelines";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsAndConditions from "./pages/TermsAndConditions";
+import LegalUpdates from "./pages/LegalUpdates";
 import CreateQuest from "./pages/CreateQuest";
 import CreateGroup from "./pages/CreateGroup";
 import QuestDetail from "./pages/QuestDetail";
@@ -26,6 +27,7 @@ import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import BottomNav from "./components/BottomNav";
+import LegalUpdateBanner from "./components/LegalUpdateBanner";
 import Welcome from "./pages/onboarding/Welcome";
 import OnboardingPermissions from "./pages/onboarding/Permissions";
 import OnboardingFriends from "./pages/onboarding/Friends";
@@ -66,7 +68,7 @@ const AuthRoute = ({ children }: { children: React.ReactNode }) => {
 
 const AppLayout = () => {
   const location = useLocation();
-  const hideNav = ["/create", "/create-group", "/login", "/signup", "/forgot-password", "/reset-password", "/settings", "/settings/blocked", "/settings/community-guidelines", "/settings/privacy-policy", "/settings/terms", "/admin", "/admin/reports"].includes(location.pathname) || location.pathname.startsWith("/quest/") || location.pathname.startsWith("/onboarding/") || /^\/g\/[^/]+\/invite$/.test(location.pathname);
+  const hideNav = ["/create", "/create-group", "/login", "/signup", "/forgot-password", "/reset-password", "/settings", "/settings/blocked", "/settings/community-guidelines", "/settings/privacy-policy", "/settings/terms", "/settings/legal-updates", "/admin", "/admin/reports"].includes(location.pathname) || location.pathname.startsWith("/quest/") || location.pathname.startsWith("/onboarding/") || /^\/g\/[^/]+\/invite$/.test(location.pathname);
 
   return (
     <div className="max-w-md mx-auto min-h-screen relative">
@@ -90,6 +92,7 @@ const AppLayout = () => {
         <Route path="/settings/community-guidelines" element={<ProtectedRoute><CommunityGuidelines /></ProtectedRoute>} />
         <Route path="/settings/privacy-policy" element={<ProtectedRoute><PrivacyPolicy /></ProtectedRoute>} />
         <Route path="/settings/terms" element={<ProtectedRoute><TermsAndConditions /></ProtectedRoute>} />
+        <Route path="/settings/legal-updates" element={<ProtectedRoute><LegalUpdates /></ProtectedRoute>} />
         <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
         <Route path="/admin/reports" element={<ProtectedRoute><AdminReports /></ProtectedRoute>} />
         <Route path="/create" element={<ProtectedRoute><CreateQuest /></ProtectedRoute>} />
@@ -98,6 +101,7 @@ const AppLayout = () => {
         <Route path="*" element={<NotFound />} />
       </Routes>
       {!hideNav && <BottomNav />}
+      {!hideNav && <LegalUpdateBanner />}
       <GlobalTour />
     </div>
   );

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Mail, Lock, Bell, LifeBuoy, FileText, ShieldCheck, LogOut, Trash2, ChevronRight, Flag, ShieldOff, Compass, BookOpen, Shield, Inbox } from "lucide-react";
+import { ArrowLeft, Mail, Lock, Bell, LifeBuoy, FileText, ShieldCheck, LogOut, Trash2, ChevronRight, Flag, ShieldOff, Compass, BookOpen, Shield, Inbox, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/contexts/AuthContext";
@@ -367,6 +367,7 @@ const Settings = () => {
         <Row icon={BookOpen} label="Community Guidelines" onClick={() => nav("/settings/community-guidelines")} />
         <Row icon={FileText} label="Terms of Service" onClick={() => nav("/settings/terms")} />
         <Row icon={ShieldCheck} label="Privacy Policy" onClick={() => nav("/settings/privacy-policy")} />
+        <Row icon={Sparkles} label="Legal Updates" onClick={() => nav("/settings/legal-updates")} />
       </Section>
 
       <Section title="Danger Zone">

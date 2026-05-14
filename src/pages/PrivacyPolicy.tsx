@@ -1,5 +1,7 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import { useLegalUpdates } from "@/hooks/useLegalUpdates";
 
 const H2 = ({ children }: { children: React.ReactNode }) => (
   <h2 className="text-base font-bold text-foreground mt-6 mb-2">{children}</h2>
@@ -21,6 +23,12 @@ const UL = ({ children }: { children: React.ReactNode }) => (
 
 const PrivacyPolicy = () => {
   const nav = useNavigate();
+  const { acknowledgeLatest } = useLegalUpdates();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    acknowledgeLatest("privacy");
+  }, [acknowledgeLatest]);
 
   return (
     <div className="min-h-screen pb-24 px-5 pt-14">
