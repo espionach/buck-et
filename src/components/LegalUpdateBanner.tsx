@@ -12,7 +12,7 @@ const LegalUpdateBanner = () => {
     first.type === "terms" ? "We updated our Terms" : "We updated our Privacy Policy";
 
   return (
-    <div className="fixed bottom-16 left-0 right-0 z-40 px-3 pointer-events-none">
+    <div className="fixed bottom-40 left-0 right-0 z-40 px-3 pointer-events-none">
       <div className="max-w-md mx-auto pointer-events-auto">
         <div className="bg-card border border-border rounded-2xl shadow-lg p-3 flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center shrink-0">
