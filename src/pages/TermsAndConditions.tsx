@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import { useLegalUpdates } from "@/hooks/useLegalUpdates";
 
 
 const H2 = ({ children }: { children: React.ReactNode }) => (
@@ -19,10 +20,12 @@ const UL = ({ children }: { children: React.ReactNode }) => (
 
 const TermsAndConditions = () => {
   const nav = useNavigate();
+  const { acknowledgeLatest } = useLegalUpdates();
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+    acknowledgeLatest("terms");
+  }, [acknowledgeLatest]);
 
   return (
     <div className="min-h-screen pb-24 px-5 pt-14">
