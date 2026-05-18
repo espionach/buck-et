@@ -5,16 +5,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Users, Check, X, ArrowRightLeft } from "lucide-react";
 import { useState } from "react";
 import { usePopup } from "@/hooks/use-popup";
-import { GROUP_COLORS } from "@/data/groupColors";
+import { parseGroupColor, gradientClassFor, gradientStyleFor, patternStyleFor } from "@/data/groupColors";
 
 interface GroupCardProps {
   group: Group;
   onClick: () => void;
   index: number;
 }
-
-const styleFor = (id?: string) =>
-  GROUP_COLORS.find((c) => c.id === id) || GROUP_COLORS[0];
 
 const GroupCard = ({ group, onClick, index }: GroupCardProps) => {
   const { transferRequests, acceptTransfer, declineTransfer, currentUser } = useAppStore();
@@ -24,6 +21,8 @@ const GroupCard = ({ group, onClick, index }: GroupCardProps) => {
   const pendingTransfer = transferRequests.find(
     (tr) => tr.type === "group" && tr.entityId === group.id && tr.toUserId === currentUser.id
   );
+  const parsed = parseGroupColor(group.color);
+  const overlay = patternStyleFor(parsed.pattern);
 
   return (
     <>
@@ -35,13 +34,14 @@ const GroupCard = ({ group, onClick, index }: GroupCardProps) => {
       >
         <button
           onClick={onClick}
-          className={`relative w-full text-left p-5 rounded-xl bg-gradient-to-br ${styleFor(group.color).gradient} border border-border/50 active:scale-[0.98] transition-transform flex flex-col overflow-hidden`}
+          style={gradientStyleFor(group.color)}
+          className={`relative w-full text-left p-5 rounded-xl ${gradientClassFor(group.color)} border border-border/50 active:scale-[0.98] transition-transform flex flex-col overflow-hidden`}
         >
-          {styleFor(group.color).patternStyle && (
+          {overlay && (
             <div
               aria-hidden
               className="absolute inset-0 pointer-events-none opacity-70"
-              style={styleFor(group.color).patternStyle}
+              style={overlay}
             />
           )}
           {/* Transfer icon badge */}
