@@ -57,7 +57,7 @@ const confettiSvg = (c: string) =>
   `<rect x='30' y='34' width='7' height='2.5' rx='1' transform='rotate(-10 33.5 35.25)' fill='${c}'/>` +
   `</svg>`;
 
-export const patternStyleFor = (pattern: PatternId, color = "rgba(15,23,42,0.32)"): CSSProperties | undefined => {
+export const patternStyleFor = (pattern: PatternId, color = "rgba(255,255,255,0.5)"): CSSProperties | undefined => {
   switch (pattern) {
     case "plaid":
       return {
