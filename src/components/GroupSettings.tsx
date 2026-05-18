@@ -6,7 +6,7 @@ import { UserPlus, LogOut, Crown, Clock, Trash2, Pencil, Check, Bell, BellOff, S
 import { useEffect, useState } from "react";
 import { usePopup } from "@/hooks/use-popup";
 import { motion, AnimatePresence } from "framer-motion";
-import { GROUP_COLORS } from "@/data/groupColors";
+import GroupStylePicker from "@/components/GroupStylePicker";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -175,28 +175,7 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
           {/* Group card style */}
           <div>
             <h3 className="font-bold text-foreground text-sm mb-2">Card Style</h3>
-            <div className="grid grid-cols-4 gap-2">
-              {GROUP_COLORS.map((c) => (
-                <button
-                  key={c.id}
-                  onClick={() => handleColorChange(c.id)}
-                  aria-label={c.label}
-                  title={c.label}
-                  className={`relative h-12 rounded-xl border bg-gradient-to-br ${c.gradient} overflow-hidden transition-transform active:scale-95 ${
-                    editColor === c.id ? "ring-2 ring-foreground border-transparent" : "border-border/50"
-                  }`}
-                >
-                  {c.patternStyle && (
-                    <span className="absolute inset-0 opacity-70" style={c.patternStyle} aria-hidden />
-                  )}
-                  {editColor === c.id && (
-                    <span className="absolute inset-0 flex items-center justify-center">
-                      <Check className="w-4 h-4 text-foreground drop-shadow" />
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
+            <GroupStylePicker value={editColor} onChange={handleColorChange} />
           </div>
 
           {/* Per-group notifications */}

@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import UserAvatar from "@/components/UserAvatar";
-import { GROUP_COLORS } from "@/data/groupColors";
+import GroupStylePicker from "@/components/GroupStylePicker";
 
 const CreateGroup = () => {
   const navigate = useNavigate();
@@ -98,29 +98,7 @@ const CreateGroup = () => {
 
         <div>
           <label className="text-sm font-semibold text-foreground mb-2 block">Card Style</label>
-          <div className="grid grid-cols-4 gap-2">
-            {GROUP_COLORS.map((c) => (
-              <button
-                key={c.id}
-                type="button"
-                onClick={() => setColor(c.id)}
-                aria-label={c.label}
-                title={c.label}
-                className={`relative h-14 rounded-xl border bg-gradient-to-br ${c.gradient} overflow-hidden transition-transform active:scale-95 ${
-                  color === c.id ? "ring-2 ring-foreground border-transparent" : "border-border/50"
-                }`}
-              >
-                {c.patternStyle && (
-                  <span className="absolute inset-0 opacity-70" style={c.patternStyle} aria-hidden />
-                )}
-                {color === c.id && (
-                  <span className="absolute inset-0 flex items-center justify-center">
-                    <Check className="w-4 h-4 text-foreground drop-shadow" />
-                  </span>
-                )}
-              </button>
-            ))}
-          </div>
+          <GroupStylePicker value={color} onChange={setColor} />
         </div>
 
         <div>
