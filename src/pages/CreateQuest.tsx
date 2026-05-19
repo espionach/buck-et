@@ -5,6 +5,7 @@ import { Quest } from "@/data/mockData";
 import { ALL_CONTRIBUTION_ROLES } from "@/data/contributionRoles";
 import { ArrowLeft, Sparkles, ChevronDown, ImagePlus, Link as LinkIcon, X, Globe, Check } from "lucide-react";
 import GroupSwatch from "@/components/GroupSwatch";
+import LocationPicker, { type LocationValue } from "@/components/LocationPicker";
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -28,7 +29,7 @@ const CreateQuest = () => {
   // Logistics fields
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
-  const [location, setLocation] = useState("");
+  const [location, setLocation] = useState<LocationValue>({ text: "" });
   const [meetupSpot, setMeetupSpot] = useState("");
   const [transportation, setTransportation] = useState<string>("");
   const [carpoolSlots, setCarpoolSlots] = useState("");
@@ -95,7 +96,7 @@ const CreateQuest = () => {
       return;
     }
     setSubmitting(true);
-    const hasDate = !!(date || time || location || meetupSpot || transportation || customNotes || contributionRoles.length > 0);
+    const hasDate = !!(date || time || location.text || meetupSpot || transportation || customNotes || contributionRoles.length > 0);
     try {
       // 1. Insert the sidequest row first so we get a real id and storage RLS allows uploads.
       const { data: inserted, error: insertErr } = await supabase
@@ -110,7 +111,10 @@ const CreateQuest = () => {
           links: links.length > 0 ? links : [],
           logistics_date: date || null,
           logistics_time: time || null,
-          logistics_location: location || null,
+          logistics_location: location.text || null,
+          logistics_latitude: location.latitude ?? null,
+          logistics_longitude: location.longitude ?? null,
+          logistics_place_id: location.placeId ?? null,
           logistics_meetup_spot: meetupSpot || null,
           logistics_transportation: transportation || null,
           logistics_carpool_slots: carpoolSlots ? parseInt(carpoolSlots) : null,
@@ -162,7 +166,10 @@ const CreateQuest = () => {
         logistics: hasDate ? {
           date: date || undefined,
           time: time || undefined,
-          location: location || undefined,
+          location: location.text || undefined,
+          latitude: location.latitude,
+          longitude: location.longitude,
+          placeId: location.placeId,
           meetupSpot: meetupSpot || undefined,
           transportation: (transportation as any) || undefined,
           carpoolSlots: carpoolSlots ? parseInt(carpoolSlots) : undefined,
@@ -337,8 +344,11 @@ const CreateQuest = () => {
 
             <div>
               <label className="text-[11px] text-muted-foreground mb-1 block">Location</label>
-              <input type="text" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Where's this happening?"
-                className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+              <LocationPicker
+                value={location}
+                onChange={setLocation}
+                placeholder="Where's this happening?"
+              />
             </div>
 
             <div>
