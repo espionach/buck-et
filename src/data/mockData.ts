@@ -67,6 +67,12 @@ export interface QuestLogistics {
   date?: string;
   time?: string;
   location?: string;
+  /** Resolved latitude from Google Places (when user picked a suggestion) */
+  latitude?: number;
+  /** Resolved longitude from Google Places (when user picked a suggestion) */
+  longitude?: number;
+  /** Google place_id for the chosen location, if any */
+  placeId?: string;
   meetupSpot?: string;
   transportation?: "car" | "bike" | "walk" | "transit" | "other";
   carpoolSlots?: number;
