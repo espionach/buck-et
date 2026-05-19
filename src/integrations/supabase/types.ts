@@ -452,6 +452,33 @@ export type Database = {
         }
         Relationships: []
       }
+      place_cache: {
+        Row: {
+          fetched_at: string
+          formatted_address: string
+          latitude: number
+          longitude: number
+          place_id: string
+          raw: Json | null
+        }
+        Insert: {
+          fetched_at?: string
+          formatted_address: string
+          latitude: number
+          longitude: number
+          place_id: string
+          raw?: Json | null
+        }
+        Update: {
+          fetched_at?: string
+          formatted_address?: string
+          latitude?: number
+          longitude?: number
+          place_id?: string
+          raw?: Json | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -631,8 +658,11 @@ export type Database = {
           logistics_carpool_slots: number | null
           logistics_custom_notes: string | null
           logistics_date: string | null
+          logistics_latitude: number | null
           logistics_location: string | null
+          logistics_longitude: number | null
           logistics_meetup_spot: string | null
+          logistics_place_id: string | null
           logistics_time: string | null
           logistics_transportation: string | null
           notes: string | null
@@ -653,8 +683,11 @@ export type Database = {
           logistics_carpool_slots?: number | null
           logistics_custom_notes?: string | null
           logistics_date?: string | null
+          logistics_latitude?: number | null
           logistics_location?: string | null
+          logistics_longitude?: number | null
           logistics_meetup_spot?: string | null
+          logistics_place_id?: string | null
           logistics_time?: string | null
           logistics_transportation?: string | null
           notes?: string | null
@@ -675,8 +708,11 @@ export type Database = {
           logistics_carpool_slots?: number | null
           logistics_custom_notes?: string | null
           logistics_date?: string | null
+          logistics_latitude?: number | null
           logistics_location?: string | null
+          logistics_longitude?: number | null
           logistics_meetup_spot?: string | null
+          logistics_place_id?: string | null
           logistics_time?: string | null
           logistics_transportation?: string | null
           notes?: string | null
