@@ -1,42 +1,69 @@
-# Legal Updates System
+# Smart location for sidequests
 
-A simple in-app system to notify users when the Terms of Service or Privacy Policy changes, and let them review past updates from Settings.
+Replace the plain "location" text field with a Google-powered address autocomplete, a small embedded map preview while creating/editing, and an "Open in Maps" link on the quest detail page. Resolved coordinates are saved so we don't re-query Google on every view.
 
-## What gets built
+## What changes for users
 
-1. **Database**
-   - New table `legal_updates`: `id`, `type` (`terms` | `privacy`), `version` (int), `title`, `message`, `effective_date`, `created_at`. Public read, admin-only write.
-   - New table `user_legal_acknowledgements`: `user_id`, `type`, `last_seen_version`, `seen_at`. Unique on (user_id, type). Each user can only read/write their own rows.
+**Create / Edit Sidequest**
+- Location field becomes a search box. As you type (after a short pause), real places appear in a dropdown — venue name + address.
+- Pick one → field fills with the formatted address, and a small map preview appears below the field with a pin on the spot.
+- You can still type a free-form location and skip the suggestions (e.g. "My place"). No map shows in that case.
+- A small "Clear" affordance removes the picked place.
 
-2. **Banner**
-   - New `LegalUpdateBanner` component shown above the bottom nav on the main app screens (Home, Groups, Profile).
-   - Queries the latest `legal_updates` row per type and compares with the user's `user_legal_acknowledgements`.
-   - If anything is unseen, shows a single banner: title "We updated our Terms" / "We updated our Privacy Policy", message "Tap to review the latest changes.", and a "Review" button that navigates to `/settings/terms` or `/settings/privacy-policy`.
-   - When the user opens that page, we mark the latest version as seen, which dismisses the banner.
-   - If multiple updates are unseen, the most recent one is shown first; the next appears after acknowledging the first.
+**Quest Detail**
+- Location row shows the address as today.
+- If coordinates are saved, an "Open in Maps" button appears next to it. On iOS it opens Apple Maps; on Android/desktop it opens Google Maps. No embedded map on the detail page (per your direction — only on create).
 
-3. **Policy pages**
-   - `TermsAndConditions.tsx` and `PrivacyPolicy.tsx` already show a "Last updated" date — keep it, and on mount upsert `user_legal_acknowledgements` with the latest version of that type.
+## Technical plan
 
-4. **Settings → Legal Updates**
-   - New row in Settings opening `/settings/legal-updates`.
-   - Page lists past `legal_updates` (newest first) with title, date, short summary, and a button to open the corresponding policy page.
+### 1. Connector + secrets
+- Connect the **Google Maps Platform** connector (managed connection). This provisions:
+  - `GOOGLE_MAPS_API_KEY` (server, for the gateway)
+  - `VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY` (referrer-restricted, safe in browser — used only to render the small map preview)
+- All Places autocomplete + Place Details + Geocoding calls go **server-side through the connector gateway**, never directly from the browser. This keeps the browser key narrowly scoped and lets us cache.
 
-5. **Seeding current versions**
-   - Insert two initial rows so the system has a known "current" version for each policy:
-     - Terms: version 1, date May 11, 2026, title "Terms of Service Update", message "We updated our Terms of Service."
-     - Privacy: version 1, date May 06, 2026, title "Privacy Policy Update", message "We updated our Privacy Policy."
+### 2. Database (migration)
+Add to `public.sidequests`:
+- `logistics_latitude` numeric, nullable
+- `logistics_longitude` numeric, nullable
+- `logistics_place_id` text, nullable — Google place_id so we can de-dupe lookups
 
-## Technical details
+New table `public.place_cache` (shared cache, app-wide):
+- `place_id` text primary key
+- `formatted_address` text
+- `latitude` numeric, `longitude` numeric
+- `raw` jsonb (display name, types — for future use)
+- `fetched_at` timestamptz default now()
+- RLS: any authenticated user can SELECT; only the edge function (service role) writes.
 
-- New routes in `App.tsx`: `/settings/legal-updates`. Add to `hideNav` list.
-- Banner placement: render inside `AppLayout` just above `<BottomNav />`, hidden on the same routes `hideNav` hides the nav, plus auth/onboarding routes.
-- Hook `useLegalUpdates()` returns `{ latestByType, unseen, acknowledge(type, version) }` using Supabase queries; subscribes to realtime changes on `legal_updates` so banner appears immediately when admins publish a new update.
-- Acknowledgement uses `upsert` on (user_id, type) with `last_seen_version = greatest(existing, new)`.
-- All styling uses existing semantic tokens (`bg-card`, `text-foreground`, `text-muted-foreground`, `text-primary`); no custom colors. Lucide icons only.
-- To publish a future update: admin inserts a new `legal_updates` row with an incremented `version` for that type. (No admin UI in this pass — table writes happen via SQL/migration. Can be added later if you want.)
+### 3. Edge function: `places-proxy`
+One function with two actions, keeps the API key server-side and lets us cache:
+- `action: "autocomplete"` → calls `places/v1/places:autocomplete` (Places API New) with the user's input + a session token. Returns a trimmed list `{ place_id, primary_text, secondary_text }`.
+- `action: "details"` → looks up `place_cache` first; on miss, calls `places/v1/places/{placeId}` with a `X-Goog-FieldMask` limited to `id,formattedAddress,location,displayName`, stores in `place_cache`, returns `{ place_id, formatted_address, latitude, longitude }`.
+- Input validated with Zod, rate-limited per user (simple in-memory token bucket — acceptable for current scale, with a note to upgrade later), and requires a valid JWT.
 
-## Out of scope
+### 4. Frontend
+- New component `src/components/LocationPicker.tsx`:
+  - Debounced (300ms) input that calls `places-proxy` autocomplete.
+  - Dropdown of suggestions. Selecting one calls `places-proxy` details and lifts `{ address, lat, lng, place_id }` to the parent.
+  - If the user types but doesn't pick, we still keep the raw text (no coords).
+  - Small `MapPreview` (~160px tall, rounded) renders a static map using Google's **Maps Static API** through the connector gateway as a `<img>` src wrapped by a signed proxy — simplest implementation: an edge function `static-map` that streams the bytes through, so the browser key isn't needed at all. Alternative: use the JS Maps API with the browser key. We'll go with the **static map via edge function** for fewer moving parts and zero extra JS payload.
+- Update `CreateQuest.tsx` to use `LocationPicker` and persist `latitude`, `longitude`, `place_id` alongside `logistics_location`.
+- Update `QuestDetail.tsx` to render an "Open in Maps" button when coords exist. Link format: `https://www.google.com/maps/search/?api=1&query=<lat>,<lng>&query_place_id=<place_id>` (works cross-platform; iOS users with Google Maps installed get it, others fall through to the web map; Apple Maps deep-link also added as a secondary option via `maps://` UA sniff is optional — recommend the universal Google link to keep it simple).
 
-- Push notifications, email notifications.
-- Admin UI for composing legal updates (insert directly in the DB / via migration for now).
+### 5. Cost controls (your asks)
+- **Caching**: place details cached in `place_cache` table (forever, with a manual refresh path later if needed). Autocomplete uses session tokens so Google bills one Place Details lookup per session rather than per keystroke.
+- **Field masks**: every Places call uses a minimal `X-Goog-FieldMask` to stay in the cheaper tier.
+- **Debounce + min length**: no autocomplete request until ≥3 chars and 300ms idle.
+- **Rate limit**: edge function caps requests per user per minute.
+- **API key restrictions**: browser key isn't shipped to the client at all (we proxy the static map), so referrer restrictions on it don't matter for this feature. Server key is workspace-scoped via the connector gateway.
+- **Billing alerts / hard caps**: these are set in Google Cloud Console on the underlying project. With the **managed** Lovable connector, billing lives on Lovable's side and you can't set caps there — I'll call this out. If you want hard spend caps you can enforce, we'd switch to a **custom** Google Maps connection using your own GCP project, where you control budgets and quotas. Want me to set that up instead?
+
+## Open question
+
+The managed Google Maps connector doesn't let you set your own billing alerts or spending caps — those live on the underlying Google Cloud project. If hard caps matter, we should use a custom connection with your own Google Cloud key. Two options:
+
+1. **Ship with the managed connector now** (fastest; usage is included in your Lovable plan, no GCP setup).
+2. **Use your own Google Cloud key** (you get budget alerts, quotas, hard caps; requires ~10 min of GCP setup on your end before we wire it up).
+
+Tell me which you prefer when you approve the plan and I'll proceed accordingly.
