@@ -363,9 +363,19 @@ const QuestDetail = () => {
               </div>
             )}
             {logistics.location && (
-              <div className="flex items-center gap-2.5 text-sm">
-                <MapPin className="w-4 h-4 text-primary" />
-                <span className="text-foreground">{logistics.location}</span>
+              <div className="flex items-center gap-2.5 text-sm flex-wrap">
+                <MapPin className="w-4 h-4 text-primary shrink-0" />
+                <span className="text-foreground flex-1 min-w-0">{logistics.location}</span>
+                {logistics.latitude != null && logistics.longitude != null && (
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${logistics.latitude},${logistics.longitude}${logistics.placeId ? `&query_place_id=${logistics.placeId}` : ""}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-muted text-foreground hover:bg-accent transition-colors"
+                  >
+                    Open in Maps
+                  </a>
+                )}
               </div>
             )}
             {logistics.meetupSpot && (
