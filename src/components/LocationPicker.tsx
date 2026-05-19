@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { MapPin, X, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import MapPreview from "@/components/MapPreview";
 
 export interface LocationValue {
   text: string;
@@ -107,11 +108,6 @@ const LocationPicker = ({ value, onChange, placeholder }: Props) => {
     onChange({ text: "" });
   };
 
-  const staticMapSrc =
-    hasResolved && value.latitude !== undefined && value.longitude !== undefined
-      ? `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/static-map?lat=${value.latitude}&lng=${value.longitude}&zoom=15&w=600&h=200`
-      : null;
-
   return (
     <div className="relative">
       <div className="relative">
@@ -158,15 +154,8 @@ const LocationPicker = ({ value, onChange, placeholder }: Props) => {
         </div>
       )}
 
-      {staticMapSrc && (
-        <div className="mt-2 rounded-xl overflow-hidden border border-border bg-muted">
-          <img
-            src={staticMapSrc}
-            alt="Map preview"
-            className="w-full h-[140px] object-cover"
-            loading="lazy"
-          />
-        </div>
+      {hasResolved && value.latitude !== undefined && value.longitude !== undefined && (
+        <MapPreview lat={value.latitude} lng={value.longitude} />
       )}
     </div>
   );
