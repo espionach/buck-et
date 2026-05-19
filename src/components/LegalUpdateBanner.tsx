@@ -1,13 +1,30 @@
 import { useNavigate } from "react-router-dom";
-import { FileText } from "lucide-react";
+import { useState, useEffect } from "react";
+import { FileText, X } from "lucide-react";
 import { useLegalUpdates, LEGAL_PATHS, LEGAL_LABEL } from "@/hooks/useLegalUpdates";
 
 const LegalUpdateBanner = () => {
   const nav = useNavigate();
   const { unseen } = useLegalUpdates();
-  if (unseen.length === 0) return null;
+  const [dismissed, setDismissed] = useState<Record<string, boolean>>(() => {
+    try {
+      return JSON.parse(sessionStorage.getItem("legal_banner_dismissed") || "{}");
+    } catch {
+      return {};
+    }
+  });
 
-  const first = unseen[0];
+  useEffect(() => {
+    sessionStorage.setItem("legal_banner_dismissed", JSON.stringify(dismissed));
+  }, [dismissed]);
+
+  const first = unseen.find((u) => !dismissed[`${u.type}:${u.version}`]);
+  if (!first) return null;
+
+  const dismiss = () => {
+    setDismissed((prev) => ({ ...prev, [`${first.type}:${first.version}`]: true }));
+  };
+
   const title =
     first.type === "terms" ? "We updated our Terms" : "We updated our Privacy Policy";
 
@@ -30,6 +47,13 @@ const LegalUpdateBanner = () => {
             aria-label={`Review ${LEGAL_LABEL[first.type]}`}
           >
             Review
+          </button>
+          <button
+            onClick={dismiss}
+            className="w-7 h-7 rounded-lg hover:bg-muted flex items-center justify-center shrink-0 text-muted-foreground"
+            aria-label="Dismiss"
+          >
+            <X className="w-4 h-4" />
           </button>
         </div>
       </div>
