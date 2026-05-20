@@ -799,6 +799,9 @@ export const useAppStore = create<AppState>((set, get) => ({
           dbUpdates.logistics_date = l.date || null;
           dbUpdates.logistics_time = l.time || null;
           dbUpdates.logistics_location = l.location || null;
+          dbUpdates.logistics_latitude = l.latitude ?? null;
+          dbUpdates.logistics_longitude = l.longitude ?? null;
+          dbUpdates.logistics_place_id = l.placeId ?? null;
           dbUpdates.logistics_meetup_spot = l.meetupSpot || null;
           dbUpdates.logistics_transportation = l.transportation || null;
           dbUpdates.logistics_carpool_slots = l.carpoolSlots || null;
@@ -808,6 +811,9 @@ export const useAppStore = create<AppState>((set, get) => ({
           dbUpdates.logistics_date = null;
           dbUpdates.logistics_time = null;
           dbUpdates.logistics_location = null;
+          dbUpdates.logistics_latitude = null;
+          dbUpdates.logistics_longitude = null;
+          dbUpdates.logistics_place_id = null;
           dbUpdates.logistics_meetup_spot = null;
           dbUpdates.logistics_transportation = null;
           dbUpdates.logistics_carpool_slots = null;
