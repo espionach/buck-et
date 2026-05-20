@@ -5,6 +5,7 @@ import UserAvatar from "@/components/UserAvatar";
 import GroupSwatch from "@/components/GroupSwatch";
 import SidequestPhoto from "@/components/SidequestPhoto";
 import CommentThread from "@/components/CommentThread";
+import MapPreview from "@/components/MapPreview";
 import { ArrowLeft, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send, ExternalLink, HandMetal, Check, Globe, StickyNote, MoreVertical, Pencil, Pin, Trash2, Flag, Share2 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -377,6 +378,9 @@ const QuestDetail = () => {
                   </a>
                 )}
               </div>
+            )}
+            {logistics.location && logistics.latitude != null && logistics.longitude != null && (
+              <MapPreview lat={logistics.latitude} lng={logistics.longitude} />
             )}
             {logistics.meetupSpot && (
               <div className="flex items-start gap-2.5 text-sm">
