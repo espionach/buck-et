@@ -369,7 +369,7 @@ const QuestDetail = () => {
                 <span className="text-foreground flex-1 min-w-0">{logistics.location}</span>
                 {logistics.latitude != null && logistics.longitude != null && (
                   <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${logistics.latitude},${logistics.longitude}${logistics.placeId ? `&query_place_id=${logistics.placeId}` : ""}`}
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(logistics.location)}${logistics.placeId ? `&query_place_id=${encodeURIComponent(logistics.placeId)}` : ""}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-muted text-foreground hover:bg-accent transition-colors"
