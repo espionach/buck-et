@@ -14,6 +14,7 @@ import { uploadAvatar, uploadSidequestPhotos } from "@/lib/uploads";
 import SidequestPhoto from "@/components/SidequestPhoto";
 import { toast } from "sonner";
 import { validateContent } from "@/lib/contentFilter";
+import LocationPicker, { LocationValue } from "@/components/LocationPicker";
 const Profile = () => {
   const {
     currentUser,
@@ -73,6 +74,9 @@ const Profile = () => {
   const [editDate, setEditDate] = useState("");
   const [editTime, setEditTime] = useState("");
   const [editLocation, setEditLocation] = useState("");
+  const [editLocationLat, setEditLocationLat] = useState<number | undefined>(undefined);
+  const [editLocationLng, setEditLocationLng] = useState<number | undefined>(undefined);
+  const [editLocationPlaceId, setEditLocationPlaceId] = useState<string | undefined>(undefined);
   const [editMeetupSpot, setEditMeetupSpot] = useState("");
   const [editTransportation, setEditTransportation] = useState("");
   const [editCarpoolSlots, setEditCarpoolSlots] = useState("");
@@ -262,6 +266,9 @@ const Profile = () => {
     setEditDate(quest.logistics?.date || "");
     setEditTime(quest.logistics?.time || "");
     setEditLocation(quest.logistics?.location || "");
+    setEditLocationLat(quest.logistics?.latitude);
+    setEditLocationLng(quest.logistics?.longitude);
+    setEditLocationPlaceId(quest.logistics?.placeId);
     setEditMeetupSpot(quest.logistics?.meetupSpot || "");
     setEditTransportation(quest.logistics?.transportation || "");
     setEditCarpoolSlots(quest.logistics?.carpoolSlots?.toString() || "");
@@ -296,6 +303,9 @@ const Profile = () => {
           date: editDate || undefined,
           time: editTime || undefined,
           location: editLocation || undefined,
+          latitude: editLocationLat,
+          longitude: editLocationLng,
+          placeId: editLocationPlaceId,
           meetupSpot: editMeetupSpot || undefined,
           transportation: (editTransportation as any) || undefined,
           carpoolSlots: editCarpoolSlots ? parseInt(editCarpoolSlots) : undefined,
@@ -919,8 +929,21 @@ const Profile = () => {
                 </div>
                 <div>
                   <label className="text-[11px] text-muted-foreground mb-1 block">Location</label>
-                  <input type="text" value={editLocation} onChange={(e) => setEditLocation(e.target.value)} placeholder="Where's this happening?"
-                    className="w-full px-3 py-2 rounded-xl bg-muted border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                  <LocationPicker
+                    value={{
+                      text: editLocation,
+                      latitude: editLocationLat,
+                      longitude: editLocationLng,
+                      placeId: editLocationPlaceId,
+                    }}
+                    onChange={(v: LocationValue) => {
+                      setEditLocation(v.text);
+                      setEditLocationLat(v.latitude);
+                      setEditLocationLng(v.longitude);
+                      setEditLocationPlaceId(v.placeId);
+                    }}
+                    placeholder="Where's this happening?"
+                  />
                 </div>
                 <div>
                   <label className="text-[11px] text-muted-foreground mb-1 block">Meetup Spot</label>
