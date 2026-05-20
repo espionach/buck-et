@@ -14,6 +14,7 @@ import { uploadAvatar, uploadSidequestPhotos } from "@/lib/uploads";
 import SidequestPhoto from "@/components/SidequestPhoto";
 import { toast } from "sonner";
 import { validateContent } from "@/lib/contentFilter";
+import LocationPicker, { LocationValue } from "@/components/LocationPicker";
 const Profile = () => {
   const {
     currentUser,
@@ -73,6 +74,9 @@ const Profile = () => {
   const [editDate, setEditDate] = useState("");
   const [editTime, setEditTime] = useState("");
   const [editLocation, setEditLocation] = useState("");
+  const [editLocationLat, setEditLocationLat] = useState<number | undefined>(undefined);
+  const [editLocationLng, setEditLocationLng] = useState<number | undefined>(undefined);
+  const [editLocationPlaceId, setEditLocationPlaceId] = useState<string | undefined>(undefined);
   const [editMeetupSpot, setEditMeetupSpot] = useState("");
   const [editTransportation, setEditTransportation] = useState("");
   const [editCarpoolSlots, setEditCarpoolSlots] = useState("");
@@ -262,6 +266,9 @@ const Profile = () => {
     setEditDate(quest.logistics?.date || "");
     setEditTime(quest.logistics?.time || "");
     setEditLocation(quest.logistics?.location || "");
+    setEditLocationLat(quest.logistics?.latitude);
+    setEditLocationLng(quest.logistics?.longitude);
+    setEditLocationPlaceId(quest.logistics?.placeId);
     setEditMeetupSpot(quest.logistics?.meetupSpot || "");
     setEditTransportation(quest.logistics?.transportation || "");
     setEditCarpoolSlots(quest.logistics?.carpoolSlots?.toString() || "");
@@ -296,6 +303,9 @@ const Profile = () => {
           date: editDate || undefined,
           time: editTime || undefined,
           location: editLocation || undefined,
+          latitude: editLocationLat,
+          longitude: editLocationLng,
+          placeId: editLocationPlaceId,
           meetupSpot: editMeetupSpot || undefined,
           transportation: (editTransportation as any) || undefined,
           carpoolSlots: editCarpoolSlots ? parseInt(editCarpoolSlots) : undefined,
