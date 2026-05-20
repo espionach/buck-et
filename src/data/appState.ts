@@ -1272,6 +1272,9 @@ export const useAppStore = create<AppState>((set, get) => ({
       if (logisticsUpdates.date !== undefined) dbUpdates.logistics_date = logisticsUpdates.date || null;
       if (logisticsUpdates.time !== undefined) dbUpdates.logistics_time = logisticsUpdates.time || null;
       if (logisticsUpdates.location !== undefined) dbUpdates.logistics_location = logisticsUpdates.location || null;
+      if (logisticsUpdates.latitude !== undefined) dbUpdates.logistics_latitude = logisticsUpdates.latitude ?? null;
+      if (logisticsUpdates.longitude !== undefined) dbUpdates.logistics_longitude = logisticsUpdates.longitude ?? null;
+      if (logisticsUpdates.placeId !== undefined) dbUpdates.logistics_place_id = logisticsUpdates.placeId ?? null;
       if (logisticsUpdates.meetupSpot !== undefined) dbUpdates.logistics_meetup_spot = logisticsUpdates.meetupSpot || null;
       if (logisticsUpdates.transportation !== undefined) dbUpdates.logistics_transportation = logisticsUpdates.transportation || null;
       if (logisticsUpdates.carpoolSlots !== undefined) dbUpdates.logistics_carpool_slots = logisticsUpdates.carpoolSlots || null;
