@@ -929,8 +929,21 @@ const Profile = () => {
                 </div>
                 <div>
                   <label className="text-[11px] text-muted-foreground mb-1 block">Location</label>
-                  <input type="text" value={editLocation} onChange={(e) => setEditLocation(e.target.value)} placeholder="Where's this happening?"
-                    className="w-full px-3 py-2 rounded-xl bg-muted border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                  <LocationPicker
+                    value={{
+                      text: editLocation,
+                      latitude: editLocationLat,
+                      longitude: editLocationLng,
+                      placeId: editLocationPlaceId,
+                    }}
+                    onChange={(v: LocationValue) => {
+                      setEditLocation(v.text);
+                      setEditLocationLat(v.latitude);
+                      setEditLocationLng(v.longitude);
+                      setEditLocationPlaceId(v.placeId);
+                    }}
+                    placeholder="Where's this happening?"
+                  />
                 </div>
                 <div>
                   <label className="text-[11px] text-muted-foreground mb-1 block">Meetup Spot</label>
