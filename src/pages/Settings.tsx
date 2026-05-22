@@ -341,7 +341,8 @@ const Settings = () => {
     });
     setSupportSubmitting(false);
     if (error) {
-      toast({ title: "Couldn't send", description: error.message, variant: "destructive" });
+      console.error("[Settings.support]", error);
+      toast({ title: "Couldn't send", description: getUserFriendlyError("support message", error.message), variant: "destructive" });
       return;
     }
     toast({ title: "Message sent", description: "Thanks! We'll get back to you within a few business days." });
