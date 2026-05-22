@@ -860,6 +860,42 @@ const Profile = () => {
                 />
               </div>
 
+              {/* Photos & Videos — right after description for a more visual feel */}
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1.5 block">Photos & Videos (optional)</label>
+                <input
+                  ref={currentPhotoRef}
+                  type="file"
+                  accept="image/*,video/*"
+                  multiple
+                  onChange={handleCurrentPhotoUpload}
+                  className="hidden"
+                />
+                <div className="flex flex-wrap gap-2">
+                  {editQuestPhotos.map((photo, i) => (
+                    <div key={i} className="relative group">
+                      <SidequestPhoto
+                        src={photo}
+                        alt={`Photo ${i + 1}`}
+                        className="w-28 h-28 rounded-xl object-cover border border-border/30"
+                      />
+                      <button
+                        onClick={() => setEditQuestPhotos((prev) => prev.filter((_, idx) => idx !== i))}
+                        className="absolute -top-1.5 -right-1.5 p-0.5 rounded-full bg-destructive text-destructive-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    onClick={() => currentPhotoRef.current?.click()}
+                    className="w-28 h-28 rounded-xl border border-dashed border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <ImagePlus className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
               {/* Quest type: Friends Only or a Group */}
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1.5 block">Shared with</label>
@@ -1088,40 +1124,6 @@ const Profile = () => {
                 </div>
               </div>
 
-              {/* Photos */}
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1.5 block">Photos & Videos (optional)</label>
-                <input
-                  ref={currentPhotoRef}
-                  type="file"
-                  accept="image/*,video/*"
-                  multiple
-                  onChange={handleCurrentPhotoUpload}
-                  className="hidden"
-                />
-                <div className="flex flex-wrap gap-2">
-                   {editQuestPhotos.map((photo, i) => (
-                    <div key={i} className="relative group">
-                      <SidequestPhoto
-                        src={photo}
-                        alt={`Photo ${i + 1}`}
-                        className="w-16 h-16 rounded-xl object-cover border border-border/30"
-                      />
-                      <button
-                        onClick={() => setEditQuestPhotos((prev) => prev.filter((_, idx) => idx !== i))}
-                        className="absolute -top-1.5 -right-1.5 p-0.5 rounded-full bg-destructive text-destructive-foreground opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </div>
-                  ))}
-                  <button
-                    onClick={() => currentPhotoRef.current?.click()}
-                  >
-                    <ImagePlus className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
               </div>
 
               {/* Sticky buttons at bottom */}

@@ -331,6 +331,48 @@ const CreateQuest = () => {
             />
           </div>
 
+          {/* Photos & Videos — right after description for a more visual feel */}
+          <div>
+            <label className="text-sm font-semibold text-foreground mb-2 block">Photos & Videos</label>
+            <div className="flex flex-wrap gap-2">
+              {photoPreviews.map((preview, i) => {
+                const file = pendingPhotos[i];
+                const isVideo = file?.type?.startsWith("video/");
+                return (
+                  <div key={i} className="relative w-28 h-28 rounded-xl overflow-hidden">
+                    {isVideo ? (
+                      <video src={preview} className="w-full h-full object-cover" muted />
+                    ) : (
+                      <img src={preview} alt="" className="w-full h-full object-cover" />
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => removePendingPhoto(i)}
+                      className="absolute top-1 right-1 p-0.5 rounded-full bg-foreground/60 text-background"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                );
+              })}
+              <button
+                type="button"
+                onClick={() => photoInputRef.current?.click()}
+                className="w-28 h-28 rounded-xl border border-dashed border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <ImagePlus className="w-6 h-6" />
+              </button>
+              <input
+                ref={photoInputRef}
+                type="file"
+                accept="image/*,video/*"
+                multiple
+                onChange={handlePhotoUpload}
+                className="hidden"
+              />
+            </div>
+          </div>
+
           {/* Quest Details - always visible */}
           <div className="space-y-3">
             <span className="text-sm font-semibold text-foreground">Sidequest Details (optional)</span>
@@ -430,47 +472,6 @@ const CreateQuest = () => {
               </div>
             </div>
 
-            {/* Photos & Videos */}
-            <div>
-              <label className="text-[11px] text-muted-foreground mb-1 block">Photos & Videos</label>
-              <div className="flex flex-wrap gap-2">
-                {photoPreviews.map((preview, i) => {
-                  const file = pendingPhotos[i];
-                  const isVideo = file?.type?.startsWith("video/");
-                  return (
-                    <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden">
-                      {isVideo ? (
-                        <video src={preview} className="w-full h-full object-cover" muted />
-                      ) : (
-                        <img src={preview} alt="" className="w-full h-full object-cover" />
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => removePendingPhoto(i)}
-                        className="absolute top-0.5 right-0.5 p-0.5 rounded-full bg-foreground/60 text-background"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </div>
-                  );
-                })}
-                <button
-                  type="button"
-                  onClick={() => photoInputRef.current?.click()}
-                  className="w-16 h-16 rounded-lg border border-dashed border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <ImagePlus className="w-5 h-5" />
-                </button>
-                <input
-                  ref={photoInputRef}
-                  type="file"
-                  accept="image/*,video/*"
-                  multiple
-                  onChange={handlePhotoUpload}
-                  className="hidden"
-                />
-              </div>
-            </div>
 
             {/* Links */}
             <div>
