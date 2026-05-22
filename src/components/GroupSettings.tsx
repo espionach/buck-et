@@ -68,7 +68,8 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
         .insert({ user_id: currentUser.id, group_id: group.id });
       if (error) {
         setMuted(false);
-        toast({ title: "Couldn't mute group", description: error.message, variant: "destructive" });
+        console.error("[GroupSettings.mute]", error);
+        toast({ title: "Couldn't mute group", description: getUserFriendlyError("group", error.message), variant: "destructive" });
       }
     } else {
       const { error } = await supabase
@@ -78,7 +79,8 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
         .eq("group_id", group.id);
       if (error) {
         setMuted(true);
-        toast({ title: "Couldn't unmute group", description: error.message, variant: "destructive" });
+        console.error("[GroupSettings.unmute]", error);
+        toast({ title: "Couldn't unmute group", description: getUserFriendlyError("group", error.message), variant: "destructive" });
       }
     }
   };
