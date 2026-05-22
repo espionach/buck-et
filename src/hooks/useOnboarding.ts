@@ -50,15 +50,22 @@ export function useOnboardingStatus() {
     }
     let cancelled = false;
     (async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("profiles")
         .select("onboarded_at, onboarding_step")
         .eq("user_id", user.id)
         .maybeSingle();
       if (cancelled) return;
+      // If the fetch errored or returned no row (transient auth/network race
+      // after a token refresh, RLS hiccup, etc.), do NOT flip the user back
+      // to onboarding — assume completed so we don't replay it by accident.
+      if (error || !data) {
+        setState((prev) => prev ?? { onboarded: true, step: null });
+        return;
+      }
       setState({
-        onboarded: !!data?.onboarded_at,
-        step: (data?.onboarding_step as OnboardingStep | null) ?? null,
+        onboarded: !!data.onboarded_at,
+        step: (data.onboarding_step as OnboardingStep | null) ?? null,
       });
     })();
     return () => {
