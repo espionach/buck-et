@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useAppStore } from "@/data/appState";
 import ErrorBanner, { ApiError } from "@/components/ErrorBanner";
 import { getUserFriendlyError } from "@/lib/errorMapping";
+import { Button } from "@/components/ui/button";
 import {
   useCurrentProfile,
   useQuests,
@@ -34,7 +35,7 @@ function extractErrorInfo(error: unknown): { message: string; code?: string } {
 }
 
 export const DataProvider = ({ children }: { children: React.ReactNode }) => {
-  const { user } = useAuth();
+  const { user, loading: authLoading, signOut } = useAuth();
   const queryClient = useQueryClient();
   const store = useAppStore();
   const [apiErrors, setApiErrors] = useState<ApiError[]>([]);
@@ -251,16 +252,31 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
     })();
   }, [user, profile.data]);
 
-  // Gate the app until the signed-in user's profile is loaded. Before profile
-  // resolves, the Zustand store holds an "empty user" with id "" — any mutation
-  // fired in that window sends "" as user_id, producing UUID syntax errors and
-  // RLS violations (auth.uid() never matches "").
-  const profileReady = !user || (!!profile.data && !profile.isLoading);
+  // Gate only while auth/profile are actively loading. If a profile is missing,
+  // useCurrentProfile self-repairs it; if repair fails, show a recoverable error
+  // instead of leaving the app in a permanent loading state.
+  const profilePending = !authLoading && !!user && profile.isLoading && !profile.data;
+  const profileFailed = !authLoading && !!user && !profile.isLoading && !profile.data;
 
-  if (!profileReady) {
+  if (profilePending) {
     return (
       <div className="flex min-h-screen items-center justify-center text-muted-foreground">
         Loading...
+      </div>
+    );
+  }
+
+  if (profileFailed) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center">
+        <div className="space-y-2">
+          <h1 className="text-xl font-semibold text-foreground">We couldn't finish loading your account.</h1>
+          <p className="text-sm text-muted-foreground">Please try again. If this keeps happening, sign out and sign back in.</p>
+        </div>
+        <div className="flex gap-2">
+          <Button onClick={() => queryClient.invalidateQueries({ queryKey: ["profile", user.id] })}>Try again</Button>
+          <Button variant="outline" onClick={() => void signOut()}>Sign out</Button>
+        </div>
       </div>
     );
   }
