@@ -117,6 +117,20 @@ interface AppState {
 
 const emptyUser: User = { id: "", name: "", avatar: "👤", bio: "" };
 
+/**
+ * Resolve the live auth user id. Mutations should never use `currentUser.id`
+ * directly because that comes from a profile fetch that may not have resolved
+ * yet — sending "" to the DB causes UUID syntax errors and RLS violations.
+ */
+async function getAuthUserId(): Promise<string | null> {
+  try {
+    const { data } = await supabase.auth.getUser();
+    return data.user?.id ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export const useAppStore = create<AppState>((set, get) => ({
   quests: [],
   groups: [],
