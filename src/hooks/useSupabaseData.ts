@@ -220,6 +220,17 @@ export function useQuests() {
         supabase.from("sidequest_volunteers").select("*").in("sidequest_id", questIds),
         supabase.from("comments").select("*").in("sidequest_id", questIds).order("created_at", { ascending: true }),
       ]);
+      // Fetch comment likes for the comments we just loaded
+      const commentIds = (commentsRes.data || []).map((c) => c.id);
+      const { data: likesData } = commentIds.length
+        ? await supabase.from("comment_likes").select("comment_id, user_id").in("comment_id", commentIds)
+        : { data: [] as { comment_id: string; user_id: string }[] };
+      const likeCountByComment = new Map<string, number>();
+      const likedByMe = new Set<string>();
+      (likesData || []).forEach((l) => {
+        likeCountByComment.set(l.comment_id, (likeCountByComment.get(l.comment_id) || 0) + 1);
+        if (l.user_id === user.id) likedByMe.add(l.comment_id);
+      });
       // Collect all user IDs
       const allUserIds = new Set<string>();
       quests.forEach((q) => allUserIds.add(q.created_by));
@@ -260,6 +271,8 @@ export function useQuests() {
             createdAt: c.created_at.split("T")[0],
             parentId: (c as any).parent_comment_id || undefined,
             replies: [],
+            likeCount: likeCountByComment.get(c.id) || 0,
+            likedByMe: likedByMe.has(c.id),
           }));
         const byId = new Map(flat.map((c) => [c.id, c]));
         const comments: Comment[] = [];
