@@ -77,6 +77,7 @@ interface AppState {
   unfriend: (userId: string) => void;
   addComment: (questId: string, comment: Comment) => void;
   deleteComment: (questId: string, commentId: string) => void;
+  toggleCommentLike: (questId: string, commentId: string) => void;
   updateQuest: (questId: string, updates: Partial<Quest>) => void;
   deleteQuest: (questId: string) => void;
   updateProfile: (updates: Partial<User>) => void;
