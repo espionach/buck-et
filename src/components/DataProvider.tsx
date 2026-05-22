@@ -251,6 +251,20 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
     })();
   }, [user, profile.data]);
 
+  // Gate the app until the signed-in user's profile is loaded. Before profile
+  // resolves, the Zustand store holds an "empty user" with id "" — any mutation
+  // fired in that window sends "" as user_id, producing UUID syntax errors and
+  // RLS violations (auth.uid() never matches "").
+  const profileReady = !user || (!!profile.data && !profile.isLoading);
+
+  if (!profileReady) {
+    return (
+      <div className="flex min-h-screen items-center justify-center text-muted-foreground">
+        Loading...
+      </div>
+    );
+  }
+
   return (
     <>
       <ErrorBanner
