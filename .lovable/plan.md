@@ -1,69 +1,64 @@
-# Smart location for sidequests
+## What's going wrong
 
-Replace the plain "location" text field with a Google-powered address autocomplete, a small embedded map preview while creating/editing, and an "Open in Maps" link on the quest detail page. Resolved coordinates are saved so we don't re-query Google on every view.
+After remixing, the database is brand new (empty tables, new RLS, your fresh signup is the only user). The features themselves work — the bug is in how the app sources the *current user id* before sending writes to the backend.
 
-## What changes for users
+### Root cause
 
-**Create / Edit Sidequest**
-- Location field becomes a search box. As you type (after a short pause), real places appear in a dropdown — venue name + address.
-- Pick one → field fills with the formatted address, and a small map preview appears below the field with a pin on the spot.
-- You can still type a free-form location and skip the suggestions (e.g. "My place"). No map shows in that case.
-- A small "Clear" affordance removes the picked place.
+Every mutation in `src/data/appState.ts` and several pages (e.g. `src/pages/CreateQuest.tsx`, profile picture upload) reads `currentUser.id` from the Zustand store. The store is initialized with:
 
-**Quest Detail**
-- Location row shows the address as today.
-- If coordinates are saved, an "Open in Maps" button appears next to it. On iOS it opens Apple Maps; on Android/desktop it opens Google Maps. No embedded map on the detail page (per your direction — only on create).
+```ts
+const emptyUser = { id: "", name: "", avatar: "👤", bio: "" };
+```
 
-## Technical plan
+`currentUser` is only replaced once `useCurrentProfile()` finishes loading inside `DataProvider`. There is a race window where:
 
-### 1. Connector + secrets
-- Connect the **Google Maps Platform** connector (managed connection). This provisions:
-  - `GOOGLE_MAPS_API_KEY` (server, for the gateway)
-  - `VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY` (referrer-restricted, safe in browser — used only to render the small map preview)
-- All Places autocomplete + Place Details + Geocoding calls go **server-side through the connector gateway**, never directly from the browser. This keeps the browser key narrowly scoped and lets us cache.
+- You're signed in (auth user exists)
+- The profile query hasn't returned yet (or the `profiles` row was just created by the `handle_new_user` trigger and the cache hasn't caught up)
+- But the UI is already interactive
 
-### 2. Database (migration)
-Add to `public.sidequests`:
-- `logistics_latitude` numeric, nullable
-- `logistics_longitude` numeric, nullable
-- `logistics_place_id` text, nullable — Google place_id so we can de-dupe lookups
+In that window, any action sends `created_by: ""` / `user_id: ""` to Supabase, which produces exactly the two error classes you're seeing:
 
-New table `public.place_cache` (shared cache, app-wide):
-- `place_id` text primary key
-- `formatted_address` text
-- `latitude` numeric, `longitude` numeric
-- `raw` jsonb (display name, types — for future use)
-- `fetched_at` timestamptz default now()
-- RLS: any authenticated user can SELECT; only the edge function (service role) writes.
+1. `invalid input syntax for type uuid: ""` — the UUID error
+2. `new row violates row-level security policy` — because RLS checks `auth.uid() = user_id`, and `""` never matches
 
-### 3. Edge function: `places-proxy`
-One function with two actions, keeps the API key server-side and lets us cache:
-- `action: "autocomplete"` → calls `places/v1/places:autocomplete` (Places API New) with the user's input + a session token. Returns a trimmed list `{ place_id, primary_text, secondary_text }`.
-- `action: "details"` → looks up `place_cache` first; on miss, calls `places/v1/places/{placeId}` with a `X-Goog-FieldMask` limited to `id,formattedAddress,location,displayName`, stores in `place_cache`, returns `{ place_id, formatted_address, latitude, longitude }`.
-- Input validated with Zod, rate-limited per user (simple in-memory token bucket — acceptable for current scale, with a note to upgrade later), and requires a valid JWT.
+A remix makes this much more visible because:
+- There's no cached profile from a previous session
+- The `profiles` row is created by a trigger on first signup, so the first few seconds after signup have no profile yet
+- The post-onboarding flow immediately drops you into Create Quest / Profile edit, hitting the race every time
 
-### 4. Frontend
-- New component `src/components/LocationPicker.tsx`:
-  - Debounced (300ms) input that calls `places-proxy` autocomplete.
-  - Dropdown of suggestions. Selecting one calls `places-proxy` details and lifts `{ address, lat, lng, place_id }` to the parent.
-  - If the user types but doesn't pick, we still keep the raw text (no coords).
-  - Small `MapPreview` (~160px tall, rounded) renders a static map using Google's **Maps Static API** through the connector gateway as a `<img>` src wrapped by a signed proxy — simplest implementation: an edge function `static-map` that streams the bytes through, so the browser key isn't needed at all. Alternative: use the JS Maps API with the browser key. We'll go with the **static map via edge function** for fewer moving parts and zero extra JS payload.
-- Update `CreateQuest.tsx` to use `LocationPicker` and persist `latitude`, `longitude`, `place_id` alongside `logistics_location`.
-- Update `QuestDetail.tsx` to render an "Open in Maps" button when coords exist. Link format: `https://www.google.com/maps/search/?api=1&query=<lat>,<lng>&query_place_id=<place_id>` (works cross-platform; iOS users with Google Maps installed get it, others fall through to the web map; Apple Maps deep-link also added as a secondary option via `maps://` UA sniff is optional — recommend the universal Google link to keep it simple).
+### Secondary issue: raw error messages
 
-### 5. Cost controls (your asks)
-- **Caching**: place details cached in `place_cache` table (forever, with a manual refresh path later if needed). Autocomplete uses session tokens so Google bills one Place Details lookup per session rather than per keystroke.
-- **Field masks**: every Places call uses a minimal `X-Goog-FieldMask` to stay in the cheaper tier.
-- **Debounce + min length**: no autocomplete request until ≥3 chars and 300ms idle.
-- **Rate limit**: edge function caps requests per user per minute.
-- **API key restrictions**: browser key isn't shipped to the client at all (we proxy the static map), so referrer restrictions on it don't matter for this feature. Server key is workspace-scoped via the connector gateway.
-- **Billing alerts / hard caps**: these are set in Google Cloud Console on the underlying project. With the **managed** Lovable connector, billing lives on Lovable's side and you can't set caps there — I'll call this out. If you want hard spend caps you can enforce, we'd switch to a **custom** Google Maps connection using your own GCP project, where you control budgets and quotas. Want me to set that up instead?
+`CreateQuest.tsx`, `Settings.tsx`, and several store mutations call `toast.error(err.message)` or `toast({ description: error.message })`, which shows raw Postgres text like `invalid input syntax for type uuid: ""` to the user. The project already has `src/lib/errorMapping.ts` (`getUserFriendlyError`) and `ErrorBanner` for this — they're just not used at the action sites.
 
-## Open question
+## Fix plan
 
-The managed Google Maps connector doesn't let you set your own billing alerts or spending caps — those live on the underlying Google Cloud project. If hard caps matter, we should use a custom connection with your own Google Cloud key. Two options:
+### 1. Always read the user id from auth, not from the store
 
-1. **Ship with the managed connector now** (fastest; usage is included in your Lovable plan, no GCP setup).
-2. **Use your own Google Cloud key** (you get budget alerts, quotas, hard caps; requires ~10 min of GCP setup on your end before we wire it up).
+- In `src/data/appState.ts`, replace every `currentUser.id` used inside a write (`addQuest`, `toggleParticipant`, group creation, friend requests, profile updates, notifications, comment likes, etc.) with the live auth user id read via `supabase.auth.getUser()` at the top of the async block. If no auth user is returned, bail out early and surface a friendly error instead of inserting.
+- In `src/pages/CreateQuest.tsx`, use `user.id` from `useAuth()` instead of `currentUser.id` for the insert and participant rows. Disable the "Launch" button while `user` is null or while `loading` is true.
+- Same change anywhere else a mutation reads `currentUser.id` (profile picture upload, comment posting, etc.).
 
-Tell me which you prefer when you approve the plan and I'll proceed accordingly.
+### 2. Don't let actions fire before auth + profile are ready
+
+- Add a small `useAuthReady()` helper (or extend `useAuth`) that exposes `ready: boolean` — true only after `getSession()` has resolved and either a user exists or we know the user is signed out.
+- In `DataProvider`, keep the existing "initialized" gate but also block render of the protected app shell until `ready && profile.data` (or show a lightweight skeleton). This eliminates the race entirely for the common path.
+- The store's `emptyUser` stays as a safe default for read paths, but no write should ever use it.
+
+### 3. Stop showing raw backend errors
+
+- Replace the raw `toast.error(err.message)` / `toast({ description: error.message })` calls in:
+  - `src/pages/CreateQuest.tsx`
+  - `src/pages/Settings.tsx` (notification prefs save, support form, appeal submit)
+  - any store mutation that surfaces a toast
+- Route them through `getUserFriendlyError(source, err.message)` so the user sees things like "Couldn't create your sidequest — please try again" while the raw message is still `console.error`'d for debugging.
+- The existing `ErrorBanner` already does this for query errors; we're applying the same treatment to mutation errors.
+
+### 4. Verify
+
+- Sign in fresh, immediately try: upload avatar, create sidequest, like a comment, send a friend request. None should produce UUID or RLS errors.
+- Confirm console still has the technical details for any genuine failure, while the toast/banner shows a friendly message.
+
+## Out of scope
+
+- No schema changes, no RLS edits — the database is fine. The fix is purely client-side: where we read the user id and how we render errors.
+- Google Maps Platform link from the earlier remix step is unrelated and untouched.
