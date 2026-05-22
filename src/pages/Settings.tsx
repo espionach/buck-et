@@ -134,12 +134,14 @@ const Settings = () => {
           if (typeof v === "boolean") next[k] = v;
         }
         setPrefs(next);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        setIsMutedAll(!!(data as any).is_muted_all);
       }
     })();
   }, [user]);
 
   const togglePref = async (key: DbPrefKey) => {
-    if (!user) return;
+    if (!user || isMutedAll) return;
     const next = { ...prefs, [key]: !prefs[key] };
     setPrefs(next);
     const { error } = await supabase
@@ -151,24 +153,60 @@ const Settings = () => {
     }
   };
 
-  const allMuted = DB_PREF_KEYS.every((k) => !prefs[k]);
-
-  const setAllPrefs = async (value: boolean) => {
+  const toggleMuteAll = async (mute: boolean) => {
     if (!user) return;
-    const next = { ...prefs };
-    for (const k of DB_PREF_KEYS) next[k] = value;
-    const prev = prefs;
-    setPrefs(next);
-    const { error } = await supabase
-      .from("notification_preferences")
-      .upsert({ user_id: user.id, ...next }, { onConflict: "user_id" });
-    if (error) {
-      setPrefs(prev);
-      toast({ title: "Couldn't save", description: error.message, variant: "destructive" });
+    const prevMuted = isMutedAll;
+    const prevPrefs = prefs;
+    setIsMutedAll(mute);
+    if (mute) {
+      // Save current prefs as snapshot; keep `prefs` so they re-appear on unmute
+      const { error } = await supabase
+        .from("notification_preferences")
+        .upsert(
+          {
+            user_id: user.id,
+            ...prefs,
+            is_muted_all: true,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            pre_mute_snapshot: prefs as any,
+          },
+          { onConflict: "user_id" }
+        );
+      if (error) {
+        setIsMutedAll(prevMuted);
+        toast({ title: "Couldn't save", description: error.message, variant: "destructive" });
+      }
     } else {
-      toast({ title: value ? "Notifications unmuted" : "All notifications muted" });
+      // Unmute: restore from snapshot if present
+      const { data } = await supabase
+        .from("notification_preferences")
+        .select("pre_mute_snapshot")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const snap = (data as any)?.pre_mute_snapshot as Partial<NotifPrefs> | null;
+      const restored = { ...DEFAULT_PREFS, ...prefs, ...(snap || {}) };
+      // Ensure only known keys, booleans
+      const clean = { ...DEFAULT_PREFS } as NotifPrefs;
+      for (const k of DB_PREF_KEYS) {
+        const v = (restored as Record<string, unknown>)[k];
+        clean[k] = typeof v === "boolean" ? v : true;
+      }
+      setPrefs(clean);
+      const { error } = await supabase
+        .from("notification_preferences")
+        .upsert(
+          { user_id: user.id, ...clean, is_muted_all: false, pre_mute_snapshot: null },
+          { onConflict: "user_id" }
+        );
+      if (error) {
+        setIsMutedAll(prevMuted);
+        setPrefs(prevPrefs);
+        toast({ title: "Couldn't save", description: error.message, variant: "destructive" });
+      }
     }
   };
+
 
   const handleChangeEmail = async () => {
     const trimmed = newEmail.trim().toLowerCase();
