@@ -90,6 +90,10 @@ const CreateQuest = () => {
 
   const handleCreate = async () => {
     if (!title.trim() || submitting) return;
+    if (!user?.id) {
+      toast.error("Still signing you in. Try again in a moment.");
+      return;
+    }
     const { validateContent } = await import("@/lib/contentFilter");
     const violation = validateContent(title, description, customNotes, ...links);
     if (violation) {
