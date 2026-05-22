@@ -17,6 +17,8 @@ export interface Comment {
   createdAt: string;
   parentId?: string;
   replies?: Comment[];
+  likeCount?: number;
+  likedByMe?: boolean;
 }
 
 export type GroupMemberRole = "owner" | "member" | "invited";

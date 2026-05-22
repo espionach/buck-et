@@ -1,7 +1,7 @@
 import { Comment, User, Quest } from "@/data/mockData";
 import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
-import { Send, Trash2, CornerDownRight, Flag } from "lucide-react";
+import { Send, Trash2, CornerDownRight, Flag, Heart } from "lucide-react";
 import { useState } from "react";
 import { validateContent } from "@/lib/contentFilter";
 import { toast } from "sonner";
@@ -15,7 +15,7 @@ interface CommentThreadProps {
 }
 
 const CommentThread = ({ quest, highlightCommentId, onInteract }: CommentThreadProps) => {
-  const { currentUser, addComment, deleteComment } = useAppStore();
+  const { currentUser, addComment, deleteComment, toggleCommentLike } = useAppStore();
   const [newComment, setNewComment] = useState("");
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
@@ -64,6 +64,20 @@ const CommentThread = ({ quest, highlightCommentId, onInteract }: CommentThreadP
             </div>
             <p className="text-xs text-muted-foreground break-words">{c.text}</p>
             <div className="flex items-center gap-3 mt-0.5">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onInteract?.(e);
+                  toggleCommentLike(quest.id, c.id);
+                }}
+                className={`flex items-center gap-1 text-[10px] font-semibold transition-colors ${
+                  c.likedByMe ? "text-destructive" : "text-muted-foreground hover:text-foreground"
+                }`}
+                aria-label={c.likedByMe ? "Unlike comment" : "Like comment"}
+              >
+                <Heart className={`w-2.5 h-2.5 ${c.likedByMe ? "fill-current" : ""}`} />
+                {c.likeCount ? c.likeCount : ""}
+              </button>
               <button
                 onClick={(e) => {
                   e.stopPropagation();
