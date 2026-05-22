@@ -1,7 +1,7 @@
 import { Comment, User, Quest } from "@/data/mockData";
 import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
-import { Send, Trash2, CornerDownRight, Flag } from "lucide-react";
+import { Send, Trash2, CornerDownRight, Flag, Heart } from "lucide-react";
 import { useState } from "react";
 import { validateContent } from "@/lib/contentFilter";
 import { toast } from "sonner";
