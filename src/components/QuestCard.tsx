@@ -300,13 +300,13 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
 
         {/* Photos & Videos */}
         {quest.photos && quest.photos.length > 0 && (
-          <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
+          <div className="flex gap-2 mt-3 overflow-x-auto pb-1 -mx-4 px-4">
             {quest.photos.map((photo, i) => (
               <SidequestPhoto
                 key={i}
                 src={photo}
                 alt={`Quest photo ${i + 1}`}
-                className="w-20 h-20 rounded-xl object-cover shrink-0 border border-border/30"
+                className={`${quest.photos!.length === 1 ? "w-full max-w-md aspect-[4/3]" : "w-56 h-56"} rounded-xl object-cover shrink-0 border border-border/30`}
               />
             ))}
           </div>
