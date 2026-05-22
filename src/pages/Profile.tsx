@@ -246,12 +246,17 @@ const Profile = () => {
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file) return;
+    if (!authUser?.id) {
+      toast.error("Still signing you in. Try again in a moment.");
+      return;
+    }
     setUploadingAvatar(true);
     try {
-      const url = await uploadAvatar(currentUser.id, file);
+      const url = await uploadAvatar(authUser.id, file);
       setEditProfilePic(url);
     } catch (err: any) {
-      toast.error(err?.message || "Couldn't upload photo. Try again?");
+      console.error("[Profile.uploadAvatar]", err);
+      toast.error(getUserFriendlyError("profile picture", err?.message || ""));
     } finally {
       setUploadingAvatar(false);
     }
