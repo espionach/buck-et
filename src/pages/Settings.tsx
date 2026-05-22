@@ -452,13 +452,19 @@ const Settings = () => {
             >
               <h3 className="font-bold text-foreground text-base mb-1">Notification Settings</h3>
               <p className="text-xs text-muted-foreground mb-3">Choose what we should ping you about.</p>
-              <button
-                onClick={() => setAllPrefs(allMuted)}
-                className="w-full mb-4 px-3 py-2 rounded-xl border border-border text-sm font-semibold text-foreground hover:bg-muted transition-colors"
-              >
-                {allMuted ? "Unmute all notifications" : "Mute all notifications"}
-              </button>
-              <div className="max-h-[60vh] overflow-y-auto -mx-1 px-1 space-y-5">
+              <div className="mb-4 p-4 rounded-2xl border border-border bg-muted/40 flex items-start gap-3">
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-bold text-foreground">Mute all notifications</div>
+                  <div className="text-[11px] text-muted-foreground mt-1 leading-snug">
+                    Turns every notification off. You can re-enable any time.
+                  </div>
+                </div>
+                <Switch
+                  checked={isMutedAll}
+                  onCheckedChange={(v) => toggleMuteAll(v)}
+                />
+              </div>
+              <div className={`max-h-[60vh] overflow-y-auto -mx-1 px-1 space-y-5 transition-opacity ${isMutedAll ? "opacity-50 pointer-events-none" : ""}`}>
                 {SECTION_ORDER.map((section) => (
                   <div key={section}>
                     <h4 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2">
@@ -478,6 +484,7 @@ const Settings = () => {
                           <Switch
                             checked={prefs[row.key]}
                             onCheckedChange={() => togglePref(row.key)}
+                            disabled={isMutedAll}
                           />
                         </div>
                       ))}
