@@ -18,6 +18,7 @@ import {
   SECTION_ORDER,
   SECTION_LABEL,
 } from "@/data/notificationCategories";
+import { getUserFriendlyError } from "@/lib/errorMapping";
 
 type NotifPrefs = Record<DbPrefKey, boolean>;
 
@@ -149,7 +150,8 @@ const Settings = () => {
       .upsert({ user_id: user.id, ...next }, { onConflict: "user_id" });
     if (error) {
       setPrefs(prefs); // rollback
-      toast({ title: "Couldn't save", description: error.message, variant: "destructive" });
+      console.error("[Settings.togglePref]", error);
+      toast({ title: "Couldn't save", description: getUserFriendlyError("notification settings", error.message), variant: "destructive" });
     }
   };
 
@@ -174,7 +176,8 @@ const Settings = () => {
         );
       if (error) {
         setIsMutedAll(prevMuted);
-        toast({ title: "Couldn't save", description: error.message, variant: "destructive" });
+        console.error("[Settings.toggleMuteAll]", error);
+        toast({ title: "Couldn't save", description: getUserFriendlyError("notification settings", error.message), variant: "destructive" });
       }
     } else {
       // Unmute: restore from snapshot if present
@@ -202,7 +205,8 @@ const Settings = () => {
       if (error) {
         setIsMutedAll(prevMuted);
         setPrefs(prevPrefs);
-        toast({ title: "Couldn't save", description: error.message, variant: "destructive" });
+        console.error("[Settings.toggleMuteAll]", error);
+        toast({ title: "Couldn't save", description: getUserFriendlyError("notification settings", error.message), variant: "destructive" });
       }
     }
   };
@@ -337,7 +341,8 @@ const Settings = () => {
     });
     setSupportSubmitting(false);
     if (error) {
-      toast({ title: "Couldn't send", description: error.message, variant: "destructive" });
+      console.error("[Settings.support]", error);
+      toast({ title: "Couldn't send", description: getUserFriendlyError("support message", error.message), variant: "destructive" });
       return;
     }
     toast({ title: "Message sent", description: "Thanks! We'll get back to you within a few business days." });
@@ -734,7 +739,8 @@ const Settings = () => {
                     if (!user) return;
                     const { error } = await supabase.from("appeals").insert({ user_id: user.id, reason: appealReason.trim() });
                     if (error) {
-                      toast({ title: "Couldn't submit", description: error.message, variant: "destructive" });
+                      console.error("[Settings.appeal]", error);
+                      toast({ title: "Couldn't submit", description: getUserFriendlyError("appeal", error.message), variant: "destructive" });
                       return;
                     }
                     toast({ title: "Appeal submitted", description: "An admin will review your request." });

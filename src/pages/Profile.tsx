@@ -13,6 +13,8 @@ import { usePopup } from "@/hooks/use-popup";
 import { uploadAvatar, uploadSidequestPhotos } from "@/lib/uploads";
 import SidequestPhoto from "@/components/SidequestPhoto";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
+import { getUserFriendlyError } from "@/lib/errorMapping";
 import { validateContent } from "@/lib/contentFilter";
 import LocationPicker, { LocationValue } from "@/components/LocationPicker";
 const Profile = () => {
@@ -32,6 +34,7 @@ const Profile = () => {
     pinnedQuestIds,
     groups,
   } = useAppStore();
+  const { user: authUser } = useAuth();
   const location = useLocation();
   const nav = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -243,12 +246,17 @@ const Profile = () => {
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file) return;
+    if (!authUser?.id) {
+      toast.error("Still signing you in. Try again in a moment.");
+      return;
+    }
     setUploadingAvatar(true);
     try {
-      const url = await uploadAvatar(currentUser.id, file);
+      const url = await uploadAvatar(authUser.id, file);
       setEditProfilePic(url);
     } catch (err: any) {
-      toast.error(err?.message || "Couldn't upload photo. Try again?");
+      console.error("[Profile.uploadAvatar]", err);
+      toast.error(getUserFriendlyError("profile picture", err?.message || ""));
     } finally {
       setUploadingAvatar(false);
     }

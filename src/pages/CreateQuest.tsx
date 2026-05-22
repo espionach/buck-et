@@ -12,6 +12,7 @@ import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadSidequestPhotos } from "@/lib/uploads";
 import { toast } from "sonner";
+import { getUserFriendlyError } from "@/lib/errorMapping";
 
 const CreateQuest = () => {
   const navigate = useNavigate();
@@ -89,6 +90,10 @@ const CreateQuest = () => {
 
   const handleCreate = async () => {
     if (!title.trim() || submitting) return;
+    if (!user?.id) {
+      toast.error("Still signing you in. Try again in a moment.");
+      return;
+    }
     const { validateContent } = await import("@/lib/contentFilter");
     const violation = validateContent(title, description, customNotes, ...links);
     if (violation) {
@@ -104,7 +109,7 @@ const CreateQuest = () => {
         .insert({
           title: title.trim(),
           description: description.trim() || null,
-          created_by: currentUser.id,
+          created_by: user.id,
           group_id: selectedGroup || null,
           is_friends_only: !selectedGroup,
           photos: [],
@@ -130,7 +135,7 @@ const CreateQuest = () => {
       // 2. Add creator as participant.
       await supabase.from("sidequest_participants").insert({
         sidequest_id: questId,
-        user_id: currentUser.id,
+        user_id: user.id,
       });
 
       // 3. Upload any pending photos under the new quest id.
@@ -197,7 +202,8 @@ const CreateQuest = () => {
         navigate("/profile", { replace: true, state: { justAddedQuestId: questId } });
       }
     } catch (err: any) {
-      toast.error(err?.message || "Couldn't create sidequest. Try again?");
+      console.error("[CreateQuest]", err);
+      toast.error(getUserFriendlyError("sidequest", err?.message || ""));
       setSubmitting(false);
     }
   };
