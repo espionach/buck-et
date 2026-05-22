@@ -18,6 +18,7 @@ import {
   SECTION_ORDER,
   SECTION_LABEL,
 } from "@/data/notificationCategories";
+import { getUserFriendlyError } from "@/lib/errorMapping";
 
 type NotifPrefs = Record<DbPrefKey, boolean>;
 
