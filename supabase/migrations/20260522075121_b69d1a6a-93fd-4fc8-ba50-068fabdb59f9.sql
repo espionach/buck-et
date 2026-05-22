@@ -1,0 +1,1 @@
+ALTER TABLE public.notification_preferences ADD COLUMN IF NOT EXISTS is_muted_all boolean NOT NULL DEFAULT false, ADD COLUMN IF NOT EXISTS pre_mute_snapshot jsonb;
