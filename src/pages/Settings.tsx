@@ -150,7 +150,8 @@ const Settings = () => {
       .upsert({ user_id: user.id, ...next }, { onConflict: "user_id" });
     if (error) {
       setPrefs(prefs); // rollback
-      toast({ title: "Couldn't save", description: error.message, variant: "destructive" });
+      console.error("[Settings.togglePref]", error);
+      toast({ title: "Couldn't save", description: getUserFriendlyError("notification settings", error.message), variant: "destructive" });
     }
   };
 
