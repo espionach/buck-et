@@ -12,6 +12,7 @@ import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadSidequestPhotos } from "@/lib/uploads";
 import { toast } from "sonner";
+import { getUserFriendlyError } from "@/lib/errorMapping";
 
 const CreateQuest = () => {
   const navigate = useNavigate();
