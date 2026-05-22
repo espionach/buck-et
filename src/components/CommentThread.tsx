@@ -68,6 +68,20 @@ const CommentThread = ({ quest, highlightCommentId, onInteract }: CommentThreadP
                 onClick={(e) => {
                   e.stopPropagation();
                   onInteract?.(e);
+                  toggleCommentLike(quest.id, c.id);
+                }}
+                className={`flex items-center gap-1 text-[10px] font-semibold transition-colors ${
+                  c.likedByMe ? "text-destructive" : "text-muted-foreground hover:text-foreground"
+                }`}
+                aria-label={c.likedByMe ? "Unlike comment" : "Like comment"}
+              >
+                <Heart className={`w-2.5 h-2.5 ${c.likedByMe ? "fill-current" : ""}`} />
+                {c.likeCount ? c.likeCount : ""}
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onInteract?.(e);
                   setReplyTo(isReplying ? null : c.id);
                   setReplyText("");
                 }}
