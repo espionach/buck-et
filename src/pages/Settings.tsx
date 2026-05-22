@@ -739,7 +739,8 @@ const Settings = () => {
                     if (!user) return;
                     const { error } = await supabase.from("appeals").insert({ user_id: user.id, reason: appealReason.trim() });
                     if (error) {
-                      toast({ title: "Couldn't submit", description: error.message, variant: "destructive" });
+                      console.error("[Settings.appeal]", error);
+                      toast({ title: "Couldn't submit", description: getUserFriendlyError("appeal", error.message), variant: "destructive" });
                       return;
                     }
                     toast({ title: "Appeal submitted", description: "An admin will review your request." });
