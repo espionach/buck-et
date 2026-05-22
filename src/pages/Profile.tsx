@@ -34,6 +34,7 @@ const Profile = () => {
     pinnedQuestIds,
     groups,
   } = useAppStore();
+  const { user: authUser } = useAuth();
   const location = useLocation();
   const nav = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
