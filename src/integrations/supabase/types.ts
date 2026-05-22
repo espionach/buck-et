@@ -351,6 +351,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          is_muted_all: boolean
           notify_comment_reply: boolean
           notify_friend_accepted: boolean
           notify_friend_new_quest: boolean
@@ -365,12 +366,14 @@ export type Database = {
           notify_quest_reminder: boolean
           notify_quest_updated: boolean
           notify_removed_from_group_or_quest: boolean
+          pre_mute_snapshot: Json | null
           updated_at: string
           user_id: string
         }
         Insert: {
           created_at?: string
           id?: string
+          is_muted_all?: boolean
           notify_comment_reply?: boolean
           notify_friend_accepted?: boolean
           notify_friend_new_quest?: boolean
@@ -385,12 +388,14 @@ export type Database = {
           notify_quest_reminder?: boolean
           notify_quest_updated?: boolean
           notify_removed_from_group_or_quest?: boolean
+          pre_mute_snapshot?: Json | null
           updated_at?: string
           user_id: string
         }
         Update: {
           created_at?: string
           id?: string
+          is_muted_all?: boolean
           notify_comment_reply?: boolean
           notify_friend_accepted?: boolean
           notify_friend_new_quest?: boolean
@@ -405,6 +410,7 @@ export type Database = {
           notify_quest_reminder?: boolean
           notify_quest_updated?: boolean
           notify_removed_from_group_or_quest?: boolean
+          pre_mute_snapshot?: Json | null
           updated_at?: string
           user_id?: string
         }
