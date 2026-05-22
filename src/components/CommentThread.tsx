@@ -15,7 +15,7 @@ interface CommentThreadProps {
 }
 
 const CommentThread = ({ quest, highlightCommentId, onInteract }: CommentThreadProps) => {
-  const { currentUser, addComment, deleteComment } = useAppStore();
+  const { currentUser, addComment, deleteComment, toggleCommentLike } = useAppStore();
   const [newComment, setNewComment] = useState("");
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
