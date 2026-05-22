@@ -205,7 +205,8 @@ const Settings = () => {
       if (error) {
         setIsMutedAll(prevMuted);
         setPrefs(prevPrefs);
-        toast({ title: "Couldn't save", description: error.message, variant: "destructive" });
+        console.error("[Settings.toggleMuteAll]", error);
+        toast({ title: "Couldn't save", description: getUserFriendlyError("notification settings", error.message), variant: "destructive" });
       }
     }
   };
