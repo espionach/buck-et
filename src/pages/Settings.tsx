@@ -70,6 +70,7 @@ const Settings = () => {
   const isMod = currentUserRoles.includes("admin") || currentUserRoles.includes("moderator");
   const isAdmin = currentUserRoles.includes("admin");
   const [prefs, setPrefs] = useState<NotifPrefs>(DEFAULT_PREFS);
+  const [isMutedAll, setIsMutedAll] = useState(false);
   const [showNotif, setShowNotif] = useState(false);
   const [showEmail, setShowEmail] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
