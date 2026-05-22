@@ -198,7 +198,8 @@ const CreateQuest = () => {
         navigate("/profile", { replace: true, state: { justAddedQuestId: questId } });
       }
     } catch (err: any) {
-      toast.error(err?.message || "Couldn't create sidequest. Try again?");
+      console.error("[CreateQuest]", err);
+      toast.error(getUserFriendlyError("sidequest", err?.message || ""));
       setSubmitting(false);
     }
   };
