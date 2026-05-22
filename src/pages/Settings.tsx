@@ -150,6 +150,25 @@ const Settings = () => {
     }
   };
 
+  const allMuted = DB_PREF_KEYS.every((k) => !prefs[k]);
+
+  const setAllPrefs = async (value: boolean) => {
+    if (!user) return;
+    const next = { ...prefs };
+    for (const k of DB_PREF_KEYS) next[k] = value;
+    const prev = prefs;
+    setPrefs(next);
+    const { error } = await supabase
+      .from("notification_preferences")
+      .upsert({ user_id: user.id, ...next }, { onConflict: "user_id" });
+    if (error) {
+      setPrefs(prev);
+      toast({ title: "Couldn't save", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: value ? "Notifications unmuted" : "All notifications muted" });
+    }
+  };
+
   const handleChangeEmail = async () => {
     const trimmed = newEmail.trim().toLowerCase();
     setEmailError(null);
