@@ -150,6 +150,25 @@ const Settings = () => {
     }
   };
 
+  const allMuted = DB_PREF_KEYS.every((k) => !prefs[k]);
+
+  const setAllPrefs = async (value: boolean) => {
+    if (!user) return;
+    const next = { ...prefs };
+    for (const k of DB_PREF_KEYS) next[k] = value;
+    const prev = prefs;
+    setPrefs(next);
+    const { error } = await supabase
+      .from("notification_preferences")
+      .upsert({ user_id: user.id, ...next }, { onConflict: "user_id" });
+    if (error) {
+      setPrefs(prev);
+      toast({ title: "Couldn't save", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: value ? "Notifications unmuted" : "All notifications muted" });
+    }
+  };
+
   const handleChangeEmail = async () => {
     const trimmed = newEmail.trim().toLowerCase();
     setEmailError(null);
@@ -393,7 +412,13 @@ const Settings = () => {
               className="w-full max-w-sm bg-card rounded-2xl p-5 shadow-lg"
             >
               <h3 className="font-bold text-foreground text-base mb-1">Notification Settings</h3>
-              <p className="text-xs text-muted-foreground mb-4">Choose what we should ping you about.</p>
+              <p className="text-xs text-muted-foreground mb-3">Choose what we should ping you about.</p>
+              <button
+                onClick={() => setAllPrefs(allMuted)}
+                className="w-full mb-4 px-3 py-2 rounded-xl border border-border text-sm font-semibold text-foreground hover:bg-muted transition-colors"
+              >
+                {allMuted ? "Unmute all notifications" : "Mute all notifications"}
+              </button>
               <div className="max-h-[60vh] overflow-y-auto -mx-1 px-1 space-y-5">
                 {SECTION_ORDER.map((section) => (
                   <div key={section}>
