@@ -778,6 +778,43 @@ export const useAppStore = create<AppState>((set, get) => ({
     })();
   },
 
+  toggleCommentLike: (questId, commentId) => {
+    const { currentUser, _invalidate } = get();
+    // Find current liked state for optimistic update
+    let wasLiked = false;
+    const flipInList = (list: Comment[]): Comment[] =>
+      list.map((c) => {
+        if (c.id === commentId) {
+          wasLiked = !!c.likedByMe;
+          return {
+            ...c,
+            likedByMe: !wasLiked,
+            likeCount: Math.max(0, (c.likeCount || 0) + (wasLiked ? -1 : 1)),
+          };
+        }
+        return { ...c, replies: c.replies ? flipInList(c.replies) : c.replies };
+      });
+    set((s) => ({
+      quests: s.quests.map((q) =>
+        q.id === questId ? { ...q, comments: flipInList(q.comments) } : q
+      ),
+    }));
+    (async () => {
+      if (wasLiked) {
+        await supabase
+          .from("comment_likes")
+          .delete()
+          .eq("comment_id", commentId)
+          .eq("user_id", currentUser.id);
+      } else {
+        await supabase
+          .from("comment_likes")
+          .insert({ comment_id: commentId, user_id: currentUser.id });
+      }
+      _invalidate(["quests"]);
+    })();
+  },
+
   updateQuest: (questId, updates) => {
     const prevQuest = get().quests.find((q) => q.id === questId);
     set((s) => ({
