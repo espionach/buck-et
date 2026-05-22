@@ -135,7 +135,7 @@ const CreateQuest = () => {
       // 2. Add creator as participant.
       await supabase.from("sidequest_participants").insert({
         sidequest_id: questId,
-        user_id: currentUser.id,
+        user_id: user.id,
       });
 
       // 3. Upload any pending photos under the new quest id.
