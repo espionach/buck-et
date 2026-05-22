@@ -109,7 +109,7 @@ const CreateQuest = () => {
         .insert({
           title: title.trim(),
           description: description.trim() || null,
-          created_by: currentUser.id,
+          created_by: user.id,
           group_id: selectedGroup || null,
           is_friends_only: !selectedGroup,
           photos: [],
