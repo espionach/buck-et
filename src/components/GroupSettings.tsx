@@ -11,6 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { validateContent } from "@/lib/contentFilter";
+import { getUserFriendlyError } from "@/lib/errorMapping";
 
 interface GroupSettingsProps {
   group: Group;
