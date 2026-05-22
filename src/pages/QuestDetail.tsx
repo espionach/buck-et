@@ -300,19 +300,6 @@ const QuestDetail = () => {
             <p className="text-sm text-muted-foreground">{quest.description}</p>
           )}
 
-          {/* Links */}
-          {quest.links && quest.links.length > 0 && (
-            <div className="space-y-1">
-              {quest.links.map((link, i) => (
-                <a key={i} href={link} target="_blank" rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 text-xs text-primary hover:underline truncate">
-                  <ExternalLink className="w-3 h-3 shrink-0" />
-                  <span className="truncate">{link}</span>
-                </a>
-              ))}
-            </div>
-          )}
-
           {/* Photos & Videos */}
           {quest.photos && quest.photos.length > 0 && (
             <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4">
@@ -323,6 +310,19 @@ const QuestDetail = () => {
                   alt={`Quest photo ${i + 1}`}
                   className={`${quest.photos!.length === 1 ? "w-full aspect-[4/3]" : "w-64 h-64"} rounded-xl object-cover shrink-0 border border-border/30`}
                 />
+              ))}
+            </div>
+          )}
+
+          {/* Links */}
+          {quest.links && quest.links.length > 0 && (
+            <div className="space-y-1">
+              {quest.links.map((link, i) => (
+                <a key={i} href={link} target="_blank" rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 text-xs text-primary hover:underline truncate">
+                  <ExternalLink className="w-3 h-3 shrink-0" />
+                  <span className="truncate">{link}</span>
+                </a>
               ))}
             </div>
           )}
