@@ -23,6 +23,13 @@ function dbProfileToUser(row: any): User {
   return u;
 }
 
+async function ensureCurrentProfile(): Promise<User | null> {
+  const { data, error } = await (supabase as any).rpc("ensure_current_user_profile");
+  if (error) throw error;
+  const row = Array.isArray(data) ? data[0] : data;
+  return row ? dbProfileToUser(row) : null;
+}
+
 function getCachedUser(userId: string): User {
   return profileCache.get(userId) || placeholderUser(userId);
 }
@@ -53,7 +60,8 @@ export function useCurrentProfile() {
         .eq("user_id", user.id)
         .maybeSingle();
       if (error) throw error;
-      return data ? dbProfileToUser(data) : null;
+      if (data) return dbProfileToUser(data);
+      return ensureCurrentProfile();
     },
     enabled: !!user,
   });
