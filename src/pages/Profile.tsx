@@ -13,6 +13,8 @@ import { usePopup } from "@/hooks/use-popup";
 import { uploadAvatar, uploadSidequestPhotos } from "@/lib/uploads";
 import SidequestPhoto from "@/components/SidequestPhoto";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
+import { getUserFriendlyError } from "@/lib/errorMapping";
 import { validateContent } from "@/lib/contentFilter";
 import LocationPicker, { LocationValue } from "@/components/LocationPicker";
 const Profile = () => {
