@@ -307,7 +307,7 @@ const CreateQuest = () => {
         <div className="space-y-5">
           <div>
             <label className="text-sm font-semibold text-foreground mb-2 block">
-              What's the sidequest?
+              What's the sidequest? <span className="text-destructive">*</span>
             </label>
             <input
               value={title}
@@ -320,7 +320,7 @@ const CreateQuest = () => {
 
           <div>
             <label className="text-sm font-semibold text-foreground mb-2 block">
-              Description (optional)
+              Description
             </label>
             <textarea
               value={description}
@@ -375,7 +375,7 @@ const CreateQuest = () => {
 
           {/* Quest Details - always visible */}
           <div className="space-y-3">
-            <span className="text-sm font-semibold text-foreground">Sidequest Details (optional)</span>
+            <span className="text-sm font-semibold text-foreground">Sidequest Details</span>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
