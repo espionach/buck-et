@@ -1,52 +1,59 @@
-# Calendar view
+# Empty State Overhaul
 
-Replace the "Coming soon" placeholder at `/calendar` with a working month calendar that shows the user's scheduled sidequests.
+Apply your finalized copy across the app, swap all emoji icons for lucide, and standardize layout via a small shared component.
 
-## Behavior
+## 1. New shared component: `src/components/EmptyState.tsx`
 
-- **Scope of quests shown**: any quest the user owns OR participates in that has a `logistics.date` set. Completed quests still appear on their original date (faded), so the calendar doubles as a light history.
-- **Month grid**: shadcn `Calendar` (single-select) as the main view. Each day with one or more quests gets a small dot under the date number (primary color). Days with 3+ quests show a "•••" indicator.
-- **Header**: page title "Calendar", short subtitle. Month/year label with prev/next chevrons (DayPicker built-in), plus a "Today" button that snaps back to the current day.
-- **Selected-day panel**: under the calendar, list the quests scheduled for the selected date (defaults to today). Each row shows the quest's group color/emoji, title, time (if set), location (if set), and the owner avatar. Tapping a row navigates to `/quest/:id`.
-- **Empty states**:
-  - No quests on the selected day → "Nothing scheduled" line with a soft icon.
-  - User has zero scheduled quests anywhere → keep the calendar visible but show a one-line hint under it explaining that scheduled quests will appear here.
-- **Today highlight**: today's cell stays visually distinct even when another date is selected (DayPicker default + our dot still renders).
-- **Past dates**: still selectable; past quests render with reduced opacity in the list.
+A single presentational component every empty state uses, so spacing, typography, and CTA styling stay consistent.
 
-## Layout
+Props:
+- `icon`: lucide icon component (required)
+- `title`: bolded first line
+- `description`: second line (muted)
+- `cta?`: `{ label: string; onClick: () => void }` — renders pill button matching existing primary/secondary button styling
+- `size?`: `"sm" | "md"` (sm for inline lists like comments, md for full-page)
 
-```text
-┌─────────────────────────────────┐
-│ Calendar                        │
-│ Your scheduled sidequests       │
-│                                 │
-│   ‹  November 2026  ›   [Today] │
-│   ┌─────────────────────────┐   │
-│   │  S  M  T  W  T  F  S    │   │
-│   │           1  2  3  4  5 │   │
-│   │  6  7  8• 9 10•11 12    │   │
-│   │ ...                     │   │
-│   └─────────────────────────┘   │
-│                                 │
-│ Friday, Nov 13                  │
-│ ┌─────────────────────────────┐ │
-│ │ 🟣 Beach day        7:00 PM │ │
-│ │    Santa Monica Pier        │ │
-│ ├─────────────────────────────┤ │
-│ │ 🟢 Pottery class    2:00 PM │ │
-│ └─────────────────────────────┘ │
-│                                 │
-│ [bottom nav]                    │
-└─────────────────────────────────┘
-```
+Visual: centered column, icon in muted circle-less style, title `font-bold text-foreground`, description `text-sm text-muted-foreground`, CTA below using existing primary button look.
 
-## Technical notes
+## 2. Copy + icon map (final)
 
-- New file: rewrite `src/pages/Calendar.tsx`.
-- Data source: `useAppStore()` → `quests`, `currentUser`. Filter to quests where `logistics?.date` is set and `(createdBy.id === currentUser.id || participants.some(p => p.id === currentUser.id))`.
-- Parse `logistics.date` (YYYY-MM-DD) with `parseISO` from `date-fns`. Build a `Map<string, Quest[]>` keyed by `yyyy-MM-dd` for O(1) lookup per day.
-- Use shadcn `Calendar` with `mode="single"`, `selected`, `onSelect`. Customize the day cell via the `components.DayContent` (or `modifiers` + `modifiersClassNames`) to render a dot below the number when the date has quests. Keep `className="p-3 pointer-events-auto"` per project convention.
-- Quest row card: reuse styling tokens (`bg-card`, `border-border`, `rounded-[var(--radius)]`). Tap → `navigate(\`/quest/${quest.id}\`)`.
-- Respect existing visual tokens: DM Sans, lucide icons only, no emoji in UI (the diagram above is illustrative — actual group color comes from the group's color/pattern, not a literal emoji).
-- No DB or schema changes. No new dependencies — `react-day-picker` and `date-fns` are already in the project (shadcn Calendar uses them).
+| Location | File | Title (bold) | Description | Icon | CTA |
+|---|---|---|---|---|---|
+| Profile (own) — Active | `Profile.tsx` | No active sidequests | Nothing planned yet. Start something fun. | `Sparkles` | Create sidequest → `/create` |
+| Profile (own) — Completed | `Profile.tsx` | No completed sidequests yet | Finished sidequests will show up here. | `CheckCircle2` | — |
+| Profile (friend) — Active | `UserProfileView.tsx` | No upcoming sidequests | Nothing planned right now. Start something they can join. | `Sparkles` | Create sidequest |
+| Profile (friend) — Completed | `UserProfileView.tsx` | No completed sidequests | Finished sidequests will appear here. | `CheckCircle2` | — |
+| Home feed / Friends feed default | `Home.tsx`, `Feed.tsx`, `QuestList.tsx` default | Your feed is quiet | Sidequests from friends and groups will show up here. Add friends to get things going. | `Users` | Add friends → friends/onboarding entry |
+| My Groups | `MyGroupsTab.tsx` | No groups yet | Tap "New group" to create one and get started. | `Users` | New group |
+| Feed search | `Feed.tsx` (search mode) | No sidequests found | Try another search or clear your filters. | `Search` | Clear search |
+| Calendar — empty day | `Calendar.tsx` | Nothing planned for this day | Looks like you've got a little breathing room. | `CalendarIcon` | — |
+| Calendar — zero dated quests | `Calendar.tsx` | Your calendar is waiting | Sidequests with dates will appear here. | `CalendarIcon` | Create sidequest |
+| Notifications | `NotificationPanel.tsx` | Nothing new yet | Friend requests, comments, and updates will appear here. | `Bell` | — |
+| Quest detail — no access | `QuestDetail.tsx` | You don't have access | This sidequest is private or unavailable. | `Lock` | — |
+| Quest detail — logistics | `QuestDetail.tsx` | No details yet | Add a time, place, or anything people should know. | `Info` | Add details (owners only) |
+| Quest detail — comments | `CommentThread.tsx` | No comments yet | Be the first to say something. | `MessageCircle` | Add comment (focuses input) |
+| Group members — empty | `GroupMembers.tsx` | No one here yet | Add friends and start planning together. | `Users` | Add friends |
+| Group members — search no match | `GroupMembers.tsx`, `AddMembersModal.tsx`, `GroupSettings.tsx` | No matches found | Try another name. | `UserSearch` | — |
+| Create group — no friends | `CreateGroup.tsx` | No friends added yet | Buck-et works best with people you know. Add a few friends to get started. | `Users` | Add friends |
+| Blocked users | `BlockedUsers.tsx` | No blocked users | People you block will appear here. | `ShieldOff` | — |
+| Legal updates | `LegalUpdates.tsx` | Nothing here yet | Legal updates and policy changes will appear here. | `FileText` | — |
+
+All current emoji icons (🔭, 👤) get removed; only lucide icons render.
+
+## 3. Files touched
+
+Create: `src/components/EmptyState.tsx`
+
+Edit: `Profile.tsx`, `UserProfileView.tsx`, `Home.tsx`, `Feed.tsx`, `MyGroupsTab.tsx`, `Calendar.tsx`, `NotificationPanel.tsx`, `QuestDetail.tsx`, `CommentThread.tsx`, `GroupMembers.tsx`, `AddMembersModal.tsx`, `GroupSettings.tsx`, `CreateGroup.tsx`, `BlockedUsers.tsx`, `LegalUpdates.tsx`, `QuestList.tsx` (default `emptyText` removed in favor of `EmptyState` rendered by caller).
+
+No backend, schema, or business-logic changes.
+
+## 4. Items from the audit not in your new spec
+
+Want me to also update these, or leave as-is?
+
+- **Admin screens** (`AdminReports.tsx`, `AdminDashboard.tsx` tabs: reports / sidequests / comments / appeals / actions) — internal tooling, currently flat text.
+- **BucketLoader** (`Buck-et, we ball…`) — this is the loading screen tagline, not an empty state. Leaving untouched unless you say otherwise.
+- **Feed header subtitle** in `Feed.tsx` (`Buck-et, we ball. Join sidequests, have fun.`) — header copy, not empty state.
+
+Confirm and I'll implement, including admin if you want them included.
