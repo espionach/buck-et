@@ -47,7 +47,9 @@ function Coachmarks({ steps, onComplete, onSkip, onBackFromFirst }: Props) {
   const navigate = useNavigate();
 
   const step = steps[index];
-  const onCorrectRoute = !step?.route || location.pathname === step.route;
+  const stepFullRoute = step?.route ?? null;
+  const currentFullRoute = location.pathname + location.search;
+  const onCorrectRoute = !stepFullRoute || currentFullRoute === stepFullRoute;
 
   // Measure the tooltip after each render so we can place it without
   // covering the spotlighted target.
@@ -60,10 +62,10 @@ function Coachmarks({ steps, onComplete, onSkip, onBackFromFirst }: Props) {
   // Ensure user is on the right route for this step.
   useEffect(() => {
     if (!step) return;
-    if (step.route && location.pathname !== step.route) {
-      navigate(step.route, { replace: true });
+    if (stepFullRoute && currentFullRoute !== stepFullRoute) {
+      navigate(stepFullRoute, { replace: true });
     }
-  }, [step, location.pathname, navigate]);
+  }, [step, stepFullRoute, currentFullRoute, navigate]);
 
   // Find target & track its rect (also re-measure on resize / scroll).
   useLayoutEffect(() => {
