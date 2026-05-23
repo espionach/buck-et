@@ -517,8 +517,9 @@ const CreateQuest = () => {
                 >
                   Add
                 </button>
-              </div>
             </div>
+            </>)}
+          </div>
           </div>
         </div>
       </motion.div>
