@@ -257,10 +257,12 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
 
 
                 grouped[section].push(
-                  <button
+                  <div
                     key={n.id}
+                    role="button"
+                    tabIndex={0}
                     onClick={() => handleNotificationClick(n)}
-                    className={`w-full text-left flex items-start gap-3 p-4 border-b border-border/30 transition-colors active:scale-[0.99] ${
+                    className={`w-full text-left flex items-start gap-3 p-4 border-b border-border/30 transition-colors active:scale-[0.99] cursor-pointer ${
                       n.read ? "opacity-60" : "bg-primary/5"
                     }`}
                   >
@@ -275,7 +277,7 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
                     {!n.read && (
                       <div className="w-2 h-2 rounded-full bg-primary shrink-0 mt-1.5" />
                     )}
-                  </button>
+                  </div>
                 );
               });
 
