@@ -33,14 +33,9 @@ const SidequestPhoto = ({ src, alt = "Photo", className, asVideo, thumbnail }: S
   if (!resolved) {
     return (
       <div
-        className={cn(
-          "bg-muted flex flex-col items-center justify-center text-muted-foreground text-xs",
-          className
-        )}
+        className={cn("bg-muted animate-pulse", className)}
         aria-label="Loading photo"
-      >
-        <span>Loading…</span>
-      </div>
+      />
     );
   }
 

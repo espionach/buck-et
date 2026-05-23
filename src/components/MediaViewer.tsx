@@ -40,9 +40,7 @@ const Slide = ({ src, onClose }: { src: string; onClose: () => void }) => {
 
   if (!url) {
     return (
-      <div className="flex flex-col items-center justify-center w-[85vw] h-[60vh] bg-muted rounded-lg text-muted-foreground text-sm">
-        <span>Loading…</span>
-      </div>
+      <div className="w-[85vw] h-[60vh] bg-muted animate-pulse rounded-lg" aria-label="Loading media" />
     );
   }
 
