@@ -138,7 +138,6 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
               // that live in "social".
               const grouped: Record<NotifSection, React.ReactNode[]> = {
                 social: [],
-                groups: [],
                 your_quests: [],
                 activity: [],
                 updates: [],
