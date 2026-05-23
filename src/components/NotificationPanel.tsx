@@ -5,6 +5,7 @@ import { X, Bell, MessageCircle, UserPlus, ArrowRightLeft, Check, Users, Camera,
 import { useNavigate } from "react-router-dom";
 import { usePopup } from "@/hooks/use-popup";
 import { SECTION_ORDER, SECTION_LABEL, TYPE_TO_SECTION, NotificationType, NotifSection } from "@/data/notificationCategories";
+import EmptyState from "@/components/EmptyState";
 
 interface NotificationPanelProps {
   open: boolean;
@@ -286,10 +287,11 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
               return (
                 <div className="max-h-[60vh] overflow-y-auto">
                   {isEmpty ? (
-                    <div className="text-center py-10 text-muted-foreground">
-                      <Bell className="w-6 h-6 mx-auto mb-2 opacity-40" />
-                      <p className="text-sm">No notifications yet</p>
-                    </div>
+                    <EmptyState
+                      icon={Bell}
+                      title="Nothing new yet"
+                      description="Friend requests, comments, and updates will appear here."
+                    />
                   ) : (
                     SECTION_ORDER.filter((s) => grouped[s].length > 0).map((s) => (
                       <div key={s}>

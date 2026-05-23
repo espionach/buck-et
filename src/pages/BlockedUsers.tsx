@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, ShieldOff } from "lucide-react";
+import EmptyState from "@/components/EmptyState";
 import { supabase } from "@/integrations/supabase/client";
 import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
@@ -63,13 +64,11 @@ const BlockedUsers = () => {
       {loading ? (
         <p className="text-sm text-muted-foreground text-center py-12">Loading…</p>
       ) : blockedUserIds.length === 0 ? (
-        <div className="text-center py-16">
-          <ShieldOff className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
-          <p className="font-bold text-foreground mb-1">No blocked users</p>
-          <p className="text-sm text-muted-foreground">
-            People you block will appear here.
-          </p>
-        </div>
+        <EmptyState
+          icon={ShieldOff}
+          title="No blocked users"
+          description="People you block will appear here."
+        />
       ) : (
         <div className="bg-card rounded-2xl border border-border divide-y divide-border overflow-hidden">
           {users.map((u) => (

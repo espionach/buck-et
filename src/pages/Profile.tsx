@@ -2,7 +2,8 @@ import { useAppStore } from "@/data/appState";
 import QuestList from "@/components/QuestList";
 import MyGroupsTab from "@/components/MyGroupsTab";
 import UserAvatar from "@/components/UserAvatar";
-import { Edit, X, Check, Users as UsersIcon, UserPlus, Trash2, ImagePlus, Camera, Link as LinkIcon, Plus, ArrowLeft, Map, ScrollText, Pin, Settings as SettingsIcon, User as UserIcon, Globe, ChevronDown, Share2 } from "lucide-react";
+import { Edit, X, Check, Users as UsersIcon, UserPlus, Trash2, ImagePlus, Camera, Link as LinkIcon, Plus, ArrowLeft, Map, ScrollText, Pin, Settings as SettingsIcon, User as UserIcon, Globe, ChevronDown, Share2, Sparkles, CheckCircle2 } from "lucide-react";
+import EmptyState from "@/components/EmptyState";
 import { ALL_CONTRIBUTION_ROLES } from "@/data/contributionRoles";
 import GroupSwatch from "@/components/GroupSwatch";
 import UserProfileView from "@/components/UserProfileView";
@@ -734,12 +735,12 @@ const Profile = () => {
         {tab === "groups" ? (
           <MyGroupsTab />
         ) : active.length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground">
-            {tab === "current" ? <Map className="w-10 h-10 mx-auto mb-2 opacity-40" /> : <ScrollText className="w-10 h-10 mx-auto mb-2 opacity-40" />}
-            <p className="text-sm">
-              {tab === "current" ? "Kinda empty here… Start something fun!" : "Zero done… We'll ignore that for now"}
-            </p>
-          </div>
+          <EmptyState
+            icon={tab === "current" ? Sparkles : CheckCircle2}
+            title={tab === "current" ? "No active sidequests" : "No completed sidequests yet"}
+            description={tab === "current" ? "Nothing planned yet. Start something fun." : "Finished sidequests will show up here."}
+            cta={tab === "current" ? { label: "Create sidequest", onClick: () => nav("/create") } : undefined}
+          />
         ) : tab === "current" ? (
           <>
             {/* Pinned section */}

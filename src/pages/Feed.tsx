@@ -3,7 +3,7 @@ import { User, isQuestCompleted } from "@/data/mockData";
 import QuestList from "@/components/QuestList";
 import UserAvatar from "@/components/UserAvatar";
 import NotificationPanel from "@/components/NotificationPanel";
-import { Search, Lock, UserPlus, Mail, X, Globe, UserSearch } from "lucide-react";
+import { Search, Lock, UserPlus, Mail, X, Globe, UserSearch, Users } from "lucide-react";
 import GroupSwatch from "@/components/GroupSwatch";
 import UserProfileView from "@/components/UserProfileView";
 import { useState, useEffect, useRef } from "react";
@@ -281,8 +281,10 @@ const Feed = () => {
                 <div className="divide-y divide-border">
                   <QuestList
                     quests={filteredQuests}
-                    emptyIcon="🔭"
-                    emptyText="No sidequests found"
+                    emptyIcon={Search}
+                    emptyTitle="No sidequests found"
+                    emptyDescription="Try another search or clear your filters."
+                    emptyCta={{ label: "Clear search", onClick: () => { setSearch(""); sessionStorage.removeItem("feedSearchText"); } }}
                     onMarkDone={() => navigate("/profile?tab=past")}
                     onMarkUndone={() => navigate("/profile?tab=current")}
                     onQuestClick={() => {
@@ -371,9 +373,10 @@ const Feed = () => {
             <div className="divide-y divide-border">
               <QuestList
                 quests={filteredQuests}
-                emptyIcon="🔭"
-                emptyText="It's quiet in here…"
-                emptySubtext="Where are your friends?"
+                emptyIcon={Users}
+                emptyTitle="Your feed is quiet"
+                emptyDescription="Sidequests from friends and groups will show up here. Add friends to get things going."
+                emptyCta={{ label: "Add friends", onClick: () => navigate("/onboarding/friends") }}
                 onMarkDone={() => navigate("/profile?tab=past")}
                 onMarkUndone={() => navigate("/profile?tab=current")}
                 onViewProfile={(user) => setSelectedProfile(user)}

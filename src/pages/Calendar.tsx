@@ -6,6 +6,7 @@ import { Calendar as CalendarIcon, Clock, MapPin } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
+import EmptyState from "@/components/EmptyState";
 import type { Quest } from "@/data/mockData";
 
 const dateKey = (d: Date) => format(d, "yyyy-MM-dd");
@@ -111,11 +112,19 @@ const CalendarPage = () => {
           {format(selected, "EEEE, MMM d")}
         </h2>
 
-        {selectedQuests.length === 0 ? (
-          <div className="flex flex-col items-center justify-center text-center text-muted-foreground py-10 border border-dashed border-border rounded-[var(--radius)]">
-            <CalendarIcon className="w-6 h-6 mb-2 opacity-40" />
-            <p className="text-xs">Nothing scheduled</p>
-          </div>
+        {myDatedQuests.length === 0 ? (
+          <EmptyState
+            icon={CalendarIcon}
+            title="Your calendar is waiting"
+            description="Sidequests with dates will appear here."
+            cta={{ label: "Create sidequest", onClick: () => navigate("/create") }}
+          />
+        ) : selectedQuests.length === 0 ? (
+          <EmptyState
+            icon={CalendarIcon}
+            title="Nothing planned for this day"
+            description="Looks like you've got a little breathing room."
+          />
         ) : (
           <div className="space-y-2">
             {selectedQuests.map((q) => {
@@ -169,12 +178,6 @@ const CalendarPage = () => {
               );
             })}
           </div>
-        )}
-
-        {myDatedQuests.length === 0 && (
-          <p className="text-[11px] text-muted-foreground mt-4 text-center">
-            Sidequests with a date will appear here.
-          </p>
         )}
       </div>
     </div>

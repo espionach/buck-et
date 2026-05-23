@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, X, UserPlus, UserSearch } from "lucide-react";
+import EmptyState from "@/components/EmptyState";
 import UserAvatar from "@/components/UserAvatar";
 import { useAppStore } from "@/data/appState";
 import { Group, User } from "@/data/mockData";
@@ -79,10 +80,12 @@ const AddMembersModal = ({ group, open, onClose }: AddMembersModalProps) => {
                       All your friends are already in this group.
                     </p>
                   ) : visible.length === 0 ? (
-                    <div className="py-6 flex flex-col items-center gap-2 text-muted-foreground">
-                      <UserSearch className="w-5 h-5" />
-                      <p className="text-xs">No friends match "{memberSearch}"</p>
-                    </div>
+                    <EmptyState
+                      icon={UserSearch}
+                      title="No matches found"
+                      description="Try another name."
+                      size="sm"
+                    />
                   ) : (
                     <>
                       <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-2">

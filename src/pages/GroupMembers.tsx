@@ -9,7 +9,9 @@ import {
   Search,
   X,
   UserSearch,
+  Users,
 } from "lucide-react";
+import EmptyState from "@/components/EmptyState";
 import { useAppStore } from "@/data/appState";
 import { User } from "@/data/mockData";
 import UserAvatar from "@/components/UserAvatar";
@@ -109,9 +111,13 @@ const GroupMembers = () => {
         </div>
 
         {group.members.length === 0 ? (
-          <p className="text-xs text-muted-foreground py-4 text-center">
-            No one in this group yet. Tap Add to include friends.
-          </p>
+          <EmptyState
+            icon={Users}
+            title="No one here yet"
+            description="Add friends and start planning together."
+            cta={{ label: "Add friends", onClick: () => { setMemberSearch(""); setShowAdd(true); } }}
+            size="sm"
+          />
         ) : (
           <div className="space-y-1">
             {group.members.map((m) => (
@@ -187,10 +193,12 @@ const GroupMembers = () => {
                         All your friends are already in this group.
                       </p>
                     ) : visible.length === 0 ? (
-                      <div className="py-6 flex flex-col items-center gap-2 text-muted-foreground">
-                        <UserSearch className="w-5 h-5" />
-                        <p className="text-xs">No friends match "{memberSearch}"</p>
-                      </div>
+                      <EmptyState
+                        icon={UserSearch}
+                        title="No matches found"
+                        description="Try another name."
+                        size="sm"
+                      />
                     ) : (
                       <div className="space-y-1">
                         {visible.map((user) => (

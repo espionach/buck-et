@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { ArrowLeft, FileText, ShieldCheck, ChevronRight } from "lucide-react";
+import EmptyState from "@/components/EmptyState";
 import { useLegalUpdates, LEGAL_PATHS } from "@/hooks/useLegalUpdates";
 
 const LegalUpdates = () => {
@@ -31,7 +32,11 @@ const LegalUpdates = () => {
       {loading ? (
         <p className="text-sm text-muted-foreground">Loading…</p>
       ) : updates.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No legal updates yet.</p>
+        <EmptyState
+          icon={FileText}
+          title="Nothing here yet"
+          description="Legal updates and policy changes will appear here."
+        />
       ) : (
         <div className="space-y-3">
           {updates.map((u) => {
