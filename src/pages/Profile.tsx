@@ -711,6 +711,7 @@ const Profile = () => {
         {(["current", "past", "groups"] as const).map((t) => (
           <button
             key={t}
+            data-tour={`profile-tab-${t}`}
             onClick={() => setTab(t)}
             className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all relative ${
               tab === t ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
