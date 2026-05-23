@@ -1,11 +1,11 @@
-import { Home, LayoutGrid, User, Plus } from "lucide-react";
+import { Home, Calendar, User, Plus } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAppStore } from "@/data/appState";
 
 const tabs = [
   { path: "/", icon: Home, label: "Home", tourId: "nav-home" },
-  { path: "/groups", icon: LayoutGrid, label: "Groups", tourId: "nav-groups" },
+  { path: "/calendar", icon: Calendar, label: "Calendar", tourId: "nav-calendar" },
   { path: "/profile", icon: User, label: "Profile", tourId: "nav-profile" },
 ];
 
@@ -35,7 +35,7 @@ const BottomNav = () => {
       <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-xl border-t border-border safe-bottom">
         <div className="flex items-center justify-around h-16 max-w-md mx-auto px-2">
           {tabs.map((tab) => {
-            const isActive = location.pathname === tab.path || (tab.path === "/groups" && location.pathname === "/boards");
+            const isActive = location.pathname === tab.path;
             return (
               <button
                 key={tab.path}

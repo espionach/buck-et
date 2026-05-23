@@ -12,7 +12,7 @@ interface NotificationPanelProps {
 }
 
 const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
-  const { notifications, markNotificationRead, markAllNotificationsRead, friendRequests, acceptFriendRequest, declineFriendRequest, groupInvitations, acceptGroupInvitation, declineGroupInvitation, clearNotification } = useAppStore();
+  const { notifications, markNotificationRead, markAllNotificationsRead, friendRequests, acceptFriendRequest, declineFriendRequest, clearNotification } = useAppStore();
   const navigate = useNavigate();
   usePopup(open);
 
@@ -57,16 +57,15 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
   const handleNotificationClick = (notification: typeof notifications[0]) => {
     markNotificationRead(notification.id);
 
-    if ((notification.type === "new_comment" || notification.type === "comment_reply") && notification.groupId) {
-      const params = new URLSearchParams({ open: notification.groupId, highlightQuest: notification.entityId || "" });
+    if ((notification.type === "new_comment" || notification.type === "comment_reply") && notification.entityId) {
+      const params = new URLSearchParams();
       if (notification.commentId) params.set("commentId", notification.commentId);
-      navigate(`/groups?${params.toString()}`);
-    } else if ((notification.type === "new_comment" || notification.type === "comment_reply") && notification.entityId) {
+      const qs = params.toString();
+      navigate(`/quest/${notification.entityId}${qs ? `?${qs}` : ""}`);
+    } else if (notification.type === "transfer_quest" && notification.entityId) {
       navigate(`/quest/${notification.entityId}`);
-    } else if (notification.type === "transfer_quest" && notification.groupId) {
-      navigate(`/groups?open=${notification.groupId}`);
     } else if (notification.type === "transfer_group") {
-      navigate("/groups");
+      navigate("/profile?tab=groups");
     } else if (
       (notification.type === "new_participant" ||
         notification.type === "new_contribution" ||
@@ -79,18 +78,17 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
       notification.entityId
     ) {
       navigate(`/quest/${notification.entityId}`);
-    } else if (notification.type === "removed_from_group" && notification.groupId) {
-      navigate("/groups");
+    } else if (notification.type === "removed_from_group") {
+      navigate("/profile");
     } else if (notification.type === "friend_accepted" && notification.fromUser?.id) {
       navigate(`/profile/${notification.fromUser.id}`);
-    } else if (notification.type === "new_participant" && notification.groupId) {
-      navigate(`/groups?open=${notification.groupId}`);
     } else {
       navigate("/profile?tab=current");
     }
 
     onClose();
   };
+
 
   /** Render notification message with bold fromUser name and group name */
   const renderMessage = (n: typeof notifications[0]) => (
@@ -184,60 +182,12 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
               // 2. Real notifications → routed to their section
               notifications.forEach((n) => {
                 const section = TYPE_TO_SECTION[n.type as NotificationType] || "social";
-                const pendingInvite =
-                  n.type === "board_invitation" && n.entityId
-                    ? groupInvitations.find((gi) => gi.id === n.entityId)
-                    : null;
-
-                if (pendingInvite) {
-                  grouped[section].push(
-                    <div
-                      key={n.id}
-                      className={`flex items-center gap-3 p-4 border-b border-border/30 ${
-                        n.read ? "opacity-60" : "bg-primary/5"
-                      }`}
-                    >
-                      <div className="shrink-0">
-                        <UserAvatar user={n.fromUser} size="sm" />
-                      </div>
-                      <button
-                        onClick={() => {
-                          onClose();
-                          navigate(`/g/${pendingInvite.groupId}/invite`);
-                        }}
-                        className="flex-1 min-w-0 text-left active:opacity-70"
-                      >
-                        {renderMessage(n)}
-                        <p className="text-[10px] text-muted-foreground mt-1">{n.createdAt}</p>
-                      </button>
-                      <div className="flex gap-1.5 shrink-0">
-                        <button
-                          onClick={() => {
-                            acceptGroupInvitation(pendingInvite.id);
-                            clearNotification(n.id);
-                            onClose();
-                            navigate("/groups");
-                          }}
-                          className="p-1.5 rounded-lg bg-secondary text-secondary-foreground"
-                          aria-label="Accept invitation"
-                        >
-                          <Check className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          onClick={() => {
-                            declineGroupInvitation(pendingInvite.id);
-                            clearNotification(n.id);
-                          }}
-                          className="p-1.5 rounded-lg bg-muted text-muted-foreground"
-                          aria-label="Decline invitation"
-                        >
-                          <X className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                  );
+                // board_invitation is legacy — groups are now direct-add lists.
+                // Skip rendering any stale pending-invite notifications entirely.
+                if (n.type === "board_invitation") {
                   return;
                 }
+
 
                 grouped[section].push(
                   <button

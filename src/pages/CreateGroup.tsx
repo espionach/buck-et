@@ -44,7 +44,7 @@ const CreateGroup = () => {
       { user: currentUser, role: "owner" },
       ...friendsList
         .filter((f) => selectedMembers.includes(f.id))
-        .map((u) => ({ user: u, role: "invited" as const })),
+        .map((u) => ({ user: u, role: "member" as const })),
     ];
     const group: Group = {
       id: `g${Date.now()}`,
@@ -59,10 +59,11 @@ const CreateGroup = () => {
       activeQuests: 0,
       createdAt: new Date().toISOString().split("T")[0],
     };
-    const realId = await addGroup(group);
+    await addGroup(group);
     setSubmitting(false);
-    navigate(`/groups?open=${realId ?? group.id}`, { replace: true });
+    navigate(`/profile?tab=groups`, { replace: true });
   };
+
 
   return (
     <div className="min-h-screen px-5 pt-14 pb-10">
