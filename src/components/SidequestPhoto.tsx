@@ -19,8 +19,7 @@ interface SidequestPhotoProps {
 const SidequestPhoto = ({ src, alt = "Photo", className, asVideo }: SidequestPhotoProps) => {
   const [resolved, setResolved] = useState<string | null>(null);
 
-  const isLegacyVideo = src.startsWith("data:video");
-  const renderAsVideo = asVideo ?? isLegacyVideo;
+  const renderAsVideo = asVideo ?? isVideoSrc(src);
 
   useEffect(() => {
     let cancelled = false;
