@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { X } from "lucide-react";
 import {
   Carousel,
   CarouselContent,
@@ -9,7 +10,6 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import { getSidequestPhotoUrl } from "@/lib/uploads";
-import { cn } from "@/lib/utils";
 import { usePopup } from "@/hooks/use-popup";
 
 export const isVideoSrc = (src: string) => {
@@ -25,7 +25,7 @@ interface MediaViewerProps {
   onOpenChange: (open: boolean) => void;
 }
 
-const Slide = ({ src }: { src: string }) => {
+const Slide = ({ src, onClose }: { src: string; onClose: () => void }) => {
   const [url, setUrl] = useState<string | null>(null);
   useEffect(() => {
     let cancelled = false;
@@ -39,18 +39,37 @@ const Slide = ({ src }: { src: string }) => {
   }, [src]);
 
   if (!url) {
-    return <div className="w-full h-full flex items-center justify-center text-white/60 text-sm">Loading…</div>;
+    return <div className="text-white/70 text-sm">Loading…</div>;
   }
-  return isVideoSrc(src) ? (
+
+  const media = isVideoSrc(src) ? (
     <video
       src={url}
-      className="max-h-[90vh] max-w-full object-contain"
+      className="max-h-[85vh] max-w-[92vw] object-contain rounded-lg shadow-2xl"
       controls
       autoPlay
       playsInline
     />
   ) : (
-    <img src={url} alt="" className="max-h-[90vh] max-w-full object-contain" />
+    <img
+      src={url}
+      alt=""
+      className="max-h-[85vh] max-w-[92vw] object-contain rounded-lg shadow-2xl"
+    />
+  );
+
+  return (
+    <div className="relative inline-block">
+      {media}
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label="Close"
+        className="absolute top-2 right-2 h-8 w-8 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center backdrop-blur-sm transition-colors"
+      >
+        <X className="h-4 w-4" />
+      </button>
+    </div>
   );
 };
 
@@ -75,41 +94,50 @@ const MediaViewer = ({ sources, startIndex = 0, open, onOpenChange }: MediaViewe
     };
   }, [api]);
 
+  const close = () => onOpenChange(false);
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        className={cn(
-          "max-w-none w-screen h-screen p-0 border-0 bg-black/95 rounded-none translate-x-[-50%] translate-y-[-50%]",
-          "flex items-center justify-center"
-        )}
-      >
-        <Carousel
-          className="w-full h-full"
-          opts={{ startIndex, loop: sources.length > 1 }}
-          setApi={setApi}
+    <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
+      <DialogPrimitive.Portal>
+        <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
+        <DialogPrimitive.Content
+          onClick={(e) => {
+            if (e.target === e.currentTarget) close();
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
         >
-          <CarouselContent className="h-screen ml-0">
-            {sources.map((src, i) => (
-              <CarouselItem
-                key={i}
-                className="pl-0 h-screen flex items-center justify-center"
-              >
-                <Slide src={src} />
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          {sources.length > 1 && (
-            <>
-              <CarouselPrevious className="left-4 h-10 w-10 bg-white/10 text-white border-white/20 hover:bg-white/20" />
-              <CarouselNext className="right-4 h-10 w-10 bg-white/10 text-white border-white/20 hover:bg-white/20" />
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/80 text-xs bg-black/40 rounded-full px-3 py-1">
-                {current + 1} / {sources.length}
-              </div>
-            </>
-          )}
-        </Carousel>
-      </DialogContent>
-    </Dialog>
+          <DialogPrimitive.Title className="sr-only">Media viewer</DialogPrimitive.Title>
+          <Carousel
+            className="w-full"
+            opts={{ startIndex, loop: sources.length > 1 }}
+            setApi={setApi}
+          >
+            <CarouselContent className="ml-0">
+              {sources.map((src, i) => (
+                <CarouselItem
+                  key={i}
+                  className="pl-0 flex items-center justify-center"
+                  onClick={(e) => {
+                    if (e.target === e.currentTarget) close();
+                  }}
+                >
+                  <Slide src={src} onClose={close} />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            {sources.length > 1 && (
+              <>
+                <CarouselPrevious className="left-4 h-10 w-10 bg-white/10 text-white border-white/20 hover:bg-white/20" />
+                <CarouselNext className="right-4 h-10 w-10 bg-white/10 text-white border-white/20 hover:bg-white/20" />
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/90 text-xs bg-black/50 rounded-full px-3 py-1 backdrop-blur-sm">
+                  {current + 1} / {sources.length}
+                </div>
+              </>
+            )}
+          </Carousel>
+        </DialogPrimitive.Content>
+      </DialogPrimitive.Portal>
+    </DialogPrimitive.Root>
   );
 };
 
