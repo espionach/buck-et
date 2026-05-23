@@ -57,6 +57,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showOwnerLeave, setShowOwnerLeave] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const [viewerIndex, setViewerIndex] = useState<number | null>(null);
   const [showReport, setShowReport] = useState(false);
   usePopup(showDeleteConfirm || showOwnerLeave);
 
