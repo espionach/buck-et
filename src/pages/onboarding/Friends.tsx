@@ -89,7 +89,7 @@ const Friends = () => {
       <div className="flex-1 flex flex-col overflow-hidden">
         <h1 className="text-2xl font-bold text-foreground mb-2">Add your friends</h1>
         <p className="text-sm text-muted-foreground mb-5">
-          Sidequests are better with friends. Invite a few or find people you know.
+          Sidequests need people. Good thing it's just your friends here. Your profile is private and only visible to them. Add a few to start using Buck-et.
         </p>
 
         {/* Share invite link */}
