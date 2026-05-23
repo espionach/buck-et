@@ -103,6 +103,7 @@ const Profile = () => {
   const [questCompletedAt, setQuestCompletedAt] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showDeleteQuestConfirm, setShowDeleteQuestConfirm] = useState(false);
+  const [editDetailsOpen, setEditDetailsOpen] = useState(false);
 
   // Sync tab from URL params
   useEffect(() => {
