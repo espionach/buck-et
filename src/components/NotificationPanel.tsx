@@ -90,14 +90,77 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
   };
 
 
-  /** Render notification message with bold fromUser name and group name */
-  const renderMessage = (n: typeof notifications[0]) => (
-    <p className="text-xs text-foreground leading-relaxed">
-      <span className="font-bold">{n.fromUser.name}</span>{" "}{n.message}
-      {n.groupName && <span className="font-bold">{n.groupName}</span>}
-      {n.type === "transfer_group" && n.groupName && " group to you"}
-    </p>
-  );
+  const goToUser = (e: React.MouseEvent, userId?: string) => {
+    e.stopPropagation();
+    if (!userId) return;
+    navigate(`/profile/${userId}`);
+    onClose();
+  };
+
+  const goToQuest = (e: React.MouseEvent, questId?: string) => {
+    e.stopPropagation();
+    if (!questId) return;
+    navigate(`/quest/${questId}`);
+    onClose();
+  };
+
+  /** Render notification message with bold/clickable fromUser name and quest name */
+  const renderMessage = (n: typeof notifications[0]) => {
+    // Quest-linked types: replace '<title>' in the message with a bold clickable span.
+    const questLinkedTypes = new Set([
+      "new_participant",
+      "new_contribution",
+      "photo_added",
+      "quest_updated",
+      "quest_canceled",
+      "quest_reminder",
+      "friend_new_quest",
+      "new_comment",
+      "comment_reply",
+      "removed_from_quest",
+      "transfer_quest",
+      "transfer_declined",
+    ]);
+    const isQuestLinked = questLinkedTypes.has(n.type) && !!n.entityId;
+
+    let messageNodes: React.ReactNode = n.message;
+    if (isQuestLinked) {
+      const match = n.message.match(/^(.*?)'([^']+)'(.*)$/);
+      if (match) {
+        const [, before, title, after] = match;
+        messageNodes = (
+          <>
+            {before}
+            <span
+              role="link"
+              tabIndex={0}
+              onClick={(e) => goToQuest(e, n.entityId)}
+              className="font-bold underline-offset-2 hover:underline cursor-pointer"
+            >
+              {title}
+            </span>
+            {after}
+          </>
+        );
+      }
+    }
+
+    return (
+      <p className="text-xs text-foreground leading-relaxed">
+        <span
+          role="link"
+          tabIndex={0}
+          onClick={(e) => goToUser(e, n.fromUser?.id)}
+          className="font-bold underline-offset-2 hover:underline cursor-pointer"
+        >
+          {n.fromUser.name}
+        </span>{" "}
+        {messageNodes}
+        {n.groupName && <span className="font-bold">{n.groupName}</span>}
+        {n.type === "transfer_group" && n.groupName && " group to you"}
+      </p>
+    );
+  };
 
   return (
     <AnimatePresence>
@@ -194,10 +257,12 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
 
 
                 grouped[section].push(
-                  <button
+                  <div
                     key={n.id}
+                    role="button"
+                    tabIndex={0}
                     onClick={() => handleNotificationClick(n)}
-                    className={`w-full text-left flex items-start gap-3 p-4 border-b border-border/30 transition-colors active:scale-[0.99] ${
+                    className={`w-full text-left flex items-start gap-3 p-4 border-b border-border/30 transition-colors active:scale-[0.99] cursor-pointer ${
                       n.read ? "opacity-60" : "bg-primary/5"
                     }`}
                   >
@@ -212,7 +277,7 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
                     {!n.read && (
                       <div className="w-2 h-2 rounded-full bg-primary shrink-0 mt-1.5" />
                     )}
-                  </button>
+                  </div>
                 );
               });
 
