@@ -10,6 +10,7 @@ function emitOnboardingStatus(detail: { onboarded: boolean; step: OnboardingStep
 
 export type OnboardingStep =
   | "welcome"
+  | "examples"
   | "permissions"
   | "friends"
   | "tour"
@@ -17,6 +18,7 @@ export type OnboardingStep =
 
 export const ONBOARDING_ORDER: OnboardingStep[] = [
   "welcome",
+  "examples",
   "permissions",
   "friends",
   "tour",
@@ -25,6 +27,7 @@ export const ONBOARDING_ORDER: OnboardingStep[] = [
 
 export const ONBOARDING_PATHS: Record<OnboardingStep, string> = {
   welcome: "/onboarding/welcome",
+  examples: "/onboarding/examples",
   permissions: "/onboarding/permissions",
   friends: "/onboarding/friends",
   tour: "/onboarding/tour",
