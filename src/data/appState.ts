@@ -367,31 +367,28 @@ export const useAppStore = create<AppState>((set, get) => ({
       owner_id: currentUser.id,
     } as never).select().single();
     if (!data) {
-      _invalidate(["groups", "group_invitations"]);
+      _invalidate(["groups"]);
       return null;
     }
-    // Add owner as member
-    await supabase.from("group_members").insert({
-      group_id: data.id,
-      user_id: currentUser.id,
-      role: "owner",
-    });
-    // Invite selected members
-    const invitees = group.memberRoles
-      .filter((mr) => mr.role === "invited" || (mr.role === "member" && mr.user.id !== currentUser.id));
-    for (const mr of invitees) {
-      await supabase.from("group_invitations").insert({
+    // Directly add chosen friends as members. Owner is implicit (groups.owner_id),
+    // so we no longer insert the owner into group_members.
+    const memberInserts = group.memberRoles
+      .filter((mr) => mr.user.id !== currentUser.id)
+      .map((mr) => ({
         group_id: data.id,
-        invited_user_id: mr.user.id,
-        invited_by: currentUser.id,
-      });
+        user_id: mr.user.id,
+        role: "member" as const,
+      }));
+    if (memberInserts.length > 0) {
+      await supabase.from("group_members").insert(memberInserts);
     }
     set((s) => ({
       groups: s.groups.map((g) => g.id === group.id ? { ...g, id: data.id } : g),
     }));
-    _invalidate(["groups", "group_invitations"]);
+    _invalidate(["groups"]);
     return data.id as string;
   },
+
 
   updateGroup: (groupId, updates) => {
     set((s) => ({
@@ -471,37 +468,32 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   inviteToGroup: (groupId, user) => {
+    // "Invite" is now a direct add — groups are private launch lists owned by
+    // the current user. Members are added straight in, no acceptance step.
     set((s) => ({
       groups: s.groups.map((g) =>
         g.id === groupId
           ? {
               ...g,
-              memberRoles: [...g.memberRoles, { user, role: "invited" as const }],
+              members: g.members.some((m) => m.id === user.id) ? g.members : [...g.members, user],
+              memberRoles: g.memberRoles.some((mr) => mr.user.id === user.id)
+                ? g.memberRoles
+                : [...g.memberRoles, { user, role: "member" as const }],
             }
           : g
       ),
     }));
-    const { currentUser, _invalidate, groups } = get();
-    const groupName = groups.find((g) => g.id === groupId)?.name;
+    const { _invalidate } = get();
     (async () => {
-      const { data: inv } = await supabase.from("group_invitations").insert({
+      await supabase.from("group_members").insert({
         group_id: groupId,
-        invited_user_id: user.id,
-        invited_by: currentUser.id,
-      }).select().single();
-      // Notify the invited user
-      await notifyUsers({
-        recipientIds: [user.id],
-        fromUserId: currentUser.id,
-        type: "board_invitation",
-        message: `invited you to `,
-        entityId: inv?.id || null,
-        groupId,
-        groupName: groupName || null,
+        user_id: user.id,
+        role: "member",
       });
-      _invalidate(["groups", "group_invitations"]);
+      _invalidate(["groups"]);
     })();
   },
+
 
   acceptGroupInvitation: (invitationId) => {
     const { currentUser, _invalidate } = get();

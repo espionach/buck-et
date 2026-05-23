@@ -196,8 +196,6 @@ const CreateQuest = () => {
         // After their first sidequest, send them to their profile so they
         // can see it sitting in their Active list.
         navigate("/profile", { replace: true, state: { justAddedQuestId: questId } });
-      } else if (selectedGroup) {
-        navigate(`/groups?open=${selectedGroup}`, { replace: true, state: { justAddedQuestId: questId } });
       } else {
         navigate("/profile", { replace: true, state: { justAddedQuestId: questId } });
       }
