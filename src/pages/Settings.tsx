@@ -353,7 +353,7 @@ const Settings = () => {
   const handleReplayTour = async () => {
     if (!user) return;
     await resetOnboarding(user.id);
-    nav("/onboarding/tour");
+    nav("/onboarding/welcome");
   };
 
   return (
