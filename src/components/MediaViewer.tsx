@@ -27,9 +27,11 @@ interface MediaViewerProps {
 
 const Slide = ({ src, onClose }: { src: string; onClose: () => void }) => {
   const [url, setUrl] = useState<string | null>(null);
+  const [loaded, setLoaded] = useState(false);
   useEffect(() => {
     let cancelled = false;
     setUrl(null);
+    setLoaded(false);
     getSidequestPhotoUrl(src).then((u) => {
       if (!cancelled) setUrl(u);
     });
@@ -38,39 +40,50 @@ const Slide = ({ src, onClose }: { src: string; onClose: () => void }) => {
     };
   }, [src]);
 
-  if (!url) {
-    return (
-      <div className="w-[85vw] h-[60vh] bg-muted animate-pulse rounded-lg" aria-label="Loading media" />
-    );
-  }
-
-  const media = isVideoSrc(src) ? (
-    <video
-      src={url}
-      className="max-h-[85vh] max-w-[92vw] object-contain rounded-lg shadow-2xl"
-      controls
-      autoPlay
-      playsInline
-    />
-  ) : (
-    <img
-      src={url}
-      alt=""
-      className="max-h-[85vh] max-w-[92vw] object-contain rounded-lg shadow-2xl"
-    />
-  );
+  const isVideo = isVideoSrc(src);
 
   return (
     <div className="relative inline-block">
-      {media}
-      <button
-        type="button"
-        onClick={onClose}
-        aria-label="Close"
-        className="absolute top-2 right-2 h-8 w-8 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center backdrop-blur-sm transition-colors"
-      >
-        <X className="h-4 w-4" />
-      </button>
+      <div className="relative w-[85vw] h-[60vh] flex items-center justify-center">
+        <div
+          className={`absolute inset-0 bg-muted animate-pulse rounded-lg transition-opacity duration-300 ${
+            loaded ? "opacity-0" : "opacity-100"
+          }`}
+          aria-hidden={loaded}
+        />
+        {url && (isVideo ? (
+          <video
+            src={url}
+            className={`relative max-h-[85vh] max-w-[92vw] object-contain rounded-lg shadow-2xl transition-opacity duration-300 ${
+              loaded ? "opacity-100" : "opacity-0"
+            }`}
+            controls
+            autoPlay
+            playsInline
+            onLoadedData={() => setLoaded(true)}
+            onLoadedMetadata={() => setLoaded(true)}
+          />
+        ) : (
+          <img
+            src={url}
+            alt=""
+            className={`relative max-h-[85vh] max-w-[92vw] object-contain rounded-lg shadow-2xl transition-opacity duration-300 ${
+              loaded ? "opacity-100" : "opacity-0"
+            }`}
+            onLoad={() => setLoaded(true)}
+          />
+        ))}
+      </div>
+      {loaded && (
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close"
+          className="absolute top-2 right-2 h-8 w-8 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center backdrop-blur-sm transition-colors"
+        >
+          <X className="h-4 w-4" />
+        </button>
+      )}
     </div>
   );
 };
