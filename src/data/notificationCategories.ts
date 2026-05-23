@@ -9,7 +9,6 @@
 
 export type NotifSection =
   | "social"
-  | "groups"
   | "your_quests"
   | "activity"
   | "updates";
