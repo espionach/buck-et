@@ -1,39 +1,17 @@
-## What happened
+## Plan
 
-The app is stuck because the new safety gate I added waits for the signed-in user’s profile row before rendering the app. Your current session is authenticated, but the backend returns no matching `profiles` row for that user, so the gate never opens.
+1. **Keep the placeholder mounted until media is actually ready**
+   - Update `SidequestPhoto` so the pulsing placeholder stays visible behind/over the media while the image/video source resolves and the media finishes loading.
+   - Avoid the current sequence where the placeholder disappears as soon as a URL is resolved, before the browser has rendered the image.
 
-That also explains the earlier “nothing works” behavior: after the remix, profile creation is not happening reliably. The app had an authenticated user, but no profile/user identity in the app store, so actions like creating sidequests or uploading avatars could run with an empty/missing user id and hit UUID/RLS-style backend errors.
+2. **Fade media in smoothly**
+   - Render the image/video immediately after the URL is resolved, but start it at `opacity-0`.
+   - On `onLoad` for images and `onLoadedData`/`onLoadedMetadata` for videos, transition media to full opacity while fading out the placeholder.
 
-## Fix plan
+3. **Apply the same behavior everywhere quest media appears**
+   - Quest cards and quest details already share `SidequestPhoto`, so this will cover both.
+   - Update `MediaViewer` fullscreen slides with the same placeholder-under-media fade-in pattern so swiping fullscreen media does not flash or jump.
 
-1. **Replace the fragile loading gate**
-   - Stop blocking forever on `profile.data`.
-   - Only show loading while auth/profile queries are actually loading.
-   - If a profile is missing, run a recovery path instead of leaving the app on `Loading...`.
-
-2. **Add profile self-repair**
-   - Add a safe backend function that creates the current user’s missing profile using the authenticated session.
-   - It will not expose admin privileges or rely on client-supplied user ids.
-   - `useCurrentProfile()` will call this when the profile query returns no row, then return the recovered profile.
-
-3. **Make auth readiness explicit**
-   - Ensure authenticated queries only run after auth restoration is complete.
-   - This prevents queries/mutations from firing while the session token is still being restored.
-
-4. **Keep user-facing errors clean**
-   - If profile recovery fails, show a friendly “We couldn’t finish loading your account” message with retry/sign-out options instead of raw backend errors.
-
-5. **Verify the affected workflows**
-   - Fresh login no longer stays on loading.
-   - Missing profile gets recreated.
-   - Create sidequest, upload profile picture, like comments, and settings actions no longer send empty UUIDs.
-   - Onboarding should only show based on the saved profile fields, not from transient fetch failures.
-
-## Notes
-
-The current data state appears empty after remixing, so existing sidequests/groups/friends may not be present in this backend unless they were migrated/restored separately. This plan fixes the app being unusable and prevents missing-profile identity failures going forward.
-
-<presentation-actions>
-<presentation-open-history>View History</presentation-open-history>
-<presentation-link url="https://docs.lovable.dev/tips-tricks/troubleshooting">Troubleshooting docs</presentation-link>
-</presentation-actions>
+4. **Preserve layout size and current visuals**
+   - Keep existing media dimensions, rounded corners, video play overlays, and fullscreen viewer controls unchanged.
+   - Only change the loading behavior to remove the placeholder-disappear-then-image-appear glitch.
