@@ -39,7 +39,11 @@ const Slide = ({ src, onClose }: { src: string; onClose: () => void }) => {
   }, [src]);
 
   if (!url) {
-    return <div className="text-white/70 text-sm">Loading…</div>;
+    return (
+      <div className="flex flex-col items-center justify-center w-[85vw] h-[60vh] bg-muted rounded-lg text-muted-foreground text-sm">
+        <span>Loading…</span>
+      </div>
+    );
   }
 
   const media = isVideoSrc(src) ? (
