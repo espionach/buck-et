@@ -114,12 +114,14 @@ export const TYPE_TO_SECTION: Record<NotificationType, NotifSection> = {
   friend_request: "social",
   friend_accepted: "social",
   friend_new_quest: "social",
-  board_invitation: "groups",
-  removed_from_group: "groups",
-  removed_from_quest: "groups",
-  transfer_quest: "groups",
-  transfer_group: "groups",
-  transfer_declined: "groups",
+  // Group-related types are intentionally hidden from the notification panel
+  // so users cannot infer membership in private launch lists others created.
+  board_invitation: "updates",
+  removed_from_group: "updates",
+  removed_from_quest: "updates",
+  transfer_quest: "updates",
+  transfer_group: "updates",
+  transfer_declined: "updates",
   new_participant: "your_quests",
   new_contribution: "your_quests",
   photo_added: "your_quests",
@@ -134,7 +136,6 @@ export const TYPE_TO_SECTION: Record<NotificationType, NotifSection> = {
 
 export const SECTION_LABEL: Record<NotifSection, string> = {
   social: "Social",
-  groups: "Groups & Invitations",
   your_quests: "Your Quests",
   activity: "Activity & Comments",
   updates: "Updates & Reminders",
@@ -143,7 +144,6 @@ export const SECTION_LABEL: Record<NotifSection, string> = {
 /** Order of sections in both Settings and the panel. */
 export const SECTION_ORDER: NotifSection[] = [
   "social",
-  "groups",
   "your_quests",
   "activity",
   "updates",
@@ -165,11 +165,6 @@ export const SETTINGS_TOGGLES: Record<NotifSection, SettingsToggle[]> = {
       hint: "Sent occasionally — at most once per friend per week.",
     },
   ],
-  groups: [
-    { key: "notify_group_invitation", label: "Group invites" },
-    { key: "notify_removed_from_group_or_quest", label: "Removed from a group or quest" },
-    { key: "notify_ownership_transfer", label: "Ownership transferred" },
-  ],
   your_quests: [
     { key: "notify_quest_join", label: "Someone joined your quest" },
     { key: "notify_new_contribution", label: "New contribution on your quest" },
@@ -179,7 +174,6 @@ export const SETTINGS_TOGGLES: Record<NotifSection, SettingsToggle[]> = {
     { key: "notify_comment_reply", label: "Replies to your comments" },
   ],
   updates: [
-    { key: "notify_new_quest_in_group", label: "New quest in a group" },
     { key: "notify_quest_updated", label: "Quest updates" },
     { key: "notify_quest_canceled", label: "Quest canceled" },
     { key: "notify_quest_reminder", label: "Reminders" },
