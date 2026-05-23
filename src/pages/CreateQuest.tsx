@@ -389,7 +389,8 @@ const CreateQuest = () => {
             ) : (
               <span className="text-sm font-semibold text-foreground">Sidequest Details</span>
             )}
-            {detailsOpen && (<></>)}
+            {detailsOpen && (<>
+
 
             <div className="grid grid-cols-2 gap-3">
               <div>
