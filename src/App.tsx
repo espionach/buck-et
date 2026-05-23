@@ -20,6 +20,8 @@ import TermsAndConditions from "./pages/TermsAndConditions";
 import LegalUpdates from "./pages/LegalUpdates";
 import CreateQuest from "./pages/CreateQuest";
 import CreateGroup from "./pages/CreateGroup";
+import GroupMembers from "./pages/GroupMembers";
+import GroupSettings from "./pages/GroupSettings";
 import QuestDetail from "./pages/QuestDetail";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
@@ -68,7 +70,7 @@ const AuthRoute = ({ children }: { children: React.ReactNode }) => {
 
 const AppLayout = () => {
   const location = useLocation();
-  const hideNav = ["/create", "/create-group", "/login", "/signup", "/forgot-password", "/reset-password", "/settings", "/settings/blocked", "/settings/community-guidelines", "/settings/privacy-policy", "/settings/terms", "/settings/legal-updates", "/admin", "/admin/reports"].includes(location.pathname) || location.pathname.startsWith("/quest/") || location.pathname.startsWith("/onboarding/");
+  const hideNav = ["/create", "/create-group", "/login", "/signup", "/forgot-password", "/reset-password", "/settings", "/settings/blocked", "/settings/community-guidelines", "/settings/privacy-policy", "/settings/terms", "/settings/legal-updates", "/admin", "/admin/reports"].includes(location.pathname) || location.pathname.startsWith("/quest/") || location.pathname.startsWith("/onboarding/") || location.pathname.startsWith("/groups/");
 
   return (
     <div className="max-w-md mx-auto min-h-screen relative">
@@ -99,6 +101,8 @@ const AppLayout = () => {
         <Route path="/admin/reports" element={<ProtectedRoute><AdminReports /></ProtectedRoute>} />
         <Route path="/create" element={<ProtectedRoute><CreateQuest /></ProtectedRoute>} />
         <Route path="/create-group" element={<ProtectedRoute><CreateGroup /></ProtectedRoute>} />
+        <Route path="/groups/:groupId" element={<ProtectedRoute><GroupMembers /></ProtectedRoute>} />
+        <Route path="/groups/:groupId/settings" element={<ProtectedRoute><GroupSettings /></ProtectedRoute>} />
         <Route path="/quest/:questId" element={<ProtectedRoute><QuestDetail /></ProtectedRoute>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
