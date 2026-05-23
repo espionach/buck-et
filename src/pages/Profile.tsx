@@ -864,6 +864,40 @@ const Profile = () => {
                 />
               </div>
 
+              {/* Date / Time / Location — always visible between title and description */}
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[11px] text-muted-foreground mb-1 block">Date</label>
+                    <input type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl bg-muted border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                  </div>
+                  <div>
+                    <label className="text-[11px] text-muted-foreground mb-1 block">Time</label>
+                    <input type="text" value={editTime} onChange={(e) => setEditTime(e.target.value)} placeholder="e.g. 6:00 PM"
+                      className="w-full px-3 py-2 rounded-xl bg-muted border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[11px] text-muted-foreground mb-1 block">Location</label>
+                  <LocationPicker
+                    value={{
+                      text: editLocation,
+                      latitude: editLocationLat,
+                      longitude: editLocationLng,
+                      placeId: editLocationPlaceId,
+                    }}
+                    onChange={(v: LocationValue) => {
+                      setEditLocation(v.text);
+                      setEditLocationLat(v.latitude);
+                      setEditLocationLng(v.longitude);
+                      setEditLocationPlaceId(v.placeId);
+                    }}
+                    placeholder="Where's this happening?"
+                  />
+                </div>
+              </div>
+
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1.5 block">Description</label>
                 <textarea
