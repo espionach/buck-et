@@ -3,6 +3,7 @@ import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
 import GroupSwatch from "@/components/GroupSwatch";
 import SidequestPhoto from "@/components/SidequestPhoto";
+import MediaViewer from "@/components/MediaViewer";
 import CommentThread from "@/components/CommentThread";
 
 import { motion, AnimatePresence } from "framer-motion";
@@ -56,6 +57,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showOwnerLeave, setShowOwnerLeave] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const [viewerIndex, setViewerIndex] = useState<number | null>(null);
   const [showReport, setShowReport] = useState(false);
   usePopup(showDeleteConfirm || showOwnerLeave);
 
@@ -283,14 +285,33 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
         {quest.photos && quest.photos.length > 0 && (
           <div className="flex gap-2 mt-3 overflow-x-auto pb-1 -mx-4 px-4">
             {quest.photos.map((photo, i) => (
-              <SidequestPhoto
+              <button
                 key={i}
-                src={photo}
-                alt={`Quest photo ${i + 1}`}
-                className={`${quest.photos!.length === 1 ? "w-full max-w-md aspect-[4/3]" : "w-56 h-56"} rounded-xl object-cover shrink-0 border border-border/30`}
-              />
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setViewerIndex(i);
+                }}
+                className={`${quest.photos!.length === 1 ? "w-full max-w-md aspect-[4/3]" : "w-56 h-56"} shrink-0 rounded-xl overflow-hidden border border-border/30 focus:outline-none focus:ring-2 focus:ring-ring`}
+                aria-label={`Open photo ${i + 1}`}
+              >
+                <SidequestPhoto
+                  src={photo}
+                  alt={`Quest photo ${i + 1}`}
+                  thumbnail
+                  className="w-full h-full object-cover"
+                />
+              </button>
             ))}
           </div>
+        )}
+        {quest.photos && quest.photos.length > 0 && viewerIndex !== null && (
+          <MediaViewer
+            sources={quest.photos}
+            startIndex={viewerIndex}
+            open={viewerIndex !== null}
+            onOpenChange={(o) => !o && setViewerIndex(null)}
+          />
         )}
 
         {/* Links */}
