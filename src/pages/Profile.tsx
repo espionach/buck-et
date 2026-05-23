@@ -1,5 +1,6 @@
 import { useAppStore } from "@/data/appState";
 import QuestList from "@/components/QuestList";
+import MyGroupsTab from "@/components/MyGroupsTab";
 import UserAvatar from "@/components/UserAvatar";
 import { Edit, X, Check, Users as UsersIcon, UserPlus, Trash2, ImagePlus, Camera, Link as LinkIcon, Plus, ArrowLeft, Map, ScrollText, Pin, Settings as SettingsIcon, User as UserIcon, Globe, ChevronDown, Share2 } from "lucide-react";
 import { ALL_CONTRIBUTION_ROLES } from "@/data/contributionRoles";
@@ -39,9 +40,13 @@ const Profile = () => {
   const nav = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const justAddedQuestId = (location.state as any)?.justAddedQuestId as string | undefined;
-  const [tab, setTab] = useState<"current" | "past">(
-    new URLSearchParams(location.search).get("tab") === "past" ? "past" : "current"
-  );
+  const initialTab = (() => {
+    const t = new URLSearchParams(location.search).get("tab");
+    if (t === "past") return "past" as const;
+    if (t === "groups") return "groups" as const;
+    return "current" as const;
+  })();
+  const [tab, setTab] = useState<"current" | "past" | "groups">(initialTab);
   // Clear navigation state so refresh doesn't re-trigger
   useEffect(() => {
     if (justAddedQuestId) {
@@ -103,6 +108,7 @@ const Profile = () => {
     const urlTab = new URLSearchParams(location.search).get("tab");
     if (urlTab === "past") setTab("past");
     else if (urlTab === "current") setTab("current");
+    else if (urlTab === "groups") setTab("groups");
   }, [location.search]);
 
   // Handle viewUser query param from QuestDetail
@@ -200,7 +206,7 @@ const Profile = () => {
       return new Date(bDate).getTime() - new Date(aDate).getTime();
     });
 
-  const active = tab === "current" ? current : past;
+  const active = tab === "current" ? current : tab === "past" ? past : [];
 
   const handleSaveProfile = async () => {
     const trimmedUsername = editUsername.trim();
@@ -701,7 +707,7 @@ const Profile = () => {
 
       {/* Tabs */}
       <div className="flex bg-muted rounded-2xl p-1 mb-5">
-        {(["current", "past"] as const).map((t) => (
+        {(["current", "past", "groups"] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -709,19 +715,25 @@ const Profile = () => {
               tab === t ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
             }`}
           >
-            {t === "current" ? `Active (${current.length})` : `Completed (${past.length})`}
+            {t === "current"
+              ? `Active (${current.length})`
+              : t === "past"
+              ? `Completed (${past.length})`
+              : `Groups (${groups.length})`}
           </button>
         ))}
       </div>
 
-      {/* Sidequests */}
+      {/* Sidequests / Groups */}
       <motion.div
         key={tab}
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="divide-y divide-border"
+        className={tab === "groups" ? "" : "divide-y divide-border"}
       >
-        {active.length === 0 ? (
+        {tab === "groups" ? (
+          <MyGroupsTab />
+        ) : active.length === 0 ? (
           <div className="text-center py-12 text-muted-foreground">
             {tab === "current" ? <Map className="w-10 h-10 mx-auto mb-2 opacity-40" /> : <ScrollText className="w-10 h-10 mx-auto mb-2 opacity-40" />}
             <p className="text-sm">
@@ -813,6 +825,7 @@ const Profile = () => {
           />
         )}
       </motion.div>
+
 
       {/* Current Quest Editor Modal (centered) */}
       <AnimatePresence>
