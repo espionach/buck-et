@@ -30,12 +30,12 @@ const GroupCard = ({ group, onClick, index }: GroupCardProps) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: index * 0.08 }}
-        className="w-full relative"
+        className="w-full relative h-full"
       >
         <button
           onClick={onClick}
           style={gradientStyleFor(group.color)}
-          className={`relative w-full text-left p-5 rounded-xl ${gradientClassFor(group.color)} border border-border/50 active:scale-[0.98] transition-transform flex flex-col overflow-hidden`}
+          className={`relative w-full h-full min-h-[124px] text-left p-5 rounded-xl ${gradientClassFor(group.color)} border border-border/50 active:scale-[0.98] transition-transform flex flex-col overflow-hidden`}
         >
           {overlay && (
             <div
