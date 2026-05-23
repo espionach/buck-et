@@ -43,7 +43,7 @@ const CreateQuest = () => {
   const [newLink, setNewLink] = useState("");
   const photoInputRef = useRef<HTMLInputElement>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [detailsOpen, setDetailsOpen] = useState(!isOnboarding);
+  const [detailsOpen, setDetailsOpen] = useState(false);
 
   // Revoke object URLs when component unmounts or list changes
   useEffect(() => {
@@ -317,6 +317,30 @@ const CreateQuest = () => {
             />
           </div>
 
+          {/* Date / Time / Location — always visible between title and description */}
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-[11px] text-muted-foreground mb-1 block">Date</label>
+                <input type="date" value={date} onChange={(e) => setDate(e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+              </div>
+              <div>
+                <label className="text-[11px] text-muted-foreground mb-1 block">Time</label>
+                <input type="text" value={time} onChange={(e) => setTime(e.target.value)} placeholder="e.g. 6:00 PM"
+                  className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+              </div>
+            </div>
+            <div>
+              <label className="text-[11px] text-muted-foreground mb-1 block">Location</label>
+              <LocationPicker
+                value={location}
+                onChange={setLocation}
+                placeholder="Where's this happening?"
+              />
+            </div>
+          </div>
+
           <div>
             <label className="text-sm font-semibold text-foreground mb-2 block">
               Description
@@ -324,7 +348,7 @@ const CreateQuest = () => {
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Add notes, time, meetup spot..."
+              placeholder="Add notes, meetup spot..."
               rows={3}
               className="w-full px-4 py-3.5 rounded-xl bg-card border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm resize-none"
             />
@@ -372,47 +396,20 @@ const CreateQuest = () => {
             </div>
           </div>
 
-          {/* Quest Details - collapsible during onboarding for faster first launch */}
+          {/* Quest Details - collapsible (date/time/location now live above) */}
           <div className="space-y-3">
-            {isOnboarding ? (
-              <button
-                type="button"
-                onClick={() => setDetailsOpen((v) => !v)}
-                className="w-full flex items-center justify-between text-left"
-              >
-                <span className="text-sm font-semibold text-foreground">Sidequest Details</span>
-                <span className="text-xs text-muted-foreground flex items-center gap-1">
-                  {detailsOpen ? "Hide" : "Optional"}
-                  <ChevronDown className={`w-4 h-4 transition-transform ${detailsOpen ? "rotate-180" : ""}`} />
-                </span>
-              </button>
-            ) : (
+            <button
+              type="button"
+              onClick={() => setDetailsOpen((v) => !v)}
+              className="w-full flex items-center justify-between text-left"
+            >
               <span className="text-sm font-semibold text-foreground">Sidequest Details</span>
-            )}
+              <span className="text-xs text-muted-foreground flex items-center gap-1">
+                {detailsOpen ? "Hide" : "Optional"}
+                <ChevronDown className={`w-4 h-4 transition-transform ${detailsOpen ? "rotate-180" : ""}`} />
+              </span>
+            </button>
             {detailsOpen && (<>
-
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="text-[11px] text-muted-foreground mb-1 block">Date</label>
-                <input type="date" value={date} onChange={(e) => setDate(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
-              </div>
-              <div>
-                <label className="text-[11px] text-muted-foreground mb-1 block">Time</label>
-                <input type="text" value={time} onChange={(e) => setTime(e.target.value)} placeholder="e.g. 6:00 PM"
-                  className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
-              </div>
-            </div>
-
-            <div>
-              <label className="text-[11px] text-muted-foreground mb-1 block">Location</label>
-              <LocationPicker
-                value={location}
-                onChange={setLocation}
-                placeholder="Where's this happening?"
-              />
-            </div>
 
             <div>
               <label className="text-[11px] text-muted-foreground mb-1 block">Meetup Spot</label>
