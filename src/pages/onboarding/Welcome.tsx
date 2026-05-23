@@ -9,8 +9,8 @@ const Welcome = () => {
   const { user } = useAuth();
 
   const handleContinue = async () => {
-    if (user) await setOnboardingStep(user.id, "permissions");
-    navigate("/onboarding/permissions");
+    if (user) await setOnboardingStep(user.id, "examples");
+    navigate("/onboarding/examples");
   };
 
   const handleSkipAll = async () => {
@@ -24,9 +24,9 @@ const Welcome = () => {
         <div className="w-20 h-20 rounded-3xl bg-primary/10 flex items-center justify-center mb-6">
           <Sparkles className="w-10 h-10 text-primary" />
         </div>
-        <h1 className="text-3xl font-bold text-foreground mb-3">Let's set you up</h1>
+        <h1 className="text-3xl font-bold text-foreground mb-3">Welcome to Buck-et</h1>
         <p className="text-base text-muted-foreground max-w-xs">
-          A couple of quick steps and you'll be ready to launch your first sidequest.
+          The social app for spontaneous sidequesting with friends. Turn "we should do that someday" into actually getting you out of the house. Let's get you set up.
         </p>
       </div>
 
