@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Play } from "lucide-react";
 import { getSidequestPhotoUrl } from "@/lib/uploads";
 import { cn } from "@/lib/utils";
 import { isVideoSrc } from "@/components/MediaViewer";
@@ -10,15 +11,12 @@ interface SidequestPhotoProps {
   className?: string;
   /** Render as <video> instead of <img>. Auto-detects from src for legacy data: URLs. */
   asVideo?: boolean;
+  /** When true, renders as a non-interactive thumbnail with a play overlay for videos. */
+  thumbnail?: boolean;
 }
 
-/**
- * Resolves a sidequest photo path to a signed URL and renders it.
- * Falls back transparently for legacy base64/full URL entries.
- */
-const SidequestPhoto = ({ src, alt = "Photo", className, asVideo }: SidequestPhotoProps) => {
+const SidequestPhoto = ({ src, alt = "Photo", className, asVideo, thumbnail }: SidequestPhotoProps) => {
   const [resolved, setResolved] = useState<string | null>(null);
-
   const renderAsVideo = asVideo ?? isVideoSrc(src);
 
   useEffect(() => {
@@ -36,11 +34,30 @@ const SidequestPhoto = ({ src, alt = "Photo", className, asVideo }: SidequestPho
     return <div className={cn("bg-muted animate-pulse", className)} aria-label="Loading photo" />;
   }
 
-  return renderAsVideo ? (
-    <video src={resolved} className={className} muted controls />
-  ) : (
-    <img src={resolved} alt={alt} className={className} />
-  );
+  if (renderAsVideo) {
+    if (thumbnail) {
+      return (
+        <div className={cn("relative overflow-hidden bg-black", className)}>
+          <video
+            src={resolved}
+            className="w-full h-full object-cover pointer-events-none"
+            muted
+            playsInline
+            preload="metadata"
+          />
+          <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+            <div className="bg-black/60 rounded-full p-3">
+              <Play className="w-6 h-6 text-white fill-white" />
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return <video src={resolved} className={className} muted controls />;
+  }
+
+  return <img src={resolved} alt={alt} className={className} />;
 };
 
 export default SidequestPhoto;
+
