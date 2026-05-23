@@ -260,7 +260,7 @@ const CreateQuest = () => {
           <span className="text-foreground font-medium">
             {selectedGroupData
               ? <span className="flex items-center gap-1.5"><GroupSwatch color={selectedGroupData.color} size={16} />{selectedGroupData.name}</span>
-              : <span className="flex items-center gap-1.5"><Globe className="w-4 h-4" />Friends Only</span>}
+              : <span className="flex items-center gap-1.5"><Globe className="w-4 h-4" />All Friends</span>}
           </span>
           <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${showGroupDropdown ? "rotate-180" : ""}`} />
         </button>
@@ -277,7 +277,7 @@ const CreateQuest = () => {
                 !selectedGroup ? "bg-primary/5 text-primary font-semibold" : "text-foreground hover:bg-muted"
               }`}
             >
-              <span className="flex items-center gap-1.5"><Globe className="w-4 h-4" />Friends Only</span>
+              <span className="flex items-center gap-1.5"><Globe className="w-4 h-4" />All Friends</span>
             </button>
             {groups.map((g) => (
               <button
@@ -310,7 +310,7 @@ const CreateQuest = () => {
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g. Road trip to the coast 🏖️"
+              placeholder="E.g. Go to the beach, cafe hopping, etc."
               className="w-full px-4 py-3.5 rounded-xl bg-card border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 text-base"
               autoFocus
             />

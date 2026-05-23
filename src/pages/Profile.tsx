@@ -929,10 +929,10 @@ const Profile = () => {
                                 {g.name}
                               </span>
                             ) : (
-                              <span className="flex items-center gap-1.5"><Globe className="w-4 h-4" />Friends Only</span>
+                              <span className="flex items-center gap-1.5"><Globe className="w-4 h-4" />All Friends</span>
                             );
                           })()
-                        : <span className="flex items-center gap-1.5"><Globe className="w-4 h-4" />Friends Only</span>}
+                        : <span className="flex items-center gap-1.5"><Globe className="w-4 h-4" />All Friends</span>}
                     </span>
                     <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${showEditGroupDropdown ? "rotate-180" : ""}`} />
                   </button>
@@ -948,7 +948,7 @@ const Profile = () => {
                           !editGroupId ? "bg-primary/5 text-primary font-semibold" : "text-foreground hover:bg-muted"
                         }`}
                       >
-                        <span className="flex items-center gap-1.5"><Globe className="w-4 h-4" />Friends Only</span>
+                        <span className="flex items-center gap-1.5"><Globe className="w-4 h-4" />All Friends</span>
                       </button>
                       {groups.map((g) => (
                         <button
