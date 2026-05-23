@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 import {
@@ -53,6 +53,7 @@ const Slide = ({ src, onClose }: { src: string; onClose: () => void }) => {
         />
         {url && (isVideo ? (
           <video
+            ref={(node) => { if (node && node.readyState >= 1) setLoaded(true); }}
             src={url}
             className={`relative max-h-[85vh] max-w-[92vw] object-contain rounded-lg shadow-2xl transition-opacity duration-300 ${
               loaded ? "opacity-100" : "opacity-0"
@@ -62,15 +63,19 @@ const Slide = ({ src, onClose }: { src: string; onClose: () => void }) => {
             playsInline
             onLoadedData={() => setLoaded(true)}
             onLoadedMetadata={() => setLoaded(true)}
+            onCanPlay={() => setLoaded(true)}
+            onError={() => setLoaded(true)}
           />
         ) : (
           <img
+            ref={(node) => { if (node && node.complete && node.naturalWidth > 0) setLoaded(true); }}
             src={url}
             alt=""
             className={`relative max-h-[85vh] max-w-[92vw] object-contain rounded-lg shadow-2xl transition-opacity duration-300 ${
               loaded ? "opacity-100" : "opacity-0"
             }`}
             onLoad={() => setLoaded(true)}
+            onError={() => setLoaded(true)}
           />
         ))}
       </div>
