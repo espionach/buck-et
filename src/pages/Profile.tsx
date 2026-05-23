@@ -841,7 +841,7 @@ const Profile = () => {
               </div>
 
               <div>
-                <label className="text-sm font-semibold text-foreground mb-1.5 block">Sidequest Name</label>
+                <label className="text-sm font-semibold text-foreground mb-1.5 block">Sidequest Name <span className="text-destructive">*</span></label>
                 <input
                   value={editQuestTitle}
                   onChange={(e) => setEditQuestTitle(e.target.value)}
@@ -862,7 +862,7 @@ const Profile = () => {
 
               {/* Photos & Videos — right after description for a more visual feel */}
               <div>
-                <label className="text-sm font-semibold text-foreground mb-1.5 block">Photos & Videos (optional)</label>
+                <label className="text-sm font-semibold text-foreground mb-1.5 block">Photos & Videos</label>
                 <input
                   ref={currentPhotoRef}
                   type="file"
@@ -1091,7 +1091,7 @@ const Profile = () => {
 
               {/* Links */}
               <div>
-                <label className="text-sm font-semibold text-foreground mb-1.5 block">Links (optional)</label>
+                <label className="text-sm font-semibold text-foreground mb-1.5 block">Links</label>
                 <div className="space-y-1.5">
                   {editQuestLinks.map((link, i) => (
                     <div key={i} className="flex items-center gap-2">
