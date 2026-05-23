@@ -17,11 +17,13 @@ interface SidequestPhotoProps {
 
 const SidequestPhoto = ({ src, alt = "Photo", className, asVideo, thumbnail }: SidequestPhotoProps) => {
   const [resolved, setResolved] = useState<string | null>(null);
+  const [loaded, setLoaded] = useState(false);
   const renderAsVideo = asVideo ?? isVideoSrc(src);
 
   useEffect(() => {
     let cancelled = false;
     setResolved(null);
+    setLoaded(false);
     getSidequestPhotoUrl(src).then((url) => {
       if (!cancelled) setResolved(url);
     });
@@ -30,40 +32,85 @@ const SidequestPhoto = ({ src, alt = "Photo", className, asVideo, thumbnail }: S
     };
   }, [src]);
 
-  if (!resolved) {
+  // Always render the placeholder in the same box; overlay the media on top
+  // and fade it in once it has actually loaded. This avoids the
+  // placeholder-disappears-then-image-appears flash.
+  const placeholder = (
+    <div
+      className={cn(
+        "absolute inset-0 bg-muted animate-pulse transition-opacity duration-300",
+        loaded ? "opacity-0" : "opacity-100"
+      )}
+      aria-hidden={loaded}
+    />
+  );
+
+  if (renderAsVideo && thumbnail) {
     return (
-      <div
-        className={cn("bg-muted animate-pulse", className)}
-        aria-label="Loading photo"
-      />
-    );
-  }
-
-
-  if (renderAsVideo) {
-    if (thumbnail) {
-      return (
-        <div className={cn("relative overflow-hidden bg-black", className)}>
+      <div className={cn("relative overflow-hidden bg-muted", className)}>
+        {resolved && (
           <video
             src={resolved}
-            className="w-full h-full object-cover pointer-events-none"
+            className={cn(
+              "w-full h-full object-cover pointer-events-none transition-opacity duration-300",
+              loaded ? "opacity-100" : "opacity-0"
+            )}
             muted
             playsInline
             preload="metadata"
+            onLoadedData={() => setLoaded(true)}
+            onLoadedMetadata={() => setLoaded(true)}
           />
+        )}
+        {placeholder}
+        {loaded && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/20">
             <div className="bg-black/60 rounded-full p-3">
               <Play className="w-6 h-6 text-white fill-white" />
             </div>
           </div>
-        </div>
-      );
-    }
-    return <video src={resolved} className={cn("transition-opacity duration-300", className)} muted controls />;
+        )}
+      </div>
+    );
   }
 
-  return <img src={resolved} alt={alt} className={cn("transition-opacity duration-300", className)} />;
+  if (renderAsVideo) {
+    return (
+      <div className={cn("relative overflow-hidden bg-muted", className)}>
+        {resolved && (
+          <video
+            src={resolved}
+            className={cn(
+              "w-full h-full transition-opacity duration-300",
+              loaded ? "opacity-100" : "opacity-0"
+            )}
+            muted
+            controls
+            onLoadedData={() => setLoaded(true)}
+            onLoadedMetadata={() => setLoaded(true)}
+          />
+        )}
+        {placeholder}
+      </div>
+    );
+  }
+
+  return (
+    <div className={cn("relative overflow-hidden bg-muted", className)}>
+      {resolved && (
+        <img
+          src={resolved}
+          alt={alt}
+          className={cn(
+            "w-full h-full object-cover transition-opacity duration-300",
+            loaded ? "opacity-100" : "opacity-0"
+          )}
+          onLoad={() => setLoaded(true)}
+        />
+      )}
+      {placeholder}
+    </div>
+  );
 };
 
 export default SidequestPhoto;
-
