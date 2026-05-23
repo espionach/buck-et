@@ -31,8 +31,19 @@ const SidequestPhoto = ({ src, alt = "Photo", className, asVideo, thumbnail }: S
   }, [src]);
 
   if (!resolved) {
-    return <div className={cn("bg-muted animate-pulse", className)} aria-label="Loading photo" />;
+    return (
+      <div
+        className={cn(
+          "bg-muted flex flex-col items-center justify-center text-muted-foreground text-xs",
+          className
+        )}
+        aria-label="Loading photo"
+      >
+        <span>Loading…</span>
+      </div>
+    );
   }
+
 
   if (renderAsVideo) {
     if (thumbnail) {
@@ -53,10 +64,10 @@ const SidequestPhoto = ({ src, alt = "Photo", className, asVideo, thumbnail }: S
         </div>
       );
     }
-    return <video src={resolved} className={className} muted controls />;
+    return <video src={resolved} className={cn("transition-opacity duration-300", className)} muted controls />;
   }
 
-  return <img src={resolved} alt={alt} className={className} />;
+  return <img src={resolved} alt={alt} className={cn("transition-opacity duration-300", className)} />;
 };
 
 export default SidequestPhoto;
