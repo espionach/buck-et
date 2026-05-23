@@ -126,67 +126,41 @@ export function useFriendRequests() {
 }
 
 // ---- Groups ----
+// Groups are now private launch lists owned by a single user. RLS restricts
+// SELECT on `groups` to rows where owner_id = auth.uid(), so we just fetch
+// every visible group and treat them all as owned by the current user.
 export function useGroups() {
   const { user } = useAuth();
   return useQuery({
     queryKey: ["groups", user?.id],
     queryFn: async () => {
       if (!user) return [];
-      // Get groups user is a member of
-      const { data: memberships } = await supabase
-        .from("group_members")
-        .select("group_id, role")
-        .eq("user_id", user.id);
-      if (!memberships || memberships.length === 0) return [];
-      const groupIds = memberships.map((m) => m.group_id);
-      // Fetch group details
       const { data: groups } = await supabase
         .from("groups")
         .select("*")
-        .in("id", groupIds);
-      // Fetch all members for these groups
+        .eq("owner_id", user.id);
+      if (!groups || groups.length === 0) return [];
+      const groupIds = groups.map((g) => g.id);
       const { data: allMembers } = await supabase
         .from("group_members")
         .select("*")
         .in("group_id", groupIds);
-      // Fetch all pending invitations for these groups
-      const { data: allInvites } = await supabase
-        .from("group_invitations")
-        .select("*")
-        .in("group_id", groupIds)
-        .eq("status", "pending");
-      // Get all member + invited user profiles
-      const memberUserIds = [
-        ...new Set([
-          ...(allMembers || []).map((m) => m.user_id),
-          ...(allInvites || []).map((i) => i.invited_user_id),
-        ]),
-      ];
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("*")
-        .in("user_id", memberUserIds);
+      // The owner is implicit and is not shown in the members list. Old data
+      // may have an owner row with role='owner' — filter that out here.
+      const memberRows = (allMembers || []).filter((m) => m.user_id !== user.id);
+      const memberUserIds = [...new Set(memberRows.map((m) => m.user_id))];
+      const { data: profiles } = memberUserIds.length
+        ? await supabase.from("profiles").select("*").in("user_id", memberUserIds)
+        : { data: [] as any[] };
       const profileMap = new Map((profiles || []).map((p) => [p.user_id, dbProfileToUser(p)]));
 
-      return (groups || []).map((g): Group => {
-        const gMembers = (allMembers || []).filter((m) => m.group_id === g.id);
-        const gInvites = (allInvites || []).filter((i) => i.group_id === g.id);
-        // Don't double-count: skip invites for users already in members
-        const memberIds = new Set(gMembers.map((m) => m.user_id));
-        const filteredInvites = gInvites.filter((i) => !memberIds.has(i.invited_user_id));
-        // `members` = accepted members only (used for counts, group-quest access, ownership transfer)
+      return groups.map((g): Group => {
+        const gMembers = memberRows.filter((m) => m.group_id === g.id);
         const members = gMembers.map((m) => profileMap.get(m.user_id) || placeholderUser(m.user_id));
-        // `memberRoles` includes invited users so the settings UI can show their pending status
-        const memberRoles: GroupMember[] = [
-          ...gMembers.map((m) => ({
-            user: profileMap.get(m.user_id) || placeholderUser(m.user_id),
-            role: m.role as GroupMember["role"],
-          })),
-          ...filteredInvites.map((i) => ({
-            user: profileMap.get(i.invited_user_id) || placeholderUser(i.invited_user_id),
-            role: "invited" as const,
-          })),
-        ];
+        const memberRoles: GroupMember[] = gMembers.map((m) => ({
+          user: profileMap.get(m.user_id) || placeholderUser(m.user_id),
+          role: "member" as const,
+        }));
         return {
           id: g.id,
           name: g.name,
@@ -205,6 +179,7 @@ export function useGroups() {
     enabled: !!user,
   });
 }
+
 
 // ---- Quests ----
 export function useQuests() {
