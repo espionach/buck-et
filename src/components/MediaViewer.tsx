@@ -58,38 +58,36 @@ const Slide = ({ src, onClose }: { src: string; onClose: () => void }) => {
   const isVideo = isVideoSrc(src);
 
   return (
-    <div className="relative inline-block">
-      <div className="relative w-[85vw] h-[60vh] flex items-center justify-center">
-        {!loaded && (
-          <div
-            className="absolute inset-0 bg-muted animate-pulse rounded-lg"
-            aria-hidden
-          />
-        )}
-        {url && (isVideo ? (
-          <video
-            ref={(node) => { if (node && node.readyState >= 1) markLoaded(); }}
-            src={url}
-            className="relative max-h-[85vh] max-w-[92vw] object-contain rounded-lg shadow-2xl"
-            controls
-            autoPlay
-            playsInline
-            onLoadedData={markLoaded}
-            onLoadedMetadata={markLoaded}
-            onCanPlay={markLoaded}
-            onError={markLoaded}
-          />
-        ) : (
-          <img
-            ref={(node) => { if (node && node.complete && node.naturalWidth > 0) markLoaded(); }}
-            src={url}
-            alt=""
-            className="relative max-h-[85vh] max-w-[92vw] object-contain rounded-lg shadow-2xl"
-            onLoad={markLoaded}
-            onError={markLoaded}
-          />
-        ))}
-      </div>
+    <div className="relative inline-block leading-none">
+      {!loaded && (
+        <div
+          className="w-[85vw] h-[60vh] bg-muted animate-pulse rounded-lg"
+          aria-hidden
+        />
+      )}
+      {url && (isVideo ? (
+        <video
+          ref={(node) => { if (node && node.readyState >= 1) markLoaded(); }}
+          src={url}
+          className={`block max-h-[85vh] max-w-[92vw] object-contain rounded-lg shadow-2xl ${loaded ? "" : "hidden"}`}
+          controls
+          autoPlay
+          playsInline
+          onLoadedData={markLoaded}
+          onLoadedMetadata={markLoaded}
+          onCanPlay={markLoaded}
+          onError={markLoaded}
+        />
+      ) : (
+        <img
+          ref={(node) => { if (node && node.complete && node.naturalWidth > 0) markLoaded(); }}
+          src={url}
+          alt=""
+          className={`block max-h-[85vh] max-w-[92vw] object-contain rounded-lg shadow-2xl ${loaded ? "" : "hidden"}`}
+          onLoad={markLoaded}
+          onError={markLoaded}
+        />
+      ))}
       {loaded && (
         <button
           type="button"
