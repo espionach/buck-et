@@ -12,6 +12,7 @@ import {
   X,
   UserSearch,
   Users as UsersIcon,
+  MoreVertical,
 } from "lucide-react";
 import { useAppStore } from "@/data/appState";
 import { Group, User } from "@/data/mockData";
@@ -21,11 +22,18 @@ import GroupStylePicker from "@/components/GroupStylePicker";
 import { usePopup } from "@/hooks/use-popup";
 import { validateContent } from "@/lib/contentFilter";
 import { toast } from "sonner";
+import {
+  parseGroupColor,
+  gradientClassFor,
+  gradientStyleFor,
+  patternStyleFor,
+} from "@/data/groupColors";
 
-/**
- * Owner-only "launch lists" — render the current user's private groups,
- * let them add/remove friends, rename, restyle, or delete each one.
- */
+type View =
+  | { kind: "list" }
+  | { kind: "members"; groupId: string }
+  | { kind: "settings"; groupId: string };
+
 const MyGroupsTab = () => {
   const {
     groups,
@@ -37,26 +45,39 @@ const MyGroupsTab = () => {
   } = useAppStore();
   const navigate = useNavigate();
 
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const selected = groups.find((g) => g.id === selectedId) || null;
+  const [view, setView] = useState<View>({ kind: "list" });
+  const selected =
+    view.kind !== "list"
+      ? groups.find((g) => g.id === view.groupId) || null
+      : null;
 
   const sortedGroups = [...groups].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 
-  if (selected) {
+  if (view.kind === "members" && selected) {
     return (
-      <GroupEditor
+      <GroupMembersView
         group={selected}
         friends={friends}
-        onBack={() => setSelectedId(null)}
-        onRename={(name) => updateGroup(selected.id, { name })}
-        onRestyle={(color) => updateGroup(selected.id, { color })}
+        onBack={() => setView({ kind: "list" })}
+        onOpenSettings={() => setView({ kind: "settings", groupId: selected.id })}
         onAdd={(user) => inviteToGroup(selected.id, user)}
         onRemove={(userId) => removeMemberFromGroup(selected.id, userId)}
+      />
+    );
+  }
+
+  if (view.kind === "settings" && selected) {
+    return (
+      <GroupSettingsView
+        group={selected}
+        onBack={() => setView({ kind: "members", groupId: selected.id })}
+        onRename={(name) => updateGroup(selected.id, { name })}
+        onRestyle={(color) => updateGroup(selected.id, { color })}
         onDelete={() => {
           deleteGroup(selected.id);
-          setSelectedId(null);
+          setView({ kind: "list" });
         }}
       />
     );
@@ -64,135 +85,127 @@ const MyGroupsTab = () => {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-3">
-        <p className="text-xs text-muted-foreground">
-          Private lists to launch sidequests to a hand-picked subset of friends.
-          Only you can see them.
-        </p>
+      <p className="text-xs text-muted-foreground mb-3">
+        Private lists to launch sidequests to a hand-picked subset of friends.
+        Only you can see them.
+      </p>
+
+      <div className="grid grid-cols-2 gap-3 items-stretch">
+        {/* New group card — always first, same size as group cards */}
+        <motion.button
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          onClick={() => navigate("/create-group")}
+          className="w-full rounded-xl border-2 border-dashed border-border bg-muted/30 hover:bg-muted/50 hover:border-foreground/30 transition-colors flex flex-col items-center justify-center gap-2 p-5 min-h-[124px] text-muted-foreground"
+        >
+          <Plus className="w-5 h-5" />
+          <span className="text-xs font-semibold">New group</span>
+        </motion.button>
+
+        {sortedGroups.map((g, i) => (
+          <div key={g.id} className="relative">
+            <GroupCard
+              group={g}
+              index={i + 1}
+              onClick={() => setView({ kind: "members", groupId: g.id })}
+            />
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setView({ kind: "settings", groupId: g.id });
+              }}
+              className="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-card/70 backdrop-blur-sm text-foreground hover:bg-card transition-colors"
+              aria-label={`Edit ${g.name}`}
+            >
+              <MoreVertical className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        ))}
       </div>
 
-      <button
-        onClick={() => navigate("/create-group")}
-        className="w-full mb-4 py-3 rounded-xl border border-dashed border-border text-sm font-semibold text-muted-foreground hover:text-foreground hover:border-foreground/40 transition-colors flex items-center justify-center gap-2"
-      >
-        <Plus className="w-4 h-4" />
-        New group
-      </button>
-
-      {sortedGroups.length === 0 ? (
-        <div className="text-center py-12 text-muted-foreground">
+      {sortedGroups.length === 0 && (
+        <div className="text-center py-10 text-muted-foreground">
           <UsersIcon className="w-10 h-10 mx-auto mb-2 opacity-40" />
-          <p className="text-sm">No groups yet — create one to start launching to a subset of friends.</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 gap-3 items-stretch">
-          {sortedGroups.map((g, i) => (
-            <GroupCard
-              key={g.id}
-              group={g}
-              index={i}
-              onClick={() => setSelectedId(g.id)}
-            />
-          ))}
+          <p className="text-sm">No groups yet — tap "New group" to create one.</p>
         </div>
       )}
     </div>
   );
 };
 
-interface GroupEditorProps {
+/* ───────────────────────── Members view ───────────────────────── */
+
+interface MembersViewProps {
   group: Group;
   friends: User[];
   onBack: () => void;
-  onRename: (name: string) => void;
-  onRestyle: (color: string) => void;
+  onOpenSettings: () => void;
   onAdd: (user: User) => void;
   onRemove: (userId: string) => void;
-  onDelete: () => void;
 }
 
-const GroupEditor = ({
+const GroupMembersView = ({
   group,
   friends,
   onBack,
-  onRename,
-  onRestyle,
+  onOpenSettings,
   onAdd,
   onRemove,
-  onDelete,
-}: GroupEditorProps) => {
-  const [name, setName] = useState(group.name);
-  const [editingName, setEditingName] = useState(false);
-  const [color, setColor] = useState(group.color || "sky");
+}: MembersViewProps) => {
   const [showAdd, setShowAdd] = useState(false);
   const [memberSearch, setMemberSearch] = useState("");
   const [confirmRemove, setConfirmRemove] = useState<User | null>(null);
-  const [confirmDelete, setConfirmDelete] = useState(false);
-  usePopup(showAdd || !!confirmRemove || confirmDelete);
+  usePopup(showAdd || !!confirmRemove);
 
-  const handleSaveName = () => {
-    const trimmed = name.trim();
-    if (!trimmed) return;
-    const violation = validateContent(trimmed);
-    if (violation) {
-      toast.error(violation);
-      return;
-    }
-    onRename(trimmed);
-    setEditingName(false);
-  };
-
-  const handleColor = (next: string) => {
-    setColor(next);
-    onRestyle(next);
-  };
+  const parsed = parseGroupColor(group.color);
+  const overlay = patternStyleFor(parsed.pattern);
 
   const memberIds = new Set(group.members.map((m) => m.id));
   const available = friends.filter((f) => !memberIds.has(f.id));
 
   return (
     <div className="space-y-5">
-      <button
-        onClick={onBack}
-        className="p-2 rounded-xl bg-muted text-muted-foreground"
-        aria-label="Back"
-      >
-        <ArrowLeft className="w-5 h-5" />
-      </button>
-
-      {/* Name */}
-      <div className="flex gap-2 items-end">
-        <div className="flex-1 flex items-center gap-1.5">
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            disabled={!editingName}
-            className={`flex-1 px-3 py-2.5 rounded-xl border text-base font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 ${
-              editingName ? "bg-muted border-border" : "bg-transparent border-transparent"
-            }`}
-          />
-          <button
-            onClick={() => (editingName ? handleSaveName() : setEditingName(true))}
-            className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-            aria-label={editingName ? "Save name" : "Edit name"}
-          >
-            {editingName ? <Check className="w-4 h-4 text-primary" /> : <Pencil className="w-4 h-4" />}
-          </button>
-        </div>
+      <div className="flex items-center justify-between">
+        <button
+          onClick={onBack}
+          className="p-2 rounded-xl bg-muted text-muted-foreground"
+          aria-label="Back"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </button>
+        <button
+          onClick={onOpenSettings}
+          className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+          aria-label="Group settings"
+        >
+          <MoreVertical className="w-5 h-5" />
+        </button>
       </div>
 
-      {/* Style */}
-      <div>
-        <h3 className="font-bold text-foreground text-sm mb-2">Card Style</h3>
-        <GroupStylePicker value={color} onChange={handleColor} />
+      {/* Group header card */}
+      <div
+        style={gradientStyleFor(group.color)}
+        className={`relative w-full p-5 rounded-xl ${gradientClassFor(group.color)} border border-border/50 overflow-hidden`}
+      >
+        {overlay && (
+          <div
+            aria-hidden
+            className="absolute inset-0 pointer-events-none opacity-70"
+            style={overlay}
+          />
+        )}
+        <h2 className="relative font-display font-bold text-lg text-foreground">
+          {group.name}
+        </h2>
+        <p className="relative text-xs text-muted-foreground mt-0.5">
+          {group.members.length} {group.members.length === 1 ? "member" : "members"}
+        </p>
       </div>
 
       {/* Members */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <h3 className="font-bold text-foreground text-sm">
-            Members ({group.members.length})
-          </h3>
+          <h3 className="font-bold text-foreground text-sm">Members</h3>
           <button
             onClick={() => {
               setMemberSearch("");
@@ -232,15 +245,6 @@ const GroupEditor = ({
           </div>
         )}
       </div>
-
-      {/* Delete group */}
-      <button
-        onClick={() => setConfirmDelete(true)}
-        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-destructive/30 text-destructive text-sm font-semibold hover:bg-destructive/5 transition-colors"
-      >
-        <Trash2 className="w-4 h-4" />
-        Delete group
-      </button>
 
       {/* Add members modal */}
       <AnimatePresence>
@@ -371,8 +375,100 @@ const GroupEditor = ({
           </motion.div>
         )}
       </AnimatePresence>
+    </div>
+  );
+};
 
-      {/* Confirm delete group */}
+/* ───────────────────────── Settings view ───────────────────────── */
+
+interface SettingsViewProps {
+  group: Group;
+  onBack: () => void;
+  onRename: (name: string) => void;
+  onRestyle: (color: string) => void;
+  onDelete: () => void;
+}
+
+const GroupSettingsView = ({
+  group,
+  onBack,
+  onRename,
+  onRestyle,
+  onDelete,
+}: SettingsViewProps) => {
+  const [name, setName] = useState(group.name);
+  const [editingName, setEditingName] = useState(false);
+  const [color, setColor] = useState(group.color || "sky");
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  usePopup(confirmDelete);
+
+  const handleSaveName = () => {
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    const violation = validateContent(trimmed);
+    if (violation) {
+      toast.error(violation);
+      return;
+    }
+    onRename(trimmed);
+    setEditingName(false);
+  };
+
+  const handleColor = (next: string) => {
+    setColor(next);
+    onRestyle(next);
+  };
+
+  return (
+    <div className="space-y-5">
+      <div className="flex items-center gap-2">
+        <button
+          onClick={onBack}
+          className="p-2 rounded-xl bg-muted text-muted-foreground"
+          aria-label="Back"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </button>
+        <h2 className="text-base font-bold text-foreground">Group settings</h2>
+      </div>
+
+      {/* Name */}
+      <div>
+        <h3 className="font-bold text-foreground text-sm mb-2">Name</h3>
+        <div className="flex items-center gap-1.5">
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            disabled={!editingName}
+            className={`flex-1 px-3 py-2.5 rounded-xl border text-base font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 ${
+              editingName ? "bg-muted border-border" : "bg-transparent border-transparent"
+            }`}
+          />
+          <button
+            onClick={() => (editingName ? handleSaveName() : setEditingName(true))}
+            className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            aria-label={editingName ? "Save name" : "Edit name"}
+          >
+            {editingName ? <Check className="w-4 h-4 text-primary" /> : <Pencil className="w-4 h-4" />}
+          </button>
+        </div>
+      </div>
+
+      {/* Style */}
+      <div>
+        <h3 className="font-bold text-foreground text-sm mb-2">Card style</h3>
+        <GroupStylePicker value={color} onChange={handleColor} />
+      </div>
+
+      {/* Delete */}
+      <button
+        onClick={() => setConfirmDelete(true)}
+        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-destructive/30 text-destructive text-sm font-semibold hover:bg-destructive/5 transition-colors"
+      >
+        <Trash2 className="w-4 h-4" />
+        Delete group
+      </button>
+
       <AnimatePresence>
         {confirmDelete && (
           <motion.div
