@@ -181,9 +181,14 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
               // 2. Real notifications → routed to their section
               notifications.forEach((n) => {
                 const section = TYPE_TO_SECTION[n.type as NotificationType] || "social";
-                // board_invitation is legacy — groups are now direct-add lists.
-                // Skip rendering any stale pending-invite notifications entirely.
-                if (n.type === "board_invitation") {
+                // Group-related notifications are intentionally suppressed —
+                // users should not learn which private launch lists they're on.
+                if (
+                  n.type === "board_invitation" ||
+                  n.type === "removed_from_group" ||
+                  n.type === "transfer_group" ||
+                  n.type === "new_quest_in_group"
+                ) {
                   return;
                 }
 
