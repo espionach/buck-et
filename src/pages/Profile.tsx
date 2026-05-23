@@ -876,32 +876,7 @@ const Profile = () => {
                   </div>
                   <div className="relative">
                     <label className="text-[11px] text-muted-foreground mb-1 block">Time</label>
-                    <div className="relative">
-                      <input
-                        type="time"
-                        value={(() => {
-                          if (!editTime) return "";
-                          if (/^\d{1,2}:\d{2}$/.test(editTime)) return editTime.padStart(5, "0");
-                          const m = editTime.match(/^(\d{1,2}):(\d{2})\s*(AM|PM|am|pm)$/i);
-                          if (!m) return "";
-                          let h = parseInt(m[1]);
-                          const p = m[3].toLowerCase();
-                          if (p === "pm" && h !== 12) h += 12;
-                          if (p === "am" && h === 12) h = 0;
-                          return `${String(h).padStart(2, "0")}:${m[2]}`;
-                        })()}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          if (!val) { setEditTime(""); return; }
-                          const [h, m] = val.split(":").map(Number);
-                          const period = h >= 12 ? "PM" : "AM";
-                          const hour12 = h % 12 || 12;
-                          setEditTime(`${hour12}:${String(m).padStart(2, "0")} ${period}`);
-                        }}
-                        className="w-full px-3 py-2 pl-9 rounded-xl bg-muted border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-                      />
-                      <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-                    </div>
+                    <TimePicker value={editTime} onChange={setEditTime} className="bg-muted py-2" />
                   </div>
                 </div>
                 <div>
