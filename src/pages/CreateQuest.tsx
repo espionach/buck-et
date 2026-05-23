@@ -43,6 +43,7 @@ const CreateQuest = () => {
   const [newLink, setNewLink] = useState("");
   const photoInputRef = useRef<HTMLInputElement>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(!isOnboarding);
 
   // Revoke object URLs when component unmounts or list changes
   useEffect(() => {
@@ -371,9 +372,24 @@ const CreateQuest = () => {
             </div>
           </div>
 
-          {/* Quest Details - always visible */}
+          {/* Quest Details - collapsible during onboarding for faster first launch */}
           <div className="space-y-3">
-            <span className="text-sm font-semibold text-foreground">Sidequest Details</span>
+            {isOnboarding ? (
+              <button
+                type="button"
+                onClick={() => setDetailsOpen((v) => !v)}
+                className="w-full flex items-center justify-between text-left"
+              >
+                <span className="text-sm font-semibold text-foreground">Sidequest Details</span>
+                <span className="text-xs text-muted-foreground flex items-center gap-1">
+                  {detailsOpen ? "Hide" : "Optional"}
+                  <ChevronDown className={`w-4 h-4 transition-transform ${detailsOpen ? "rotate-180" : ""}`} />
+                </span>
+              </button>
+            ) : (
+              <span className="text-sm font-semibold text-foreground">Sidequest Details</span>
+            )}
+            {detailsOpen && (<></>)}
 
             <div className="grid grid-cols-2 gap-3">
               <div>
