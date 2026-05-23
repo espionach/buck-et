@@ -10,6 +10,7 @@ function emitOnboardingStatus(detail: { onboarded: boolean; step: OnboardingStep
 
 export type OnboardingStep =
   | "welcome"
+  | "examples"
   | "permissions"
   | "friends"
   | "tour"
@@ -17,6 +18,7 @@ export type OnboardingStep =
 
 export const ONBOARDING_ORDER: OnboardingStep[] = [
   "welcome",
+  "examples",
   "permissions",
   "friends",
   "tour",
@@ -25,6 +27,7 @@ export const ONBOARDING_ORDER: OnboardingStep[] = [
 
 export const ONBOARDING_PATHS: Record<OnboardingStep, string> = {
   welcome: "/onboarding/welcome",
+  examples: "/onboarding/examples",
   permissions: "/onboarding/permissions",
   friends: "/onboarding/friends",
   tour: "/onboarding/tour",
@@ -109,9 +112,9 @@ export async function completeOnboarding(userId: string) {
 export async function resetOnboarding(userId: string) {
   await supabase
     .from("profiles")
-    .update({ onboarded_at: null, onboarding_step: "tour" })
+    .update({ onboarded_at: null, onboarding_step: "welcome" })
     .eq("user_id", userId);
-  emitOnboardingStatus({ onboarded: false, step: "tour" });
+  emitOnboardingStatus({ onboarded: false, step: "welcome" });
 }
 
 /** Convenience: handler that completes + navigates to "/" */

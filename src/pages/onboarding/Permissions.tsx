@@ -39,8 +39,8 @@ const Permissions = () => {
   };
 
   const handleBack = async () => {
-    if (user) await setOnboardingStep(user.id, "welcome");
-    navigate("/onboarding/welcome", { replace: true });
+    if (user) await setOnboardingStep(user.id, "examples");
+    navigate("/onboarding/examples", { replace: true });
   };
 
   return (

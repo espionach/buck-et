@@ -31,6 +31,7 @@ import ResetPassword from "./pages/ResetPassword";
 import BottomNav from "./components/BottomNav";
 import LegalUpdateBanner from "./components/LegalUpdateBanner";
 import Welcome from "./pages/onboarding/Welcome";
+import OnboardingExamples from "./pages/onboarding/Examples";
 import OnboardingPermissions from "./pages/onboarding/Permissions";
 import OnboardingFriends from "./pages/onboarding/Friends";
 import OnboardingTour from "./pages/onboarding/Tour";
@@ -80,6 +81,7 @@ const AppLayout = () => {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/onboarding/welcome" element={<ProtectedRoute><Welcome /></ProtectedRoute>} />
+        <Route path="/onboarding/examples" element={<ProtectedRoute><OnboardingExamples /></ProtectedRoute>} />
         <Route path="/onboarding/permissions" element={<ProtectedRoute><OnboardingPermissions /></ProtectedRoute>} />
         <Route path="/onboarding/friends" element={<ProtectedRoute><OnboardingFriends /></ProtectedRoute>} />
         <Route path="/onboarding/tour" element={<ProtectedRoute><OnboardingTour /></ProtectedRoute>} />
