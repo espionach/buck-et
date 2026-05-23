@@ -13,11 +13,11 @@ const STEPS: CoachmarkStep[] = [
     route: "/",
   },
   {
-    targetSelector: '[data-tour="nav-groups"]',
-    title: "Groups",
-    body: "Your friend groups. Where plans happen. Tap + to start one.",
+    targetSelector: '[data-tour="nav-calendar"]',
+    title: "Calendar",
+    body: "Your upcoming sidequests on a calendar (coming soon).",
     placement: "top",
-    route: "/groups",
+    route: "/calendar",
   },
   {
     targetSelector: '[data-tour="nav-profile"]',
