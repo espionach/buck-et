@@ -5,12 +5,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { DataProvider } from "@/components/DataProvider";
-import Boards from "./pages/Home";
 import Home from "./pages/Feed";
+import Calendar from "./pages/Calendar";
 import Profile from "./pages/Profile";
 import PublicProfile from "./pages/PublicProfile";
 import Settings from "./pages/Settings";
-import GroupInvite from "./pages/GroupInvite";
+
 import BlockedUsers from "./pages/BlockedUsers";
 import AdminReports from "./pages/AdminReports";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -68,7 +68,7 @@ const AuthRoute = ({ children }: { children: React.ReactNode }) => {
 
 const AppLayout = () => {
   const location = useLocation();
-  const hideNav = ["/create", "/create-group", "/login", "/signup", "/forgot-password", "/reset-password", "/settings", "/settings/blocked", "/settings/community-guidelines", "/settings/privacy-policy", "/settings/terms", "/settings/legal-updates", "/admin", "/admin/reports"].includes(location.pathname) || location.pathname.startsWith("/quest/") || location.pathname.startsWith("/onboarding/") || /^\/g\/[^/]+\/invite$/.test(location.pathname);
+  const hideNav = ["/create", "/create-group", "/login", "/signup", "/forgot-password", "/reset-password", "/settings", "/settings/blocked", "/settings/community-guidelines", "/settings/privacy-policy", "/settings/terms", "/settings/legal-updates", "/admin", "/admin/reports"].includes(location.pathname) || location.pathname.startsWith("/quest/") || location.pathname.startsWith("/onboarding/");
 
   return (
     <div className="max-w-md mx-auto min-h-screen relative">
@@ -82,11 +82,13 @@ const AppLayout = () => {
         <Route path="/onboarding/friends" element={<ProtectedRoute><OnboardingFriends /></ProtectedRoute>} />
         <Route path="/onboarding/tour" element={<ProtectedRoute><OnboardingTour /></ProtectedRoute>} />
         <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-        <Route path="/boards" element={<ProtectedRoute><Boards /></ProtectedRoute>} />
-        <Route path="/groups" element={<ProtectedRoute><Boards /></ProtectedRoute>} />
+        <Route path="/calendar" element={<ProtectedRoute><Calendar /></ProtectedRoute>} />
+        {/* Legacy group routes redirect to the new Groups tab on Profile */}
+        <Route path="/groups" element={<Navigate to="/profile?tab=groups" replace />} />
+        <Route path="/boards" element={<Navigate to="/profile?tab=groups" replace />} />
+        <Route path="/g/:groupId/invite" element={<Navigate to="/profile?tab=groups" replace />} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="/u/:username" element={<ProtectedRoute><PublicProfile /></ProtectedRoute>} />
-        <Route path="/g/:groupId/invite" element={<ProtectedRoute><GroupInvite /></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
         <Route path="/settings/blocked" element={<ProtectedRoute><BlockedUsers /></ProtectedRoute>} />
         <Route path="/settings/community-guidelines" element={<ProtectedRoute><CommunityGuidelines /></ProtectedRoute>} />
