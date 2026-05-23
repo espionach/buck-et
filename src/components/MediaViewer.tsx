@@ -25,19 +25,34 @@ interface MediaViewerProps {
   onOpenChange: (open: boolean) => void;
 }
 
+// Module-level caches so flipping between slides doesn't re-show the
+// placeholder for media that has already loaded once this session.
+const slideUrlCache = new Map<string, string>();
+const slideLoadedCache = new Set<string>();
+
 const Slide = ({ src, onClose }: { src: string; onClose: () => void }) => {
-  const [url, setUrl] = useState<string | null>(null);
-  const [loaded, setLoaded] = useState(false);
+  const [url, setUrl] = useState<string | null>(() => slideUrlCache.get(src) ?? null);
+  const [loaded, setLoaded] = useState<boolean>(() => slideLoadedCache.has(src));
+
   useEffect(() => {
+    const cached = slideUrlCache.get(src) ?? null;
+    setUrl(cached);
+    setLoaded(slideLoadedCache.has(src));
+    if (cached) return;
     let cancelled = false;
-    setUrl(null);
-    setLoaded(false);
     getSidequestPhotoUrl(src).then((u) => {
-      if (!cancelled) setUrl(u);
+      if (cancelled || !u) return;
+      slideUrlCache.set(src, u);
+      setUrl(u);
     });
     return () => {
       cancelled = true;
     };
+  }, [src]);
+
+  const markLoaded = useCallback(() => {
+    slideLoadedCache.add(src);
+    setLoaded(true);
   }, [src]);
 
   const isVideo = isVideoSrc(src);
@@ -45,37 +60,33 @@ const Slide = ({ src, onClose }: { src: string; onClose: () => void }) => {
   return (
     <div className="relative inline-block">
       <div className="relative w-[85vw] h-[60vh] flex items-center justify-center">
-        <div
-          className={`absolute inset-0 bg-muted animate-pulse rounded-lg transition-opacity duration-300 ${
-            loaded ? "opacity-0" : "opacity-100"
-          }`}
-          aria-hidden={loaded}
-        />
+        {!loaded && (
+          <div
+            className="absolute inset-0 bg-muted animate-pulse rounded-lg"
+            aria-hidden
+          />
+        )}
         {url && (isVideo ? (
           <video
-            ref={(node) => { if (node && node.readyState >= 1) setLoaded(true); }}
+            ref={(node) => { if (node && node.readyState >= 1) markLoaded(); }}
             src={url}
-            className={`relative max-h-[85vh] max-w-[92vw] object-contain rounded-lg shadow-2xl transition-opacity duration-300 ${
-              loaded ? "opacity-100" : "opacity-0"
-            }`}
+            className="relative max-h-[85vh] max-w-[92vw] object-contain rounded-lg shadow-2xl"
             controls
             autoPlay
             playsInline
-            onLoadedData={() => setLoaded(true)}
-            onLoadedMetadata={() => setLoaded(true)}
-            onCanPlay={() => setLoaded(true)}
-            onError={() => setLoaded(true)}
+            onLoadedData={markLoaded}
+            onLoadedMetadata={markLoaded}
+            onCanPlay={markLoaded}
+            onError={markLoaded}
           />
         ) : (
           <img
-            ref={(node) => { if (node && node.complete && node.naturalWidth > 0) setLoaded(true); }}
+            ref={(node) => { if (node && node.complete && node.naturalWidth > 0) markLoaded(); }}
             src={url}
             alt=""
-            className={`relative max-h-[85vh] max-w-[92vw] object-contain rounded-lg shadow-2xl transition-opacity duration-300 ${
-              loaded ? "opacity-100" : "opacity-0"
-            }`}
-            onLoad={() => setLoaded(true)}
-            onError={() => setLoaded(true)}
+            className="relative max-h-[85vh] max-w-[92vw] object-contain rounded-lg shadow-2xl"
+            onLoad={markLoaded}
+            onError={markLoaded}
           />
         ))}
       </div>

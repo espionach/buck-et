@@ -12,46 +12,62 @@ interface SidequestPhotoProps {
   thumbnail?: boolean;
 }
 
+// Module-level caches so remounting a media element for a source we've
+// already resolved/loaded doesn't briefly flash a pulsing placeholder.
+const urlCache = new Map<string, string>();
+const loadedCache = new Set<string>();
+
 const SidequestPhoto = ({ src, alt = "Photo", className, asVideo, thumbnail }: SidequestPhotoProps) => {
-  const [resolved, setResolved] = useState<string | null>(null);
-  const [loaded, setLoaded] = useState(false);
+  const [resolved, setResolved] = useState<string | null>(() => urlCache.get(src) ?? null);
+  const [loaded, setLoaded] = useState<boolean>(() => loadedCache.has(src));
   const renderAsVideo = asVideo ?? isVideoSrc(src);
 
   useEffect(() => {
+    const cached = urlCache.get(src) ?? null;
+    setResolved(cached);
+    setLoaded(loadedCache.has(src));
+    if (cached) return;
     let cancelled = false;
-    setResolved(null);
-    setLoaded(false);
     getSidequestPhotoUrl(src).then((url) => {
-      if (!cancelled) setResolved(url);
+      if (cancelled || !url) return;
+      urlCache.set(src, url);
+      setResolved(url);
     });
     return () => {
       cancelled = true;
     };
   }, [src]);
 
+  const markLoaded = useCallback(() => {
+    loadedCache.add(src);
+    setLoaded(true);
+  }, [src]);
+
   // Ref callbacks handle the case where a cached <img>/<video> completes
   // loading before React attaches onLoad handlers.
-  const imgRef = useCallback((node: HTMLImageElement | null) => {
-    if (node && node.complete && node.naturalWidth > 0) {
-      setLoaded(true);
-    }
-  }, [resolved]);
-
-  const videoRef = useCallback((node: HTMLVideoElement | null) => {
-    if (node && node.readyState >= 1) {
-      setLoaded(true);
-    }
-  }, [resolved]);
-
-  const placeholder = (
-    <div
-      className={cn(
-        "absolute inset-0 bg-muted animate-pulse transition-opacity duration-300",
-        loaded ? "opacity-0 pointer-events-none" : "opacity-100"
-      )}
-      aria-hidden={loaded}
-    />
+  const imgRef = useCallback(
+    (node: HTMLImageElement | null) => {
+      if (node && node.complete && node.naturalWidth > 0) markLoaded();
+    },
+    [markLoaded, resolved]
   );
+
+  const videoRef = useCallback(
+    (node: HTMLVideoElement | null) => {
+      if (node && node.readyState >= 1) markLoaded();
+    },
+    [markLoaded, resolved]
+  );
+
+  // Only show the placeholder while we genuinely have nothing to display.
+  // Once loaded, we unmount it entirely so it can't re-trigger animations.
+  const showPlaceholder = !loaded;
+  const placeholder = showPlaceholder ? (
+    <div
+      className="absolute inset-0 bg-muted animate-pulse"
+      aria-hidden
+    />
+  ) : null;
 
   if (renderAsVideo && thumbnail) {
     return (
@@ -60,17 +76,14 @@ const SidequestPhoto = ({ src, alt = "Photo", className, asVideo, thumbnail }: S
           <video
             ref={videoRef}
             src={resolved}
-            className={cn(
-              "w-full h-full object-cover pointer-events-none transition-opacity duration-300",
-              loaded ? "opacity-100" : "opacity-0"
-            )}
+            className="w-full h-full object-cover pointer-events-none"
             muted
             playsInline
             preload="metadata"
-            onLoadedData={() => setLoaded(true)}
-            onLoadedMetadata={() => setLoaded(true)}
-            onCanPlay={() => setLoaded(true)}
-            onError={() => setLoaded(true)}
+            onLoadedData={markLoaded}
+            onLoadedMetadata={markLoaded}
+            onCanPlay={markLoaded}
+            onError={markLoaded}
           />
         )}
         {placeholder}
@@ -92,16 +105,13 @@ const SidequestPhoto = ({ src, alt = "Photo", className, asVideo, thumbnail }: S
           <video
             ref={videoRef}
             src={resolved}
-            className={cn(
-              "w-full h-full transition-opacity duration-300",
-              loaded ? "opacity-100" : "opacity-0"
-            )}
+            className="w-full h-full"
             muted
             controls
-            onLoadedData={() => setLoaded(true)}
-            onLoadedMetadata={() => setLoaded(true)}
-            onCanPlay={() => setLoaded(true)}
-            onError={() => setLoaded(true)}
+            onLoadedData={markLoaded}
+            onLoadedMetadata={markLoaded}
+            onCanPlay={markLoaded}
+            onError={markLoaded}
           />
         )}
         {placeholder}
@@ -116,12 +126,9 @@ const SidequestPhoto = ({ src, alt = "Photo", className, asVideo, thumbnail }: S
           ref={imgRef}
           src={resolved}
           alt={alt}
-          className={cn(
-            "w-full h-full object-cover transition-opacity duration-300",
-            loaded ? "opacity-100" : "opacity-0"
-          )}
-          onLoad={() => setLoaded(true)}
-          onError={() => setLoaded(true)}
+          className="w-full h-full object-cover"
+          onLoad={markLoaded}
+          onError={markLoaded}
         />
       )}
       {placeholder}
