@@ -46,10 +46,10 @@ const MyGroupsTab = () => {
                 e.stopPropagation();
                 navigate(`/groups/${g.id}/settings`);
               }}
-              className="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-card/70 backdrop-blur-sm text-foreground hover:bg-card transition-colors"
+              className="absolute top-2 right-2 z-10 p-1 text-foreground hover:opacity-70 transition-opacity"
               aria-label={`Edit ${g.name}`}
             >
-              <MoreVertical className="w-3.5 h-3.5" />
+              <MoreVertical className="w-4 h-4" />
             </button>
           </div>
         ))}
