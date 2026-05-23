@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getSidequestPhotoUrl } from "@/lib/uploads";
 import { cn } from "@/lib/utils";
+import { isVideoSrc } from "@/components/MediaViewer";
 
 interface SidequestPhotoProps {
   /** A storage path inside the sidequest-photos bucket, OR a legacy data:/http(s) URL. */
