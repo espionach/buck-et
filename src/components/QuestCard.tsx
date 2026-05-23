@@ -3,6 +3,7 @@ import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
 import GroupSwatch from "@/components/GroupSwatch";
 import SidequestPhoto from "@/components/SidequestPhoto";
+import MediaViewer from "@/components/MediaViewer";
 import CommentThread from "@/components/CommentThread";
 
 import { motion, AnimatePresence } from "framer-motion";
