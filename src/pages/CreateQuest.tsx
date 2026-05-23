@@ -6,6 +6,7 @@ import { ALL_CONTRIBUTION_ROLES } from "@/data/contributionRoles";
 import { ArrowLeft, Sparkles, ChevronDown, ImagePlus, Link as LinkIcon, X, Globe, Check, Clock } from "lucide-react";
 import GroupSwatch from "@/components/GroupSwatch";
 import LocationPicker, { type LocationValue } from "@/components/LocationPicker";
+import { TimePicker } from "@/components/TimePicker";
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
