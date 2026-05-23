@@ -6,6 +6,7 @@ import { ALL_CONTRIBUTION_ROLES } from "@/data/contributionRoles";
 import { ArrowLeft, Sparkles, ChevronDown, ImagePlus, Link as LinkIcon, X, Globe, Check, Clock } from "lucide-react";
 import GroupSwatch from "@/components/GroupSwatch";
 import LocationPicker, { type LocationValue } from "@/components/LocationPicker";
+import { TimePicker } from "@/components/TimePicker";
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -327,32 +328,7 @@ const CreateQuest = () => {
               </div>
               <div className="relative">
                 <label className="text-[11px] text-muted-foreground mb-1 block">Time</label>
-                <div className="relative">
-                  <input
-                    type="time"
-                    value={(() => {
-                      if (!time) return "";
-                      if (/^\d{1,2}:\d{2}$/.test(time)) return time.padStart(5, "0");
-                      const m = time.match(/^(\d{1,2}):(\d{2})\s*(AM|PM|am|pm)$/i);
-                      if (!m) return "";
-                      let h = parseInt(m[1]);
-                      const p = m[3].toLowerCase();
-                      if (p === "pm" && h !== 12) h += 12;
-                      if (p === "am" && h === 12) h = 0;
-                      return `${String(h).padStart(2, "0")}:${m[2]}`;
-                    })()}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      if (!val) { setTime(""); return; }
-                      const [h, m] = val.split(":").map(Number);
-                      const period = h >= 12 ? "PM" : "AM";
-                      const hour12 = h % 12 || 12;
-                      setTime(`${hour12}:${String(m).padStart(2, "0")} ${period}`);
-                    }}
-                    className="w-full px-3 py-2.5 pl-9 rounded-xl bg-card border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
-                  />
-                  <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-                </div>
+                <TimePicker value={time} onChange={setTime} />
               </div>
             </div>
             <div>
