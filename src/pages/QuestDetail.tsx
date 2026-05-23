@@ -7,7 +7,8 @@ import SidequestPhoto from "@/components/SidequestPhoto";
 import MediaViewer from "@/components/MediaViewer";
 import CommentThread from "@/components/CommentThread";
 import MapPreview from "@/components/MapPreview";
-import { ArrowLeft, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send, ExternalLink, HandMetal, Check, Globe, StickyNote, MoreVertical, Pencil, Pin, Trash2, Flag, Share2 } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send, ExternalLink, HandMetal, Check, Globe, StickyNote, MoreVertical, Pencil, Pin, Trash2, Flag, Share2, Lock, Info } from "lucide-react";
+import EmptyState from "@/components/EmptyState";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -61,15 +62,11 @@ const QuestDetail = () => {
           </button>
         </div>
         <div className="flex-1 flex items-center justify-center px-8 -mt-12">
-          <div className="text-center max-w-xs">
-            <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
-              <Globe className="w-6 h-6 text-muted-foreground" />
-            </div>
-            <h2 className="text-base font-bold text-foreground mb-1.5">You don't have access</h2>
-            <p className="text-sm text-muted-foreground">
-              This sidequest is private. You need to be friends with the owner or a member of the group to view it.
-            </p>
-          </div>
+          <EmptyState
+            icon={Lock}
+            title="You don't have access"
+            description="This sidequest is private or unavailable."
+          />
         </div>
       </div>
     );
@@ -421,9 +418,20 @@ const QuestDetail = () => {
               </p>
             )}
             {!logistics.date && !logistics.location && !logistics.transportation && !logistics.customNotes && (
-              <p className="text-xs text-muted-foreground text-center py-2">
-                No details added yet
-              </p>
+              isOwner ? (
+                <EmptyState
+                  icon={Info}
+                  title="No details yet"
+                  description="Add a time, place, or anything people should know."
+                  size="sm"
+                />
+              ) : (
+                <EmptyState
+                  icon={Info}
+                  title="No details yet"
+                  size="sm"
+                />
+              )
             )}
           </div>
         </div>

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Plus, Users as UsersIcon, MoreVertical } from "lucide-react";
 import { useAppStore } from "@/data/appState";
 import GroupCard from "@/components/GroupCard";
+import EmptyState from "@/components/EmptyState";
 
 /**
  * Owner-only "launch lists" — grid of the current user's private groups.
@@ -56,10 +57,12 @@ const MyGroupsTab = () => {
       </div>
 
       {sortedGroups.length === 0 && (
-        <div className="text-center py-10 text-muted-foreground">
-          <UsersIcon className="w-10 h-10 mx-auto mb-2 opacity-40" />
-          <p className="text-sm">No groups yet — tap "New group" to create one.</p>
-        </div>
+        <EmptyState
+          icon={UsersIcon}
+          title="No groups yet"
+          description='Tap "New group" to create one and get started.'
+          cta={{ label: "New group", onClick: () => navigate("/create-group") }}
+        />
       )}
     </div>
   );

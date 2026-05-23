@@ -1,14 +1,16 @@
 import { Quest, User } from "@/data/mockData";
 import QuestCard from "@/components/QuestCard";
+import EmptyState from "@/components/EmptyState";
 import { useState, useEffect, useRef } from "react";
-import { Search as SearchIcon } from "lucide-react";
+import { Users, LucideIcon } from "lucide-react";
 
 interface QuestListProps {
   quests: Quest[];
   pageSize?: number;
-  emptyIcon?: string;
-  emptyText?: string;
-  emptySubtext?: string;
+  emptyIcon?: LucideIcon;
+  emptyTitle?: string;
+  emptyDescription?: string;
+  emptyCta?: { label: string; onClick: () => void };
   showGroup?: boolean;
   hideActions?: boolean;
   onEditCurrent?: (quest: Quest) => void;
@@ -27,9 +29,10 @@ interface QuestListProps {
 const QuestList = ({
   quests,
   pageSize = 10,
-  emptyIcon = "🔭",
-  emptyText = "It's quiet in here… Where are your friends?",
-  emptySubtext,
+  emptyIcon = Users,
+  emptyTitle = "Your feed is quiet",
+  emptyDescription = "Sidequests from friends and groups will show up here. Add friends to get things going.",
+  emptyCta,
   showGroup = true,
   hideActions = false,
   onEditCurrent,
@@ -48,29 +51,27 @@ const QuestList = ({
   const scrollRef = useRef<HTMLDivElement>(null);
   const [justAdded, setJustAdded] = useState<string | undefined>(scrollToQuestId);
 
-  // Ensure the target quest is visible (expand pages if needed) then scroll
   useEffect(() => {
     if (!scrollToQuestId) return;
     const idx = quests.findIndex((q) => q.id === scrollToQuestId);
     if (idx === -1) return;
     if (idx >= visibleCount) setVisibleCount(idx + 1);
-    // Scroll after render
     requestAnimationFrame(() => {
       const el = document.getElementById(`quest-${scrollToQuestId}`);
       el?.scrollIntoView({ behavior: "smooth", block: "center" });
     });
-    // Clear highlight after animation
     const timer = setTimeout(() => setJustAdded(undefined), 2000);
     return () => clearTimeout(timer);
   }, [scrollToQuestId]);
 
   if (quests.length === 0) {
     return (
-      <div className="text-center py-12 text-muted-foreground">
-        <SearchIcon className="w-10 h-10 mx-auto mb-2 opacity-40" />
-        <p className="text-sm font-semibold">{emptyText}</p>
-        {emptySubtext && <p className="text-sm">{emptySubtext}</p>}
-      </div>
+      <EmptyState
+        icon={emptyIcon}
+        title={emptyTitle}
+        description={emptyDescription}
+        cta={emptyCta}
+      />
     );
   }
 

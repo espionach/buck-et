@@ -6,7 +6,8 @@ import GroupSettings from "@/components/GroupSettings";
 import AddMembersModal from "@/components/AddMembersModal";
 import UserAvatar from "@/components/UserAvatar";
 import UserProfileView from "@/components/UserProfileView";
-import { Plus, Search, Check, X, Settings, ArrowLeft, Map, ScrollText, Share2, UserPlus } from "lucide-react";
+import { Plus, Search, Check, X, Settings, ArrowLeft, Map, ScrollText, Share2, UserPlus, Sparkles, CheckCircle2 } from "lucide-react";
+import EmptyState from "@/components/EmptyState";
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -386,12 +387,12 @@ const Boards = () => {
               className="divide-y divide-border"
             >
               {groupQuests.length === 0 ? (
-                <div className="text-center py-12 text-muted-foreground">
-                  {boardTab === "active" ? <Map className="w-10 h-10 mx-auto mb-2 opacity-40" /> : <ScrollText className="w-10 h-10 mx-auto mb-2 opacity-40" />}
-                 <p className="text-sm">
-                    {boardTab === "active" ? "Kinda empty here… Start something fun!" : "Zero done… We'll ignore that for now"}
-                  </p>
-                </div>
+                <EmptyState
+                  icon={boardTab === "active" ? Sparkles : CheckCircle2}
+                  title={boardTab === "active" ? "No active sidequests" : "No completed sidequests yet"}
+                  description={boardTab === "active" ? "Nothing planned yet. Start something fun." : "Finished sidequests will show up here."}
+                  cta={boardTab === "active" ? { label: "Create sidequest", onClick: () => navigate("/create") } : undefined}
+                />
               ) : (
                 <QuestList
                   quests={groupQuests}

@@ -1,7 +1,8 @@
 import { Comment, User, Quest } from "@/data/mockData";
 import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
-import { Send, Trash2, CornerDownRight, Flag, Heart } from "lucide-react";
+import { Send, Trash2, CornerDownRight, Flag, Heart, MessageCircle } from "lucide-react";
+import EmptyState from "@/components/EmptyState";
 import { useState } from "react";
 import { validateContent } from "@/lib/contentFilter";
 import { toast } from "sonner";
@@ -188,7 +189,12 @@ const CommentThread = ({ quest, highlightCommentId, onInteract }: CommentThreadP
   return (
     <div className="space-y-2">
       {quest.comments.length === 0 && (
-        <p className="text-xs text-muted-foreground text-center py-2">No comments yet</p>
+        <EmptyState
+          icon={MessageCircle}
+          title="No comments yet"
+          description="Be the first to say something."
+          size="sm"
+        />
       )}
       {quest.comments.map((c) => renderComment(c, 0))}
 

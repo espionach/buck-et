@@ -1,7 +1,8 @@
 import { useAppStore } from "@/data/appState";
 import QuestCard from "@/components/QuestCard";
 import UserAvatar from "@/components/UserAvatar";
-import { ArrowLeft, X, Users as UsersIcon, Lock, UserPlus, Clock, UserMinus, Check, ShieldOff, Share2 } from "lucide-react";
+import { ArrowLeft, X, Users as UsersIcon, Lock, UserPlus, Clock, UserMinus, Check, ShieldOff, Share2, Sparkles, CheckCircle2 } from "lucide-react";
+import EmptyState from "@/components/EmptyState";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePopup } from "@/hooks/use-popup";
@@ -297,9 +298,12 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
             className="divide-y divide-border"
           >
             {shownQuests.length === 0 ? (
-              <p className="text-center text-sm text-muted-foreground py-8">
-                {tab === "current" ? "Kinda empty here… Start something fun!" : "Zero done… We'll ignore that for now"}
-              </p>
+              <EmptyState
+                icon={tab === "current" ? Sparkles : CheckCircle2}
+                title={tab === "current" ? "No upcoming sidequests" : "No completed sidequests"}
+                description={tab === "current" ? "Nothing planned right now. Start something they can join." : "Finished sidequests will appear here."}
+                cta={tab === "current" ? { label: "Create sidequest", onClick: () => { window.location.href = "/create"; } } : undefined}
+              />
             ) : (
               shownQuests.map((q, i) => (
                 <QuestCard
