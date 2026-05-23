@@ -1005,39 +1005,20 @@ const Profile = () => {
                 </div>
               </div>
 
-              {/* Logistics fields */}
+              {/* Logistics fields — collapsible (date/time/location now live above) */}
               <div className="space-y-3">
-                <label className="text-sm font-semibold text-foreground block">Sidequest Details</label>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-[11px] text-muted-foreground mb-1 block">Date</label>
-                    <input type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl bg-muted border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
-                  </div>
-                  <div>
-                    <label className="text-[11px] text-muted-foreground mb-1 block">Time</label>
-                    <input type="text" value={editTime} onChange={(e) => setEditTime(e.target.value)} placeholder="e.g. 6:00 PM"
-                      className="w-full px-3 py-2 rounded-xl bg-muted border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
-                  </div>
-                </div>
-                <div>
-                  <label className="text-[11px] text-muted-foreground mb-1 block">Location</label>
-                  <LocationPicker
-                    value={{
-                      text: editLocation,
-                      latitude: editLocationLat,
-                      longitude: editLocationLng,
-                      placeId: editLocationPlaceId,
-                    }}
-                    onChange={(v: LocationValue) => {
-                      setEditLocation(v.text);
-                      setEditLocationLat(v.latitude);
-                      setEditLocationLng(v.longitude);
-                      setEditLocationPlaceId(v.placeId);
-                    }}
-                    placeholder="Where's this happening?"
-                  />
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setEditDetailsOpen((v) => !v)}
+                  className="w-full flex items-center justify-between text-left"
+                >
+                  <span className="text-sm font-semibold text-foreground">Sidequest Details</span>
+                  <span className="text-xs text-muted-foreground flex items-center gap-1">
+                    {editDetailsOpen ? "Hide" : "Optional"}
+                    <ChevronDown className={`w-4 h-4 transition-transform ${editDetailsOpen ? "rotate-180" : ""}`} />
+                  </span>
+                </button>
+                {editDetailsOpen && (<>
                 <div>
                   <label className="text-[11px] text-muted-foreground mb-1 block">Meetup Spot</label>
                   <input type="text" value={editMeetupSpot} onChange={(e) => setEditMeetupSpot(e.target.value)} placeholder="Where should everyone meet?"
