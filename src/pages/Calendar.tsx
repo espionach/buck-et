@@ -13,6 +13,7 @@ const dateKey = (d: Date) => format(d, "yyyy-MM-dd");
 
 const CalendarPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { quests, groups, currentUser } = useAppStore();
   const [selected, setSelected] = useState<Date>(startOfDay(new Date()));
 
