@@ -117,7 +117,7 @@ function Column<T extends string | number>({ items, selected, onSelect }: Column
                 "px-3 py-1.5 mx-1 my-0.5 rounded-md text-center font-sans transition-colors",
                 isSel
                   ? "bg-primary text-primary-foreground font-medium"
-                  : "text-foreground hover:bg-accent hover:text-accent-foreground",
+                  : "text-foreground hover:bg-muted hover:text-foreground",
               )}
             >
               {it.label}
