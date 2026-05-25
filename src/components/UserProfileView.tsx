@@ -366,7 +366,15 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
       )}
       </div>
       )}
+
+      <NudgeQuestPicker
+        open={showNudgePicker}
+        onClose={() => setShowNudgePicker(false)}
+        quests={myActiveQuests}
+        targetUser={user}
+      />
     </div>
+
   );
 };
 
