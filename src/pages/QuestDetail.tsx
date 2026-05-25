@@ -8,6 +8,7 @@ import MediaViewer from "@/components/MediaViewer";
 import CommentThread from "@/components/CommentThread";
 import MapPreview from "@/components/MapPreview";
 import { ArrowLeft, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send, ExternalLink, HandMetal, Check, Globe, StickyNote, MoreVertical, Pencil, Pin, Trash2, Flag, Share2, Lock, Info } from "lucide-react";
+import NudgeModal from "@/components/NudgeModal";
 import EmptyState from "@/components/EmptyState";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
