@@ -7,7 +7,9 @@ import { Calendar } from "@/components/ui/calendar";
 import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
 import EmptyState from "@/components/EmptyState";
+import NotificationBell from "@/components/NotificationBell";
 import type { Quest } from "@/data/mockData";
+
 
 const dateKey = (d: Date) => format(d, "yyyy-MM-dd");
 
