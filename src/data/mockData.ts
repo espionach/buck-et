@@ -131,7 +131,8 @@ export interface AppNotification {
     | "new_quest_in_group"
     | "quest_updated"
     | "quest_canceled"
-    | "quest_reminder";
+    | "quest_reminder"
+    | "nudge";
   message: string;
   entityId?: string;
   groupId?: string;
