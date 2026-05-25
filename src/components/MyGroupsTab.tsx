@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Plus, Users as UsersIcon, MoreVertical } from "lucide-react";
 import { useAppStore } from "@/data/appState";
 import GroupCard from "@/components/GroupCard";
