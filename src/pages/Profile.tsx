@@ -269,28 +269,9 @@ const Profile = () => {
     }
   };
 
-  // Current quest handlers
+  // Current quest editor now lives on its own page — navigate there.
   const handleOpenCurrentEditor = (quest: Quest) => {
-    setEditingCurrentQuest(quest);
-    setEditQuestTitle(quest.title);
-    setEditQuestDescription(quest.description || "");
-    setEditQuestParticipants([...quest.participants]);
-    setEditQuestLinks(quest.links || []);
-    setEditQuestPhotos(quest.photos || []);
-    setNewLink("");
-    setEditDate(quest.logistics?.date || "");
-    setEditTime(quest.logistics?.time || "");
-    setEditLocation(quest.logistics?.location || "");
-    setEditLocationLat(quest.logistics?.latitude);
-    setEditLocationLng(quest.logistics?.longitude);
-    setEditLocationPlaceId(quest.logistics?.placeId);
-    setEditMeetupSpot(quest.logistics?.meetupSpot || "");
-    setEditTransportation(quest.logistics?.transportation || "");
-    setEditCarpoolSlots(quest.logistics?.carpoolSlots?.toString() || "");
-    setEditCustomNotes(quest.logistics?.customNotes || "");
-    setEditContributionRoles(quest.logistics?.contributionRoles || []);
-    setEditGroupId(quest.groupId || null);
-    setShowEditGroupDropdown(false);
+    nav(`/quest/${quest.id}/edit`);
   };
 
   const handleSaveCurrentQuest = () => {
