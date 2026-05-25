@@ -4,10 +4,12 @@ import UserAvatar from "@/components/UserAvatar";
 import { ArrowLeft, X, Users as UsersIcon, Lock, UserPlus, Clock, UserMinus, Check, ShieldOff, Share2, Sparkles, CheckCircle2 } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePopup } from "@/hooks/use-popup";
 import { User, isQuestCompleted, placeholderUser } from "@/data/mockData";
 import UserMenu from "@/components/UserMenu";
+import NudgeQuestPicker from "@/components/NudgeQuestPicker";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
