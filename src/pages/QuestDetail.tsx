@@ -251,7 +251,7 @@ const QuestDetail = () => {
             </button>
           )}
         </div>
-
+      </div>
 
       <motion.div layout className="px-5 space-y-4 mt-2">
         {/* Quest Card — Expanded */}
