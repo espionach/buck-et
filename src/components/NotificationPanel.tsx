@@ -208,18 +208,20 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
             <div className="flex items-center justify-between p-4 border-b border-border/50">
               <h3 className="font-bold text-foreground text-lg">Notifications</h3>
               <div className="flex items-center gap-2">
-                {notifications.some((n) => !n.read) && (
+                {notifications.length > 0 && (
                   <button
-                    onClick={markAllNotificationsRead}
-                    className="text-[10px] font-semibold text-primary"
+                    onClick={clearAllNotifications}
+                    className="text-[10px] font-semibold text-primary flex items-center gap-1"
                   >
-                    Mark all read
+                    <Trash2 className="w-3 h-3" />
+                    Clear all
                   </button>
                 )}
-                <button onClick={onClose}>
+                <button onClick={onClose} aria-label="Close notifications">
                   <X className="w-4 h-4 text-muted-foreground" />
                 </button>
               </div>
+
             </div>
 
             {(() => {
