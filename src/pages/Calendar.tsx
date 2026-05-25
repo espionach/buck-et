@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { format, parseISO, isSameDay, isPast, startOfDay } from "date-fns";
 import { Calendar as CalendarIcon, Clock, MapPin } from "lucide-react";
 
