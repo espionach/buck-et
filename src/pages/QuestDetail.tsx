@@ -213,7 +213,7 @@ const QuestDetail = () => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" sideOffset={4} className="min-w-[160px]">
                   <DropdownMenuItem
-                    onSelect={() => navigate(`/profile?editQuest=${quest.id}`)}
+                    onSelect={() => navigate(`/quest/${quest.id}/edit`)}
                     className="gap-2 text-xs"
                   >
                     <Pencil className="w-3.5 h-3.5" /> Edit

@@ -135,19 +135,15 @@ const Profile = () => {
   // Track sidequest detail page to return to when editor was opened from QuestDetail
   const [returnToQuestId, setReturnToQuestId] = useState<string | null>(null);
 
-  // Handle editQuest query param (deep-link from QuestDetail "Edit" menu)
+  // Handle editQuest query param (legacy deep-link) — redirect to the new Edit page.
   useEffect(() => {
     const editQuestId = searchParams.get("editQuest");
     if (!editQuestId) return;
-    const found = quests.find((q) => q.id === editQuestId && q.createdBy.id === currentUser.id);
-    if (found) {
-      setReturnToQuestId(editQuestId);
-      handleOpenCurrentEditor(found);
-    }
     const newParams = new URLSearchParams(searchParams);
     newParams.delete("editQuest");
     setSearchParams(newParams, { replace: true });
-  }, [searchParams, quests]);
+    nav(`/quest/${editQuestId}/edit`);
+  }, [searchParams]);
 
   // Close the current-quest editor and, if we came from QuestDetail, navigate back there
   const closeCurrentEditor = () => {
@@ -273,28 +269,9 @@ const Profile = () => {
     }
   };
 
-  // Current quest handlers
+  // Current quest editor now lives on its own page — navigate there.
   const handleOpenCurrentEditor = (quest: Quest) => {
-    setEditingCurrentQuest(quest);
-    setEditQuestTitle(quest.title);
-    setEditQuestDescription(quest.description || "");
-    setEditQuestParticipants([...quest.participants]);
-    setEditQuestLinks(quest.links || []);
-    setEditQuestPhotos(quest.photos || []);
-    setNewLink("");
-    setEditDate(quest.logistics?.date || "");
-    setEditTime(quest.logistics?.time || "");
-    setEditLocation(quest.logistics?.location || "");
-    setEditLocationLat(quest.logistics?.latitude);
-    setEditLocationLng(quest.logistics?.longitude);
-    setEditLocationPlaceId(quest.logistics?.placeId);
-    setEditMeetupSpot(quest.logistics?.meetupSpot || "");
-    setEditTransportation(quest.logistics?.transportation || "");
-    setEditCarpoolSlots(quest.logistics?.carpoolSlots?.toString() || "");
-    setEditCustomNotes(quest.logistics?.customNotes || "");
-    setEditContributionRoles(quest.logistics?.contributionRoles || []);
-    setEditGroupId(quest.groupId || null);
-    setShowEditGroupDropdown(false);
+    nav(`/quest/${quest.id}/edit`);
   };
 
   const handleSaveCurrentQuest = () => {
