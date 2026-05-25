@@ -397,9 +397,25 @@ const Feed = () => {
               <QuestList
                 quests={filteredQuests}
                 emptyIcon={Users}
-                emptyTitle="Your feed is quiet"
-                emptyDescription="Sidequests from friends and groups will show up here. Add friends to get things going."
-                emptyCta={{ label: "Add friends", onClick: () => navigate("/onboarding/friends") }}
+                emptyTitle={
+                  feedFilter === "all"
+                    ? "Your feed is quiet"
+                    : feedFilter === "followers"
+                      ? "Your feed is quiet"
+                      : "Nothing here yet"
+                }
+                emptyDescription={
+                  feedFilter === "all"
+                    ? "Sidequests from friends and groups will show up here. Add friends to get things going."
+                    : feedFilter === "followers"
+                      ? "Sidequests from friends will show up here. Add friends to get things going."
+                      : `Sidequests from ${groups.find((g) => g.id === feedFilter)?.name || "this group"} will show up here. Create a sidequest to get things going.`
+                }
+                emptyCta={
+                  feedFilter === "all" || feedFilter === "followers"
+                    ? { label: "Add friends", onClick: () => navigate("/onboarding/friends") }
+                    : { label: "Create sidequest", onClick: () => navigate(`/create-quest?groupId=${feedFilter}`) }
+                }
                 onMarkDone={() => navigate("/profile?tab=past")}
                 onMarkUndone={() => navigate("/profile?tab=current")}
                 onViewProfile={(user) => setSelectedProfile(user)}
