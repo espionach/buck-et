@@ -48,6 +48,25 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
   );
   const shownQuests = tab === "current" ? activeQuests : completedQuests;
 
+  // Current user's own active quests (for the nudge CTA on empty profiles)
+  const myActiveQuests = quests.filter(
+    (q) =>
+      (q.createdBy.id === currentUser.id ||
+        q.participants.some((p) => p.id === currentUser.id)) &&
+      !isQuestCompleted(q)
+  );
+  const canNudge = myActiveQuests.length > 0 && user.id !== currentUser.id;
+
+  const handleNudgeCta = () => {
+    if (myActiveQuests.length === 1) {
+      navigate(`/quest/${myActiveQuests[0].id}`, {
+        state: { prefillNudgeUserId: user.id },
+      });
+    } else {
+      setShowNudgePicker(true);
+    }
+  };
+
   // Fetch the viewed user's actual friends (visible to them and their friends).
   useEffect(() => {
     let cancelled = false;
