@@ -1,7 +1,8 @@
+import { useEffect, useMemo } from "react";
 import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Bell, MessageCircle, UserPlus, ArrowRightLeft, Check, Users, Camera, HandMetal, UserMinus, CalendarClock, Ban, Clock, Sparkles } from "lucide-react";
+import { X, Bell, MessageCircle, UserPlus, ArrowRightLeft, Check, Users, Camera, HandMetal, UserMinus, CalendarClock, Ban, Clock, Sparkles, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { usePopup } from "@/hooks/use-popup";
 import { SECTION_ORDER, SECTION_LABEL, TYPE_TO_SECTION, NotificationType, NotifSection } from "@/data/notificationCategories";
@@ -12,10 +13,32 @@ interface NotificationPanelProps {
   onClose: () => void;
 }
 
+const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+
 const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
-  const { notifications, markNotificationRead, markAllNotificationsRead, friendRequests, acceptFriendRequest, declineFriendRequest, clearNotification } = useAppStore();
+  const { notifications: allNotifications, markAllNotificationsRead, friendRequests, acceptFriendRequest, declineFriendRequest, clearNotification, clearAllNotifications } = useAppStore();
   const navigate = useNavigate();
   usePopup(open);
+
+  // Filter out notifications that have been read for more than a week.
+  const notifications = useMemo(() => {
+    const now = Date.now();
+    return allNotifications.filter((n) => {
+      if (!n.read) return true;
+      const ts = n.readAt ? new Date(n.readAt).getTime() : NaN;
+      if (Number.isNaN(ts)) return true;
+      return now - ts < ONE_WEEK_MS;
+    });
+  }, [allNotifications]);
+
+  // Mark all as read the moment the panel opens.
+  useEffect(() => {
+    if (open && allNotifications.some((n) => !n.read)) {
+      markAllNotificationsRead();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
 
   const getIcon = (type: string) => {
     switch (type) {
