@@ -65,6 +65,7 @@ const MyGroupsTab = () => {
           icon={UsersIcon}
           title="No groups yet"
           description="Create a group to launch sidequests to a hand-picked subset of friends."
+          cta={{ label: "New group", onClick: () => goCreate() }}
         />
       )}
     </div>
