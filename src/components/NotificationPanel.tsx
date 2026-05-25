@@ -151,7 +151,7 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
         <span
           role="link"
           tabIndex={0}
-          onClick={(e) => goToUser(e, n.fromUser?.id)}
+          onClick={(e) => goToUser(e, n.fromUser?.username)}
           className="font-bold underline-offset-2 hover:underline cursor-pointer"
         >
           {n.fromUser.name}
