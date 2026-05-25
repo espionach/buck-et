@@ -2,8 +2,9 @@ import { useAppStore } from "@/data/appState";
 import { User, isQuestCompleted } from "@/data/mockData";
 import QuestList from "@/components/QuestList";
 import UserAvatar from "@/components/UserAvatar";
-import NotificationPanel from "@/components/NotificationPanel";
-import { Search, Lock, UserPlus, Mail, X, Globe, UserSearch, Users } from "lucide-react";
+import NotificationBell from "@/components/NotificationBell";
+import { Search, Lock, UserPlus, X, Globe, UserSearch, Users } from "lucide-react";
+
 import GroupSwatch from "@/components/GroupSwatch";
 import UserProfileView from "@/components/UserProfileView";
 import { useState, useEffect, useRef } from "react";
@@ -11,11 +12,11 @@ import { motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const Feed = () => {
-  const { quests, groups, friends: friendsList, cleanupEmptyQuests, notifications, friendRequests, currentUser, sentFriendRequests, sendFriendRequest } = useAppStore();
+  const { quests, groups, friends: friendsList, cleanupEmptyQuests, friendRequests, currentUser, sentFriendRequests, sendFriendRequest } = useAppStore();
   const [search, setSearch] = useState(() => sessionStorage.getItem("feedSearchText") || "");
   const [searchTab, setSearchTab] = useState<"quests" | "people">("quests");
   const [selectedProfile, setSelectedProfile] = useState<User | null>(null);
-  const [showNotifications, setShowNotifications] = useState(false);
+
   const [feedFilter, setFeedFilter] = useState<"all" | "followers" | string>("all");
   const [searchMode, setSearchMode] = useState(() => !!sessionStorage.getItem("feedSearchText"));
   // Scope recent searches to the current user so multiple accounts on the
@@ -45,7 +46,7 @@ const Feed = () => {
     cleanupEmptyQuests();
   }, [location.pathname]);
 
-  const unreadCount = notifications.filter((n) => !n.read).length + friendRequests.length;
+  
 
   // Show friends-only quests from friends AND group quests where user is a member
   const userGroupIds = groups.map((g) => g.id);
@@ -159,17 +160,8 @@ const Feed = () => {
             <p className="text-xs text-muted-foreground mt-0.5">Buck-et, we ball. Join sidequests, have fun.</p>
           </div>
         </div>
-        <button
-          onClick={() => setShowNotifications(true)}
-          className="relative p-2 text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <Mail className="w-5 h-5" />
-          {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center">
-              {unreadCount}
-            </span>
-          )}
-        </button>
+        <NotificationBell />
+
       </div>
       
 
@@ -426,7 +418,7 @@ const Feed = () => {
         </>
       )}
 
-      <NotificationPanel open={showNotifications} onClose={() => setShowNotifications(false)} />
+      
     </div>
   );
 };

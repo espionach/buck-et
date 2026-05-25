@@ -97,6 +97,7 @@ interface AppState {
   markNotificationRead: (notificationId: string) => void;
   markAllNotificationsRead: () => void;
   clearNotification: (notificationId: string) => void;
+  clearAllNotifications: () => void;
 
   // Moderation
   blockUser: (userId: string) => Promise<void>;
@@ -1382,6 +1383,16 @@ export const useAppStore = create<AppState>((set, get) => ({
       await supabase.from("notifications")
         .delete()
         .eq("id", notificationId);
+    })();
+  },
+
+  clearAllNotifications: () => {
+    const { currentUser } = get();
+    set({ notifications: [] });
+    (async () => {
+      await supabase.from("notifications")
+        .delete()
+        .eq("user_id", currentUser.id);
     })();
   },
 

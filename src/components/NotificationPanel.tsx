@@ -1,7 +1,8 @@
+import { useEffect, useMemo } from "react";
 import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Bell, MessageCircle, UserPlus, ArrowRightLeft, Check, Users, Camera, HandMetal, UserMinus, CalendarClock, Ban, Clock, Sparkles } from "lucide-react";
+import { X, Bell, MessageCircle, UserPlus, ArrowRightLeft, Check, Users, Camera, HandMetal, UserMinus, CalendarClock, Ban, Clock, Sparkles, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { usePopup } from "@/hooks/use-popup";
 import { SECTION_ORDER, SECTION_LABEL, TYPE_TO_SECTION, NotificationType, NotifSection } from "@/data/notificationCategories";
@@ -12,10 +13,34 @@ interface NotificationPanelProps {
   onClose: () => void;
 }
 
+const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+
 const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
-  const { notifications, markNotificationRead, markAllNotificationsRead, friendRequests, acceptFriendRequest, declineFriendRequest, clearNotification } = useAppStore();
+  const { notifications: allNotifications, markAllNotificationsRead, friendRequests, acceptFriendRequest, declineFriendRequest, clearNotification, clearAllNotifications } = useAppStore();
   const navigate = useNavigate();
   usePopup(open);
+
+  // Filter out notifications that have been read for more than a week.
+  // We approximate readAt with createdAt since we don't persist the read timestamp.
+  const notifications = useMemo(() => {
+    const now = Date.now();
+    return allNotifications.filter((n) => {
+      if (!n.read) return true;
+      const ts = n.createdAt ? new Date(n.createdAt).getTime() : NaN;
+      if (Number.isNaN(ts)) return true;
+      return now - ts < ONE_WEEK_MS;
+    });
+  }, [allNotifications]);
+
+  // Mark all as read the moment the panel opens.
+  useEffect(() => {
+    if (open && allNotifications.some((n) => !n.read)) {
+      markAllNotificationsRead();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
+
 
   const getIcon = (type: string) => {
     switch (type) {
@@ -56,7 +81,7 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
   };
 
   const handleNotificationClick = (notification: typeof notifications[0]) => {
-    markNotificationRead(notification.id);
+
 
     if ((notification.type === "new_comment" || notification.type === "comment_reply") && notification.entityId) {
       const params = new URLSearchParams();
@@ -183,18 +208,20 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
             <div className="flex items-center justify-between p-4 border-b border-border/50">
               <h3 className="font-bold text-foreground text-lg">Notifications</h3>
               <div className="flex items-center gap-2">
-                {notifications.some((n) => !n.read) && (
+                {notifications.length > 0 && (
                   <button
-                    onClick={markAllNotificationsRead}
-                    className="text-[10px] font-semibold text-primary"
+                    onClick={clearAllNotifications}
+                    className="text-[10px] font-semibold text-primary flex items-center gap-1"
                   >
-                    Mark all read
+                    <Trash2 className="w-3 h-3" />
+                    Clear all
                   </button>
                 )}
-                <button onClick={onClose}>
+                <button onClick={onClose} aria-label="Close notifications">
                   <X className="w-4 h-4 text-muted-foreground" />
                 </button>
               </div>
+
             </div>
 
             {(() => {
@@ -263,7 +290,7 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
                     role="button"
                     tabIndex={0}
                     onClick={() => handleNotificationClick(n)}
-                    className={`w-full text-left flex items-start gap-3 p-4 border-b border-border/30 transition-colors active:scale-[0.99] cursor-pointer ${
+                    className={`group/notif w-full text-left flex items-start gap-3 p-4 border-b border-border/30 transition-colors active:scale-[0.99] cursor-pointer ${
                       n.read ? "opacity-60" : "bg-primary/5"
                     }`}
                   >
@@ -272,15 +299,28 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
                     </div>
                     <div className="flex-1 min-w-0">
                       {renderMessage(n)}
-                      <p className="text-[10px] text-muted-foreground mt-1">{n.createdAt}</p>
+                      <p className="text-[10px] text-muted-foreground mt-1">
+                        {(() => {
+                          const d = new Date(n.createdAt);
+                          return isNaN(d.getTime()) ? n.createdAt : d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+                        })()}
+                      </p>
                     </div>
                     <div className="shrink-0 mt-1">{getIcon(n.type)}</div>
-                    {!n.read && (
-                      <div className="w-2 h-2 rounded-full bg-primary shrink-0 mt-1.5" />
-                    )}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        clearNotification(n.id);
+                      }}
+                      aria-label="Clear notification"
+                      className="shrink-0 p-1 -mr-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                 );
               });
+
 
               const isEmpty = SECTION_ORDER.every((s) => grouped[s].length === 0);
 

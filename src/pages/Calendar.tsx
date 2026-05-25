@@ -7,7 +7,9 @@ import { Calendar } from "@/components/ui/calendar";
 import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
 import EmptyState from "@/components/EmptyState";
+import NotificationBell from "@/components/NotificationBell";
 import type { Quest } from "@/data/mockData";
+
 
 const dateKey = (d: Date) => format(d, "yyyy-MM-dd");
 
@@ -84,15 +86,18 @@ const CalendarPage = () => {
             Your scheduled sidequests
           </p>
         </div>
-        <button
-          onClick={() => setSelected(startOfDay(new Date()))}
-          className="text-xs font-semibold text-primary px-3 py-1.5 rounded-lg border border-border hover:bg-muted/40 transition-colors mt-2"
-        >
-          Today
-        </button>
+        <NotificationBell />
       </div>
 
       <div className="mt-4 bg-card border border-border rounded-[var(--radius)] overflow-hidden">
+        <div className="flex justify-end px-3 pt-3">
+          <button
+            onClick={() => setSelected(startOfDay(new Date()))}
+            className="text-xs font-semibold text-primary px-3 py-1.5 rounded-lg border border-border hover:bg-muted/40 transition-colors"
+          >
+            Today
+          </button>
+        </div>
         <Calendar
           mode="single"
           selected={selected}
@@ -107,6 +112,7 @@ const CalendarPage = () => {
           className="p-3 pointer-events-auto mx-auto"
         />
       </div>
+
 
       <div className="mt-6">
         <h2 className="text-sm font-bold text-foreground mb-3">
