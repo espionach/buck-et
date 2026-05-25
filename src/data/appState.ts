@@ -97,6 +97,7 @@ interface AppState {
   markNotificationRead: (notificationId: string) => void;
   markAllNotificationsRead: () => void;
   clearNotification: (notificationId: string) => void;
+  clearAllNotifications: () => void;
 
   // Moderation
   blockUser: (userId: string) => Promise<void>;
