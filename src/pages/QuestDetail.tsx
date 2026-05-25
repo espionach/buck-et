@@ -374,8 +374,27 @@ const QuestDetail = () => {
                 </button>
               ))}
             </div>
+            {isOwner && (
+              <button
+                type="button"
+                onClick={() => setShowNudge(true)}
+                className="mt-3 w-full flex items-center justify-between gap-3 p-2.5 rounded-lg border border-primary/30 bg-primary/5 hover:bg-primary/10 transition-colors text-left"
+              >
+                <div className="flex items-center gap-2 min-w-0">
+                  <HandMetal className="w-4 h-4 text-primary shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-xs font-semibold text-foreground">Send a nudge</p>
+                    <p className="text-[10px] text-muted-foreground truncate">
+                      Give friends a friendly poke to join or remember this quest.
+                    </p>
+                  </div>
+                </div>
+                <span className="text-[10px] font-semibold text-primary shrink-0">Nudge →</span>
+              </button>
+            )}
           </div>
         </div>
+        <NudgeModal open={showNudge} onClose={() => setShowNudge(false)} quest={quest} />
 
         {/* Logistics Section */}
         <div className="p-4 rounded-xl border border-border/50 bg-card space-y-3">
