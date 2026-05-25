@@ -81,7 +81,7 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
   };
 
   const handleNotificationClick = (notification: typeof notifications[0]) => {
-    markNotificationRead(notification.id);
+
 
     if ((notification.type === "new_comment" || notification.type === "comment_reply") && notification.entityId) {
       const params = new URLSearchParams();
