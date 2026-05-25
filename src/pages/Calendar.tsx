@@ -118,7 +118,7 @@ const CalendarPage = () => {
             icon={CalendarIcon}
             title="Your calendar is waiting"
             description="Sidequests with dates will appear here."
-            cta={{ label: "Create sidequest", onClick: () => navigate("/create") }}
+            cta={{ label: "Create sidequest", onClick: () => navigate("/create", { state: { from: location.pathname + location.search } }) }}
           />
         ) : selectedQuests.length === 0 ? (
           <EmptyState
