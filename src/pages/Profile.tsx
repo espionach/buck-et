@@ -603,25 +603,9 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen pb-24 px-5 pt-14">
-      {/* Settings icon — top right, no circle */}
+      {/* Top right — Notifications & Settings */}
       <div className="absolute top-4 right-4 flex items-center gap-1">
-        {currentUser.username && (
-          <button
-            onClick={async () => {
-              const url = `${window.location.origin}/u/${currentUser.username}`;
-              try {
-                await navigator.clipboard.writeText(url);
-                toast.success("Profile link copied!");
-              } catch {
-                toast.error("Couldn't copy link.");
-              }
-            }}
-            aria-label="Copy profile link"
-            className="p-2 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <Share2 className="w-5 h-5" />
-          </button>
-        )}
+        <NotificationBell />
         <button
           onClick={() => nav("/settings")}
           aria-label="Settings"
@@ -638,22 +622,6 @@ const Profile = () => {
         {currentUser.username && (
           <p className="text-xs text-muted-foreground/70 mt-0.5">@{currentUser.username}</p>
         )}
-        <div className="mt-2 flex items-center gap-2">
-        <button
-          onClick={() => {
-            setEditName(currentUser.name);
-            setEditUsername(currentUser.username || "");
-            setUsernameError(null);
-            setEditBio(currentUser.bio);
-            setEditProfilePic(currentUser.profilePicture || "");
-            setShowEditProfile(true);
-          }}
-          className="px-2.5 py-0 h-6 rounded-md bg-muted text-muted-foreground text-xs font-medium flex items-center gap-1"
-        >
-          <Edit className="w-3 h-3" />
-          Edit
-        </button>
-        </div>
         <p className="text-sm text-muted-foreground mt-1 text-center">{currentUser.bio}</p>
         <div className="flex items-center justify-center gap-4 mt-3">
           <button
@@ -664,7 +632,42 @@ const Profile = () => {
             {friendsList.length} Friends
           </button>
         </div>
+        <div className="mt-3 flex items-center gap-2">
+          <button
+            onClick={() => {
+              setEditName(currentUser.name);
+              setEditUsername(currentUser.username || "");
+              setUsernameError(null);
+              setEditBio(currentUser.bio);
+              setEditProfilePic(currentUser.profilePicture || "");
+              setShowEditProfile(true);
+            }}
+            className="px-2.5 py-0 h-6 rounded-md bg-muted text-muted-foreground text-xs font-medium flex items-center gap-1"
+          >
+            <Edit className="w-3 h-3" />
+            Edit
+          </button>
+          {currentUser.username && (
+            <button
+              onClick={async () => {
+                const url = `${window.location.origin}/u/${currentUser.username}`;
+                try {
+                  await navigator.clipboard.writeText(url);
+                  toast.success("Profile link copied!");
+                } catch {
+                  toast.error("Couldn't copy link.");
+                }
+              }}
+              aria-label="Copy profile link"
+              className="px-2.5 py-0 h-6 rounded-md bg-muted text-muted-foreground text-xs font-medium flex items-center gap-1"
+            >
+              <Share2 className="w-3 h-3" />
+              Share
+            </button>
+          )}
+        </div>
       </div>
+
 
 
       {/* Friends Modal Popup */}
