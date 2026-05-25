@@ -57,7 +57,7 @@ const GroupCard = ({ group, onClick, index }: GroupCardProps) => {
             </div>
           )}
 
-          <div className="relative flex flex-col items-center justify-center h-full text-center">
+          <div className="relative flex flex-col items-start justify-start h-full text-left">
             <h3 className="font-display font-bold text-base text-foreground mb-1.5 line-clamp-1">{group.name}</h3>
             <div className="flex items-center gap-1.5 text-muted-foreground">
               <Users className="w-3.5 h-3.5" />
