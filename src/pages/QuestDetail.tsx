@@ -42,6 +42,7 @@ const volunteerRoles = ALL_CONTRIBUTION_ROLES;
 
 const QuestDetail = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { questId } = useParams<{ questId: string }>();
   const { user, loading: authLoading } = useAuth();
   const { data: hydratedQuests, isLoading: questsLoading, isFetching: questsFetching } = useQuests();
@@ -50,6 +51,7 @@ const QuestDetail = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showReport, setShowReport] = useState(false);
   const [showNudge, setShowNudge] = useState(false);
+  const [prefillNudgeUserId, setPrefillNudgeUserId] = useState<string | null>(null);
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
   const [joinAnim, setJoinAnim] = useState<"idle" | "morph" | "exit" | "done">("idle");
   usePopup(showDeleteConfirm);
