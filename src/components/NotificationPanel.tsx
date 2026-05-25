@@ -75,6 +75,8 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
         return <Ban className="w-4 h-4 text-destructive" />;
       case "quest_reminder":
         return <Clock className="w-4 h-4 text-primary" />;
+      case "nudge":
+        return <HandMetal className="w-4 h-4 text-primary" />;
       default:
         return <Bell className="w-4 h-4 text-muted-foreground" />;
     }
