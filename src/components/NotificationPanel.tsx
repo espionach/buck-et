@@ -149,6 +149,7 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
       "removed_from_quest",
       "transfer_quest",
       "transfer_declined",
+      "nudge",
     ]);
     const isQuestLinked = questLinkedTypes.has(n.type) && !!n.entityId;
 
