@@ -1267,7 +1267,7 @@ const Profile = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 bg-foreground/40 flex items-center justify-center p-5"
-            onClick={() => setEditingPastQuest(null)}
+            onClick={(e) => { if (e.target === e.currentTarget) setEditingPastQuest(null); }}
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
