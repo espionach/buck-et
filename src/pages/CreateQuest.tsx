@@ -344,8 +344,8 @@ const CreateQuest = () => {
                 placeholder="Where's this happening?"
               />
             </div>
-            <div>
-              {!meetupOpen && !meetupSpot ? (
+            <div className="ml-2">
+              {!meetupOpen ? (
                 <button
                   type="button"
                   onClick={() => setMeetupOpen(true)}
@@ -355,7 +355,16 @@ const CreateQuest = () => {
                 </button>
               ) : (
                 <>
-                  <label className="text-[11px] text-muted-foreground mb-1 block">Meetup Spot</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-[11px] text-muted-foreground">Meetup Spot</label>
+                    <button
+                      type="button"
+                      onClick={() => setMeetupOpen(false)}
+                      className="text-[11px] text-muted-foreground hover:text-primary font-medium"
+                    >
+                      − Hide
+                    </button>
+                  </div>
                   <input
                     type="text"
                     value={meetupSpot}
