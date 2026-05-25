@@ -21,11 +21,12 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
   usePopup(open);
 
   // Filter out notifications that have been read for more than a week.
+  // We approximate readAt with createdAt since we don't persist the read timestamp.
   const notifications = useMemo(() => {
     const now = Date.now();
     return allNotifications.filter((n) => {
       if (!n.read) return true;
-      const ts = n.readAt ? new Date(n.readAt).getTime() : NaN;
+      const ts = n.createdAt ? new Date(n.createdAt).getTime() : NaN;
       if (Number.isNaN(ts)) return true;
       return now - ts < ONE_WEEK_MS;
     });
@@ -38,6 +39,7 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
+
 
 
   const getIcon = (type: string) => {
