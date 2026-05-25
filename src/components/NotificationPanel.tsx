@@ -81,8 +81,8 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
       navigate(`/quest/${notification.entityId}`);
     } else if (notification.type === "removed_from_group") {
       navigate("/profile");
-    } else if (notification.type === "friend_accepted" && notification.fromUser?.id) {
-      navigate(`/profile/${notification.fromUser.id}`);
+    } else if (notification.type === "friend_accepted" && notification.fromUser?.username) {
+      navigate(`/u/${notification.fromUser.username}`);
     } else {
       navigate("/profile?tab=current");
     }
