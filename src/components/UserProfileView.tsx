@@ -323,9 +323,27 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
             {shownQuests.length === 0 ? (
               <EmptyState
                 icon={tab === "current" ? Sparkles : CheckCircle2}
-                title={tab === "current" ? "No upcoming sidequests" : "No completed sidequests"}
-                description={tab === "current" ? "Nothing planned right now. Start something they can join." : "Finished sidequests will appear here."}
-                cta={tab === "current" ? { label: "Create sidequest", onClick: () => { window.location.href = "/create"; } } : undefined}
+                title={
+                  tab === "current"
+                    ? canNudge
+                      ? "No active sidequests yet"
+                      : "No upcoming sidequests"
+                    : "No completed sidequests"
+                }
+                description={
+                  tab === "current"
+                    ? canNudge
+                      ? `Nudge ${user.name.split(" ")[0]} to join one of yours.`
+                      : "Nothing planned right now. Start something they can join."
+                    : "Finished sidequests will appear here."
+                }
+                cta={
+                  tab === "current"
+                    ? canNudge
+                      ? { label: "Send a nudge", onClick: handleNudgeCta }
+                      : { label: "Create sidequest", onClick: () => { window.location.href = "/create"; } }
+                    : undefined
+                }
               />
             ) : (
               shownQuests.map((q, i) => (
