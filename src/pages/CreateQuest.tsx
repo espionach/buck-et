@@ -17,6 +17,8 @@ import { getUserFriendlyError } from "@/lib/errorMapping";
 
 const CreateQuest = () => {
   const navigate = useNavigate();
+  const routeLocation = useLocation();
+  const fromPath = (routeLocation.state as { from?: string } | null)?.from;
   const [searchParams] = useSearchParams();
   const preselectedGroup = searchParams.get("groupId");
   const isOnboarding = searchParams.get("onboarding") === "1";
