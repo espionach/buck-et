@@ -23,6 +23,7 @@ import CreateGroup from "./pages/CreateGroup";
 import GroupMembers from "./pages/GroupMembers";
 import GroupSettings from "./pages/GroupSettings";
 import QuestDetail from "./pages/QuestDetail";
+import EditQuest from "./pages/EditQuest";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
