@@ -8,6 +8,8 @@ import { ALL_CONTRIBUTION_ROLES } from "@/data/contributionRoles";
 import GroupSwatch from "@/components/GroupSwatch";
 import { TimePicker } from "@/components/TimePicker";
 import UserProfileView from "@/components/UserProfileView";
+import NotificationBell from "@/components/NotificationBell";
+
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Quest, User, isQuestCompleted } from "@/data/mockData";
