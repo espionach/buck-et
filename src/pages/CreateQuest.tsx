@@ -532,6 +532,13 @@ const CreateQuest = () => {
                 </button>
             </div>
             </div>
+
+            {/* Additional Notes — last */}
+            <div>
+              <label className="text-[11px] text-muted-foreground mb-1 block">Additional Notes</label>
+              <textarea value={customNotes} onChange={(e) => setCustomNotes(e.target.value)} placeholder="Anything else everyone should know?"
+                rows={2} className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none" />
+            </div>
             </>)}
           </div>
         </div>
