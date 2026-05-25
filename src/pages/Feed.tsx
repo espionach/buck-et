@@ -336,9 +336,32 @@ const Feed = () => {
                           <span className="text-[10px] font-semibold text-secondary px-2 py-1 rounded-full bg-secondary/10">
                             Friend
                           </span>
-                        ) : (
+                        ) : sentFriendRequests.includes(user.id) ? (
                           <span className="text-[10px] font-semibold text-muted-foreground px-2 py-1 rounded-full bg-muted">
-                            Not a friend
+                            Requested
+                          </span>
+                        ) : friendRequests.some((r) => r.from.id === user.id) ? (
+                          <span className="text-[10px] font-semibold text-muted-foreground px-2 py-1 rounded-full bg-muted">
+                            Wants to be friends
+                          </span>
+                        ) : (
+                          <span
+                            role="button"
+                            tabIndex={0}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              sendFriendRequest(user);
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.stopPropagation();
+                                sendFriendRequest(user);
+                              }
+                            }}
+                            className="inline-flex items-center gap-1 text-[10px] font-semibold text-primary-foreground px-2.5 py-1 rounded-full bg-primary hover:bg-primary/90 transition-colors cursor-pointer"
+                          >
+                            <UserPlus className="w-3 h-3" />
+                            Add friend
                           </span>
                         )}
                       </button>
