@@ -418,7 +418,7 @@ const Feed = () => {
         </>
       )}
 
-      <NotificationPanel open={showNotifications} onClose={() => setShowNotifications(false)} />
+      
     </div>
   );
 };
