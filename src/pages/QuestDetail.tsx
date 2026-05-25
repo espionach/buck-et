@@ -294,6 +294,12 @@ const QuestDetail = () => {
               {logistics.location && logistics.latitude != null && logistics.longitude != null && (
                 <MapPreview lat={logistics.latitude} lng={logistics.longitude} />
               )}
+              {logistics.meetupSpot && (
+                <div className="flex items-start gap-2.5 text-sm">
+                  <MapPin className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
+                  <span className="text-muted-foreground">Meet at: {logistics.meetupSpot}</span>
+                </div>
+              )}
             </div>
           )}
 
