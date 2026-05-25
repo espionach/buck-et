@@ -11,7 +11,7 @@ import { motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const Feed = () => {
-  const { quests, groups, friends: friendsList, cleanupEmptyQuests, notifications, friendRequests, currentUser } = useAppStore();
+  const { quests, groups, friends: friendsList, cleanupEmptyQuests, notifications, friendRequests, currentUser, sentFriendRequests, sendFriendRequest } = useAppStore();
   const [search, setSearch] = useState(() => sessionStorage.getItem("feedSearchText") || "");
   const [searchTab, setSearchTab] = useState<"quests" | "people">("quests");
   const [selectedProfile, setSelectedProfile] = useState<User | null>(null);
