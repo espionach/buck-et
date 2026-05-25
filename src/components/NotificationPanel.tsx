@@ -81,8 +81,8 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
       navigate(`/quest/${notification.entityId}`);
     } else if (notification.type === "removed_from_group") {
       navigate("/profile");
-    } else if (notification.type === "friend_accepted" && notification.fromUser?.id) {
-      navigate(`/profile/${notification.fromUser.id}`);
+    } else if (notification.type === "friend_accepted" && notification.fromUser?.username) {
+      navigate(`/u/${notification.fromUser.username}`);
     } else {
       navigate("/profile?tab=current");
     }
@@ -91,10 +91,10 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
   };
 
 
-  const goToUser = (e: React.MouseEvent, userId?: string) => {
+  const goToUser = (e: React.MouseEvent, username?: string) => {
     e.stopPropagation();
-    if (!userId) return;
-    navigate(`/profile/${userId}`);
+    if (!username) return;
+    navigate(`/u/${username}`);
     onClose();
   };
 
@@ -151,7 +151,7 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
         <span
           role="link"
           tabIndex={0}
-          onClick={(e) => goToUser(e, n.fromUser?.id)}
+          onClick={(e) => goToUser(e, n.fromUser?.username)}
           className="font-bold underline-offset-2 hover:underline cursor-pointer"
         >
           {n.fromUser.name}
