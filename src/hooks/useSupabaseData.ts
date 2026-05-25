@@ -404,7 +404,7 @@ export function useNotifications() {
         groupName: n.group_name || undefined,
         fromUser: n.from_user_id ? (profileMap.get(n.from_user_id) || placeholderUser(n.from_user_id)) : placeholderUser("system"),
         read: n.read,
-        createdAt: n.created_at.split("T")[0],
+        createdAt: n.created_at,
       }));
     },
     enabled: !!user,
