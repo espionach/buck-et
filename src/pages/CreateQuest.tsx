@@ -47,6 +47,7 @@ const CreateQuest = () => {
   const photoInputRef = useRef<HTMLInputElement>(null);
   const [submitting, setSubmitting] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [meetupOpen, setMeetupOpen] = useState(false);
 
   // Revoke object URLs when component unmounts or list changes
   useEffect(() => {
