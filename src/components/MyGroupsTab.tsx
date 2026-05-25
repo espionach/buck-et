@@ -12,6 +12,8 @@ import EmptyState from "@/components/EmptyState";
 const MyGroupsTab = () => {
   const { groups } = useAppStore();
   const navigate = useNavigate();
+  const location = useLocation();
+  const goCreate = () => navigate("/create-group", { state: { from: location.pathname + location.search } });
 
   const sortedGroups = [...groups].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
