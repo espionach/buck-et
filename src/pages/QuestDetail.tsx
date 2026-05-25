@@ -13,6 +13,8 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePopup } from "@/hooks/use-popup";
+import { useAuth } from "@/contexts/AuthContext";
+import { useQuests } from "@/hooks/useSupabaseData";
 import ReportContentModal from "@/components/ReportContentModal";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { validateContent } from "@/lib/contentFilter";
@@ -40,6 +42,8 @@ const volunteerRoles = ALL_CONTRIBUTION_ROLES;
 const QuestDetail = () => {
   const navigate = useNavigate();
   const { questId } = useParams<{ questId: string }>();
+  const { user, loading: authLoading } = useAuth();
+  const { data: hydratedQuests, isLoading: questsLoading, isFetching: questsFetching } = useQuests();
   const { quests, groups, addComment, volunteerForQuest, unvolunteerFromQuest, currentUser, pinQuest, unpinQuest, pinnedQuestIds, deleteQuest, toggleImIn } = useAppStore();
   const [showMenu, setShowMenu] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -50,8 +54,24 @@ const QuestDetail = () => {
 
   useEffect(() => { window.scrollTo(0, 0); }, [questId]);
 
-  const quest = quests.find((q) => q.id === questId);
+  const questList = hydratedQuests ?? quests;
+  const quest = questList.find((q) => q.id === questId);
   const [newComment, setNewComment] = useState("");
+  const isQuestLookupPending = authLoading || (!!user && !quest && (questsLoading || questsFetching));
+
+  useEffect(() => {
+    if (quest && isQuestCompleted(quest)) {
+      navigate(-1);
+    }
+  }, [quest, navigate]);
+
+  if (isQuestLookupPending) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-8 text-sm text-muted-foreground">
+        Loading sidequest...
+      </div>
+    );
+  }
 
   if (!quest) {
     return (
@@ -74,10 +94,7 @@ const QuestDetail = () => {
 
   // Once the owner finishes the quest, the detail view is no longer
   // accessible (the quest moves to history).
-  if (isQuestCompleted(quest)) {
-    navigate(-1);
-    return null;
-  }
+  if (isQuestCompleted(quest)) return null;
   const isIn = quest.participants.some((p) => p.id === currentUser.id);
 
   const group = quest.groupId ? groups.find((g) => g.id === quest.groupId) : null;
