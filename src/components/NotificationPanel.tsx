@@ -75,6 +75,8 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
         return <Ban className="w-4 h-4 text-destructive" />;
       case "quest_reminder":
         return <Clock className="w-4 h-4 text-primary" />;
+      case "nudge":
+        return <HandMetal className="w-4 h-4 text-primary" />;
       default:
         return <Bell className="w-4 h-4 text-muted-foreground" />;
     }
@@ -100,7 +102,8 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
         notification.type === "quest_canceled" ||
         notification.type === "quest_reminder" ||
         notification.type === "friend_new_quest" ||
-        notification.type === "new_quest_in_group") &&
+        notification.type === "new_quest_in_group" ||
+        notification.type === "nudge") &&
       notification.entityId
     ) {
       navigate(`/quest/${notification.entityId}`);
@@ -146,6 +149,7 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
       "removed_from_quest",
       "transfer_quest",
       "transfer_declined",
+      "nudge",
     ]);
     const isQuestLinked = questLinkedTypes.has(n.type) && !!n.entityId;
 

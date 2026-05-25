@@ -41,6 +41,8 @@ export type NotificationType =
   | "quest_updated"
   | "quest_canceled"
   | "quest_reminder"
+  // Nudges
+  | "nudge"
   // Legacy — kept for back-compat with old rows
   | "follow_request";
 
@@ -106,6 +108,7 @@ export const TYPE_TO_PREF: Record<NotificationType, DbPrefKey | null> = {
   quest_updated: "notify_quest_updated",
   quest_canceled: "notify_quest_canceled",
   quest_reminder: "notify_quest_reminder",
+  nudge: null, // always shown — sender is rate-limited to once/24h per recipient
   follow_request: null,
 };
 
@@ -131,6 +134,7 @@ export const TYPE_TO_SECTION: Record<NotificationType, NotifSection> = {
   quest_updated: "updates",
   quest_canceled: "updates",
   quest_reminder: "updates",
+  nudge: "your_quests",
   follow_request: "social",
 };
 

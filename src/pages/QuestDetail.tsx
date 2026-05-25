@@ -8,6 +8,7 @@ import MediaViewer from "@/components/MediaViewer";
 import CommentThread from "@/components/CommentThread";
 import MapPreview from "@/components/MapPreview";
 import { ArrowLeft, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send, ExternalLink, HandMetal, Check, Globe, StickyNote, MoreVertical, Pencil, Pin, Trash2, Flag, Share2, Lock, Info } from "lucide-react";
+import NudgeModal from "@/components/NudgeModal";
 import EmptyState from "@/components/EmptyState";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -48,6 +49,7 @@ const QuestDetail = () => {
   const [showMenu, setShowMenu] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showReport, setShowReport] = useState(false);
+  const [showNudge, setShowNudge] = useState(false);
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
   const [joinAnim, setJoinAnim] = useState<"idle" | "morph" | "exit" | "done">("idle");
   usePopup(showDeleteConfirm);
@@ -372,8 +374,27 @@ const QuestDetail = () => {
                 </button>
               ))}
             </div>
+            {isOwner && (
+              <button
+                type="button"
+                onClick={() => setShowNudge(true)}
+                className="mt-3 w-full flex items-center justify-between gap-3 p-2.5 rounded-lg border border-primary/30 bg-primary/5 hover:bg-primary/10 transition-colors text-left"
+              >
+                <div className="flex items-center gap-2 min-w-0">
+                  <HandMetal className="w-4 h-4 text-primary shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-xs font-semibold text-foreground">Send a nudge</p>
+                    <p className="text-[10px] text-muted-foreground truncate">
+                      Give friends a friendly poke to join or remember this quest.
+                    </p>
+                  </div>
+                </div>
+                <span className="text-[10px] font-semibold text-primary shrink-0">Nudge →</span>
+              </button>
+            )}
           </div>
         </div>
+        <NudgeModal open={showNudge} onClose={() => setShowNudge(false)} quest={quest} />
 
         {/* Logistics Section */}
         <div className="p-4 rounded-xl border border-border/50 bg-card space-y-3">
