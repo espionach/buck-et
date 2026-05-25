@@ -102,7 +102,8 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
         notification.type === "quest_canceled" ||
         notification.type === "quest_reminder" ||
         notification.type === "friend_new_quest" ||
-        notification.type === "new_quest_in_group") &&
+        notification.type === "new_quest_in_group" ||
+        notification.type === "nudge") &&
       notification.entityId
     ) {
       navigate(`/quest/${notification.entityId}`);
