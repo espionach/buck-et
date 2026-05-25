@@ -41,6 +41,8 @@ export type NotificationType =
   | "quest_updated"
   | "quest_canceled"
   | "quest_reminder"
+  // Nudges
+  | "nudge"
   // Legacy — kept for back-compat with old rows
   | "follow_request";
 
