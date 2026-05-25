@@ -218,7 +218,9 @@ const CreateQuest = () => {
           onClick={() =>
             isOnboarding
               ? navigate("/onboarding/tour", { replace: true })
-              : navigate(-1)
+              : fromPath
+                ? navigate(fromPath)
+                : navigate("/")
           }
           className="p-2 rounded-xl bg-muted text-muted-foreground"
           aria-label="Back"
