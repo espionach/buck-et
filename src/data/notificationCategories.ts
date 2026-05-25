@@ -134,6 +134,7 @@ export const TYPE_TO_SECTION: Record<NotificationType, NotifSection> = {
   quest_updated: "updates",
   quest_canceled: "updates",
   quest_reminder: "updates",
+  nudge: "your_quests",
   follow_request: "social",
 };
 
