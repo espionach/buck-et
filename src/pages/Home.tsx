@@ -124,7 +124,7 @@ const Boards = () => {
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-3xl font-bold text-foreground">Your Groups</h1>
           <button
-            onClick={() => navigate("/create-group")}
+            onClick={() => navigate("/create-group", { state: { from: location.pathname + location.search } })}
             className="p-2 text-muted-foreground hover:text-primary transition-colors"
           >
             <Plus className="w-5 h-5" />
