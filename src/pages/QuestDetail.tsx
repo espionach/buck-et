@@ -58,6 +58,19 @@ const QuestDetail = () => {
 
   useEffect(() => { window.scrollTo(0, 0); }, [questId]);
 
+  // Auto-open nudge modal with a preselected target (e.g., from a friend's profile)
+  useEffect(() => {
+    const state = location.state as { prefillNudgeUserId?: string } | null;
+    const targetId = state?.prefillNudgeUserId;
+    if (!targetId) return;
+    const q = (hydratedQuests ?? quests).find((qq) => qq.id === questId);
+    if (!q) return;
+    if (q.createdBy.id !== currentUser.id) return;
+    setPrefillNudgeUserId(targetId);
+    setShowNudge(true);
+    navigate(location.pathname, { replace: true, state: {} });
+  }, [location.state, location.pathname, hydratedQuests, quests, questId, currentUser.id, navigate]);
+
   const questList = hydratedQuests ?? quests;
   const quest = questList.find((q) => q.id === questId);
   const [newComment, setNewComment] = useState("");
