@@ -290,7 +290,7 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
                     role="button"
                     tabIndex={0}
                     onClick={() => handleNotificationClick(n)}
-                    className={`w-full text-left flex items-start gap-3 p-4 border-b border-border/30 transition-colors active:scale-[0.99] cursor-pointer ${
+                    className={`group/notif w-full text-left flex items-start gap-3 p-4 border-b border-border/30 transition-colors active:scale-[0.99] cursor-pointer ${
                       n.read ? "opacity-60" : "bg-primary/5"
                     }`}
                   >
@@ -299,15 +299,28 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
                     </div>
                     <div className="flex-1 min-w-0">
                       {renderMessage(n)}
-                      <p className="text-[10px] text-muted-foreground mt-1">{n.createdAt}</p>
+                      <p className="text-[10px] text-muted-foreground mt-1">
+                        {(() => {
+                          const d = new Date(n.createdAt);
+                          return isNaN(d.getTime()) ? n.createdAt : d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+                        })()}
+                      </p>
                     </div>
                     <div className="shrink-0 mt-1">{getIcon(n.type)}</div>
-                    {!n.read && (
-                      <div className="w-2 h-2 rounded-full bg-primary shrink-0 mt-1.5" />
-                    )}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        clearNotification(n.id);
+                      }}
+                      aria-label="Clear notification"
+                      className="shrink-0 p-1 -mr-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                 );
               });
+
 
               const isEmpty = SECTION_ORDER.every((s) => grouped[s].length === 0);
 
