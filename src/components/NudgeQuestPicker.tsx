@@ -69,10 +69,10 @@ const NudgeQuestPicker = ({ open, onClose, quests, targetUser }: NudgeQuestPicke
                           <p className="text-sm font-semibold text-foreground truncate">
                             {q.title}
                           </p>
-                          {q.date && (
+                          {q.logistics?.date && (
                             <p className="text-[11px] text-muted-foreground truncate">
-                              {q.date}
-                              {q.time ? ` · ${q.time}` : ""}
+                              {q.logistics.date}
+                              {q.logistics.time ? ` · ${q.logistics.time}` : ""}
                             </p>
                           )}
                         </div>
