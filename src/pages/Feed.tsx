@@ -2,8 +2,9 @@ import { useAppStore } from "@/data/appState";
 import { User, isQuestCompleted } from "@/data/mockData";
 import QuestList from "@/components/QuestList";
 import UserAvatar from "@/components/UserAvatar";
-import NotificationPanel from "@/components/NotificationPanel";
-import { Search, Lock, UserPlus, Mail, X, Globe, UserSearch, Users } from "lucide-react";
+import NotificationBell from "@/components/NotificationBell";
+import { Search, Lock, UserPlus, X, Globe, UserSearch, Users } from "lucide-react";
+
 import GroupSwatch from "@/components/GroupSwatch";
 import UserProfileView from "@/components/UserProfileView";
 import { useState, useEffect, useRef } from "react";
