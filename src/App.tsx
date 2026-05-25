@@ -107,6 +107,7 @@ const AppLayout = () => {
         <Route path="/groups/:groupId" element={<ProtectedRoute><GroupMembers /></ProtectedRoute>} />
         <Route path="/groups/:groupId/settings" element={<ProtectedRoute><GroupSettings /></ProtectedRoute>} />
         <Route path="/quest/:questId" element={<ProtectedRoute><QuestDetail /></ProtectedRoute>} />
+        <Route path="/quest/:questId/edit" element={<ProtectedRoute><EditQuest /></ProtectedRoute>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       {!hideNav && <BottomNav />}
