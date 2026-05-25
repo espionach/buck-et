@@ -556,6 +556,33 @@ export type Database = {
         }
         Relationships: []
       }
+      quest_nudges: {
+        Row: {
+          created_at: string
+          from_user_id: string
+          id: string
+          note: string | null
+          sidequest_id: string
+          to_user_id: string
+        }
+        Insert: {
+          created_at?: string
+          from_user_id: string
+          id?: string
+          note?: string | null
+          sidequest_id: string
+          to_user_id: string
+        }
+        Update: {
+          created_at?: string
+          from_user_id?: string
+          id?: string
+          note?: string | null
+          sidequest_id?: string
+          to_user_id?: string
+        }
+        Relationships: []
+      }
       quest_reminders_sent: {
         Row: {
           id: string
