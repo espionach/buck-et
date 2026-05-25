@@ -294,6 +294,12 @@ const QuestDetail = () => {
               {logistics.location && logistics.latitude != null && logistics.longitude != null && (
                 <MapPreview lat={logistics.latitude} lng={logistics.longitude} />
               )}
+              {logistics.meetupSpot && (
+                <div className="flex items-start gap-2.5 text-sm">
+                  <MapPin className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
+                  <span className="text-muted-foreground">Meet at: {logistics.meetupSpot}</span>
+                </div>
+              )}
             </div>
           )}
 
@@ -374,12 +380,6 @@ const QuestDetail = () => {
           <h3 className="text-sm font-bold text-foreground">Sidequest Details</h3>
 
           <div className="space-y-2.5">
-            {logistics.meetupSpot && (
-              <div className="flex items-start gap-2.5 text-sm">
-                <MapPin className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
-                <span className="text-muted-foreground">Meet at: {logistics.meetupSpot}</span>
-              </div>
-            )}
             {logistics.transportation && TransportIcon && (
               <div className="flex items-center gap-2.5 text-sm">
                 <TransportIcon className="w-4 h-4 text-primary" />

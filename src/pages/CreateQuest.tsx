@@ -47,6 +47,7 @@ const CreateQuest = () => {
   const photoInputRef = useRef<HTMLInputElement>(null);
   const [submitting, setSubmitting] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [meetupOpen, setMeetupOpen] = useState(false);
 
   // Revoke object URLs when component unmounts or list changes
   useEffect(() => {
@@ -343,6 +344,29 @@ const CreateQuest = () => {
                 placeholder="Where's this happening?"
               />
             </div>
+            <div>
+              {!meetupOpen && !meetupSpot ? (
+                <button
+                  type="button"
+                  onClick={() => setMeetupOpen(true)}
+                  className="text-xs font-semibold text-primary hover:underline"
+                >
+                  + Add meetup spot
+                </button>
+              ) : (
+                <>
+                  <label className="text-[11px] text-muted-foreground mb-1 block">Meetup Spot</label>
+                  <input
+                    type="text"
+                    value={meetupSpot}
+                    onChange={(e) => setMeetupSpot(e.target.value)}
+                    placeholder="Where should everyone meet?"
+                    autoFocus
+                    className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  />
+                </>
+              )}
+            </div>
           </div>
 
           <div>
@@ -416,12 +440,6 @@ const CreateQuest = () => {
             {detailsOpen && (<>
 
             <div>
-              <label className="text-[11px] text-muted-foreground mb-1 block">Meetup Spot</label>
-              <input type="text" value={meetupSpot} onChange={(e) => setMeetupSpot(e.target.value)} placeholder="Where should everyone meet?"
-                className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
-            </div>
-
-            <div>
               <label className="text-[11px] text-muted-foreground mb-1 block">Transportation</label>
               <div className="flex flex-wrap gap-2">
                 {[
@@ -449,12 +467,6 @@ const CreateQuest = () => {
                   className="w-24 px-3 py-2.5 rounded-xl bg-card border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
               </div>
             )}
-
-            <div>
-              <label className="text-[11px] text-muted-foreground mb-1 block">Additional Notes</label>
-              <textarea value={customNotes} onChange={(e) => setCustomNotes(e.target.value)} placeholder="Anything else everyone should know?"
-                rows={2} className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none" />
-            </div>
 
             {/* Contributions — let other users sign up to help */}
             <div>
@@ -519,6 +531,13 @@ const CreateQuest = () => {
                   Add
                 </button>
             </div>
+            </div>
+
+            {/* Additional Notes — last */}
+            <div>
+              <label className="text-[11px] text-muted-foreground mb-1 block">Additional Notes</label>
+              <textarea value={customNotes} onChange={(e) => setCustomNotes(e.target.value)} placeholder="Anything else everyone should know?"
+                rows={2} className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none" />
             </div>
             </>)}
           </div>
