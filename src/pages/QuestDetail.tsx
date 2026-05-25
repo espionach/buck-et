@@ -384,7 +384,7 @@ const QuestDetail = () => {
                   <HandMetal className="w-4 h-4 text-primary shrink-0" />
                   <div className="min-w-0">
                     <p className="text-xs font-semibold text-foreground">Send a nudge</p>
-                    <p className="text-[10px] text-muted-foreground truncate">
+                    <p className="text-[10px] text-muted-foreground leading-tight">
                       Give friends a friendly poke to join or remember this quest.
                     </p>
                   </div>
