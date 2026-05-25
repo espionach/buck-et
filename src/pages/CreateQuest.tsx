@@ -8,7 +8,7 @@ import GroupSwatch from "@/components/GroupSwatch";
 import LocationPicker, { type LocationValue } from "@/components/LocationPicker";
 import { TimePicker } from "@/components/TimePicker";
 import { useState, useRef, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadSidequestPhotos } from "@/lib/uploads";
@@ -17,6 +17,8 @@ import { getUserFriendlyError } from "@/lib/errorMapping";
 
 const CreateQuest = () => {
   const navigate = useNavigate();
+  const routeLocation = useLocation();
+  const fromPath = (routeLocation.state as { from?: string } | null)?.from;
   const [searchParams] = useSearchParams();
   const preselectedGroup = searchParams.get("groupId");
   const isOnboarding = searchParams.get("onboarding") === "1";
@@ -216,7 +218,9 @@ const CreateQuest = () => {
           onClick={() =>
             isOnboarding
               ? navigate("/onboarding/tour", { replace: true })
-              : navigate(-1)
+              : fromPath
+                ? navigate(fromPath)
+                : navigate("/")
           }
           className="p-2 rounded-xl bg-muted text-muted-foreground"
           aria-label="Back"

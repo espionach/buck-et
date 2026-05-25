@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { format, parseISO, isSameDay, isPast, startOfDay } from "date-fns";
 import { Calendar as CalendarIcon, Clock, MapPin } from "lucide-react";
 
@@ -13,6 +13,7 @@ const dateKey = (d: Date) => format(d, "yyyy-MM-dd");
 
 const CalendarPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { quests, groups, currentUser } = useAppStore();
   const [selected, setSelected] = useState<Date>(startOfDay(new Date()));
 
@@ -117,7 +118,7 @@ const CalendarPage = () => {
             icon={CalendarIcon}
             title="Your calendar is waiting"
             description="Sidequests with dates will appear here."
-            cta={{ label: "Create sidequest", onClick: () => navigate("/create") }}
+            cta={{ label: "Create sidequest", onClick: () => navigate("/create", { state: { from: location.pathname + location.search } }) }}
           />
         ) : selectedQuests.length === 0 ? (
           <EmptyState

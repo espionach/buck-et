@@ -124,7 +124,7 @@ const Boards = () => {
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-3xl font-bold text-foreground">Your Groups</h1>
           <button
-            onClick={() => navigate("/create-group")}
+            onClick={() => navigate("/create-group", { state: { from: location.pathname + location.search } })}
             className="p-2 text-muted-foreground hover:text-primary transition-colors"
           >
             <Plus className="w-5 h-5" />
@@ -391,7 +391,7 @@ const Boards = () => {
                   icon={boardTab === "active" ? Sparkles : CheckCircle2}
                   title={boardTab === "active" ? "No active sidequests" : "No completed sidequests yet"}
                   description={boardTab === "active" ? "Nothing planned yet. Start something fun." : "Finished sidequests will show up here."}
-                  cta={boardTab === "active" ? { label: "Create sidequest", onClick: () => navigate("/create") } : undefined}
+                  cta={boardTab === "active" ? { label: "Create sidequest", onClick: () => navigate("/create", { state: { from: location.pathname + location.search } }) } : undefined}
                 />
               ) : (
                 <QuestList

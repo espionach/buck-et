@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Plus, Users as UsersIcon, MoreVertical } from "lucide-react";
 import { useAppStore } from "@/data/appState";
 import GroupCard from "@/components/GroupCard";
@@ -12,6 +12,8 @@ import EmptyState from "@/components/EmptyState";
 const MyGroupsTab = () => {
   const { groups } = useAppStore();
   const navigate = useNavigate();
+  const location = useLocation();
+  const goCreate = () => navigate("/create-group", { state: { from: location.pathname + location.search } });
 
   const sortedGroups = [...groups].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -28,7 +30,7 @@ const MyGroupsTab = () => {
         <motion.button
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          onClick={() => navigate("/create-group")}
+          onClick={() => goCreate()}
           className="w-full rounded-xl border-2 border-dashed border-border bg-muted/30 hover:bg-muted/50 hover:border-foreground/30 transition-colors flex flex-col items-center justify-center gap-2 p-5 min-h-[124px] text-muted-foreground"
         >
           <Plus className="w-5 h-5" />
@@ -61,7 +63,7 @@ const MyGroupsTab = () => {
           icon={UsersIcon}
           title="No groups yet"
           description='Tap "New group" to create one and get started.'
-          cta={{ label: "New group", onClick: () => navigate("/create-group") }}
+          cta={{ label: "New group", onClick: () => goCreate() }}
         />
       )}
     </div>
