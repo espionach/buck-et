@@ -312,7 +312,7 @@ const CreateQuest = () => {
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="E.g. Go to the beach, cafe hopping, etc."
+              placeholder="E.g. Beach trip, cafe hopping, etc."
               className="w-full px-4 py-3.5 rounded-xl bg-card border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 text-base"
               autoFocus
             />
