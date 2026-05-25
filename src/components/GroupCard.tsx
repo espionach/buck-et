@@ -57,25 +57,27 @@ const GroupCard = ({ group, onClick, index }: GroupCardProps) => {
             </div>
           )}
 
-          <h3 className="relative font-display font-bold text-sm text-foreground mb-1 line-clamp-1">{group.name}</h3>
-          <div className="relative flex items-center gap-1.5 text-muted-foreground ml-0">
-            <Users className="w-3.5 h-3.5" />
-            <span className="text-xs">{group.members.length} members</span>
-          </div>
-          <div className="relative flex -space-x-1.5 mt-3">
-            {group.members.slice(0, 4).map((m) => (
-              <UserAvatar
-                key={m.id}
-                user={m}
-                size="xs"
-                className="border-2 border-card w-7 h-7"
-              />
-            ))}
-            {group.members.length > 4 && (
-              <span className="w-7 h-7 rounded-full bg-muted flex items-center justify-center text-[10px] font-semibold text-muted-foreground border-2 border-card">
-                +{group.members.length - 4}
-              </span>
-            )}
+          <div className="relative flex flex-col items-center justify-center h-full text-center">
+            <h3 className="font-display font-bold text-base text-foreground mb-1.5 line-clamp-1">{group.name}</h3>
+            <div className="flex items-center gap-1.5 text-muted-foreground">
+              <Users className="w-3.5 h-3.5" />
+              <span className="text-xs">{group.members.length} members</span>
+            </div>
+            <div className="flex -space-x-1.5 mt-2">
+              {group.members.slice(0, 3).map((m) => (
+                <UserAvatar
+                  key={m.id}
+                  user={m}
+                  size="xs"
+                  className="border-2 border-card w-6 h-6"
+                />
+              ))}
+              {group.members.length > 3 && (
+                <span className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-[10px] font-semibold text-muted-foreground border-2 border-card">
+                  +{group.members.length - 3}
+                </span>
+              )}
+            </div>
           </div>
         </button>
       </motion.div>
