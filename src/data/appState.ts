@@ -1386,6 +1386,16 @@ export const useAppStore = create<AppState>((set, get) => ({
     })();
   },
 
+  clearAllNotifications: () => {
+    const { currentUser } = get();
+    set({ notifications: [] });
+    (async () => {
+      await supabase.from("notifications")
+        .delete()
+        .eq("user_id", currentUser.id);
+    })();
+  },
+
   // ---- Moderation ----
   blockUser: async (userId) => {
     const { currentUser, _invalidate } = get();
