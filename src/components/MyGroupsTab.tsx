@@ -27,6 +27,7 @@ const MyGroupsTab = () => {
       </p>
 
       <div className="grid grid-cols-2 gap-3 items-stretch">
+      {sortedGroups.length > 0 && (
         <motion.button
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -36,6 +37,7 @@ const MyGroupsTab = () => {
           <Plus className="w-5 h-5" />
           <span className="text-xs font-semibold">New group</span>
         </motion.button>
+      )}
 
         {sortedGroups.map((g, i) => (
           <div key={g.id} className="relative">
@@ -62,8 +64,7 @@ const MyGroupsTab = () => {
         <EmptyState
           icon={UsersIcon}
           title="No groups yet"
-          description='Tap "New group" to create one and get started.'
-          cta={{ label: "New group", onClick: () => goCreate() }}
+          description="Create a group to launch sidequests to a hand-picked subset of friends."
         />
       )}
     </div>
