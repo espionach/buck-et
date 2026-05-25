@@ -10,6 +10,8 @@ import GroupStylePicker from "@/components/GroupStylePicker";
 
 const CreateGroup = () => {
   const navigate = useNavigate();
+  const routeLocation = useLocation();
+  const fromPath = (routeLocation.state as { from?: string } | null)?.from;
   const { addGroup, friends: friendsList, currentUser } = useAppStore();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
