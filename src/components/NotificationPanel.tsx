@@ -91,10 +91,10 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
   };
 
 
-  const goToUser = (e: React.MouseEvent, userId?: string) => {
+  const goToUser = (e: React.MouseEvent, username?: string) => {
     e.stopPropagation();
-    if (!userId) return;
-    navigate(`/profile/${userId}`);
+    if (!username) return;
+    navigate(`/u/${username}`);
     onClose();
   };
 
