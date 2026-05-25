@@ -3,7 +3,7 @@ import { Group, GroupMember } from "@/data/mockData";
 import { ArrowLeft, Plus, Check, Search, UserSearch, UserPlus, Users } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import UserAvatar from "@/components/UserAvatar";
 import GroupStylePicker from "@/components/GroupStylePicker";
