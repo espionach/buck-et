@@ -22,9 +22,11 @@ interface UserProfileViewProps {
 
 const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfileViewProps) => {
   const { quests, friends, currentUser, sentFriendRequests, sendFriendRequest, unfriend, friendRequests, acceptFriendRequest, blockedUserIds } = useAppStore();
+  const navigate = useNavigate();
   const [tab, setTab] = useState<"current" | "past">("current");
   const [showFriends, setShowFriends] = useState(false);
   const [showUnfriendConfirm, setShowUnfriendConfirm] = useState(false);
+  const [showNudgePicker, setShowNudgePicker] = useState(false);
   const [viewedUserFriends, setViewedUserFriends] = useState<User[] | null>(null);
   usePopup(showFriends || showUnfriendConfirm);
 
