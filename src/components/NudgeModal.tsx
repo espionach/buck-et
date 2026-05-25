@@ -154,7 +154,7 @@ const NudgeModal = ({ open, onClose, quest }: NudgeModalProps) => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 30 }}
             onClick={(e) => e.stopPropagation()}
-            className="w-full sm:max-w-md bg-card rounded-t-2xl sm:rounded-2xl shadow-xl border border-border max-h-[85vh] flex flex-col"
+            className="w-full sm:max-w-md bg-card rounded-t-2xl sm:rounded-2xl shadow-xl border border-border h-[75vh] flex flex-col"
           >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-border/50">
