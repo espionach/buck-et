@@ -305,9 +305,11 @@ const CreateQuest = () => {
           onClick={() =>
             isOnboarding
               ? navigate("/onboarding/tour", { replace: true })
-              : fromPath
-                ? navigate(fromPath)
-                : navigate("/")
+              : searchParams.get("draftId")
+                ? navigate("/drafts")
+                : fromPath
+                  ? navigate(fromPath)
+                  : navigate("/")
           }
           className="p-2 rounded-xl bg-muted text-muted-foreground"
           aria-label="Back"
