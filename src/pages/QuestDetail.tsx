@@ -409,7 +409,13 @@ const QuestDetail = () => {
             )}
           </div>
         </div>
-        <NudgeModal open={showNudge} onClose={() => setShowNudge(false)} quest={quest} />
+        <NudgeModal
+          open={showNudge}
+          onClose={() => { setShowNudge(false); setPrefillNudgeUserId(null); }}
+          quest={quest}
+          initialSelectedUserId={prefillNudgeUserId}
+        />
+
 
         {/* Logistics Section */}
         <div className="p-4 rounded-xl border border-border/50 bg-card space-y-3">
