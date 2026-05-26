@@ -24,6 +24,7 @@ import GroupMembers from "./pages/GroupMembers";
 import GroupSettings from "./pages/GroupSettings";
 import QuestDetail from "./pages/QuestDetail";
 import EditQuest from "./pages/EditQuest";
+import Drafts from "./pages/Drafts";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -72,7 +73,7 @@ const AuthRoute = ({ children }: { children: React.ReactNode }) => {
 
 const AppLayout = () => {
   const location = useLocation();
-  const hideNav = ["/create", "/create-group", "/login", "/signup", "/forgot-password", "/reset-password", "/settings", "/settings/blocked", "/settings/community-guidelines", "/settings/privacy-policy", "/settings/terms", "/settings/legal-updates", "/admin", "/admin/reports"].includes(location.pathname) || location.pathname.startsWith("/quest/") || location.pathname.startsWith("/onboarding/") || location.pathname.startsWith("/groups/") || location.pathname.endsWith("/edit");
+  const hideNav = ["/create", "/create-group", "/drafts", "/login", "/signup", "/forgot-password", "/reset-password", "/settings", "/settings/blocked", "/settings/community-guidelines", "/settings/privacy-policy", "/settings/terms", "/settings/legal-updates", "/admin", "/admin/reports"].includes(location.pathname) || location.pathname.startsWith("/quest/") || location.pathname.startsWith("/onboarding/") || location.pathname.startsWith("/groups/") || location.pathname.endsWith("/edit");
 
   return (
     <div className="max-w-md mx-auto min-h-screen relative">
@@ -103,6 +104,7 @@ const AppLayout = () => {
         <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
         <Route path="/admin/reports" element={<ProtectedRoute><AdminReports /></ProtectedRoute>} />
         <Route path="/create" element={<ProtectedRoute><CreateQuest /></ProtectedRoute>} />
+        <Route path="/drafts" element={<ProtectedRoute><Drafts /></ProtectedRoute>} />
         <Route path="/create-group" element={<ProtectedRoute><CreateGroup /></ProtectedRoute>} />
         <Route path="/groups/:groupId" element={<ProtectedRoute><GroupMembers /></ProtectedRoute>} />
         <Route path="/groups/:groupId/settings" element={<ProtectedRoute><GroupSettings /></ProtectedRoute>} />
