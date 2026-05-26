@@ -60,6 +60,90 @@ const CreateQuest = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Draft tracking — stable id, hydration on mount, autosave on unmount
+  const draftIdRef = useRef<string>(searchParams.get("draftId") || newDraftId());
+  const submittedRef = useRef(false);
+  const hydratedRef = useRef(false);
+
+  // Hydrate from existing draft (once)
+  useEffect(() => {
+    if (hydratedRef.current) return;
+    hydratedRef.current = true;
+    const id = searchParams.get("draftId");
+    if (!id || !currentUser?.id) return;
+    const d = getDraft(currentUser.id, id);
+    if (!d) return;
+    setTitle(d.title);
+    setDescription(d.description);
+    setSelectedGroup(d.groupId);
+    setDate(d.date);
+    setTime(d.time);
+    setLocation(d.location);
+    setMeetupSpot(d.meetupSpot);
+    if (d.meetupSpot) setMeetupOpen(true);
+    setTransportation(d.transportation);
+    setCarpoolSlots(d.carpoolSlots);
+    setCustomNotes(d.customNotes);
+    setLinks(d.links);
+    setContributionRoles(d.contributionRoles);
+    if (d.transportation || d.carpoolSlots || d.customNotes || d.links.length || d.contributionRoles.length) {
+      setDetailsOpen(true);
+    }
+    if (d.photoPlaceholderCount > 0) {
+      toast(`${d.photoPlaceholderCount} photo${d.photoPlaceholderCount > 1 ? "s" : ""} from your draft need to be re-added.`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser?.id]);
+
+  // Keep a live ref of all field values for the unmount autosave
+  const stateRef = useRef({
+    title, description, selectedGroup, date, time, location, meetupSpot,
+    transportation, carpoolSlots, customNotes, links, contributionRoles,
+    pendingPhotosCount: pendingPhotos.length,
+  });
+  stateRef.current = {
+    title, description, selectedGroup, date, time, location, meetupSpot,
+    transportation, carpoolSlots, customNotes, links, contributionRoles,
+    pendingPhotosCount: pendingPhotos.length,
+  };
+
+  // Autosave on exit
+  useEffect(() => {
+    return () => {
+      if (!currentUser?.id) return;
+      const id = draftIdRef.current;
+      if (submittedRef.current) {
+        deleteDraft(currentUser.id, id);
+        return;
+      }
+      const s = stateRef.current;
+      const payload = {
+        id,
+        userId: currentUser.id,
+        updatedAt: new Date().toISOString(),
+        title: s.title,
+        description: s.description,
+        groupId: s.selectedGroup,
+        date: s.date,
+        time: s.time,
+        location: s.location,
+        meetupSpot: s.meetupSpot,
+        transportation: s.transportation,
+        carpoolSlots: s.carpoolSlots,
+        customNotes: s.customNotes,
+        links: s.links,
+        contributionRoles: s.contributionRoles,
+        photoPlaceholderCount: s.pendingPhotosCount,
+      };
+      if (draftHasContent(payload)) {
+        saveDraft(payload);
+      } else {
+        deleteDraft(currentUser.id, id);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser?.id]);
+
   // Contributions the creator wants to open up for sign-ups
   const [contributionRoles, setContributionRoles] = useState<string[]>([]);
 
