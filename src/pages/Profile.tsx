@@ -804,7 +804,7 @@ const Profile = () => {
               if (unpinnedUndated.length === 0) return null;
               return (
                 <>
-                  <div className="pt-4 pb-2 px-1">
+                  <div className={`${datedQuests.length === 0 ? 'pt-2' : 'pt-4'} pb-2 px-1`}>
                     <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Someday</p>
                   </div>
                   <QuestList
