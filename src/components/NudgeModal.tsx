@@ -46,6 +46,19 @@ const NudgeModal = ({ open, onClose, quest, initialSelectedUserId }: NudgeModalP
     }
   }, [open]);
 
+  // Seed preselected user (e.g., from a friend's profile CTA) once candidates & throttle are known
+  useEffect(() => {
+    if (!open || !initialSelectedUserId) return;
+    if (recentNudges.has(initialSelectedUserId)) return;
+    if (!candidates.some((c) => c.id === initialSelectedUserId)) return;
+    setSelected((prev) => {
+      if (prev.has(initialSelectedUserId)) return prev;
+      const next = new Set(prev);
+      next.add(initialSelectedUserId);
+      return next;
+    });
+  }, [open, initialSelectedUserId, candidates, recentNudges]);
+
   // Load who's been nudged in the last 24h for this quest
   useEffect(() => {
     if (!open) return;
