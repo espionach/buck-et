@@ -437,7 +437,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
                   e.stopPropagation();
                   handleMarkDone();
                 }}
-                className="text-xs font-medium text-muted-foreground/70 hover:text-secondary transition-colors"
+                className="text-xs font-medium text-muted-foreground hover:text-secondary underline-offset-4 hover:underline transition-colors"
               >
                 Finish
               </button>
