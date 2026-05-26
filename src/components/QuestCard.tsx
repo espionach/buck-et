@@ -127,12 +127,42 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
 
   return (
     <>
+      <div className={`relative ${enableSwipe ? "overflow-hidden" : ""} ${isPinned ? "rounded-xl" : ""}`}>
+        {enableSwipe && (
+          <motion.div
+            style={{ opacity: underlayOpacity }}
+            className="absolute inset-0 flex items-center justify-start pl-6 bg-secondary text-secondary-foreground rounded-xl pointer-events-none"
+          >
+            <div className="flex items-center gap-2 text-sm font-semibold">
+              <Check className="w-4 h-4" />
+              Finish
+            </div>
+          </motion.div>
+        )}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: index * 0.06 }}
-        onClick={() => { if (canNavigateToDetail) { onQuestClick?.(); navigate(`/quest/${quest.id}`); } }}
-        className={`relative p-4 ${isFinished ? "opacity-60" : ""} ${canNavigateToDetail ? "cursor-pointer active:scale-[0.99] transition-transform" : ""} ${justAdded ? "animate-just-added rounded-xl" : ""} ${isPinned ? "rounded-xl border-2 border-primary/30 bg-primary/[0.03]" : ""}`}
+        style={enableSwipe ? { x: swipeX } : undefined}
+        drag={enableSwipe ? "x" : false}
+        dragConstraints={{ left: 0, right: 120 }}
+        dragElastic={0.15}
+        dragDirectionLock
+        onDragStart={() => { wasDragged.current = true; }}
+        onDragEnd={(_, info) => {
+          if (info.offset.x > 64 || info.velocity.x > 400) {
+            motionAnimate(swipeX, 400, { duration: 0.2 });
+            setTimeout(() => handleMarkDone(), 180);
+          } else {
+            motionAnimate(swipeX, 0, { type: "spring", stiffness: 400, damping: 35 });
+          }
+          setTimeout(() => { wasDragged.current = false; }, 50);
+        }}
+        onClick={() => {
+          if (wasDragged.current) return;
+          if (canNavigateToDetail) { onQuestClick?.(); navigate(`/quest/${quest.id}`); }
+        }}
+        className={`relative bg-card p-4 ${isFinished ? "opacity-60" : ""} ${canNavigateToDetail ? "cursor-pointer active:scale-[0.99] transition-transform" : ""} ${justAdded ? "animate-just-added rounded-xl" : ""} ${isPinned ? "rounded-xl border-2 border-primary/30 bg-primary/[0.03]" : ""}`}
       >
         {/* Pin icon for pinned quests */}
         {isPinned && (
