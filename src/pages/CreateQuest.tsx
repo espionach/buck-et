@@ -14,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { uploadSidequestPhotos } from "@/lib/uploads";
 import { toast } from "sonner";
 import { getUserFriendlyError } from "@/lib/errorMapping";
+import { deleteDraft, getDraft, newDraftId, saveDraft, draftHasContent } from "@/lib/drafts";
 
 const CreateQuest = () => {
   const navigate = useNavigate();
