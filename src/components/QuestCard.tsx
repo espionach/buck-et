@@ -14,8 +14,10 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { usePopup } from "@/hooks/use-popup";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { format, parseISO } from "date-fns";
 import { toast } from "sonner";
+import { useMotionValue, useTransform, animate as motionAnimate } from "framer-motion";
 
 interface QuestCardProps {
   quest: Quest;
@@ -92,6 +94,14 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
   // Three-dots menu: owners get Edit/Pin/Delete; non-owners get Share/Report.
   const showThreeDots = !isFinished;
 
+  // Finish action (owner-only, active quests).
+  const canFinish = isOwner && !isFinished && !hideActions;
+  const isMobile = useIsMobile();
+  const swipeX = useMotionValue(0);
+  const underlayOpacity = useTransform(swipeX, [0, 40, 96], [0, 0.6, 1]);
+  const wasDragged = useRef(false);
+  const enableSwipe = canFinish && isMobile;
+
   const handleShare = async () => {
     const url = `${window.location.origin}/quest/${quest.id}`;
     const shareData = {
@@ -117,12 +127,42 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
 
   return (
     <>
+      <div className={`relative ${enableSwipe ? "overflow-hidden" : ""} ${isPinned ? "rounded-xl" : ""}`}>
+        {enableSwipe && (
+          <motion.div
+            style={{ opacity: underlayOpacity }}
+            className="absolute inset-0 flex items-center justify-start pl-6 bg-secondary text-secondary-foreground rounded-xl pointer-events-none"
+          >
+            <div className="flex items-center gap-2 text-sm font-semibold">
+              <Check className="w-4 h-4" />
+              Finish
+            </div>
+          </motion.div>
+        )}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: index * 0.06 }}
-        onClick={() => { if (canNavigateToDetail) { onQuestClick?.(); navigate(`/quest/${quest.id}`); } }}
-        className={`relative p-4 ${isFinished ? "opacity-60" : ""} ${canNavigateToDetail ? "cursor-pointer active:scale-[0.99] transition-transform" : ""} ${justAdded ? "animate-just-added rounded-xl" : ""} ${isPinned ? "rounded-xl border-2 border-primary/30 bg-primary/[0.03]" : ""}`}
+        style={enableSwipe ? { x: swipeX } : undefined}
+        drag={enableSwipe ? "x" : false}
+        dragConstraints={{ left: 0, right: 120 }}
+        dragElastic={0.15}
+        dragDirectionLock
+        onDragStart={() => { wasDragged.current = true; }}
+        onDragEnd={(_, info) => {
+          if (info.offset.x > 64 || info.velocity.x > 400) {
+            motionAnimate(swipeX, 400, { duration: 0.2 });
+            setTimeout(() => handleMarkDone(), 180);
+          } else {
+            motionAnimate(swipeX, 0, { type: "spring", stiffness: 400, damping: 35 });
+          }
+          setTimeout(() => { wasDragged.current = false; }, 50);
+        }}
+        onClick={() => {
+          if (wasDragged.current) return;
+          if (canNavigateToDetail) { onQuestClick?.(); navigate(`/quest/${quest.id}`); }
+        }}
+        className={`relative bg-card p-4 ${isFinished ? "opacity-60" : ""} ${canNavigateToDetail ? "cursor-pointer active:scale-[0.99] transition-transform" : ""} ${justAdded ? "animate-just-added rounded-xl" : ""} ${isPinned ? "rounded-xl border-2 border-primary/30 bg-primary/[0.03]" : ""}`}
       >
         {/* Pin icon for pinned quests */}
         {isPinned && (
@@ -391,16 +431,15 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
               {showComments ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
             </button>
 
-            {!isFinished && isOwner && !hideActions && (
+            {canFinish && !isMobile && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   handleMarkDone();
                 }}
-                className="flex items-center gap-1 text-xs text-secondary font-semibold"
+                className="text-xs font-medium text-muted-foreground/70 hover:text-secondary transition-colors"
               >
-                <Check className="w-3.5 h-3.5" />
-                Finish Sidequest
+                Finish
               </button>
             )}
 
@@ -439,6 +478,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
           )}
         </AnimatePresence>
       </motion.div>
+      </div>
 
       {/* Delete confirmation */}
       <AnimatePresence>

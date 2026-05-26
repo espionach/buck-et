@@ -1,38 +1,61 @@
-## Sidequest Drafts (local-only)
+## Goal
 
-Autosave in-progress sidequests as drafts when the user exits Create, and give them a dedicated drafts page reachable from a banner on the Active tab.
+Replace the prominent "Finish Sidequest" CTA on quest cards with a calmer interaction:
+- **Desktop**: a subtle "Finish" text link (light grey → green on hover)
+- **Mobile**: swipe-right gesture on the card to reveal a green "Finish" action
 
-### Behavior
+Only affects the owner's active quest cards (where this button currently appears). Finished/undone states unchanged.
 
-- **Autosave on exit**: When the user leaves `CreateQuest` (back button, navigation, route change, tab/app close) and at least one field has content (title, description, group, any logistics field, photos, links, contribution roles), save a draft to localStorage.
-- **No mid-typing writes**: nothing is saved while the user is still on the screen, only on unmount/exit.
-- **Resuming a draft**: Tapping a draft opens `CreateQuest` prefilled with all saved values. The same draft ID is reused, so editing and exiting again updates the same entry.
-- **On launch**: Successfully creating the sidequest deletes its draft.
-- **Manual delete**: Each draft row in the drafts page has a delete button. A clear warning sits at the top: "Drafts are saved on this device only. Clearing your browser data or signing in on another device will erase them."
+## Files
 
-### Placement
+- `src/components/QuestCard.tsx` — swap the button, add swipe logic
+- (uses existing `src/hooks/use-mobile.tsx`)
 
-- **Active tab (Profile → Current)**: When ≥1 draft exists, show a single compact row pinned above the quest list: `Drafts (N) ›`. Tapping it navigates to a new `/drafts` page. Hidden when zero drafts.
-- **Drafts page**: Own route with back navigation to Profile. Lists drafts newest-first showing title (or "Untitled draft"), short description preview, group chip if set, and last-edited time. Row tap → resume in Create. Trash icon → confirm + delete. Empty state if user deletes them all. Warning banner at top.
+## Desktop behavior
 
-### Photos caveat
+Replace the existing `Check + "Finish Sidequest"` button (lines 394–405) with a minimal text-only link in the same footer row:
 
-Photos in Create are raw `File` objects (not yet uploaded). `File`s can't be serialized to localStorage. For drafts:
-- Persist links, text fields, logistics, group, contribution roles fully.
-- For pending photos, store only a count + filenames as a reminder ("3 photos — please re-add"). Cleanly drop them on resume rather than silently losing them without notice. Already-uploaded photo URLs (none in Create today) would persist fine.
+```text
+[💬 comments]                              Finish
+                                ^ text-muted-foreground/70
+                                  hover:text-secondary (green)
+                                  text-xs font-medium
+                                  transition-colors
+```
 
-### Technical sketch
+- No icon, no bold weight
+- Same click handler (`handleMarkDone`)
+- Same `stopPropagation` so it doesn't navigate into the quest
 
-- New `src/lib/drafts.ts`: typed `QuestDraft` shape, `listDrafts()`, `getDraft(id)`, `saveDraft(partial)`, `deleteDraft(id)`. Stored under `sidequest_drafts_v1` keyed by user id (`currentUser.id`) so multi-account on one device stays separate. Each draft: `{ id, userId, updatedAt, title, description, groupId, logistics{...}, links, contributionRoles, photoPlaceholderCount }`.
-- `CreateQuest.tsx`:
-  - Accept `?draftId=...` (or router state) to hydrate initial state.
-  - Track a stable `draftIdRef`. On unmount, if any field has content and the form wasn't successfully submitted, call `saveDraft`. If submitted successfully, call `deleteDraft(draftIdRef.current)`.
-  - Use a `submittedRef` flag set right before navigating away on successful create to skip the save-on-exit.
-- `src/pages/Drafts.tsx` (new): list + delete + warning banner + back button. Route added to `App.tsx` as `/drafts`.
-- `src/pages/Profile.tsx` (Current tab): read `listDrafts(currentUser.id)`; if length > 0, render the `Drafts (N) ›` row above the quest list, linking to `/drafts`.
+## Mobile behavior (swipe-to-finish)
 
-### Out of scope
+Wrap the card content in a swipeable container using Framer Motion (`motion.div` with `drag="x"`, already a project dependency). Pattern:
 
-- No backend table, no migrations, no RLS changes.
-- No cross-device sync.
-- No changes to other tabs, notifications, or the nudge feature.
+```text
+┌────────────────────────────────────────┐
+│ [green Finish action revealed here] →  │  ← underlay
+│ ┌────────────────────────────────────┐ │
+│ │   Quest card (draggable on x)      │ │  ← drags right to reveal
+│ └────────────────────────────────────┘ │
+└────────────────────────────────────────┘
+```
+
+- `drag="x"`, `dragConstraints={{ left: 0, right: 96 }}`, `dragElastic={0.15}`
+- Underlay: full-height green panel (`bg-secondary text-secondary-foreground`) with a centered `Check` icon + "Finish" label, revealed as the card translates right
+- On `onDragEnd`: if offset > 64px or velocity > 400 → animate card off, call `handleMarkDone()`; else snap back to 0
+- Disable drag when `!isOwner || isFinished || hideActions` (falls back to no swipe action — matches current behavior of hiding the button)
+- Tap still navigates to detail (Framer Motion distinguishes tap vs drag automatically)
+- Remove the desktop "Finish" text link on mobile to avoid duplication (gated by `useIsMobile()`)
+
+## Edge cases
+
+- Pinned cards (`isPinned` border) — swipe still works, underlay sits inside the rounded border via `overflow-hidden` on the wrapper
+- `justAdded` animation — apply to the inner draggable layer, not the wrapper, so the pulse still plays
+- Comments expansion — unaffected; lives below the draggable row only if we wrap the whole card. We'll wrap the whole `Card` so comments swipe with it; acceptable since swiping is the whole-card gesture
+- Reduced motion: respect `prefers-reduced-motion` by disabling drag (fall back to a long-press? — out of scope; just skip swipe and show the desktop-style "Finish" text link instead)
+
+## Out of scope
+
+- Three-dots menu changes
+- Any change to the "Move to Active" undo button on finished quests
+- Backend / data changes
