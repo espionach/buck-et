@@ -479,6 +479,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
           )}
         </AnimatePresence>
       </motion.div>
+      </div>
 
       {/* Delete confirmation */}
       <AnimatePresence>
