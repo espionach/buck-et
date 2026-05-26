@@ -431,16 +431,15 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
               {showComments ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
             </button>
 
-            {!isFinished && isOwner && !hideActions && (
+            {canFinish && !isMobile && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   handleMarkDone();
                 }}
-                className="flex items-center gap-1 text-xs text-secondary font-semibold"
+                className="text-xs font-medium text-muted-foreground/70 hover:text-secondary transition-colors"
               >
-                <Check className="w-3.5 h-3.5" />
-                Finish Sidequest
+                Finish
               </button>
             )}
 
