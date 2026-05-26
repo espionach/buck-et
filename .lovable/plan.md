@@ -1,49 +1,40 @@
-# Nudge Feature Plan
+# Nudge-from-empty-state CTA
 
-Let quest owners "nudge" friends/group members from the quest details page.
+## Behavior
 
-## UX
+On a friend's profile, "Active" tab empty state currently shows: "No upcoming sidequests" + "Create sidequest" CTA. Change so it depends on the **current user's** active quests:
 
-**In the "Who's In" box on `QuestDetail` (owner only):**
-- A new `Send a nudge` button under the participant chips with a one-line description: *"Give friends a friendly poke to join or remember this quest."*
+- **Current user has ≥1 active quest** → Title: "No active sidequests yet". Message: "Nudge them to join one of yours." CTA: **Send a nudge** (orange primary button).
+- **Current user has 0 active quests** → keep existing "Create sidequest" CTA (message: "Nothing planned right now. Start something they can join.").
 
-**Nudge picker modal (full-screen sheet on mobile):**
-- Header: "Send a nudge" + close (X).
-- Sticky search bar at top (filter by name/username).
-- List of candidates, one row each:
-  - Avatar + name + @username
-  - Right side: tap-target circle. Unselected = empty outline circle. Selected = filled orange circle with white check.
-- **Candidate pool:** all friends for a friends-only quest, or all members of the group for a group quest (excluding the owner). Participants are included and shown with a small "Joined" pill so the owner knows.
-- Optional **note field** (single line, ~140 chars, placeholder "Add a note (optional)").
-- Floating sticky bottom bar appears when ≥1 person is selected: orange `Send a nudge! (N)` button. Hidden when 0 selected.
-- Per-recipient throttle: if a person was nudged for this quest in the last 24h, their row is disabled with a "Nudged recently" subtext and they can't be selected.
+The "Past" tab empty state is unchanged.
 
-**Recipient side:**
-- Inbox notification (bell badge increments) of type `nudge`, deep-linking to the quest.
-- In-app toast pops if they're active in the app at delivery time (via existing realtime notifications channel).
-- True device push is out of scope for this change — the app isn't wrapped with Capacitor/PWA push yet; the inbox + realtime toast is what's wired today. I'll call this out so we can layer real push later without rework.
+## Nudge flow from this CTA
+
+Tapping **Send a nudge** opens a new lightweight picker (modal/sheet) listing the current user's active sidequests. Each row is tappable:
+
+- Tap a quest row → navigate to `/quest/:id` (QuestDetail). The friend whose profile we came from is passed via router state as `prefillNudgeUserId`, and QuestDetail auto-opens the existing `NudgeModal` with that friend pre-selected.
+- The picker has a close (X) button; QuestDetail already has back navigation. Friend's profile stays in history so back returns there.
+
+If the current user has only 1 active quest, skip the picker and go straight to that quest with the modal pre-opened.
 
 ## Technical details
 
-**Database (migration):**
-- Add `'nudge'` as an allowed value wherever notification `type` is constrained (currently free-text, so no schema change needed — just use `type = 'nudge'`).
-- New table `quest_nudges` (for the 24h throttle + audit):
-  - `id`, `sidequest_id`, `from_user_id` (owner), `to_user_id`, `note text`, `created_at`.
-  - Unique-ish lookup index on `(sidequest_id, to_user_id, created_at desc)`.
-  - RLS: insert only if `auth.uid() = from_user_id` AND caller is the quest owner (`is_sidequest_owner`). Select rows where `from_user_id = auth.uid() OR to_user_id = auth.uid()`.
+**`src/components/UserProfileView.tsx`**
+- Compute `myActiveQuests = quests.filter(q => (q.createdBy.id === currentUser.id || q.participants.some(p => p.id === currentUser.id)) && !isQuestCompleted(q))`.
+- Replace the `EmptyState` in the `tab === "current"` branch with conditional props based on `myActiveQuests.length`.
+- Add local state `showNudgePicker` and render a new `<NudgeQuestPicker>` modal (see below). Handle the single-quest shortcut inline.
 
-**Notification row** (existing `notifications` table):
-- `type = 'nudge'`, `from_user_id = owner`, `user_id = recipient`, `entity_id = quest.id`, `message` = owner's note or default `"<Owner name> nudged you about <Quest title>"`.
+**`src/components/NudgeQuestPicker.tsx`** (new, small)
+- Props: `quests: Quest[]`, `targetUser: User`, `onClose`, navigates with `navigate(`/quest/${id}`, { state: { prefillNudgeUserId: targetUser.id } })`.
+- Centered card modal matching existing "Friends" modal style in UserProfileView (max-h-[60vh], scroll). Each row: quest title + small meta (date), tappable. Uses `usePopup`.
 
-**Frontend:**
-- New component `src/components/NudgeModal.tsx` — search, list, selection state, send action.
-- Hook `useCandidatesForNudge(quest)` — friends list for friends-only quest, group members for group quest.
-- Wire into `QuestDetail.tsx` Who's-In section, owner-gated.
-- Send flow: client-side check against `quest_nudges` for last-24h dedupe (defense-in-depth; the candidate list already filters them out), insert one `quest_nudges` row + one `notifications` row per recipient. Toast "Nudge sent!".
-- Notification rendering: extend the inbox/notification panel renderer to handle `type = 'nudge'` — icon (Hand or Bell), label, tap → navigate to `/quest/:id`.
-- Realtime: notifications channel already exists; nudges flow through automatically as toasts.
+**`src/pages/QuestDetail.tsx`**
+- Read `location.state?.prefillNudgeUserId`. On mount, if present **and** current user is owner, set `showNudgeModal = true` and pass an optional `initialSelectedUserId` prop into `<NudgeModal>`. Clear the state via `navigate(..., { replace: true, state: {} })` after consuming.
+
+**`src/components/NudgeModal.tsx`**
+- Accept new optional `initialSelectedUserId?: string`. On open, seed the `selected` set with that id if it's a valid candidate (not rate-limited).
 
 ## Out of scope
-- Real device push (requires PWA service worker + push subscription or Capacitor setup; can be layered later).
-- Nudging non-friends / non-group-members.
-- Rich attachments on the note.
+
+- No DB / RLS changes. No changes to notification delivery. No copy changes elsewhere.

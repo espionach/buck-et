@@ -11,7 +11,7 @@ import { ArrowLeft, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send,
 import NudgeModal from "@/components/NudgeModal";
 import EmptyState from "@/components/EmptyState";
 import { useState, useEffect, useRef } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePopup } from "@/hooks/use-popup";
 import { useAuth } from "@/contexts/AuthContext";
@@ -42,6 +42,7 @@ const volunteerRoles = ALL_CONTRIBUTION_ROLES;
 
 const QuestDetail = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { questId } = useParams<{ questId: string }>();
   const { user, loading: authLoading } = useAuth();
   const { data: hydratedQuests, isLoading: questsLoading, isFetching: questsFetching } = useQuests();
@@ -50,11 +51,25 @@ const QuestDetail = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showReport, setShowReport] = useState(false);
   const [showNudge, setShowNudge] = useState(false);
+  const [prefillNudgeUserId, setPrefillNudgeUserId] = useState<string | null>(null);
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
   const [joinAnim, setJoinAnim] = useState<"idle" | "morph" | "exit" | "done">("idle");
   usePopup(showDeleteConfirm);
 
   useEffect(() => { window.scrollTo(0, 0); }, [questId]);
+
+  // Auto-open nudge modal with a preselected target (e.g., from a friend's profile)
+  useEffect(() => {
+    const state = location.state as { prefillNudgeUserId?: string } | null;
+    const targetId = state?.prefillNudgeUserId;
+    if (!targetId) return;
+    const q = (hydratedQuests ?? quests).find((qq) => qq.id === questId);
+    if (!q) return;
+    if (q.createdBy.id !== currentUser.id) return;
+    setPrefillNudgeUserId(targetId);
+    setShowNudge(true);
+    navigate(location.pathname, { replace: true, state: {} });
+  }, [location.state, location.pathname, hydratedQuests, quests, questId, currentUser.id, navigate]);
 
   const questList = hydratedQuests ?? quests;
   const quest = questList.find((q) => q.id === questId);
@@ -394,7 +409,13 @@ const QuestDetail = () => {
             )}
           </div>
         </div>
-        <NudgeModal open={showNudge} onClose={() => setShowNudge(false)} quest={quest} />
+        <NudgeModal
+          open={showNudge}
+          onClose={() => { setShowNudge(false); setPrefillNudgeUserId(null); }}
+          quest={quest}
+          initialSelectedUserId={prefillNudgeUserId}
+        />
+
 
         {/* Logistics Section */}
         <div className="p-4 rounded-xl border border-border/50 bg-card space-y-3">

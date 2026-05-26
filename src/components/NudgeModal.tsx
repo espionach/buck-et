@@ -15,11 +15,12 @@ interface NudgeModalProps {
   open: boolean;
   onClose: () => void;
   quest: Quest;
+  initialSelectedUserId?: string | null;
 }
 
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
-const NudgeModal = ({ open, onClose, quest }: NudgeModalProps) => {
+const NudgeModal = ({ open, onClose, quest, initialSelectedUserId }: NudgeModalProps) => {
   const { currentUser, friends, groups } = useAppStore();
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -44,6 +45,19 @@ const NudgeModal = ({ open, onClose, quest }: NudgeModalProps) => {
       setNote("");
     }
   }, [open]);
+
+  // Seed preselected user (e.g., from a friend's profile CTA) once candidates & throttle are known
+  useEffect(() => {
+    if (!open || !initialSelectedUserId) return;
+    if (recentNudges.has(initialSelectedUserId)) return;
+    if (!candidates.some((c) => c.id === initialSelectedUserId)) return;
+    setSelected((prev) => {
+      if (prev.has(initialSelectedUserId)) return prev;
+      const next = new Set(prev);
+      next.add(initialSelectedUserId);
+      return next;
+    });
+  }, [open, initialSelectedUserId, candidates, recentNudges]);
 
   // Load who's been nudged in the last 24h for this quest
   useEffect(() => {
