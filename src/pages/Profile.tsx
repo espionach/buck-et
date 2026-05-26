@@ -211,6 +211,13 @@ const Profile = () => {
 
   const active = tab === "current" ? current : tab === "past" ? past : [];
 
+  // Local-only drafts count — refresh on mount + when location changes (e.g. returning from /drafts or /create)
+  const [draftCount, setDraftCount] = useState(0);
+  useEffect(() => {
+    if (!currentUser?.id) return;
+    setDraftCount(listDrafts(currentUser.id).length);
+  }, [currentUser?.id, location.key]);
+
   const handleSaveProfile = async () => {
     const trimmedUsername = editUsername.trim();
     setUsernameError(null);
