@@ -699,6 +699,22 @@ const Profile = () => {
         )}
       </AnimatePresence>
 
+      {/* Drafts shortcut — sits just above the tab bar, right-aligned */}
+      {tab === "current" && draftCount > 0 && (
+        <div className="flex justify-end mb-2">
+          <button
+            onClick={() => nav("/drafts")}
+            className="flex items-center gap-1.5 text-xs font-semibold text-foreground group"
+          >
+            <FileText className="w-3.5 h-3.5 text-muted-foreground" />
+            <span>
+              Drafts <span className="text-muted-foreground font-normal">({draftCount})</span>
+            </span>
+            <ChevronRight className="w-3.5 h-3.5 text-muted-foreground group-active:translate-x-0.5 transition-transform" />
+          </button>
+        </div>
+      )}
+
       {/* Tabs */}
       <div className="flex bg-muted rounded-2xl p-1 mb-5">
         {(["current", "past", "groups"] as const).map((t) => (
@@ -726,22 +742,7 @@ const Profile = () => {
         animate={{ opacity: 1, y: 0 }}
         className={tab === "groups" ? "" : "divide-y divide-border"}
       >
-        {tab === "current" && draftCount > 0 && (
-          <button
-            onClick={() => nav("/drafts")}
-            className="w-full flex items-center justify-between py-3 px-1 group"
-          >
-            <span className="flex items-center gap-2">
-              <span className="p-1.5 rounded-lg bg-muted">
-                <FileText className="w-3.5 h-3.5 text-muted-foreground" />
-              </span>
-              <span className="text-sm font-semibold text-foreground">
-                Drafts <span className="text-muted-foreground font-normal">({draftCount})</span>
-              </span>
-            </span>
-            <ChevronRight className="w-4 h-4 text-muted-foreground group-active:translate-x-0.5 transition-transform" />
-          </button>
-        )}
+
         {tab === "groups" ? (
           <MyGroupsTab />
         ) : active.length === 0 ? (
