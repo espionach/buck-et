@@ -14,8 +14,10 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { usePopup } from "@/hooks/use-popup";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { format, parseISO } from "date-fns";
 import { toast } from "sonner";
+import { useMotionValue, useTransform, animate as motionAnimate } from "framer-motion";
 
 interface QuestCardProps {
   quest: Quest;
