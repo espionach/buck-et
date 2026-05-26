@@ -94,6 +94,14 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
   // Three-dots menu: owners get Edit/Pin/Delete; non-owners get Share/Report.
   const showThreeDots = !isFinished;
 
+  // Finish action (owner-only, active quests).
+  const canFinish = isOwner && !isFinished && !hideActions;
+  const isMobile = useIsMobile();
+  const swipeX = useMotionValue(0);
+  const underlayOpacity = useTransform(swipeX, [0, 40, 96], [0, 0.6, 1]);
+  const wasDragged = useRef(false);
+  const enableSwipe = canFinish && isMobile;
+
   const handleShare = async () => {
     const url = `${window.location.origin}/quest/${quest.id}`;
     const shareData = {
