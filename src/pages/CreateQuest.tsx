@@ -282,6 +282,7 @@ const CreateQuest = () => {
       if (isOnboarding && user) {
         await completeOnboarding(user.id);
       }
+      submittedRef.current = true;
       if (isOnboarding) {
         // After their first sidequest, send them to their profile so they
         // can see it sitting in their Active list.
