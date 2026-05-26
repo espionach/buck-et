@@ -22,6 +22,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { getUserFriendlyError } from "@/lib/errorMapping";
 import { validateContent } from "@/lib/contentFilter";
 import LocationPicker, { LocationValue } from "@/components/LocationPicker";
+import { listDrafts } from "@/lib/drafts";
+import { FileText, ChevronRight } from "lucide-react";
 const Profile = () => {
   const {
     currentUser,
@@ -208,6 +210,13 @@ const Profile = () => {
     });
 
   const active = tab === "current" ? current : tab === "past" ? past : [];
+
+  // Local-only drafts count — refresh on mount + when location changes (e.g. returning from /drafts or /create)
+  const [draftCount, setDraftCount] = useState(0);
+  useEffect(() => {
+    if (!currentUser?.id) return;
+    setDraftCount(listDrafts(currentUser.id).length);
+  }, [currentUser?.id, location.key]);
 
   const handleSaveProfile = async () => {
     const trimmedUsername = editUsername.trim();
@@ -717,6 +726,22 @@ const Profile = () => {
         animate={{ opacity: 1, y: 0 }}
         className={tab === "groups" ? "" : "divide-y divide-border"}
       >
+        {tab === "current" && draftCount > 0 && (
+          <button
+            onClick={() => nav("/drafts")}
+            className="w-full flex items-center justify-between py-3 px-1 group"
+          >
+            <span className="flex items-center gap-2">
+              <span className="p-1.5 rounded-lg bg-muted">
+                <FileText className="w-3.5 h-3.5 text-muted-foreground" />
+              </span>
+              <span className="text-sm font-semibold text-foreground">
+                Drafts <span className="text-muted-foreground font-normal">({draftCount})</span>
+              </span>
+            </span>
+            <ChevronRight className="w-4 h-4 text-muted-foreground group-active:translate-x-0.5 transition-transform" />
+          </button>
+        )}
         {tab === "groups" ? (
           <MyGroupsTab />
         ) : active.length === 0 ? (
