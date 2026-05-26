@@ -60,6 +60,9 @@ const CreateQuest = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Contributions the creator wants to open up for sign-ups
+  const [contributionRoles, setContributionRoles] = useState<string[]>([]);
+
   // Draft tracking — stable id, hydration on mount, autosave on unmount
   const draftIdRef = useRef<string>(searchParams.get("draftId") || newDraftId());
   const submittedRef = useRef(false);
@@ -143,9 +146,6 @@ const CreateQuest = () => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser?.id]);
-
-  // Contributions the creator wants to open up for sign-ups
-  const [contributionRoles, setContributionRoles] = useState<string[]>([]);
 
   const toggleContributionRole = (id: string) => {
     setContributionRoles((prev) =>
