@@ -15,11 +15,12 @@ interface NudgeModalProps {
   open: boolean;
   onClose: () => void;
   quest: Quest;
+  initialSelectedUserId?: string | null;
 }
 
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
-const NudgeModal = ({ open, onClose, quest }: NudgeModalProps) => {
+const NudgeModal = ({ open, onClose, quest, initialSelectedUserId }: NudgeModalProps) => {
   const { currentUser, friends, groups } = useAppStore();
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
