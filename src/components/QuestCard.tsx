@@ -445,15 +445,14 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
               </button>
             )}
 
-            {isFinished && isOwner && !hideActions && (
+            {canUndo && !isMobile && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   handleMarkUndone();
                 }}
-                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground font-semibold transition-colors"
+                className="text-xs font-medium text-muted-foreground hover:text-secondary underline-offset-4 hover:underline transition-colors"
               >
-                <Undo2 className="w-3.5 h-3.5" />
                 Move to Active
               </button>
             )}
