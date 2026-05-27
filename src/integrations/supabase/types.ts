@@ -172,6 +172,51 @@ export type Database = {
           },
         ]
       }
+      contact_discovery_consents: {
+        Row: {
+          enabled: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          enabled?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          enabled?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      contact_identifiers: {
+        Row: {
+          created_at: string
+          hash_sha256: string
+          id: string
+          kind: string
+          user_id: string
+          verified_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          hash_sha256: string
+          id?: string
+          kind: string
+          user_id: string
+          verified_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          hash_sha256?: string
+          id?: string
+          kind?: string
+          user_id?: string
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       friend_requests: {
         Row: {
           created_at: string
