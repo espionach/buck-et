@@ -154,7 +154,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
         onDragEnd={(_, info) => {
           if (info.offset.x > 64 || info.velocity.x > 400) {
             motionAnimate(swipeX, 400, { duration: 0.2 });
-            setTimeout(() => handleMarkDone(), 180);
+            setTimeout(() => (canUndo ? handleMarkUndone() : handleMarkDone()), 180);
           } else {
             motionAnimate(swipeX, 0, { type: "spring", stiffness: 400, damping: 35 });
           }
