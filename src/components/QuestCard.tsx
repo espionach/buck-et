@@ -96,11 +96,13 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
 
   // Finish action (owner-only, active quests).
   const canFinish = isOwner && !isFinished && !hideActions;
+  // Move-to-active action (owner-only, finished quests).
+  const canUndo = isOwner && isFinished && !hideActions;
   const isMobile = useIsMobile();
   const swipeX = useMotionValue(0);
   const underlayOpacity = useTransform(swipeX, [0, 40, 96], [0, 0.6, 1]);
   const wasDragged = useRef(false);
-  const enableSwipe = canFinish && isMobile;
+  const enableSwipe = (canFinish || canUndo) && isMobile;
 
   const handleShare = async () => {
     const url = `${window.location.origin}/quest/${quest.id}`;
@@ -131,11 +133,11 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
         {enableSwipe && (
           <motion.div
             style={{ opacity: underlayOpacity }}
-            className="absolute inset-0 flex items-center justify-start pl-6 bg-secondary text-secondary-foreground rounded-xl pointer-events-none"
+            className={`absolute inset-0 flex items-center justify-start pl-6 rounded-xl pointer-events-none ${canUndo ? "bg-muted text-foreground" : "bg-secondary text-secondary-foreground"}`}
           >
             <div className="flex items-center gap-2 text-sm font-semibold">
-              <Check className="w-4 h-4" />
-              Finish
+              {canUndo ? <Undo2 className="w-4 h-4" /> : <Check className="w-4 h-4" />}
+              {canUndo ? "Move to Active" : "Finish"}
             </div>
           </motion.div>
         )}
@@ -152,7 +154,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
         onDragEnd={(_, info) => {
           if (info.offset.x > 64 || info.velocity.x > 400) {
             motionAnimate(swipeX, 400, { duration: 0.2 });
-            setTimeout(() => handleMarkDone(), 180);
+            setTimeout(() => (canUndo ? handleMarkUndone() : handleMarkDone()), 180);
           } else {
             motionAnimate(swipeX, 0, { type: "spring", stiffness: 400, damping: 35 });
           }
@@ -443,15 +445,14 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
               </button>
             )}
 
-            {isFinished && isOwner && !hideActions && (
+            {canUndo && !isMobile && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   handleMarkUndone();
                 }}
-                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground font-semibold transition-colors"
+                className="text-xs font-medium text-muted-foreground hover:text-secondary underline-offset-4 hover:underline transition-colors"
               >
-                <Undo2 className="w-3.5 h-3.5" />
                 Move to Active
               </button>
             )}
