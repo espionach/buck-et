@@ -133,11 +133,11 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
         {enableSwipe && (
           <motion.div
             style={{ opacity: underlayOpacity }}
-            className="absolute inset-0 flex items-center justify-start pl-6 bg-secondary text-secondary-foreground rounded-xl pointer-events-none"
+            className={`absolute inset-0 flex items-center justify-start pl-6 rounded-xl pointer-events-none ${canUndo ? "bg-muted text-foreground" : "bg-secondary text-secondary-foreground"}`}
           >
             <div className="flex items-center gap-2 text-sm font-semibold">
-              <Check className="w-4 h-4" />
-              Finish
+              {canUndo ? <Undo2 className="w-4 h-4" /> : <Check className="w-4 h-4" />}
+              {canUndo ? "Move to Active" : "Finish"}
             </div>
           </motion.div>
         )}
