@@ -435,7 +435,7 @@ const Profile = () => {
   // Edit profile full-page view
   if (showEditProfile) {
     return (
-      <div className="min-h-screen pb-40 px-5 pt-14">
+      <div className="min-h-screen pb-20 px-5 pt-14">
         <button
           onClick={() => setShowEditProfile(false)}
           className="p-2 rounded-xl bg-muted text-muted-foreground mb-4"
@@ -590,7 +590,7 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen pb-40 px-5 pt-14">
+    <div className="min-h-screen pb-20 px-5 pt-14">
       {/* Top right — Notifications & Settings */}
       <div className="absolute top-4 right-4 flex items-center gap-1">
         <NotificationBell />
