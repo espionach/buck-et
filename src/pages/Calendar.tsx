@@ -18,6 +18,7 @@ const CalendarPage = () => {
   const location = useLocation();
   const { quests, groups, currentUser } = useAppStore();
   const [selected, setSelected] = useState<Date | undefined>(undefined);
+  const [month, setMonth] = useState<Date>(startOfDay(new Date()));
   const activeDate = selected ?? startOfDay(new Date());
 
   // User's scheduled quests (owner or participant) with a date set
