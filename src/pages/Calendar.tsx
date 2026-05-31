@@ -111,8 +111,8 @@ const CalendarPage = () => {
           }}
           classNames={{
             day_selected:
-              "bg-muted text-foreground hover:bg-muted hover:text-foreground focus:bg-muted focus:text-foreground",
-            day_today: "bg-muted text-foreground",
+              "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground rounded-md",
+            day_today: "bg-muted text-foreground rounded-md",
           }}
           className="p-3 pointer-events-auto mx-auto"
         />
