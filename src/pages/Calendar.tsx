@@ -17,7 +17,8 @@ const CalendarPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { quests, groups, currentUser } = useAppStore();
-  const [selected, setSelected] = useState<Date>(startOfDay(new Date()));
+  const [selected, setSelected] = useState<Date | undefined>(undefined);
+  const activeDate = selected ?? startOfDay(new Date());
 
   // User's scheduled quests (owner or participant) with a date set
   const myDatedQuests = useMemo(() => {
@@ -57,7 +58,7 @@ const CalendarPage = () => {
     [questsByDay],
   );
 
-  const selectedKey = dateKey(selected);
+  const selectedKey = dateKey(activeDate);
   const selectedQuests = questsByDay.get(selectedKey) ?? [];
 
   const groupById = useMemo(() => {
@@ -101,8 +102,8 @@ const CalendarPage = () => {
         <Calendar
           mode="single"
           selected={selected}
-          onSelect={(d) => d && setSelected(startOfDay(d))}
-          month={selected}
+          onSelect={(d) => setSelected(d ? startOfDay(d) : undefined)}
+          month={activeDate}
           onMonthChange={(m) => setSelected(startOfDay(m))}
           modifiers={{ hasQuest: daysWithQuests }}
           modifiersClassNames={{
@@ -111,8 +112,8 @@ const CalendarPage = () => {
           }}
           classNames={{
             day_selected:
-              "bg-muted text-foreground hover:bg-muted hover:text-foreground focus:bg-muted focus:text-foreground",
-            day_today: "bg-muted text-foreground",
+              "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground rounded-full",
+            day_today: "bg-muted text-foreground rounded-full",
           }}
           className="p-3 pointer-events-auto mx-auto"
         />
@@ -121,7 +122,7 @@ const CalendarPage = () => {
 
       <div className="mt-6">
         <h2 className="text-sm font-bold text-foreground mb-3">
-          {format(selected, "EEEE, MMM d")}
+          {format(activeDate, "EEEE, MMM d")}
         </h2>
 
         {myDatedQuests.length === 0 ? (
@@ -143,7 +144,7 @@ const CalendarPage = () => {
               const group = q.groupId ? groupById.get(q.groupId) : undefined;
               const time = formatTime(q.logistics?.time);
               const location = q.logistics?.location;
-              const past = isPast(selected) && !isSameDay(selected, new Date());
+              const past = isPast(activeDate) && !isSameDay(activeDate, new Date());
 
               return (
                 <button
