@@ -102,8 +102,8 @@ const CalendarPage = () => {
         <Calendar
           mode="single"
           selected={selected}
-          onSelect={(d) => d && setSelected(startOfDay(d))}
-          month={selected}
+          onSelect={(d) => setSelected(d ? startOfDay(d) : undefined)}
+          month={activeDate}
           onMonthChange={(m) => setSelected(startOfDay(m))}
           modifiers={{ hasQuest: daysWithQuests }}
           modifiersClassNames={{
@@ -112,8 +112,8 @@ const CalendarPage = () => {
           }}
           classNames={{
             day_selected:
-              "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground rounded-md",
-            day_today: "bg-muted text-foreground rounded-md",
+              "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground rounded-full",
+            day_today: "bg-muted text-foreground rounded-full",
           }}
           className="p-3 pointer-events-auto mx-auto"
         />
