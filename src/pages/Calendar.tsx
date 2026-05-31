@@ -147,8 +147,8 @@ const CalendarPage = () => {
             day: "h-10 w-10 p-0 font-normal text-base text-foreground hover:bg-muted/60 rounded-full transition-colors aria-selected:opacity-100 inline-flex items-center justify-center",
             day_outside: "text-muted-foreground opacity-50",
             day_selected:
-              "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground rounded-full",
-            day_today: "bg-muted text-foreground rounded-full",
+              "!rounded-full bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+            day_today: "!rounded-full bg-muted text-foreground",
           }}
           className="p-0 pointer-events-auto w-full"
         />
