@@ -101,7 +101,7 @@ const CalendarPage = () => {
               onClick={() => {
                 const today = startOfDay(new Date());
                 setMonth(today);
-                setSelected(undefined);
+                setSelected(today);
               }}
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
