@@ -58,7 +58,7 @@ const CalendarPage = () => {
     [questsByDay],
   );
 
-  const selectedKey = dateKey(selected);
+  const selectedKey = dateKey(activeDate);
   const selectedQuests = questsByDay.get(selectedKey) ?? [];
 
   const groupById = useMemo(() => {
