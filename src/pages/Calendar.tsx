@@ -144,7 +144,7 @@ const CalendarPage = () => {
               const group = q.groupId ? groupById.get(q.groupId) : undefined;
               const time = formatTime(q.logistics?.time);
               const location = q.logistics?.location;
-              const past = isPast(selected) && !isSameDay(selected, new Date());
+              const past = isPast(activeDate) && !isSameDay(activeDate, new Date());
 
               return (
                 <button
