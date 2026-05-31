@@ -109,6 +109,11 @@ const CalendarPage = () => {
             hasQuest:
               "relative after:content-[''] after:absolute after:left-1/2 after:-translate-x-1/2 after:bottom-1 after:w-1 after:h-1 after:rounded-full after:bg-primary",
           }}
+          classNames={{
+            day_selected:
+              "bg-muted text-foreground hover:bg-muted hover:text-foreground focus:bg-muted focus:text-foreground",
+            day_today: "bg-muted text-foreground",
+          }}
           className="p-3 pointer-events-auto mx-auto"
         />
       </div>
