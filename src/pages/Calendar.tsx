@@ -122,7 +122,7 @@ const CalendarPage = () => {
 
       <div className="mt-6">
         <h2 className="text-sm font-bold text-foreground mb-3">
-          {format(selected, "EEEE, MMM d")}
+          {format(activeDate, "EEEE, MMM d")}
         </h2>
 
         {myDatedQuests.length === 0 ? (
