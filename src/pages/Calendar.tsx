@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { format, parseISO, isSameDay, isPast, startOfDay } from "date-fns";
-import { Calendar as CalendarIcon, Clock, MapPin } from "lucide-react";
+import { format, parseISO, isSameDay, isPast, startOfDay, addMonths, subMonths } from "date-fns";
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Clock, MapPin } from "lucide-react";
 
 import { Calendar } from "@/components/ui/calendar";
 import { useAppStore } from "@/data/appState";
