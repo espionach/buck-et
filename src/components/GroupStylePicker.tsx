@@ -143,7 +143,7 @@ const GroupStylePicker = ({ value, onChange }: GroupStylePickerProps) => {
                 onClick={() => setPattern(p.id)}
                 aria-label={p.label}
                 title={p.label}
-                className={`relative h-12 rounded-xl border overflow-hidden transition-transform active:scale-95 bg-muted/40 ${
+                className={`relative h-12 rounded-xl border overflow-hidden transition-transform active:scale-95 bg-muted-foreground/60 ${
                   selected ? "ring-2 ring-foreground border-transparent" : "border-border/50"
                 }`}
               >
