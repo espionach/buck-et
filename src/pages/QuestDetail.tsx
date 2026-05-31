@@ -173,7 +173,7 @@ const QuestDetail = () => {
           <div className="flex-1 min-w-0">
             <h1 className="text-lg font-bold text-foreground">{quest.title}</h1>
             <p className="text-xs text-muted-foreground">
-              {group ? <span className="flex items-center gap-1"><GroupSwatch color={group.color} size={12} />{group.name}</span> : <span className="flex items-center gap-1"><Globe className="w-3 h-3" />Friends only</span>}
+              {group ? <span className="flex items-center gap-1"><GroupSwatch color={group.color} size={12} />{group.name}</span> : <span className="flex items-center gap-1"><Globe className="w-3 h-3" />Friends</span>}
             </p>
           </div>
 
