@@ -289,7 +289,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
               {quest.createdBy.name}
             </button>
             <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">
-              {group ? <span className="inline-flex items-center gap-1"><GroupSwatch color={group.color} size={12} />{group.name}</span> : <span className="inline-flex items-center gap-1"><Globe className="w-3 h-3" />Friends only</span>}
+              {group ? <span className="inline-flex items-center gap-1"><GroupSwatch color={group.color} size={12} />{group.name}</span> : <span className="inline-flex items-center gap-1"><Globe className="w-3 h-3" />Friends</span>}
             </p>
           </div>
         </div>
