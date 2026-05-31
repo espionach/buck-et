@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { format, parseISO, isSameDay, isPast, startOfDay } from "date-fns";
-import { Calendar as CalendarIcon, Clock, MapPin } from "lucide-react";
+import { format, parseISO, isSameDay, isPast, startOfDay, addMonths, subMonths } from "date-fns";
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Clock, MapPin } from "lucide-react";
 
 import { Calendar } from "@/components/ui/calendar";
 import { useAppStore } from "@/data/appState";
@@ -18,6 +18,7 @@ const CalendarPage = () => {
   const location = useLocation();
   const { quests, groups, currentUser } = useAppStore();
   const [selected, setSelected] = useState<Date | undefined>(undefined);
+  const [month, setMonth] = useState<Date>(startOfDay(new Date()));
   const activeDate = selected ?? startOfDay(new Date());
 
   // User's scheduled quests (owner or participant) with a date set
@@ -90,32 +91,66 @@ const CalendarPage = () => {
         <NotificationBell />
       </div>
 
-      <div className="mt-4 bg-card border border-border rounded-[var(--radius)] overflow-hidden">
-        <div className="flex justify-end px-3 pt-3">
-          <button
-            onClick={() => setSelected(startOfDay(new Date()))}
-            className="text-xs font-semibold text-primary px-3 py-1.5 rounded-lg border border-border hover:bg-muted/40 transition-colors"
-          >
-            Today
-          </button>
+      <div className="mt-4">
+        <div className="flex items-center justify-between mb-2 px-1">
+          <h2 className="text-lg font-bold text-foreground">
+            {format(month, "MMMM yyyy")}
+          </h2>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                const today = startOfDay(new Date());
+                setMonth(today);
+                setSelected(undefined);
+              }}
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Today
+            </button>
+            <button
+              onClick={() => setMonth((m) => subMonths(m, 1))}
+              aria-label="Previous month"
+              className="p-1 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => setMonth((m) => addMonths(m, 1))}
+              aria-label="Next month"
+              className="p-1 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
         </div>
         <Calendar
           mode="single"
           selected={selected}
           onSelect={(d) => setSelected(d ? startOfDay(d) : undefined)}
-          month={activeDate}
-          onMonthChange={(m) => setSelected(startOfDay(m))}
+          month={month}
+          onMonthChange={setMonth}
           modifiers={{ hasQuest: daysWithQuests }}
           modifiersClassNames={{
             hasQuest:
               "relative after:content-[''] after:absolute after:left-1/2 after:-translate-x-1/2 after:bottom-1 after:w-1 after:h-1 after:rounded-full after:bg-primary",
           }}
           classNames={{
+            caption: "hidden",
+            nav: "hidden",
+            months: "w-full",
+            month: "w-full space-y-2",
+            table: "w-full border-collapse",
+            head_row: "flex w-full justify-between",
+            head_cell: "text-muted-foreground font-normal text-[0.8rem] flex-1 text-center",
+            row: "flex w-full justify-between mt-2",
+            cell: "flex-1 flex justify-center p-0 relative",
+            day: "h-10 w-10 p-0 font-normal text-base text-foreground hover:bg-muted/60 rounded-full transition-colors aria-selected:opacity-100 inline-flex items-center justify-center",
+            day_outside: "text-muted-foreground opacity-50",
             day_selected:
               "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground rounded-full",
             day_today: "bg-muted text-foreground rounded-full",
           }}
-          className="p-3 pointer-events-auto mx-auto"
+          className="p-0 pointer-events-auto w-full"
         />
       </div>
 
