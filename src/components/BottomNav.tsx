@@ -28,7 +28,7 @@ const BottomNav = () => {
                   state: { from: location.pathname + location.search },
                 })
               }
-              className="pointer-events-auto flex items-center justify-center w-14 h-14 rounded-full bg-primary shadow-lg shadow-primary/30 active:scale-95 transition-transform"
+              className="pointer-events-auto flex items-center justify-center w-14 h-14 rounded-full bg-primary shadow-lg shadow-primary/30 hover:bg-primary/90 active:scale-95 transition-all"
             >
               <Plus className="w-7 h-7 text-primary-foreground" />
             </button>
