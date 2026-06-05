@@ -407,6 +407,11 @@ const QuestDetail = () => {
                 <span className="text-[10px] font-semibold text-primary shrink-0">Nudge →</span>
               </button>
             )}
+            {!isOwner && (
+              <p className="mt-3 text-[11px] text-muted-foreground italic">
+                Only {quest.createdBy.name.split(" ")[0]} can nudge people about this sidequest.
+              </p>
+            )}
           </div>
         </div>
         <NudgeModal
