@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft, Trash2, FileText, AlertTriangle } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAppStore } from "@/data/appState";
