@@ -299,23 +299,33 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
           <h4 className="font-display font-bold text-foreground leading-snug text-[15px] flex-1 min-w-0">{quest.title}</h4>
 
           {!isFinished && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleToggleImIn();
-              }}
-              disabled={!canJoin}
-              className={`shrink-0 flex items-center justify-center transition-all active:scale-95 px-3 py-1.5 rounded-full text-xs font-semibold ${
-                isIn
-                  ? "bg-background text-primary border border-primary hover:bg-primary/5"
-                  : !canJoin
-                  ? "bg-primary/40 text-primary-foreground/70 cursor-not-allowed"
-                  : "bg-primary text-primary-foreground hover:bg-primary/90"
-              }`}
-            >
-              {isIn ? "Joined" : "Join"}
-            </button>
+            isOwner ? (
+              <span
+                aria-label="You own this sidequest"
+                className="shrink-0 flex items-center justify-center px-3 py-1.5 rounded-full text-xs font-semibold bg-background text-primary border border-primary cursor-default select-none"
+              >
+                Owner
+              </span>
+            ) : (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleToggleImIn();
+                }}
+                disabled={!canJoin}
+                className={`shrink-0 flex items-center justify-center transition-all active:scale-95 px-3 py-1.5 rounded-full text-xs font-semibold ${
+                  isIn
+                    ? "bg-background text-primary border border-primary hover:bg-primary/5"
+                    : !canJoin
+                    ? "bg-primary/40 text-primary-foreground/70 cursor-not-allowed"
+                    : "bg-primary text-primary-foreground hover:bg-primary/90"
+                }`}
+              >
+                {isIn ? "Joined" : "Join"}
+              </button>
+            )
           )}
+
         </div>
 
         {/* Description */}
