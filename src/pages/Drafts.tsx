@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft, Trash2, FileText, AlertTriangle } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAppStore } from "@/data/appState";
@@ -21,6 +21,8 @@ function timeAgo(iso: string): string {
 
 const Drafts = () => {
   const nav = useNavigate();
+  const location = useLocation();
+  const backTo = (location.state as { from?: string } | null)?.from || "/profile";
   const { currentUser, groups } = useAppStore();
   const [drafts, setDrafts] = useState<QuestDraft[]>([]);
   const [confirmId, setConfirmId] = useState<string | null>(null);
@@ -45,7 +47,7 @@ const Drafts = () => {
     <div className="min-h-screen px-5 pt-14 pb-10">
       <div className="flex items-center gap-3 mb-5">
         <button
-          onClick={() => nav(-1)}
+          onClick={() => nav(backTo)}
           className="p-2 -ml-2 text-muted-foreground hover:text-foreground transition-colors"
           aria-label="Back"
         >
