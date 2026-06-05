@@ -15,8 +15,10 @@ interface NotificationPanelProps {
 
 const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
+const SEEN_STORAGE_KEY = "sq_notif_seen_ids";
+
 const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
-  const { notifications: allNotifications, markAllNotificationsRead, friendRequests, acceptFriendRequest, declineFriendRequest, clearNotification, clearAllNotifications } = useAppStore();
+  const { notifications: allNotifications, markNotificationRead, friendRequests, acceptFriendRequest, declineFriendRequest, clearNotification, clearAllNotifications } = useAppStore();
   const navigate = useNavigate();
   usePopup(open);
 
@@ -32,13 +34,36 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
     });
   }, [allNotifications]);
 
-  // Mark all as read the moment the panel opens.
+  // Two-stage read behavior:
+  // - First time the panel opens with a new unread notification, it stays
+  //   unread (orange dot, highlighted) so the user can spot it.
+  // - The NEXT time the panel opens, any notification that was already
+  //   "seen" on a previous open gets marked as read.
   useEffect(() => {
-    if (open && allNotifications.some((n) => !n.read)) {
-      markAllNotificationsRead();
+    if (!open) return;
+    let seenIds: string[] = [];
+    try {
+      seenIds = JSON.parse(localStorage.getItem(SEEN_STORAGE_KEY) || "[]");
+    } catch {
+      seenIds = [];
     }
+    const seenSet = new Set(seenIds);
+
+    // Mark as read any unread notification that was already seen previously.
+    allNotifications.forEach((n) => {
+      if (!n.read && seenSet.has(n.id)) {
+        markNotificationRead(n.id);
+      }
+    });
+
+    // Remember currently-unread IDs so they get marked read on the next open.
+    const currentUnreadIds = allNotifications
+      .filter((n) => !n.read)
+      .map((n) => n.id);
+    localStorage.setItem(SEEN_STORAGE_KEY, JSON.stringify(currentUnreadIds));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
+
 
 
 
@@ -298,8 +323,14 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
                       n.read ? "opacity-60" : "bg-primary/5"
                     }`}
                   >
-                    <div className="shrink-0 mt-0.5">
+                    <div className="shrink-0 mt-0.5 relative">
                       <UserAvatar user={n.fromUser} size="sm" />
+                      {!n.read && (
+                        <span
+                          aria-label="New notification"
+                          className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-primary ring-2 ring-card"
+                        />
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       {renderMessage(n)}
@@ -321,6 +352,7 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
+
                   </div>
                 );
               });
