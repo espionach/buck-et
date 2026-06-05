@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Bell, MessageCircle, UserPlus, ArrowRightLeft, Check, Users, Camera, HandMetal, UserMinus, CalendarClock, Ban, Clock, Sparkles, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { usePopup } from "@/hooks/use-popup";
-import { SECTION_ORDER, SECTION_LABEL, TYPE_TO_SECTION, NotificationType, NotifSection } from "@/data/notificationCategories";
+
 import EmptyState from "@/components/EmptyState";
 
 interface NotificationPanelProps {
@@ -254,21 +254,15 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
             </div>
 
             {(() => {
-              // Group notifications by section. Friend requests are pseudo-items
-              // that live in "social".
-              const grouped: Record<NotifSection, React.ReactNode[]> = {
-                social: [],
-                your_quests: [],
-                activity: [],
-                updates: [],
-              };
+              const friendRequestNodes: React.ReactNode[] = [];
+              const notificationNodes: React.ReactNode[] = [];
 
-              // 1. Friend requests → social
+              // 1. Pending friend requests grouped at the top
               friendRequests.forEach((req) => {
-                grouped.social.push(
+                friendRequestNodes.push(
                   <div
                     key={`fr-${req.id}`}
-                    className="flex items-center gap-3 p-4 border-b border-border/30 last:border-b-0 bg-primary/5"
+                    className="flex items-center gap-3 p-4 border-b border-border/30 bg-primary/5"
                   >
                     <div className="shrink-0">
                       <UserAvatar user={req.from} size="sm" />
@@ -298,9 +292,8 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
                 );
               });
 
-              // 2. Real notifications → routed to their section
+              // 2. All other notifications in a single chronological list
               notifications.forEach((n) => {
-                const section = TYPE_TO_SECTION[n.type as NotificationType] || "social";
                 // Group-related notifications are intentionally suppressed —
                 // users should not learn which private launch lists they're on.
                 if (
@@ -312,8 +305,7 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
                   return;
                 }
 
-
-                grouped[section].push(
+                notificationNodes.push(
                   <div
                     key={n.id}
                     role="button"
@@ -352,13 +344,11 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
-
                   </div>
                 );
               });
 
-
-              const isEmpty = SECTION_ORDER.every((s) => grouped[s].length === 0);
+              const isEmpty = friendRequestNodes.length === 0 && notificationNodes.length === 0;
 
               return (
                 <div className="max-h-[60vh] overflow-y-auto">
@@ -369,20 +359,15 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
                       description="Friend requests, comments, and updates will appear here."
                     />
                   ) : (
-                    SECTION_ORDER.filter((s) => grouped[s].length > 0).map((s) => (
-                      <div key={s}>
-                        <div className="px-4 pt-3 pb-1.5 bg-muted/30 border-b border-border/30">
-                          <h4 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                            {SECTION_LABEL[s]}
-                          </h4>
-                        </div>
-                        {grouped[s]}
-                      </div>
-                    ))
+                    <>
+                      {friendRequestNodes}
+                      {notificationNodes}
+                    </>
                   )}
                 </div>
               );
             })()}
+
           </motion.div>
         </motion.div>
       )}
