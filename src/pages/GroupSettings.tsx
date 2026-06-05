@@ -80,7 +80,7 @@ const GroupSettings = () => {
           />
           <button
             onClick={() => (editingName ? handleSaveName() : setEditingName(true))}
-            className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            className="p-2 text-muted-foreground hover:text-foreground transition-colors"
             aria-label={editingName ? "Save name" : "Edit name"}
           >
             {editingName ? <Check className="w-4 h-4 text-primary" /> : <Pencil className="w-4 h-4" />}
