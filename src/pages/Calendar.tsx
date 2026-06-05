@@ -17,7 +17,7 @@ const CalendarPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { quests, groups, currentUser } = useAppStore();
-  const [selected, setSelected] = useState<Date | undefined>(undefined);
+  const [selected, setSelected] = useState<Date | undefined>(() => startOfDay(new Date()));
   const [month, setMonth] = useState<Date>(startOfDay(new Date()));
   const activeDate = selected ?? startOfDay(new Date());
 
