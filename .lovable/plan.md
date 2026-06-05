@@ -1,28 +1,25 @@
-## Design System Unification
+## Update CreateQuest bottom action bar
 
-Based on your choices:
-- **Inputs** → Outlined (`bg-card border border-border`)
-- **Icon buttons** → Bare (no hover background)
-- **Cards** → Soft outlined with subtle shadow (`border border-border/50 shadow-sm`)
-- **FindFriends back** → Standard icon back button
+In `src/pages/CreateQuest.tsx` (lines 644–656), replace the single floating Launch button with a two-button row.
 
-### Changes
+### Layout
+- Container keeps fixed positioning, max-w-md, safe padding.
+- Inner: `flex gap-3`, each button `flex-1` so they are equal width.
 
-**1. Inputs — every text input/textarea standardized to `bg-card border border-border`**
-Affected files: `Feed.tsx`, `Home.tsx` (search), `Settings.tsx` (email, password, support textarea, etc.), `Profile.tsx` (edit name/bio + every modal field), `CreateQuest.tsx` & `EditQuest.tsx` (link sub-input), `CreateGroup.tsx` & `GroupMembers.tsx` (friend search), `AdminDashboard.tsx` (3 search inputs), `CommentThread.tsx` (reply + top-level), `NudgeModal.tsx` (search + custom message), `ReportUserModal.tsx`, `ReportContentModal.tsx`, `AddMembersModal.tsx`.
+### Left button — Drafts
+- Style: light grey (`bg-muted text-foreground`), same height/radius/shadow as Launch (`py-4 rounded-xl font-bold text-base`).
+- Icon: `FileText` (lucide).
+- Label: "Drafts".
+- Behavior: explicitly save current form as a draft via existing `saveDraft(...)` helper using `draftIdRef.current` (only if `draftHasContent`), then navigate back to the previous page (`navigate(-1)`). Skip save (and just navigate back) when there's no content.
+- Disabled while `submitting`.
 
-**2. Cards — soft outline + subtle shadow**
-Every `bg-card border border-border rounded-2xl` and `bg-card border border-border/50 rounded-2xl` updated to `bg-card border border-border/50 rounded-2xl shadow-sm`. Affected: `Settings.tsx`, `BlockedUsers.tsx`, `FindFriends.tsx`, `AdminDashboard.tsx`, `AdminReports.tsx`, `LegalUpdates.tsx`, `CommunityGuidelines.tsx`, `Profile.tsx`.
+### Right button — Launch
+- Style unchanged (orange `bg-primary text-primary-foreground`), now `flex-1` instead of `w-full`.
+- Icon: swap `Sparkles` → `Rocket` (lucide).
+- Label: "Launch" (shorter to fit half-width); keep "Launching…" while submitting.
+- Same disabled rule as today.
 
-**3. Icon buttons — strip hover backgrounds from header ghost buttons**
-- `GroupMembers.tsx:72` — remove `rounded-xl hover:bg-muted`
-- `GroupSettings.tsx:83` — remove `rounded-xl hover:bg-muted`
+### Imports
+- Add `Rocket`, `FileText` to the lucide-react import; remove `Sparkles` if no longer used elsewhere in the file (verify before removing).
 
-**4. FindFriends back button**
-Replace the text "← Back" link with the standard `<ArrowLeft>` icon button (`p-2 -ml-2 text-muted-foreground hover:text-foreground`) used everywhere else.
-
-### Out of scope
-- Auth pages (`Login`, `Signup`, `ForgotPassword`, `ResetPassword`) keep their bare shadcn `<Input>` — already consistent with each other; changing them would require restyling the shadcn primitive. Say the word and I'll align them too.
-- Inline action circles (accept/decline invite, photo-remove overlay, media viewer close) keep their filled-circle treatment — they're intentionally different from nav icons.
-
-Switch to build mode and approve to apply.
+No other files or business logic change. Autosave-on-unmount behavior is left intact.
