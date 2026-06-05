@@ -27,6 +27,7 @@ import QuestDetail from "./pages/QuestDetail";
 import EditQuest from "./pages/EditQuest";
 import Drafts from "./pages/Drafts";
 import NotFound from "./pages/NotFound";
+import NavAudit from "./pages/NavAudit";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -114,6 +115,7 @@ const AppLayout = () => {
         <Route path="/groups/:groupId/settings" element={<ProtectedRoute><GroupSettings /></ProtectedRoute>} />
         <Route path="/quest/:questId" element={<ProtectedRoute><QuestDetail /></ProtectedRoute>} />
         <Route path="/quest/:questId/edit" element={<ProtectedRoute><EditQuest /></ProtectedRoute>} />
+        <Route path="/nav-audit" element={<ProtectedRoute><NavAudit /></ProtectedRoute>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       {!hideNav && <BottomNav />}
