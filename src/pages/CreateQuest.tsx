@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { completeOnboarding } from "@/hooks/useOnboarding";
 import { Quest } from "@/data/mockData";
 import { ALL_CONTRIBUTION_ROLES } from "@/data/contributionRoles";
-import { ArrowLeft, Sparkles, ChevronDown, ImagePlus, Link as LinkIcon, X, Globe, Check, Clock } from "lucide-react";
+import { ArrowLeft, Sparkles, ChevronDown, ImagePlus, Link as LinkIcon, X, Globe, Check, Clock, Rocket, FileText } from "lucide-react";
 import GroupSwatch from "@/components/GroupSwatch";
 import LocationPicker, { type LocationValue } from "@/components/LocationPicker";
 import { TimePicker } from "@/components/TimePicker";
@@ -641,16 +641,24 @@ const CreateQuest = () => {
         </div>
       </motion.div>
 
-      {/* Floating Launch Quest button */}
+      {/* Floating action buttons */}
       <div className="fixed bottom-0 left-0 right-0 z-50 px-5 pb-6 pt-3 bg-background">
-        <div className="max-w-md mx-auto">
+        <div className="max-w-md mx-auto flex gap-3">
+          <button
+            onClick={() => navigate(-1)}
+            disabled={submitting}
+            className="flex-1 py-4 rounded-xl bg-muted text-foreground font-bold text-base flex items-center justify-center gap-2 disabled:opacity-40 active:scale-[0.98] transition-transform shadow-sm"
+          >
+            <FileText className="w-5 h-5" />
+            Drafts
+          </button>
           <button
             onClick={handleCreate}
             disabled={!title.trim() || submitting}
-            className="w-full py-4 rounded-xl bg-primary text-primary-foreground font-bold text-base flex items-center justify-center gap-2 disabled:opacity-40 active:scale-[0.98] transition-transform shadow-lg"
+            className="flex-1 py-4 rounded-xl bg-primary text-primary-foreground font-bold text-base flex items-center justify-center gap-2 disabled:opacity-40 active:scale-[0.98] transition-transform shadow-lg"
           >
-            <Sparkles className="w-5 h-5" />
-            {submitting ? "Launching…" : "Launch Sidequest"}
+            <Rocket className="w-5 h-5" />
+            {submitting ? "Launching…" : "Launch"}
           </button>
         </div>
       </div>
