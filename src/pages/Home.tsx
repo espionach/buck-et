@@ -281,7 +281,7 @@ const Boards = () => {
                 setActiveHighlight(null);
                 setActiveCommentId(null);
               }}
-              className="p-2 rounded-xl bg-muted text-muted-foreground mb-4"
+              className="p-2 -ml-2 text-muted-foreground hover:text-foreground transition-colors mb-4"
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
@@ -338,7 +338,7 @@ const Boards = () => {
               <div className="fixed inset-0 z-40 bg-background min-h-screen pb-24 px-5 pt-14 overflow-y-auto">
                 <button
                   onClick={() => setShowSettings(false)}
-                  className="p-2 rounded-xl bg-muted text-muted-foreground mb-4"
+                  className="p-2 -ml-2 text-muted-foreground hover:text-foreground transition-colors mb-4"
                 >
                   <ArrowLeft className="w-5 h-5" />
                 </button>
