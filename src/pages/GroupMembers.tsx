@@ -69,7 +69,7 @@ const GroupMembers = () => {
         </button>
         <button
           onClick={() => navigate(`/groups/${group.id}/settings`)}
-          className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+          className="p-2 text-muted-foreground hover:text-foreground transition-colors"
           aria-label="Group settings"
         >
           <MoreVertical className="w-5 h-5" />

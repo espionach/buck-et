@@ -166,10 +166,10 @@ const FindFriends = () => {
     <div className="min-h-screen pb-32 px-5 pt-14 max-w-xl mx-auto">
       <button
         onClick={() => nav(-1)}
-        className="flex items-center gap-1.5 text-sm text-muted-foreground mb-6 hover:text-foreground transition-colors"
+        className="p-2 -ml-2 mb-4 text-muted-foreground hover:text-foreground transition-colors"
+        aria-label="Back"
       >
-        <ArrowLeft className="w-4 h-4" />
-        Back
+        <ArrowLeft className="w-5 h-5" />
       </button>
 
       <h1 className="text-2xl font-bold mb-1">Find Friends</h1>

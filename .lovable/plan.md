@@ -1,29 +1,28 @@
-# Profile: Icon Tab Bar (Instagram/TikTok style)
+## Design System Unification
 
-Replace the current pill-style segmented control on the Profile page (Active / Completed / Groups text buttons) with a minimal, icon-only tab bar where the active tab is indicated by a thin underline beneath the icon.
+Based on your choices:
+- **Inputs** → Outlined (`bg-card border border-border`)
+- **Icon buttons** → Bare (no hover background)
+- **Cards** → Soft outlined with subtle shadow (`border border-border/50 shadow-sm`)
+- **FindFriends back** → Standard icon back button
 
-## Icons
-- **Active** → `Zap` (lightning bolt — "in-progress energy")
-- **Completed** → `Flag` (finish-line flag)
-- **Groups** → `Users2` (three-people silhouette)
+### Changes
 
-## Visual spec
-- Full-width row, 3 equal-width tab buttons.
-- Each button: icon centered, ~24px, `text-foreground` when active, `text-muted-foreground` when inactive.
-- Active tab: 2px underline bar (`bg-foreground`) anchored to the bottom of the row, ~40% the width of the button, animated horizontally between tabs (Framer Motion `layoutId`).
-- Bottom border (`border-b border-border`) spanning the full row, sitting behind the active underline — same pattern as Instagram/TikTok.
-- Remove the muted pill background and shadow chips.
-- Remove the numeric counts (e.g., "Active (3)") to keep it clean and icon-only, matching the reference. Counts already appear in section content.
-- Each tab keeps an `aria-label` ("Active sidequests", "Completed sidequests", "Groups") for accessibility.
-- Tap target ≥ 44px tall (py-3).
+**1. Inputs — every text input/textarea standardized to `bg-card border border-border`**
+Affected files: `Feed.tsx`, `Home.tsx` (search), `Settings.tsx` (email, password, support textarea, etc.), `Profile.tsx` (edit name/bio + every modal field), `CreateQuest.tsx` & `EditQuest.tsx` (link sub-input), `CreateGroup.tsx` & `GroupMembers.tsx` (friend search), `AdminDashboard.tsx` (3 search inputs), `CommentThread.tsx` (reply + top-level), `NudgeModal.tsx` (search + custom message), `ReportUserModal.tsx`, `ReportContentModal.tsx`, `AddMembersModal.tsx`.
 
-## Behavior
-- No change to tab state, URL param handling, or content rendering — only the bar's markup/styles change.
-- Preserve existing `data-tour="profile-tab-current|past|groups"` hooks so onboarding coachmarks still attach.
+**2. Cards — soft outline + subtle shadow**
+Every `bg-card border border-border rounded-2xl` and `bg-card border border-border/50 rounded-2xl` updated to `bg-card border border-border/50 rounded-2xl shadow-sm`. Affected: `Settings.tsx`, `BlockedUsers.tsx`, `FindFriends.tsx`, `AdminDashboard.tsx`, `AdminReports.tsx`, `LegalUpdates.tsx`, `CommunityGuidelines.tsx`, `Profile.tsx`.
 
-## Files
-- `src/pages/Profile.tsx` — replace the block at lines ~702-719 with the new icon tab bar; add `Zap`, `Flag`, `Users2` to the lucide-react imports (keep `CheckCircle2`/`Sparkles` since they're still used in the empty-state).
+**3. Icon buttons — strip hover backgrounds from header ghost buttons**
+- `GroupMembers.tsx:72` — remove `rounded-xl hover:bg-muted`
+- `GroupSettings.tsx:83` — remove `rounded-xl hover:bg-muted`
 
-## Out of scope
-- No changes to tab content, drafts shortcut, or routing.
-- No changes to BottomNav or any other nav surface.
+**4. FindFriends back button**
+Replace the text "← Back" link with the standard `<ArrowLeft>` icon button (`p-2 -ml-2 text-muted-foreground hover:text-foreground`) used everywhere else.
+
+### Out of scope
+- Auth pages (`Login`, `Signup`, `ForgotPassword`, `ResetPassword`) keep their bare shadcn `<Input>` — already consistent with each other; changing them would require restyling the shadcn primitive. Say the word and I'll align them too.
+- Inline action circles (accept/decline invite, photo-remove overlay, media viewer close) keep their filled-circle treatment — they're intentionally different from nav icons.
+
+Switch to build mode and approve to apply.
