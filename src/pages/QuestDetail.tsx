@@ -177,33 +177,39 @@ const QuestDetail = () => {
             </p>
           </div>
 
-          {/* Join / Joined button */}
-          {(() => {
-            const userInGroup = group ? group.members.some((m) => m.id === currentUser.id) : true;
-            const canJoin = userInGroup;
-            return (
-              <button
-                onClick={() => {
-                  if (isOwner && isIn) {
-                    setShowDeleteConfirm(true);
-                    return;
-                  }
-                  if (!canJoin) return;
-                  toggleImIn(quest.id);
-                }}
-                disabled={!canJoin && !(isOwner && isIn)}
-                className={`shrink-0 flex items-center justify-center transition-all active:scale-95 px-3 py-1.5 rounded-full text-xs font-semibold ${
-                  isIn
-                    ? "bg-background text-primary border border-primary hover:bg-primary/5"
-                    : !canJoin
-                    ? "bg-primary/40 text-primary-foreground/70 cursor-not-allowed"
-                    : "bg-primary text-primary-foreground hover:bg-primary/90"
-                }`}
-              >
-                {isIn ? "Joined" : "Join"}
-              </button>
-            );
-          })()}
+          {/* Owner badge / Join / Joined button */}
+          {isOwner ? (
+            <span
+              aria-label="You own this sidequest"
+              className="shrink-0 flex items-center justify-center px-3 py-1.5 rounded-full text-xs font-semibold bg-background text-primary border border-primary cursor-default select-none"
+            >
+              Owner
+            </span>
+          ) : (
+            (() => {
+              const userInGroup = group ? group.members.some((m) => m.id === currentUser.id) : true;
+              const canJoin = userInGroup;
+              return (
+                <button
+                  onClick={() => {
+                    if (!canJoin) return;
+                    toggleImIn(quest.id);
+                  }}
+                  disabled={!canJoin}
+                  className={`shrink-0 flex items-center justify-center transition-all active:scale-95 px-3 py-1.5 rounded-full text-xs font-semibold ${
+                    isIn
+                      ? "bg-background text-primary border border-primary hover:bg-primary/5"
+                      : !canJoin
+                      ? "bg-primary/40 text-primary-foreground/70 cursor-not-allowed"
+                      : "bg-primary text-primary-foreground hover:bg-primary/90"
+                  }`}
+                >
+                  {isIn ? "Joined" : "Join"}
+                </button>
+              );
+            })()
+          )}
+
 
           {/* Share button (always visible) */}
           <button
