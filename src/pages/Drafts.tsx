@@ -47,7 +47,7 @@ const Drafts = () => {
     <div className="min-h-screen px-5 pt-14 pb-10">
       <div className="flex items-center gap-3 mb-5">
         <button
-          onClick={() => nav(-1)}
+          onClick={() => nav(backTo)}
           className="p-2 -ml-2 text-muted-foreground hover:text-foreground transition-colors"
           aria-label="Back"
         >
