@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { completeOnboarding } from "@/hooks/useOnboarding";
 import { Quest } from "@/data/mockData";
 import { ALL_CONTRIBUTION_ROLES } from "@/data/contributionRoles";
-import { ArrowLeft, Sparkles, ChevronDown, ImagePlus, Link as LinkIcon, X, Globe, Check, Clock } from "lucide-react";
+import { ArrowLeft, Sparkles, ChevronDown, ImagePlus, Link as LinkIcon, X, Globe, Check, Clock, Rocket, FileText } from "lucide-react";
 import GroupSwatch from "@/components/GroupSwatch";
 import LocationPicker, { type LocationValue } from "@/components/LocationPicker";
 import { TimePicker } from "@/components/TimePicker";
