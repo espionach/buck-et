@@ -21,6 +21,8 @@ function timeAgo(iso: string): string {
 
 const Drafts = () => {
   const nav = useNavigate();
+  const location = useLocation();
+  const backTo = (location.state as { from?: string } | null)?.from || "/profile";
   const { currentUser, groups } = useAppStore();
   const [drafts, setDrafts] = useState<QuestDraft[]>([]);
   const [confirmId, setConfirmId] = useState<string | null>(null);
