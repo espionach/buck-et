@@ -2,7 +2,7 @@ import { useAppStore } from "@/data/appState";
 import QuestList from "@/components/QuestList";
 import MyGroupsTab from "@/components/MyGroupsTab";
 import UserAvatar from "@/components/UserAvatar";
-import { Edit, X, Check, Users as UsersIcon, UserPlus, Trash2, ImagePlus, Camera, Link as LinkIcon, Plus, ArrowLeft, Map, ScrollText, Pin, Settings as SettingsIcon, User as UserIcon, Globe, ChevronDown, Share2, Sparkles, CheckCircle2, Clock } from "lucide-react";
+import { Edit, X, Check, Users as UsersIcon, UserPlus, Trash2, ImagePlus, Camera, Link as LinkIcon, Plus, ArrowLeft, Map, ScrollText, Pin, Settings as SettingsIcon, User as UserIcon, Globe, ChevronDown, Share2, Sparkles, CheckCircle2, Clock, Zap, Flag, Users2 } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
 import { ALL_CONTRIBUTION_ROLES } from "@/data/contributionRoles";
 import GroupSwatch from "@/components/GroupSwatch";
@@ -699,24 +699,40 @@ const Profile = () => {
         )}
       </AnimatePresence>
 
-      <div className="flex bg-muted rounded-2xl p-1 mb-5">
-        {(["current", "past", "groups"] as const).map((t) => (
-          <button
-            key={t}
-            data-tour={`profile-tab-${t}`}
-            onClick={() => setTab(t)}
-            className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all relative ${
-              tab === t ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
-            }`}
-          >
-            {t === "current"
-              ? `Active (${current.length})`
-              : t === "past"
-              ? `Completed (${past.length})`
-              : `Groups (${groups.length})`}
-          </button>
-        ))}
+      <div className="flex border-b border-border mb-5">
+        {([
+          { id: "current", label: "Active sidequests", Icon: Zap },
+          { id: "past", label: "Completed sidequests", Icon: Flag },
+          { id: "groups", label: "Groups", Icon: Users2 },
+        ] as const).map(({ id, label, Icon }) => {
+          const isActive = tab === id;
+          return (
+            <button
+              key={id}
+              data-tour={`profile-tab-${id}`}
+              onClick={() => setTab(id)}
+              aria-label={label}
+              aria-selected={isActive}
+              className="relative flex-1 py-3 flex items-center justify-center transition-colors"
+            >
+              <Icon
+                className={`w-6 h-6 transition-colors ${
+                  isActive ? "text-foreground" : "text-muted-foreground"
+                }`}
+                strokeWidth={isActive ? 2.25 : 2}
+              />
+              {isActive && (
+                <motion.div
+                  layoutId="profile-tab-underline"
+                  className="absolute -bottom-px left-1/2 -translate-x-1/2 h-[2px] w-2/5 bg-foreground rounded-full"
+                  transition={{ type: "spring", stiffness: 500, damping: 40 }}
+                />
+              )}
+            </button>
+          );
+        })}
       </div>
+
 
       {/* Drafts shortcut — sits just below the tab bar, right-aligned */}
       {tab === "current" && draftCount > 0 && (
