@@ -190,7 +190,7 @@ const NudgeModal = ({ open, onClose, quest, initialSelectedUserId }: NudgeModalP
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search by name"
-                  className="w-full pl-8 pr-3 py-2 rounded-lg bg-muted text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                  className="w-full pl-8 pr-3 py-2 rounded-lg bg-card border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
                 />
               </div>
             </div>
@@ -272,7 +272,7 @@ const NudgeModal = ({ open, onClose, quest, initialSelectedUserId }: NudgeModalP
                     value={note}
                     onChange={(e) => setNote(e.target.value.slice(0, 140))}
                     placeholder="Add a note (optional)"
-                    className="w-full px-3 py-2 rounded-lg bg-muted text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                    className="w-full px-3 py-2 rounded-lg bg-card border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
                   />
                   <button
                     type="button"

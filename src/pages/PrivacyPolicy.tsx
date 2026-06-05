@@ -821,7 +821,7 @@ const PrivacyPolicy = () => {
         .
       </P>
 
-      <div className="mt-8 p-4 rounded-2xl bg-muted/50 border border-border">
+      <div className="mt-8 p-4 rounded-2xl bg-card border border-border">
         <p className="text-xs text-muted-foreground leading-relaxed">
           This Privacy Policy was created using Termly&apos;s Privacy Policy Generator.
         </p>

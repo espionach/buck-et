@@ -625,7 +625,7 @@ const AdminDashboard = () => {
                   <input
                     value={userSearch} onChange={(e) => setUserSearch(e.target.value)}
                     placeholder="Search by name or @username"
-                    className="w-full pl-8 pr-3 py-2 rounded-xl bg-muted text-sm text-foreground outline-none"
+                    className="w-full pl-8 pr-3 py-2 rounded-xl bg-card border border-border text-sm text-foreground outline-none"
                   />
                 </div>
                 <button onClick={() => setSortDir((d) => (d === "desc" ? "asc" : "desc"))} className="p-2 rounded-xl bg-muted text-muted-foreground" aria-label="Sort">
@@ -732,7 +732,7 @@ const AdminDashboard = () => {
                   <input
                     value={questSearch} onChange={(e) => setQuestSearch(e.target.value)}
                     placeholder="Search title or creator"
-                    className="w-full pl-8 pr-3 py-2 rounded-xl bg-muted text-sm text-foreground outline-none"
+                    className="w-full pl-8 pr-3 py-2 rounded-xl bg-card border border-border text-sm text-foreground outline-none"
                   />
                 </div>
                 <button onClick={() => setSortDir((d) => (d === "desc" ? "asc" : "desc"))} className="p-2 rounded-xl bg-muted text-muted-foreground" aria-label="Sort">
@@ -794,7 +794,7 @@ const AdminDashboard = () => {
                   <input
                     value={commentSearch} onChange={(e) => setCommentSearch(e.target.value)}
                     placeholder="Search text or author"
-                    className="w-full pl-8 pr-3 py-2 rounded-xl bg-muted text-sm text-foreground outline-none"
+                    className="w-full pl-8 pr-3 py-2 rounded-xl bg-card border border-border text-sm text-foreground outline-none"
                   />
                 </div>
               </div>
@@ -1067,7 +1067,7 @@ const AdminDashboard = () => {
             <input
               type="number" min={1} max={365} value={suspendDays}
               onChange={(e) => setSuspendDays(Math.max(1, Math.min(365, parseInt(e.target.value) || 1)))}
-              className="flex-1 px-3 py-2 rounded-xl bg-muted text-sm text-foreground outline-none"
+              className="flex-1 px-3 py-2 rounded-xl bg-card border border-border text-sm text-foreground outline-none"
             />
             <span className="text-sm text-muted-foreground">days</span>
           </div>

@@ -104,7 +104,7 @@ const ReportContentModal = ({
               onChange={(e) => setDescription(e.target.value.slice(0, 1000))}
               rows={3}
               placeholder="Add any context that might help us review."
-              className="w-full px-3 py-2 rounded-lg bg-muted text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none mb-4"
+              className="w-full px-3 py-2 rounded-lg bg-card border border-border text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none mb-4"
             />
 
             <div className="flex gap-2 justify-end">

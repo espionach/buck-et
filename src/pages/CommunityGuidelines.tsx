@@ -87,7 +87,7 @@ const CommunityGuidelines = () => {
         </p>
       </Section>
 
-      <div className="mt-6 p-4 rounded-2xl bg-muted/50 border border-border">
+      <div className="mt-6 p-4 rounded-2xl bg-card border border-border">
         <p className="text-xs text-muted-foreground leading-relaxed">
           Violations of these guidelines may result in content removal, temporary restrictions, or
           permanent account suspension. Questions or concerns? Reach us at{" "}

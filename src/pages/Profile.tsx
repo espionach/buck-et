@@ -534,7 +534,7 @@ const Profile = () => {
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
               placeholder="Name"
-              className="w-full px-3 py-2.5 rounded-xl bg-muted border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
             />
           </div>
 
@@ -549,7 +549,7 @@ const Profile = () => {
                   setUsernameError(null);
                 }}
                 placeholder="username"
-                className="w-full pl-7 pr-3 py-2.5 rounded-xl bg-muted border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                className="w-full pl-7 pr-3 py-2.5 rounded-xl bg-card border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
               />
             </div>
             {usernameError ? (
@@ -566,7 +566,7 @@ const Profile = () => {
               onChange={(e) => setEditBio(e.target.value)}
               placeholder="Bio"
               rows={3}
-              className="w-full px-3 py-2.5 rounded-xl bg-muted border border-border text-sm text-foreground resize-none focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-sm text-foreground resize-none focus:outline-none focus:ring-2 focus:ring-primary/30"
             />
           </div>
 
@@ -885,7 +885,7 @@ const Profile = () => {
                 <input
                   value={editQuestTitle}
                   onChange={(e) => setEditQuestTitle(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl bg-muted border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
                 />
               </div>
 
@@ -895,7 +895,7 @@ const Profile = () => {
                   <div>
                     <label className="text-[11px] text-muted-foreground mb-1 block">Date</label>
                     <input type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl bg-muted border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                      className="w-full px-3 py-2 rounded-xl bg-card border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
                   </div>
                   <div className="relative">
                     <label className="text-[11px] text-muted-foreground mb-1 block">Time</label>
@@ -929,7 +929,7 @@ const Profile = () => {
                   onChange={(e) => setEditQuestDescription(e.target.value)}
                   placeholder="Add details..."
                   rows={3}
-                  className="w-full px-3 py-2.5 rounded-xl bg-muted border border-border text-sm text-foreground resize-none focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-sm text-foreground resize-none focus:outline-none focus:ring-2 focus:ring-primary/30"
                 />
               </div>
 
@@ -976,7 +976,7 @@ const Profile = () => {
                   <button
                     type="button"
                     onClick={() => setShowEditGroupDropdown((v) => !v)}
-                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-muted border border-border text-sm"
+                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-card border border-border text-sm"
                   >
                     <span className="text-foreground font-medium">
                       {editGroupId
@@ -1046,7 +1046,7 @@ const Profile = () => {
                 <div>
                   <label className="text-[11px] text-muted-foreground mb-1 block">Meetup Spot</label>
                   <input type="text" value={editMeetupSpot} onChange={(e) => setEditMeetupSpot(e.target.value)} placeholder="Where should everyone meet?"
-                    className="w-full px-3 py-2 rounded-xl bg-muted border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                    className="w-full px-3 py-2 rounded-xl bg-card border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
                 </div>
                 <div>
                   <label className="text-[11px] text-muted-foreground mb-1 block">Transportation</label>
@@ -1072,13 +1072,13 @@ const Profile = () => {
                   <div>
                     <label className="text-[11px] text-muted-foreground mb-1 block">Carpool Seats Available</label>
                     <input type="number" value={editCarpoolSlots} onChange={(e) => setEditCarpoolSlots(e.target.value)} placeholder="e.g. 4"
-                      className="w-24 px-3 py-2 rounded-xl bg-muted border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                      className="w-24 px-3 py-2 rounded-xl bg-card border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
                   </div>
                 )}
                 <div>
                   <label className="text-[11px] text-muted-foreground mb-1 block">Additional Notes</label>
                   <textarea value={editCustomNotes} onChange={(e) => setEditCustomNotes(e.target.value)} placeholder="Anything else everyone should know?"
-                    rows={2} className="w-full px-3 py-2 rounded-xl bg-muted border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none" />
+                    rows={2} className="w-full px-3 py-2 rounded-xl bg-card border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none" />
                 </div>
 
                 {/* Contributions selector */}
@@ -1166,7 +1166,7 @@ const Profile = () => {
                       onChange={(e) => setNewLink(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleAddLink()}
                       placeholder="Add a link..."
-                      className="flex-1 px-3 py-2 rounded-xl bg-muted border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                      className="flex-1 px-3 py-2 rounded-xl bg-card border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
                     />
                     <button
                       onClick={handleAddLink}
@@ -1315,7 +1315,7 @@ const Profile = () => {
                   type="date"
                   value={questCompletedAt}
                   onChange={(e) => setQuestCompletedAt(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl bg-muted border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
                 />
               </div>
 

@@ -559,7 +559,7 @@ const Settings = () => {
                     value={newEmail}
                     onChange={(e) => { setNewEmail(e.target.value); setEmailError(null); }}
                     placeholder="new@email.com"
-                    className="w-full px-3 py-2.5 rounded-xl bg-muted text-sm text-foreground outline-none mb-2"
+                    className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-sm text-foreground outline-none mb-2"
                   />
                   {emailError && (
                     <p className="text-xs text-destructive mb-2">{emailError}</p>
@@ -613,7 +613,7 @@ const Settings = () => {
                 onChange={(e) => { setCurrentPassword(e.target.value); setPwError(null); }}
                 placeholder="Current password"
                 autoComplete="current-password"
-                className="w-full px-3 py-2.5 rounded-xl bg-muted text-sm text-foreground outline-none mb-2"
+                className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-sm text-foreground outline-none mb-2"
               />
               <input
                 type="password"
@@ -625,7 +625,7 @@ const Settings = () => {
                 }}
                 placeholder="New password"
                 autoComplete="new-password"
-                className="w-full px-3 py-2.5 rounded-xl bg-muted text-sm text-foreground outline-none mb-2"
+                className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-sm text-foreground outline-none mb-2"
               />
               <div className="mb-2">
                 <PasswordRequirements value={newPassword} showErrors={showPwErrors} />
@@ -636,7 +636,7 @@ const Settings = () => {
                 onChange={(e) => { setConfirmPassword(e.target.value); setPwError(null); }}
                 placeholder="Confirm new password"
                 autoComplete="new-password"
-                className="w-full px-3 py-2.5 rounded-xl bg-muted text-sm text-foreground outline-none mb-2"
+                className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-sm text-foreground outline-none mb-2"
               />
               {pwError && (
                 <p className="text-xs text-destructive mb-2">{pwError}</p>
@@ -730,7 +730,7 @@ const Settings = () => {
               <textarea
                 value={appealReason} onChange={(e) => setAppealReason(e.target.value)}
                 rows={4} placeholder="Explain your situation…"
-                className="w-full p-3 rounded-xl bg-muted text-sm text-foreground outline-none mb-3"
+                className="w-full p-3 rounded-xl bg-card border border-border text-sm text-foreground outline-none mb-3"
               />
               <div className="flex gap-2 justify-end">
                 <button onClick={() => setShowAppeal(false)} className="px-4 py-2 rounded-xl bg-muted text-muted-foreground font-semibold text-sm">Cancel</button>
@@ -785,13 +785,13 @@ const Settings = () => {
                 onChange={(e) => setSupportEmail(e.target.value)}
                 placeholder="you@email.com"
                 maxLength={255}
-                className="w-full px-3 py-2.5 rounded-xl bg-muted text-sm text-foreground outline-none mb-3"
+                className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-sm text-foreground outline-none mb-3"
               />
               <label className="block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">Subject</label>
               <select
                 value={supportSubject}
                 onChange={(e) => setSupportSubject(e.target.value as "general" | "bug" | "privacy")}
-                className="w-full px-3 py-2.5 rounded-xl bg-muted text-sm text-foreground outline-none mb-3"
+                className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-sm text-foreground outline-none mb-3"
               >
                 <option value="general">General Support</option>
                 <option value="bug">Report a Bug</option>
@@ -804,7 +804,7 @@ const Settings = () => {
                 placeholder="How can we help?"
                 rows={5}
                 maxLength={5000}
-                className="w-full p-3 rounded-xl bg-muted text-sm text-foreground outline-none mb-4 resize-none"
+                className="w-full p-3 rounded-xl bg-card border border-border text-sm text-foreground outline-none mb-4 resize-none"
               />
               <div className="flex gap-2 justify-end">
                 <button
