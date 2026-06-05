@@ -724,7 +724,7 @@ const Profile = () => {
               {isActive && (
                 <motion.div
                   layoutId="profile-tab-underline"
-                  className="absolute -bottom-px left-1/2 -translate-x-1/2 h-[2px] w-2/5 bg-foreground rounded-full"
+                  className="absolute -bottom-px left-0 right-0 h-[2px] bg-foreground rounded-full"
                   transition={{ type: "spring", stiffness: 500, damping: 40 }}
                 />
               )}
