@@ -27,6 +27,7 @@ import QuestDetail from "./pages/QuestDetail";
 import EditQuest from "./pages/EditQuest";
 import Drafts from "./pages/Drafts";
 import NotFound from "./pages/NotFound";
+import NavAudit from "./pages/NavAudit";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
