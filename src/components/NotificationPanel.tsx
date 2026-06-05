@@ -323,8 +323,14 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
                       n.read ? "opacity-60" : "bg-primary/5"
                     }`}
                   >
-                    <div className="shrink-0 mt-0.5">
+                    <div className="shrink-0 mt-0.5 relative">
                       <UserAvatar user={n.fromUser} size="sm" />
+                      {!n.read && (
+                        <span
+                          aria-label="New notification"
+                          className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-primary ring-2 ring-card"
+                        />
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       {renderMessage(n)}
@@ -346,6 +352,7 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
+
                   </div>
                 );
               });
