@@ -10,7 +10,7 @@ const Section = ({
   title: string;
   children: React.ReactNode;
 }) => (
-  <div className="bg-card rounded-2xl border border-border p-4 mb-3">
+  <div className="bg-card rounded-2xl border border-border/50 shadow-sm p-4 mb-3">
     <div className="flex items-center gap-2 mb-2">
       <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
         <Icon className="w-4 h-4 text-primary" />

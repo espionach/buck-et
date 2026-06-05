@@ -45,7 +45,7 @@ const LegalUpdates = () => {
               <button
                 key={u.id}
                 onClick={() => nav(LEGAL_PATHS[u.type])}
-                className="w-full text-left bg-card border border-border rounded-2xl p-4 flex items-start gap-3 active:bg-muted/60 transition-colors"
+                className="w-full text-left bg-card border border-border/50 rounded-2xl shadow-sm p-4 flex items-start gap-3 active:bg-muted/60 transition-colors"
               >
                 <div className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center shrink-0">
                   <Icon className="w-4 h-4 text-foreground" />

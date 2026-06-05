@@ -492,7 +492,7 @@ const Profile = () => {
                   initial={{ opacity: 0, scale: 0.96 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.96 }}
-                  className="pointer-events-auto w-full max-w-[280px] bg-card border border-border rounded-2xl p-2 shadow-xl"
+                  className="pointer-events-auto w-full max-w-[280px] bg-card border border-border/50 rounded-2xl shadow-sm p-2 shadow-xl"
                 >
                   <button
                     onClick={() => {

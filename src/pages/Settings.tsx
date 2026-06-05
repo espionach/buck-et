@@ -32,7 +32,7 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
     <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2 px-1">
       {title}
     </h2>
-    <div className="bg-card rounded-2xl border border-border overflow-hidden divide-y divide-border">
+    <div className="bg-card rounded-2xl border border-border/50 shadow-sm overflow-hidden divide-y divide-border">
       {children}
     </div>
   </div>
@@ -458,7 +458,7 @@ const Settings = () => {
             >
               <h3 className="font-bold text-foreground text-base mb-1">Notification Settings</h3>
               <p className="text-xs text-muted-foreground mb-3">Choose what we should ping you about.</p>
-              <div className="mb-4 p-4 rounded-2xl border border-border bg-muted/40 flex items-start gap-3">
+              <div className="mb-4 p-4 rounded-2xl border border-border/50 shadow-sm bg-muted/40 flex items-start gap-3">
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-bold text-foreground">Mute all notifications</div>
                   <div className="text-[11px] text-muted-foreground mt-1 leading-snug">
