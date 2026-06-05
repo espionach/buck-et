@@ -94,7 +94,7 @@ const QuestDetail = () => {
     return (
       <div className="min-h-screen flex flex-col">
         <div className="px-5 pt-14 pb-3">
-          <button onClick={() => navigate("/")} className="p-2 rounded-xl bg-muted text-muted-foreground" aria-label="Back">
+          <button onClick={() => navigate(-1)} className="p-2 rounded-xl bg-muted text-muted-foreground" aria-label="Back">
             <ArrowLeft className="w-5 h-5" />
           </button>
         </div>

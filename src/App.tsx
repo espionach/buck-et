@@ -33,6 +33,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import BottomNav from "./components/BottomNav";
 import LegalUpdateBanner from "./components/LegalUpdateBanner";
+import ScrollToTop from "./components/ScrollToTop";
 import Welcome from "./pages/onboarding/Welcome";
 import OnboardingExamples from "./pages/onboarding/Examples";
 import OnboardingPermissions from "./pages/onboarding/Permissions";
@@ -78,6 +79,7 @@ const AppLayout = () => {
 
   return (
     <div className="max-w-md mx-auto min-h-screen relative">
+      <ScrollToTop />
       <Routes>
         <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />
         <Route path="/signup" element={<AuthRoute><Signup /></AuthRoute>} />

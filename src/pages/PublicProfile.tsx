@@ -45,7 +45,7 @@ const PublicProfile = () => {
     return (
       <div className="min-h-screen pt-14 px-5">
         <button
-          onClick={() => nav("/")}
+          onClick={() => nav(-1)}
           aria-label="Back"
           className="p-2 -ml-2 text-muted-foreground hover:text-foreground transition-colors mb-4"
         >
