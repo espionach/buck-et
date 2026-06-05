@@ -15,8 +15,10 @@ interface NotificationPanelProps {
 
 const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
+const SEEN_STORAGE_KEY = "sq_notif_seen_ids";
+
 const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
-  const { notifications: allNotifications, markAllNotificationsRead, friendRequests, acceptFriendRequest, declineFriendRequest, clearNotification, clearAllNotifications } = useAppStore();
+  const { notifications: allNotifications, markNotificationRead, friendRequests, acceptFriendRequest, declineFriendRequest, clearNotification, clearAllNotifications } = useAppStore();
   const navigate = useNavigate();
   usePopup(open);
 
@@ -32,13 +34,36 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
     });
   }, [allNotifications]);
 
-  // Mark all as read the moment the panel opens.
+  // Two-stage read behavior:
+  // - First time the panel opens with a new unread notification, it stays
+  //   unread (orange dot, highlighted) so the user can spot it.
+  // - The NEXT time the panel opens, any notification that was already
+  //   "seen" on a previous open gets marked as read.
   useEffect(() => {
-    if (open && allNotifications.some((n) => !n.read)) {
-      markAllNotificationsRead();
+    if (!open) return;
+    let seenIds: string[] = [];
+    try {
+      seenIds = JSON.parse(localStorage.getItem(SEEN_STORAGE_KEY) || "[]");
+    } catch {
+      seenIds = [];
     }
+    const seenSet = new Set(seenIds);
+
+    // Mark as read any unread notification that was already seen previously.
+    allNotifications.forEach((n) => {
+      if (!n.read && seenSet.has(n.id)) {
+        markNotificationRead(n.id);
+      }
+    });
+
+    // Remember currently-unread IDs so they get marked read on the next open.
+    const currentUnreadIds = allNotifications
+      .filter((n) => !n.read)
+      .map((n) => n.id);
+    localStorage.setItem(SEEN_STORAGE_KEY, JSON.stringify(currentUnreadIds));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
+
 
 
 
