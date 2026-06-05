@@ -145,9 +145,14 @@ const NudgeModal = ({ open, onClose, quest, initialSelectedUserId }: NudgeModalP
         recipients.length === 1 ? "Nudge sent!" : `Nudged ${recipients.length} people!`
       );
       onClose();
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
-      toast.error("Couldn't send nudge");
+      const msg = e?.message || "";
+      if (msg.toLowerCase().includes("permission") || e?.code === "42501") {
+        toast.error("You need to own this sidequest to send a nudge.");
+      } else {
+        toast.error(msg ? `Couldn't send nudge: ${msg}` : "Couldn't send nudge");
+      }
     } finally {
       setSending(false);
     }

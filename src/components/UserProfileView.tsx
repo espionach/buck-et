@@ -299,8 +299,25 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
         </div>
       ) : (
         <>
+          {/* Nudge hint: viewer has no active quests, so cannot nudge */}
+          {user.id !== currentUser.id && myActiveQuests.length === 0 && (
+            <div className="mb-4 flex items-center gap-3 rounded-2xl border border-border/50 bg-card shadow-sm px-4 py-3">
+              <Sparkles className="w-4 h-4 text-muted-foreground shrink-0" />
+              <p className="text-xs text-muted-foreground flex-1">
+                Create a sidequest to nudge {user.name.split(" ")[0]}.
+              </p>
+              <button
+                onClick={() => navigate("/create")}
+                className="text-xs font-semibold text-primary shrink-0"
+              >
+                Create
+              </button>
+            </div>
+          )}
+
           {/* Tabs */}
           <div className="flex bg-muted rounded-2xl p-1 mb-5">
+
             {(["current", "past"] as const).map((t) => (
               <button
                 key={t}
