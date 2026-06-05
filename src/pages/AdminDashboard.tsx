@@ -625,7 +625,7 @@ const AdminDashboard = () => {
                   <input
                     value={userSearch} onChange={(e) => setUserSearch(e.target.value)}
                     placeholder="Search by name or @username"
-                    className="w-full pl-8 pr-3 py-2 rounded-xl bg-muted text-sm text-foreground outline-none"
+                    className="w-full pl-8 pr-3 py-2 rounded-xl bg-card border border-border text-sm text-foreground outline-none"
                   />
                 </div>
                 <button onClick={() => setSortDir((d) => (d === "desc" ? "asc" : "desc"))} className="p-2 rounded-xl bg-muted text-muted-foreground" aria-label="Sort">
@@ -649,7 +649,7 @@ const AdminDashboard = () => {
                 ))}
               </div>
 
-              <div className="bg-card border border-border rounded-2xl overflow-hidden divide-y divide-border">
+              <div className="bg-card border border-border/50 rounded-2xl shadow-sm overflow-hidden divide-y divide-border">
                 {filteredUsers.length === 0 ? (
                   <p className="text-sm text-muted-foreground text-center py-8">No users found.</p>
                 ) : filteredUsers.map((u) => (
@@ -732,7 +732,7 @@ const AdminDashboard = () => {
                   <input
                     value={questSearch} onChange={(e) => setQuestSearch(e.target.value)}
                     placeholder="Search title or creator"
-                    className="w-full pl-8 pr-3 py-2 rounded-xl bg-muted text-sm text-foreground outline-none"
+                    className="w-full pl-8 pr-3 py-2 rounded-xl bg-card border border-border text-sm text-foreground outline-none"
                   />
                 </div>
                 <button onClick={() => setSortDir((d) => (d === "desc" ? "asc" : "desc"))} className="p-2 rounded-xl bg-muted text-muted-foreground" aria-label="Sort">
@@ -748,7 +748,7 @@ const AdminDashboard = () => {
                 ))}
               </div>
 
-              <div className="bg-card border border-border rounded-2xl overflow-hidden divide-y divide-border">
+              <div className="bg-card border border-border/50 rounded-2xl shadow-sm overflow-hidden divide-y divide-border">
                 {filteredQuests.length === 0 ? (
                   <p className="text-sm text-muted-foreground text-center py-8">No sidequests.</p>
                 ) : filteredQuests.map((q) => (
@@ -794,11 +794,11 @@ const AdminDashboard = () => {
                   <input
                     value={commentSearch} onChange={(e) => setCommentSearch(e.target.value)}
                     placeholder="Search text or author"
-                    className="w-full pl-8 pr-3 py-2 rounded-xl bg-muted text-sm text-foreground outline-none"
+                    className="w-full pl-8 pr-3 py-2 rounded-xl bg-card border border-border text-sm text-foreground outline-none"
                   />
                 </div>
               </div>
-              <div className="bg-card border border-border rounded-2xl overflow-hidden divide-y divide-border">
+              <div className="bg-card border border-border/50 rounded-2xl shadow-sm overflow-hidden divide-y divide-border">
                 {filteredComments.length === 0 ? (
                   <p className="text-sm text-muted-foreground text-center py-8">No comments.</p>
                 ) : filteredComments.map((c) => (
@@ -868,7 +868,7 @@ const AdminDashboard = () => {
               ) : (
                 <div className="space-y-2">
                   {filteredReports.map((r) => (
-                    <div key={r.id} className="bg-card border border-border rounded-2xl p-3">
+                    <div key={r.id} className="bg-card border border-border/50 rounded-2xl shadow-sm p-3">
                       <div className="flex items-start gap-2">
                         <input
                           type="checkbox"
@@ -932,7 +932,7 @@ const AdminDashboard = () => {
           {tab === "appeals" && (
             <div>
               <p className="text-xs text-muted-foreground mb-3">User-submitted requests to lift restrictions.</p>
-              <div className="bg-card border border-border rounded-2xl overflow-hidden divide-y divide-border">
+              <div className="bg-card border border-border/50 rounded-2xl shadow-sm overflow-hidden divide-y divide-border">
                 {appeals.length === 0 ? (
                   <p className="text-sm text-muted-foreground text-center py-8">No appeals yet.</p>
                 ) : appeals.map((a) => {
@@ -978,7 +978,7 @@ const AdminDashboard = () => {
           {tab === "audit" && (
             <div>
               <p className="text-xs text-muted-foreground mb-3">Last 200 moderation actions.</p>
-              <div className="bg-card border border-border rounded-2xl overflow-hidden divide-y divide-border">
+              <div className="bg-card border border-border/50 rounded-2xl shadow-sm overflow-hidden divide-y divide-border">
                 {audit.length === 0 ? (
                   <p className="text-sm text-muted-foreground text-center py-8">No actions yet.</p>
                 ) : audit.map((a) => (
@@ -1067,7 +1067,7 @@ const AdminDashboard = () => {
             <input
               type="number" min={1} max={365} value={suspendDays}
               onChange={(e) => setSuspendDays(Math.max(1, Math.min(365, parseInt(e.target.value) || 1)))}
-              className="flex-1 px-3 py-2 rounded-xl bg-muted text-sm text-foreground outline-none"
+              className="flex-1 px-3 py-2 rounded-xl bg-card border border-border text-sm text-foreground outline-none"
             />
             <span className="text-sm text-muted-foreground">days</span>
           </div>

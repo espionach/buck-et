@@ -70,7 +70,7 @@ const BlockedUsers = () => {
           description="People you block will appear here."
         />
       ) : (
-        <div className="bg-card rounded-2xl border border-border divide-y divide-border overflow-hidden">
+        <div className="bg-card rounded-2xl border border-border/50 shadow-sm divide-y divide-border overflow-hidden">
           {users.map((u) => (
             <div key={u.id} className="flex items-center gap-3 px-3 py-3">
               <UserAvatar user={u} size="sm" />

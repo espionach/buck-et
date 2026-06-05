@@ -158,7 +158,7 @@ const CommentThread = ({ quest, highlightCommentId, onInteract }: CommentThreadP
                   }}
                   onClick={(e) => { e.stopPropagation(); onInteract?.(e); }}
                   placeholder={`Reply to ${c.user.name}…`}
-                  className="flex-1 text-xs px-2.5 py-1.5 rounded-lg bg-muted border-none text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/30"
+                  className="flex-1 text-xs px-2.5 py-1.5 rounded-lg bg-card border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/30"
                 />
                 <button
                   onClick={(e) => {
@@ -210,7 +210,7 @@ const CommentThread = ({ quest, highlightCommentId, onInteract }: CommentThreadP
           }}
           onClick={(e) => { e.stopPropagation(); onInteract?.(e); }}
           placeholder="Add a comment..."
-          className="flex-1 text-xs px-3 py-2 rounded-lg bg-muted border-none text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/30"
+          className="flex-1 text-xs px-3 py-2 rounded-lg bg-card border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/30"
         />
         <button
           onClick={(e) => {

@@ -10,7 +10,7 @@ const Section = ({
   title: string;
   children: React.ReactNode;
 }) => (
-  <div className="bg-card rounded-2xl border border-border p-4 mb-3">
+  <div className="bg-card rounded-2xl border border-border/50 shadow-sm p-4 mb-3">
     <div className="flex items-center gap-2 mb-2">
       <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
         <Icon className="w-4 h-4 text-primary" />
@@ -87,7 +87,7 @@ const CommunityGuidelines = () => {
         </p>
       </Section>
 
-      <div className="mt-6 p-4 rounded-2xl bg-muted/50 border border-border">
+      <div className="mt-6 p-4 rounded-2xl bg-card border border-border">
         <p className="text-xs text-muted-foreground leading-relaxed">
           Violations of these guidelines may result in content removal, temporary restrictions, or
           permanent account suspension. Questions or concerns? Reach us at{" "}

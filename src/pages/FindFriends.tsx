@@ -178,7 +178,7 @@ const FindFriends = () => {
       </p>
 
       {!consent && (
-        <div className="bg-card border border-border rounded-2xl p-5 mb-4">
+        <div className="bg-card border border-border/50 rounded-2xl shadow-sm p-5 mb-4">
           <div className="flex items-center gap-2 mb-2">
             <Shield className="w-4 h-4 text-muted-foreground" />
             <h2 className="text-sm font-bold">Privacy-first matching</h2>
@@ -234,7 +234,7 @@ const FindFriends = () => {
               <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
                 On SideQuest ({matches.length})
               </h2>
-              <div className="bg-card border border-border rounded-2xl divide-y divide-border overflow-hidden">
+              <div className="bg-card border border-border/50 rounded-2xl shadow-sm divide-y divide-border overflow-hidden">
                 {matches.map((m) => {
                   const isFriend = friends.some((f) => f.id === m.user_id);
                   const isSent = sent.includes(m.user_id);
@@ -283,7 +283,7 @@ const FindFriends = () => {
               <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
                 Not on SideQuest yet ({unmatchedEmails.length})
               </h2>
-              <div className="bg-card border border-border rounded-2xl divide-y divide-border overflow-hidden">
+              <div className="bg-card border border-border/50 rounded-2xl shadow-sm divide-y divide-border overflow-hidden">
                 {unmatchedEmails.map((email) => (
                   <div key={email} className="flex items-center gap-3 px-4 py-3">
                     <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center">

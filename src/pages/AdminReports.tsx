@@ -101,7 +101,7 @@ const AdminReports = () => {
       ) : (
         <div className="space-y-3">
           {reports.map((r) => (
-            <div key={r.id} className="bg-card border border-border rounded-2xl p-4">
+            <div key={r.id} className="bg-card border border-border/50 rounded-2xl shadow-sm p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   {r.reason}
