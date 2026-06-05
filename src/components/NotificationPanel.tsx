@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Bell, MessageCircle, UserPlus, ArrowRightLeft, Check, Users, Camera, HandMetal, UserMinus, CalendarClock, Ban, Clock, Sparkles, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { usePopup } from "@/hooks/use-popup";
-import { SECTION_ORDER, SECTION_LABEL, TYPE_TO_SECTION, NotificationType, NotifSection } from "@/data/notificationCategories";
+
 import EmptyState from "@/components/EmptyState";
 
 interface NotificationPanelProps {
