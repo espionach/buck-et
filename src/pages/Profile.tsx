@@ -438,7 +438,7 @@ const Profile = () => {
       <div className="min-h-screen pb-32 px-5 pt-14">
         <button
           onClick={() => setShowEditProfile(false)}
-          className="p-2 rounded-xl bg-muted text-muted-foreground mb-4"
+          className="p-2 -ml-2 text-muted-foreground hover:text-foreground transition-colors mb-4"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>

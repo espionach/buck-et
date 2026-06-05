@@ -71,7 +71,7 @@ const CreateGroup = () => {
   return (
     <div className="min-h-screen px-5 pt-14 pb-10">
       <div className="flex items-center gap-3 mb-8">
-        <button onClick={() => (fromPath ? navigate(fromPath) : navigate(-1))} className="p-2 rounded-xl bg-muted text-muted-foreground">
+        <button onClick={() => (fromPath ? navigate(fromPath) : navigate(-1))} className="p-2 -ml-2 text-muted-foreground hover:text-foreground transition-colors">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <h1 className="text-xl font-bold text-foreground">New Group</h1>

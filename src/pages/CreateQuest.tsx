@@ -311,7 +311,7 @@ const CreateQuest = () => {
                   ? navigate(fromPath)
                   : navigate(-1)
           }
-          className="p-2 rounded-xl bg-muted text-muted-foreground"
+          className="p-2 -ml-2 text-muted-foreground hover:text-foreground transition-colors"
           aria-label="Back"
         >
           <ArrowLeft className="w-5 h-5" />

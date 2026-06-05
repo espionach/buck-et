@@ -46,7 +46,7 @@ const Drafts = () => {
       <div className="flex items-center gap-3 mb-5">
         <button
           onClick={() => nav(-1)}
-          className="p-2 rounded-xl bg-muted text-muted-foreground"
+          className="p-2 -ml-2 text-muted-foreground hover:text-foreground transition-colors"
           aria-label="Back"
         >
           <ArrowLeft className="w-5 h-5" />

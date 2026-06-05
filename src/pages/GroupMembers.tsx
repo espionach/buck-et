@@ -39,7 +39,7 @@ const GroupMembers = () => {
       <div className="min-h-screen p-5 space-y-4">
         <button
           onClick={() => navigate(-1)}
-          className="p-2 rounded-xl bg-muted text-muted-foreground"
+          className="p-2 -ml-2 text-muted-foreground hover:text-foreground transition-colors"
           aria-label="Back"
         >
           <ArrowLeft className="w-5 h-5" />
@@ -62,7 +62,7 @@ const GroupMembers = () => {
       <div className="flex items-center justify-between">
         <button
           onClick={() => navigate(-1)}
-          className="p-2 rounded-xl bg-muted text-muted-foreground"
+          className="p-2 -ml-2 text-muted-foreground hover:text-foreground transition-colors"
           aria-label="Back"
         >
           <ArrowLeft className="w-5 h-5" />

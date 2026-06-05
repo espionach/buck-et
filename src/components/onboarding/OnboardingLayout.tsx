@@ -22,7 +22,7 @@ const OnboardingLayout = ({ step, onSkip, skipLabel = "Skip", onBack, children }
           onClick={onBack}
           disabled={!onBack}
           aria-label="Back"
-          className="w-9 h-9 -ml-2 flex items-center justify-center rounded-full text-foreground active:bg-muted disabled:opacity-0 disabled:pointer-events-none"
+          className="p-2 -ml-2 flex items-center justify-center text-foreground hover:text-foreground/80 transition-colors disabled:opacity-0 disabled:pointer-events-none"
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
