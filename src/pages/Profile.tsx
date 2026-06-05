@@ -738,7 +738,7 @@ const Profile = () => {
       {tab === "current" && draftCount > 0 && (
         <div className="flex justify-end mb-2">
           <button
-            onClick={() => nav("/drafts")}
+            onClick={() => nav("/drafts", { state: { from: "/profile" } })}
             className="flex items-center gap-1.5 text-xs font-semibold text-foreground group"
           >
             <FileText className="w-3.5 h-3.5 text-muted-foreground" />
