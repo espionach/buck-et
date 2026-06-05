@@ -24,7 +24,7 @@ const GroupSettings = () => {
     return (
       <div className="min-h-screen p-5 space-y-4">
         <button
-          onClick={() => navigate("/profile?tab=groups")}
+          onClick={() => navigate(-1)}
           className="p-2 rounded-xl bg-muted text-muted-foreground"
           aria-label="Back"
         >
@@ -58,7 +58,7 @@ const GroupSettings = () => {
     <div className="min-h-screen p-5 space-y-5">
       <div className="flex items-center gap-2">
         <button
-          onClick={() => navigate(`/groups/${group.id}`)}
+          onClick={() => navigate(-1)}
           className="p-2 rounded-xl bg-muted text-muted-foreground"
           aria-label="Back"
         >

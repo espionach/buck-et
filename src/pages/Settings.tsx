@@ -361,7 +361,7 @@ const Settings = () => {
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <button
-          onClick={() => nav("/profile")}
+          onClick={() => nav(-1)}
           className="p-2 -ml-2 text-muted-foreground"
           aria-label="Back"
         >

@@ -45,7 +45,7 @@ const Drafts = () => {
     <div className="min-h-screen px-5 pt-14 pb-10">
       <div className="flex items-center gap-3 mb-5">
         <button
-          onClick={() => nav("/profile")}
+          onClick={() => nav(-1)}
           className="p-2 rounded-xl bg-muted text-muted-foreground"
           aria-label="Back"
         >

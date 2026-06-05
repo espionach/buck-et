@@ -309,7 +309,7 @@ const CreateQuest = () => {
                 ? navigate("/drafts")
                 : fromPath
                   ? navigate(fromPath)
-                  : navigate("/")
+                  : navigate(-1)
           }
           className="p-2 rounded-xl bg-muted text-muted-foreground"
           aria-label="Back"
