@@ -284,9 +284,9 @@ const CreateQuest = () => {
       }
       submittedRef.current = true;
       if (isOnboarding) {
-        // After their first sidequest, send them to their profile so they
-        // can see it sitting in their Active list.
-        navigate("/profile", { replace: true, state: { justAddedQuestId: questId } });
+        // Onboarding finale — land them on the quest they just created so
+        // the contextual spotlight on /quest/:id can introduce the page.
+        navigate(`/quest/${questId}`, { replace: true });
       } else {
         navigate("/profile", { replace: true, state: { justAddedQuestId: questId } });
       }
@@ -304,7 +304,7 @@ const CreateQuest = () => {
         <button
           onClick={() =>
             isOnboarding
-              ? navigate("/onboarding/tour", { replace: true })
+              ? navigate("/onboarding/friends", { replace: true })
               : searchParams.get("draftId")
                 ? navigate("/drafts")
                 : fromPath

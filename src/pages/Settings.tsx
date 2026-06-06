@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { usePopup } from "@/hooks/use-popup";
 import { useAppStore } from "@/data/appState";
-import { resetOnboarding } from "@/hooks/useOnboarding";
+
 import PasswordRequirements from "@/components/PasswordRequirements";
 import { validatePassword, isLeakedPasswordError } from "@/lib/passwordPolicy";
 import {
@@ -350,10 +350,11 @@ const Settings = () => {
     setSupportMessage("");
   };
 
-  const handleReplayTour = async () => {
+  const handleReplayTips = async () => {
     if (!user) return;
-    await resetOnboarding(user.id);
-    nav("/onboarding/welcome");
+    const { replayAllSpotlights } = await import("@/data/spotlights");
+    replayAllSpotlights(user.id);
+    toast({ title: "Tips reset", description: "You'll see contextual tips again as you explore." });
   };
 
   return (
@@ -394,7 +395,7 @@ const Settings = () => {
         <Row icon={Bell} label="Notification Settings" onClick={() => setShowNotif(true)} />
         <Row icon={UserPlus} label="Find Friends" onClick={() => nav("/find-friends")} />
         <Row icon={ShieldOff} label="Blocked Users" onClick={() => nav("/settings/blocked")} />
-        <Row icon={Compass} label="Replay App Tour" onClick={handleReplayTour} />
+        <Row icon={Compass} label="Replay Tips" onClick={handleReplayTips} />
       </Section>
 
       {isMod && (

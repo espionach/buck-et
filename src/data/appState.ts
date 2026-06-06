@@ -33,7 +33,6 @@ interface AppState {
   hideGlobalFab: boolean;
   popupCount: number;
   pinnedQuestIds: string[];
-  tourActive: boolean;
   _initialized: boolean;
 
   // Setters for data from React Query
@@ -56,8 +55,6 @@ interface AppState {
   popPopup: () => void;
   pinQuest: (questId: string) => void;
   unpinQuest: (questId: string) => void;
-  startTour: () => void;
-  endTour: () => void;
 
   // Mutations — these update local state AND persist to DB
   addQuest: (quest: Quest) => void;
@@ -148,7 +145,6 @@ export const useAppStore = create<AppState>((set, get) => ({
   hideGlobalFab: false,
   popupCount: 0,
   pinnedQuestIds: JSON.parse(localStorage.getItem("pinnedQuestIds") || "[]"),
-  tourActive: false,
   _initialized: false,
   _invalidate: () => {},
 
@@ -182,8 +178,6 @@ export const useAppStore = create<AppState>((set, get) => ({
     localStorage.setItem("pinnedQuestIds", JSON.stringify(next));
     return { pinnedQuestIds: next };
   }),
-  startTour: () => set({ tourActive: true }),
-  endTour: () => set({ tourActive: false }),
 
   // ---- Mutations ----
 

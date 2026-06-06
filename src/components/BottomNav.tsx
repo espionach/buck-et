@@ -13,7 +13,6 @@ const BottomNav = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const hideGlobalFab = useAppStore((s) => s.hideGlobalFab || s.popupCount > 0);
-  const tourActive = useAppStore((s) => s.tourActive);
 
   return (
     <>
@@ -24,7 +23,7 @@ const BottomNav = () => {
             <button
               data-tour="fab"
               onClick={() =>
-                navigate(tourActive ? "/create?onboarding=1" : "/create", {
+                navigate("/create", {
                   state: { from: location.pathname + location.search },
                 })
               }

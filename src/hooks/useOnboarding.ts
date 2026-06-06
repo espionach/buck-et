@@ -13,7 +13,6 @@ export type OnboardingStep =
   | "examples"
   | "permissions"
   | "friends"
-  | "tour"
   | "first_quest";
 
 export const ONBOARDING_ORDER: OnboardingStep[] = [
@@ -21,7 +20,6 @@ export const ONBOARDING_ORDER: OnboardingStep[] = [
   "examples",
   "permissions",
   "friends",
-  "tour",
   "first_quest",
 ];
 
@@ -30,7 +28,6 @@ export const ONBOARDING_PATHS: Record<OnboardingStep, string> = {
   examples: "/onboarding/examples",
   permissions: "/onboarding/permissions",
   friends: "/onboarding/friends",
-  tour: "/onboarding/tour",
   first_quest: "/create",
 };
 

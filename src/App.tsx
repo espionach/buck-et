@@ -39,10 +39,9 @@ import Welcome from "./pages/onboarding/Welcome";
 import OnboardingExamples from "./pages/onboarding/Examples";
 import OnboardingPermissions from "./pages/onboarding/Permissions";
 import OnboardingFriends from "./pages/onboarding/Friends";
-import OnboardingTour from "./pages/onboarding/Tour";
 import { useOnboardingStatus, ONBOARDING_PATHS } from "@/hooks/useOnboarding";
-import GlobalTour from "./components/onboarding/GlobalTour";
-import { useAppStore } from "@/data/appState";
+import SpotlightHost from "./components/onboarding/SpotlightHost";
+
 
 const queryClient = new QueryClient();
 
@@ -50,7 +49,6 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
   const { onboarded, step, loading: onboardingLoading } = useOnboardingStatus();
   const location = useLocation();
-  const tourActive = useAppStore((s) => s.tourActive);
   if (loading) return <div className="flex min-h-screen items-center justify-center text-muted-foreground">Loading...</div>;
   if (!user) return <Navigate to="/login" replace state={{ from: location.pathname + location.search }} />;
   if (onboardingLoading) return <div className="flex min-h-screen items-center justify-center text-muted-foreground">Loading...</div>;
@@ -58,9 +56,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   // (but allow them to be on any /onboarding/* route or /create when resuming first_quest)
   const onOnboardingRoute = location.pathname.startsWith("/onboarding/");
   const onFirstQuestRoute = location.pathname === "/create";
-  // While the tour is running, allow navigation to any in-app route — Coachmarks
-  // hops between Home/Groups/Profile and would otherwise fight the gate.
-  if (!onboarded && !onOnboardingRoute && !onFirstQuestRoute && !tourActive) {
+  if (!onboarded && !onOnboardingRoute && !onFirstQuestRoute) {
     const target = step ? ONBOARDING_PATHS[step] : "/onboarding/welcome";
     return <Navigate to={target} replace />;
   }
@@ -90,7 +86,7 @@ const AppLayout = () => {
         <Route path="/onboarding/examples" element={<ProtectedRoute><OnboardingExamples /></ProtectedRoute>} />
         <Route path="/onboarding/permissions" element={<ProtectedRoute><OnboardingPermissions /></ProtectedRoute>} />
         <Route path="/onboarding/friends" element={<ProtectedRoute><OnboardingFriends /></ProtectedRoute>} />
-        <Route path="/onboarding/tour" element={<ProtectedRoute><OnboardingTour /></ProtectedRoute>} />
+        <Route path="/onboarding/tour" element={<Navigate to="/create?onboarding=1" replace />} />
         <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
         <Route path="/calendar" element={<ProtectedRoute><Calendar /></ProtectedRoute>} />
         {/* Legacy group routes redirect to the new Groups tab on Profile */}
@@ -120,7 +116,7 @@ const AppLayout = () => {
       </Routes>
       {!hideNav && <BottomNav />}
       {!hideNav && <LegalUpdateBanner />}
-      <GlobalTour />
+      <SpotlightHost />
     </div>
   );
 };

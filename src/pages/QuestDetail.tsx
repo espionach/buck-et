@@ -180,6 +180,7 @@ const QuestDetail = () => {
           {/* Owner badge / Join / Joined button */}
           {isOwner ? (
             <span
+              data-spotlight="quest-join"
               aria-label="You own this sidequest"
               className="shrink-0 flex items-center justify-center px-3 py-1.5 rounded-full text-xs font-semibold bg-muted text-muted-foreground cursor-default select-none"
             >
@@ -191,6 +192,7 @@ const QuestDetail = () => {
               const canJoin = userInGroup;
               return (
                 <button
+                  data-spotlight="quest-join"
                   onClick={() => {
                     if (!canJoin) return;
                     toggleImIn(quest.id);
