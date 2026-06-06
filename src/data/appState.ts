@@ -34,7 +34,6 @@ interface AppState {
   popupCount: number;
   pinnedQuestIds: string[];
   _initialized: boolean;
-  // Removed: tourActive (replaced by SpotlightHost)
 
   // Setters for data from React Query
   setQuests: (quests: Quest[]) => void;
