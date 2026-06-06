@@ -123,6 +123,7 @@ const CalendarPage = () => {
             </button>
           </div>
         </div>
+        <div data-spotlight="calendar-grid">
         <Calendar
           mode="single"
           selected={selected}
@@ -152,6 +153,7 @@ const CalendarPage = () => {
           }}
           className="p-0 pointer-events-auto w-full"
         />
+        </div>
       </div>
 
 
