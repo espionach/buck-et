@@ -41,7 +41,7 @@ import OnboardingPermissions from "./pages/onboarding/Permissions";
 import OnboardingFriends from "./pages/onboarding/Friends";
 import { useOnboardingStatus, ONBOARDING_PATHS } from "@/hooks/useOnboarding";
 import SpotlightHost from "./components/onboarding/SpotlightHost";
-import { useAppStore } from "@/data/appState";
+
 
 const queryClient = new QueryClient();
 
