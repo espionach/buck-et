@@ -70,8 +70,8 @@ const Friends = () => {
   };
 
   const handleContinue = async () => {
-    if (user) await setOnboardingStep(user.id, "tour");
-    navigate("/onboarding/tour");
+    if (user) await setOnboardingStep(user.id, "first_quest");
+    navigate("/create?onboarding=1");
   };
 
   const handleSkipAll = async () => {
