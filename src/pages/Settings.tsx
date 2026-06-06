@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { usePopup } from "@/hooks/use-popup";
 import { useAppStore } from "@/data/appState";
-import { resetOnboarding } from "@/hooks/useOnboarding";
+
 import PasswordRequirements from "@/components/PasswordRequirements";
 import { validatePassword, isLeakedPasswordError } from "@/lib/passwordPolicy";
 import {
