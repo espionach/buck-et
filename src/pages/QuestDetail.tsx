@@ -181,7 +181,7 @@ const QuestDetail = () => {
           {isOwner ? (
             <span
               aria-label="You own this sidequest"
-              className="shrink-0 flex items-center justify-center px-3 py-1.5 rounded-full text-xs font-semibold bg-background text-primary border border-primary cursor-default select-none"
+              className="shrink-0 flex items-center justify-center px-3 py-1.5 rounded-full text-xs font-semibold bg-muted text-muted-foreground cursor-default select-none"
             >
               Owner
             </span>
