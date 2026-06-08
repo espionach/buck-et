@@ -31,7 +31,7 @@ const OVERLAY_OPACITY = 0.45;
 const SpotlightHost = () => {
   const { user } = useAuth();
   const location = useLocation();
-  const [, forceRerender] = useState(0);
+  const [tick, forceRerender] = useState(0);
   const [rect, setRect] = useState<Rect | null>(null);
   const [tooltipHeight, setTooltipHeight] = useState(140);
   const tooltipRef = useRef<HTMLDivElement | null>(null);
