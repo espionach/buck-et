@@ -21,6 +21,7 @@ interface Rect {
 const SPOTLIGHT_PADDING = 6;
 const TOOLTIP_GAP = 14;
 const TOOLTIP_WIDTH = 280;
+const TOOLTIP_HEIGHT = 144;
 const OVERLAY_OPACITY = 0.45;
 
 /**
@@ -198,17 +199,17 @@ const SpotlightHost = () => {
     const spaceBelow = viewportH - (rect.top + rect.height) - TOOLTIP_GAP - 16;
     const preferred = active.placement;
     const placement: "top" | "bottom" =
-      preferred === "top" && spaceAbove >= tooltipHeight
+      preferred === "top" && spaceAbove >= TOOLTIP_HEIGHT
         ? "top"
-        : preferred === "bottom" && spaceBelow >= tooltipHeight
+        : preferred === "bottom" && spaceBelow >= TOOLTIP_HEIGHT
         ? "bottom"
-        : spaceAbove >= tooltipHeight
+        : spaceAbove >= TOOLTIP_HEIGHT
         ? "top"
         : "bottom";
 
     tooltipTop =
       placement === "top"
-        ? rect.top - TOOLTIP_GAP - tooltipHeight
+        ? rect.top - TOOLTIP_GAP - TOOLTIP_HEIGHT
         : rect.top + rect.height + TOOLTIP_GAP;
     tooltipLeft = Math.max(
       16,
@@ -217,7 +218,7 @@ const SpotlightHost = () => {
         rect.left + rect.width / 2 - TOOLTIP_WIDTH / 2,
       ),
     );
-    tooltipTop = Math.max(16, Math.min(viewportH - tooltipHeight - 16, tooltipTop));
+    tooltipTop = Math.max(16, Math.min(viewportH - TOOLTIP_HEIGHT - 16, tooltipTop));
   }
 
   const overlay = (
@@ -235,7 +236,6 @@ const SpotlightHost = () => {
       />
 
       <div
-        ref={tooltipRef}
         className="absolute bg-card rounded-2xl shadow-xl border border-border p-4 pointer-events-auto"
         onClick={(event) => event.stopPropagation()}
         style={{
