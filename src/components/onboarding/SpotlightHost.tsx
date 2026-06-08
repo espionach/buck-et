@@ -154,7 +154,7 @@ const SpotlightHost = () => {
             boxShadow: `0 0 0 9999px hsl(var(--foreground) / ${OVERLAY_OPACITY})`,
             transition: "opacity 0.25s ease",
             animation: "fade-in 0.25s ease-out",
-            pointerEvents: "none",
+            pointerEvents: "auto",
           }}
         />
       ) : null}
