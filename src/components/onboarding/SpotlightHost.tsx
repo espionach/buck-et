@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -38,6 +38,17 @@ const SpotlightHost = () => {
   const tooltipRef = useRef<HTMLDivElement | null>(null);
   const lastRectRef = useRef<Rect | null>(null);
 
+  const getNextSpotlight = useCallback(
+    (excludeIds: string[] = []) => {
+      if (!user || isSkippedAll(user.id)) return null;
+      const dismissed = getDismissed(user.id);
+      excludeIds.forEach((id) => dismissed.add(id));
+      const loc = { pathname: location.pathname, search: location.search };
+      return SPOTLIGHTS.find((s) => s.match(loc) && !dismissed.has(s.id)) ?? null;
+    },
+    [location.pathname, location.search, user],
+  );
+
   // Subscribe to spotlight state changes (e.g., "Skip all" or "Replay tips").
   useEffect(() => {
     const h = () => forceRerender((n) => n + 1);
@@ -47,17 +58,10 @@ const SpotlightHost = () => {
 
   // Pick the eligible spotlight before paint so the tip appears immediately.
   useLayoutEffect(() => {
-    if (!user || isSkippedAll(user.id)) {
-      if (active) setActive(null);
-      return;
-    }
-
-    const dismissed = getDismissed(user.id);
-    const loc = { pathname: location.pathname, search: location.search };
-    if (active?.match(loc) && !dismissed.has(active.id)) return;
-
-    setActive(SPOTLIGHTS.find((s) => s.match(loc) && !dismissed.has(s.id)) ?? null);
-  }, [active, location.pathname, location.search, tick, user]);
+    const next = getNextSpotlight();
+    if (active?.id === next?.id) return;
+    setActive(next);
+  }, [active?.id, getNextSpotlight, tick]);
 
   // Reset rect when spotlight changes / disappears
   useEffect(() => {
@@ -102,8 +106,12 @@ const SpotlightHost = () => {
         return;
       }
       const r = el.getBoundingClientRect();
+      const isOnScreen =
+        r.bottom > 0 && r.right > 0 && r.top < window.innerHeight && r.left < window.innerWidth;
       // Skip targets that aren't actually visible (e.g., not yet laid out).
-      if (r.width === 0 && r.height === 0) {
+      if (r.width <= 0 || r.height <= 0 || !isOnScreen) {
+        lastRectRef.current = null;
+        setRect(null);
         raf = requestAnimationFrame(measure);
         return;
       }
@@ -132,10 +140,16 @@ const SpotlightHost = () => {
   const handleDismiss = () => {
     const spotlightId = active.id;
     dismissSpotlight(user.id, spotlightId);
+    lastRectRef.current = null;
+    setRect(null);
+    setActive(getNextSpotlight([spotlightId]));
   };
 
   const handleSkipAll = () => {
     skipAllSpotlights(user.id);
+    lastRectRef.current = null;
+    setRect(null);
+    setActive(null);
   };
 
   // Compute tooltip position
