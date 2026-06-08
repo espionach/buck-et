@@ -31,7 +31,7 @@ const OVERLAY_OPACITY = 0.45;
 const SpotlightHost = () => {
   const { user } = useAuth();
   const location = useLocation();
-  const [, forceRerender] = useState(0);
+  const [tick, forceRerender] = useState(0);
   const [rect, setRect] = useState<Rect | null>(null);
   const [tooltipHeight, setTooltipHeight] = useState(140);
   const tooltipRef = useRef<HTMLDivElement | null>(null);
@@ -51,7 +51,7 @@ const SpotlightHost = () => {
     const loc = { pathname: location.pathname, search: location.search };
     return SPOTLIGHTS.find((s) => s.match(loc) && !dismissed.has(s.id)) ?? null;
     // include rerender tick by depending on user id + location only
-  }, [user, location.pathname, location.search]);
+  }, [user, location.pathname, location.search, tick]);
 
   // Reset rect when spotlight changes / disappears
   useEffect(() => {
