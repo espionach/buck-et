@@ -34,8 +34,6 @@ const SpotlightHost = () => {
   const [tick, forceRerender] = useState(0);
   const [active, setActive] = useState<SpotlightDef | null>(null);
   const [rect, setRect] = useState<Rect | null>(null);
-  const [tooltipHeight, setTooltipHeight] = useState(140);
-  const tooltipRef = useRef<HTMLDivElement | null>(null);
   const lastRectRef = useRef<Rect | null>(null);
 
   const getNextSpotlight = useCallback(
@@ -67,20 +65,18 @@ const SpotlightHost = () => {
   useEffect(() => {
     lastRectRef.current = null;
     setRect(null);
-    setTooltipHeight(140);
   }, [active?.id]);
 
-  // Measure tooltip
-  useLayoutEffect(() => {
-    if (tooltipRef.current) setTooltipHeight(tooltipRef.current.offsetHeight);
-  }, [active?.id, rect]);
-
-  // Poll for the target element until found, then keep it in sync.
+  // Observe the target instead of polling every frame. This keeps tips stable
+  // while still showing immediately once the target is present and visible.
   useLayoutEffect(() => {
     if (!active) return;
     let raf = 0;
     let cancelled = false;
-    let scheduled = false;
+    let observedEl: HTMLElement | null = null;
+    let intersectionObserver: IntersectionObserver | null = null;
+    let resizeObserver: ResizeObserver | null = null;
+    let mutationObserver: MutationObserver | null = null;
 
     const updateRect = (next: Rect) => {
       const prev = lastRectRef.current;
@@ -97,12 +93,18 @@ const SpotlightHost = () => {
       setRect(next);
     };
 
+    const clearRect = () => {
+      if (!lastRectRef.current) return;
+      lastRectRef.current = null;
+      setRect(null);
+    };
+
     const measure = () => {
-      scheduled = false;
+      raf = 0;
       if (cancelled) return;
       const el = document.querySelector(active.targetSelector) as HTMLElement | null;
       if (!el) {
-        raf = requestAnimationFrame(measure);
+        clearRect();
         return;
       }
       const r = el.getBoundingClientRect();
@@ -110,26 +112,59 @@ const SpotlightHost = () => {
         r.bottom > 0 && r.right > 0 && r.top < window.innerHeight && r.left < window.innerWidth;
       // Skip targets that aren't actually visible (e.g., not yet laid out).
       if (r.width <= 0 || r.height <= 0 || !isOnScreen) {
-        lastRectRef.current = null;
-        setRect(null);
-        raf = requestAnimationFrame(measure);
+        clearRect();
         return;
       }
       updateRect({ top: r.top, left: r.left, width: r.width, height: r.height });
     };
 
     const scheduleMeasure = () => {
-      if (scheduled || cancelled) return;
-      scheduled = true;
+      if (raf || cancelled) return;
       raf = requestAnimationFrame(measure);
     };
 
+    const attachObservers = () => {
+      const el = document.querySelector(active.targetSelector) as HTMLElement | null;
+      if (el === observedEl) return;
+
+      intersectionObserver?.disconnect();
+      resizeObserver?.disconnect();
+      observedEl = el;
+
+      if (!el) {
+        clearRect();
+        return;
+      }
+
+      intersectionObserver = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((entry) => entry.isIntersecting)) scheduleMeasure();
+          else clearRect();
+        },
+        { threshold: 0.01 },
+      );
+      intersectionObserver.observe(el);
+
+      resizeObserver = new ResizeObserver(scheduleMeasure);
+      resizeObserver.observe(el);
+      scheduleMeasure();
+    };
+
+    attachObservers();
     measure();
+    mutationObserver = new MutationObserver(() => {
+      attachObservers();
+      scheduleMeasure();
+    });
+    mutationObserver.observe(document.body, { childList: true, subtree: true });
     window.addEventListener("resize", scheduleMeasure);
     window.addEventListener("scroll", scheduleMeasure, true);
     return () => {
       cancelled = true;
       cancelAnimationFrame(raf);
+      intersectionObserver?.disconnect();
+      resizeObserver?.disconnect();
+      mutationObserver?.disconnect();
       window.removeEventListener("resize", scheduleMeasure);
       window.removeEventListener("scroll", scheduleMeasure, true);
     };
