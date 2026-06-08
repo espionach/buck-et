@@ -33,13 +33,10 @@ const SpotlightHost = () => {
   const location = useLocation();
   const [tick, forceRerender] = useState(0);
   const [active, setActive] = useState<SpotlightDef | null>(null);
-  const [isTransitioning, setIsTransitioning] = useState(false);
   const [rect, setRect] = useState<Rect | null>(null);
   const [tooltipHeight, setTooltipHeight] = useState(140);
   const tooltipRef = useRef<HTMLDivElement | null>(null);
   const lastRectRef = useRef<Rect | null>(null);
-  const isTransitioningRef = useRef(false);
-  const transitionTimersRef = useRef<number[]>([]);
 
   // Subscribe to spotlight state changes (e.g., "Skip all" or "Replay tips").
   useEffect(() => {
@@ -48,33 +45,19 @@ const SpotlightHost = () => {
     return () => window.removeEventListener("spotlight-state-changed", h);
   }, []);
 
-  useEffect(() => {
-    return () => {
-      transitionTimersRef.current.forEach((timer) => window.clearTimeout(timer));
-      transitionTimersRef.current = [];
-    };
-  }, []);
+  // Pick the eligible spotlight before paint so the tip appears immediately.
+  useLayoutEffect(() => {
+    if (!user || isSkippedAll(user.id)) {
+      if (active) setActive(null);
+      return;
+    }
 
-  // A tip stays locked until explicit dismissal. Route/user changes intentionally reset it.
-  useEffect(() => {
-    transitionTimersRef.current.forEach((timer) => window.clearTimeout(timer));
-    transitionTimersRef.current = [];
-    lastRectRef.current = null;
-    isTransitioningRef.current = false;
-    setActive(null);
-    setRect(null);
-    setTooltipHeight(140);
-    setIsTransitioning(false);
-  }, [user?.id, location.pathname, location.search]);
-
-  // Pick the next eligible spotlight only when no tip is already being shown or dismissed.
-  useEffect(() => {
-    if (!user || active || isTransitioning) return;
-    if (isSkippedAll(user.id)) return;
     const dismissed = getDismissed(user.id);
     const loc = { pathname: location.pathname, search: location.search };
+    if (active?.match(loc) && !dismissed.has(active.id)) return;
+
     setActive(SPOTLIGHTS.find((s) => s.match(loc) && !dismissed.has(s.id)) ?? null);
-  }, [active, isTransitioning, location.pathname, location.search, tick, user]);
+  }, [active, location.pathname, location.search, tick, user]);
 
   // Reset rect when spotlight changes / disappears
   useEffect(() => {
@@ -144,33 +127,15 @@ const SpotlightHost = () => {
     };
   }, [active]);
 
-  if (!active || !user) return null;
-
-  const queueTransition = (complete: () => void) => {
-    if (isTransitioningRef.current) return;
-    isTransitioningRef.current = true;
-    setIsTransitioning(true);
-    const fadeTimer = window.setTimeout(() => {
-      setActive(null);
-      setRect(null);
-      lastRectRef.current = null;
-      const settleTimer = window.setTimeout(() => {
-        complete();
-        isTransitioningRef.current = false;
-        setIsTransitioning(false);
-      }, 140);
-      transitionTimersRef.current.push(settleTimer);
-    }, 180);
-    transitionTimersRef.current.push(fadeTimer);
-  };
+  if (!active || !user || !rect) return null;
 
   const handleDismiss = () => {
     const spotlightId = active.id;
-    queueTransition(() => dismissSpotlight(user.id, spotlightId));
+    dismissSpotlight(user.id, spotlightId);
   };
 
   const handleSkipAll = () => {
-    queueTransition(() => skipAllSpotlights(user.id));
+    skipAllSpotlights(user.id);
   };
 
   // Compute tooltip position
@@ -208,43 +173,34 @@ const SpotlightHost = () => {
 
   const overlay = (
     <div className="fixed inset-0 z-[100] pointer-events-auto" onClick={handleDismiss}>
-      {rect ? (
-        <div
-          aria-hidden
-          className="absolute rounded-2xl pointer-events-none"
-          style={{
-            top: rect.top - SPOTLIGHT_PADDING,
-            left: rect.left - SPOTLIGHT_PADDING,
-            width: rect.width + SPOTLIGHT_PADDING * 2,
-            height: rect.height + SPOTLIGHT_PADDING * 2,
-            boxShadow: `0 0 0 9999px hsl(var(--foreground) / ${OVERLAY_OPACITY})`,
-            opacity: isTransitioning ? 0 : 1,
-            transition: "opacity 0.18s ease",
-          }}
-        />
-      ) : null}
+      <div
+        aria-hidden
+        className="absolute rounded-2xl pointer-events-none"
+        style={{
+          top: rect.top - SPOTLIGHT_PADDING,
+          left: rect.left - SPOTLIGHT_PADDING,
+          width: rect.width + SPOTLIGHT_PADDING * 2,
+          height: rect.height + SPOTLIGHT_PADDING * 2,
+          boxShadow: `0 0 0 9999px hsl(var(--foreground) / ${OVERLAY_OPACITY})`,
+        }}
+      />
 
-      {rect && (
-        <div
-          ref={tooltipRef}
-          className="absolute bg-card rounded-2xl shadow-xl border border-border p-4 pointer-events-auto"
-          onClick={(event) => event.stopPropagation()}
-          style={{
-            top: tooltipTop,
-            left: tooltipLeft,
-            width: TOOLTIP_WIDTH,
-            opacity: isTransitioning ? 0 : 1,
-            transform: isTransitioning ? "translateY(4px)" : "translateY(0)",
-            transition: "opacity 0.18s ease, transform 0.18s ease",
-          }}
-        >
+      <div
+        ref={tooltipRef}
+        className="absolute bg-card rounded-2xl shadow-xl border border-border p-4 pointer-events-auto"
+        onClick={(event) => event.stopPropagation()}
+        style={{
+          top: tooltipTop,
+          left: tooltipLeft,
+          width: TOOLTIP_WIDTH,
+        }}
+      >
           <div className="flex items-center justify-between mb-1">
             <div className="text-[11px] font-semibold uppercase tracking-wider text-primary">
               Tip
             </div>
             <button
               onClick={handleSkipAll}
-              disabled={isTransitioning}
               className="text-xs font-medium text-muted-foreground active:text-foreground"
             >
               Skip all tips
@@ -254,13 +210,11 @@ const SpotlightHost = () => {
           <div className="text-sm text-muted-foreground mb-4">{active.body}</div>
           <button
             onClick={handleDismiss}
-            disabled={isTransitioning}
-            className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm active:scale-[0.98] transition-transform disabled:opacity-60"
+            className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm active:scale-[0.98] transition-transform"
           >
             Got it
           </button>
         </div>
-      )}
     </div>
   );
 
