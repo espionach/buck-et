@@ -51,7 +51,7 @@ const SpotlightHost = () => {
     const loc = { pathname: location.pathname, search: location.search };
     return SPOTLIGHTS.find((s) => s.match(loc) && !dismissed.has(s.id)) ?? null;
     // include rerender tick by depending on user id + location only
-  }, [user, location.pathname, location.search]);
+  }, [user, location.pathname, location.search, tick]);
 
   // Reset rect when spotlight changes / disappears
   useEffect(() => {
