@@ -140,7 +140,7 @@ const SpotlightHost = () => {
   }
 
   const overlay = (
-    <div className="fixed inset-0 z-[100]">
+    <div className="fixed inset-0 z-[100] pointer-events-none">
       {rect ? (
         <div
           aria-hidden
@@ -162,7 +162,7 @@ const SpotlightHost = () => {
       {rect && (
         <div
           ref={tooltipRef}
-          className="absolute bg-card rounded-2xl shadow-xl border border-border p-4"
+          className="absolute bg-card rounded-2xl shadow-xl border border-border p-4 pointer-events-auto"
           style={{
             top: tooltipTop,
             left: tooltipLeft,
