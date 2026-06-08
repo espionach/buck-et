@@ -38,6 +38,7 @@ const SpotlightHost = () => {
   const [tooltipHeight, setTooltipHeight] = useState(140);
   const tooltipRef = useRef<HTMLDivElement | null>(null);
   const lastRectRef = useRef<Rect | null>(null);
+  const isTransitioningRef = useRef(false);
   const transitionTimersRef = useRef<number[]>([]);
 
   // Subscribe to spotlight state changes (e.g., "Skip all" or "Replay tips").
@@ -59,6 +60,7 @@ const SpotlightHost = () => {
     transitionTimersRef.current.forEach((timer) => window.clearTimeout(timer));
     transitionTimersRef.current = [];
     lastRectRef.current = null;
+    isTransitioningRef.current = false;
     setActive(null);
     setRect(null);
     setTooltipHeight(140);
@@ -145,7 +147,8 @@ const SpotlightHost = () => {
   if (!active || !user) return null;
 
   const queueTransition = (complete: () => void) => {
-    if (isTransitioning) return;
+    if (isTransitioningRef.current) return;
+    isTransitioningRef.current = true;
     setIsTransitioning(true);
     const fadeTimer = window.setTimeout(() => {
       setActive(null);
@@ -153,6 +156,7 @@ const SpotlightHost = () => {
       lastRectRef.current = null;
       const settleTimer = window.setTimeout(() => {
         complete();
+        isTransitioningRef.current = false;
         setIsTransitioning(false);
       }, 140);
       transitionTimersRef.current.push(settleTimer);
