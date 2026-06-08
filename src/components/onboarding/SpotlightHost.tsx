@@ -144,8 +144,7 @@ const SpotlightHost = () => {
       {rect ? (
         <div
           aria-hidden
-          onClick={handleDismiss}
-          className="absolute rounded-2xl"
+          className="absolute rounded-2xl pointer-events-none"
           style={{
             top: rect.top - SPOTLIGHT_PADDING,
             left: rect.left - SPOTLIGHT_PADDING,
@@ -154,7 +153,6 @@ const SpotlightHost = () => {
             boxShadow: `0 0 0 9999px hsl(var(--foreground) / ${OVERLAY_OPACITY})`,
             transition: "opacity 0.25s ease",
             animation: "fade-in 0.25s ease-out",
-            pointerEvents: "auto",
           }}
         />
       ) : null}
