@@ -280,13 +280,15 @@ const QuestDetail = () => {
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: swipeDir > 0 ? "-100%" : "100%", opacity: 1 }}
           transition={{ type: "tween", duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-          drag={siblingIds.length > 1 ? "x" : false}
+          drag={dragHandoff === null && siblingIds.length > 1 ? "x" : false}
           dragDirectionLock
           dragConstraints={{ left: 0, right: 0 }}
           dragElastic={0.9}
           dragTransition={{ bounceStiffness: 400, bounceDamping: 40, power: 0 }}
           dragMomentum={false}
-          onDragStart={revealSwipePreviews}
+          onDragStart={() => {
+            if (dragHandoff === null) revealSwipePreviews();
+          }}
           onDragEnd={(_, info) => {
             // Distance-based — must drag more than ~60% of the screen to commit.
             const w = typeof window !== "undefined" ? window.innerWidth : 400;
