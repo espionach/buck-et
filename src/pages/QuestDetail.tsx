@@ -227,10 +227,9 @@ const QuestDetail = () => {
       <AnimatePresence initial={false} mode="popLayout" custom={swipeDir}>
         <motion.div
           key={questId}
-          custom={swipeDir}
-          initial={(dir: number) => ({ x: dir > 0 ? "100%" : dir < 0 ? "-100%" : 0, opacity: dir === 0 ? 1 : 0.6 })}
+          initial={{ x: swipeDir > 0 ? "100%" : swipeDir < 0 ? "-100%" : 0, opacity: swipeDir === 0 ? 1 : 0.6 }}
           animate={{ x: 0, opacity: 1 }}
-          exit={(dir: number) => ({ x: dir > 0 ? "-100%" : "100%", opacity: 0.6 })}
+          exit={{ x: swipeDir > 0 ? "-100%" : "100%", opacity: 0.6 }}
           transition={{ type: "tween", duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
           drag={siblingIds.length > 1 ? "x" : false}
           dragDirectionLock
