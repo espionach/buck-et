@@ -73,13 +73,21 @@ const QuestDetail = () => {
     if (Array.isArray(s) && s.length) setSiblingIds(s);
   }, [location.state]);
 
+  // Direction of the most recent sibling navigation: +1 = swiped to next, -1 = swiped to prev.
+  // Used to drive the page slide animation between sidequests.
+  const [swipeDir, setSwipeDir] = useState(0);
+
+  const siblingIdx = questId ? siblingIds.indexOf(questId) : -1;
+  const hasPrev = siblingIdx > 0;
+  const hasNext = siblingIdx >= 0 && siblingIdx < siblingIds.length - 1;
+
   const goToSibling = (dir: 1 | -1) => {
     if (!questId || siblingIds.length < 2) return;
     const idx = siblingIds.indexOf(questId);
     if (idx === -1) return;
     const target = siblingIds[idx + dir];
     if (!target) return;
-    // Drop the one-shot swipeHint so the tip only shows once.
+    setSwipeDir(dir);
     navigate(`/quest/${target}`, { replace: true, state: { siblingIds } });
   };
 
