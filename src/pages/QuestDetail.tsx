@@ -156,6 +156,11 @@ const QuestDetail = () => {
 
   const myVolunteerRole = logistics.volunteers.find((v) => v.userId === currentUser.id);
 
+  // Neighboring sidequests for swipe-preview peeking.
+  const prevQuest = hasPrev ? questList.find((q) => q.id === siblingIds[siblingIdx - 1]) : null;
+  const nextQuest = hasNext ? questList.find((q) => q.id === siblingIds[siblingIdx + 1]) : null;
+
+
   const handleAddComment = () => {
     if (!newComment.trim()) return;
     const violation = validateContent(newComment);
