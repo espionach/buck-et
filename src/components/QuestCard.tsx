@@ -164,7 +164,13 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
         }}
         onClick={() => {
           if (wasDragged.current) return;
-          if (canNavigateToDetail) { onQuestClick?.(); navigate(`/quest/${quest.id}`); }
+          if (canNavigateToDetail) {
+            onQuestClick?.();
+            const search = showSwipeTip ? "?swipeHint=1" : "";
+            navigate(`/quest/${quest.id}${search}`, {
+              state: siblingIds && siblingIds.length > 1 ? { siblingIds } : undefined,
+            });
+          }
         }}
         className={`relative bg-card p-4 ${isFinished ? "opacity-60" : ""} ${canNavigateToDetail ? "cursor-pointer active:scale-[0.99] transition-transform" : ""} ${justAdded ? "animate-just-added rounded-xl" : ""} ${isPinned ? "rounded-xl border-2 border-primary/30 bg-primary/[0.03]" : ""}`}
       >
