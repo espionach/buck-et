@@ -10,6 +10,7 @@ import MapPreview from "@/components/MapPreview";
 import { ArrowLeft, ChevronLeft, ChevronRight, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send, ExternalLink, HandMetal, Check, Globe, StickyNote, MoreVertical, Pencil, Pin, Trash2, Flag, Share2, Lock, Info } from "lucide-react";
 import NudgeModal from "@/components/NudgeModal";
 import EmptyState from "@/components/EmptyState";
+import QuestDetailPreview from "@/components/QuestDetailPreview";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams, useLocation, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -156,6 +157,11 @@ const QuestDetail = () => {
 
   const myVolunteerRole = logistics.volunteers.find((v) => v.userId === currentUser.id);
 
+  // Neighboring sidequests for swipe-preview peeking.
+  const prevQuest = hasPrev ? questList.find((q) => q.id === siblingIds[siblingIdx - 1]) : null;
+  const nextQuest = hasNext ? questList.find((q) => q.id === siblingIds[siblingIdx + 1]) : null;
+
+
   const handleAddComment = () => {
     if (!newComment.trim()) return;
     const violation = validateContent(newComment);
@@ -246,7 +252,20 @@ const QuestDetail = () => {
             if (dir === -1 && !hasPrev) return;
             goToSibling(dir);
           }}
+          className="relative"
         >
+          {/* Off-screen previews of neighboring sidequests — visible while dragging. */}
+          {prevQuest && (
+            <div className="absolute inset-y-0 right-full w-full" aria-hidden>
+              <QuestDetailPreview quest={prevQuest} />
+            </div>
+          )}
+          {nextQuest && (
+            <div className="absolute inset-y-0 left-full w-full" aria-hidden>
+              <QuestDetailPreview quest={nextQuest} />
+            </div>
+          )}
+
       {/* Header */}
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg px-5 pt-14 pb-3">
         <div className="flex items-center gap-3">
