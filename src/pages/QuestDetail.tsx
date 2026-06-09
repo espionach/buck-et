@@ -279,31 +279,26 @@ const QuestDetail = () => {
           key={questId}
           initial={
             dragHandoff !== null
-              ? { x: dragHandoff }
-              : { x: swipeDir > 0 ? "100%" : swipeDir < 0 ? "-100%" : 0 }
+              ? { x: dragHandoff, opacity: 1 }
+              : { x: swipeDir > 0 ? "100%" : swipeDir < 0 ? "-100%" : 0, opacity: swipeDir === 0 ? 1 : 0.6 }
           }
-          animate={{ x: 0 }}
-          exit={{ x: swipeDir > 0 ? "-100%" : "100%" }}
-          transition={{ type: "tween", duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          animate={{ x: 0, opacity: 1 }}
+          exit={{ x: swipeDir > 0 ? "-100%" : "100%", opacity: 1 }}
+          transition={{ type: "tween", duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
           drag={dragHandoff === null && siblingIds.length > 1 ? "x" : false}
           dragDirectionLock
           dragConstraints={{ left: 0, right: 0 }}
-          dragElastic={1}
+          dragElastic={0.9}
           dragTransition={{ bounceStiffness: 400, bounceDamping: 40, power: 0 }}
           dragMomentum={false}
           onDragStart={() => {
             if (dragHandoff === null) revealSwipePreviews();
           }}
           onDragEnd={(_, info) => {
-            // Easy swipe: ~20% of screen OR a quick flick commits.
+            // Distance-based — must drag more than ~60% of the screen to commit.
             const w = typeof window !== "undefined" ? window.innerWidth : 400;
-            const distanceThreshold = w * 0.2;
-            const velocityThreshold = 400;
-            const passed =
-              Math.abs(info.offset.x) > distanceThreshold ||
-              Math.abs(info.velocity.x) > velocityThreshold;
-            if (!passed) {
-
+            const distanceThreshold = w * 0.6;
+            if (Math.abs(info.offset.x) <= distanceThreshold) {
               hideSwipePreviews(450);
               return;
             }
