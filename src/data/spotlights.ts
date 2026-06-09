@@ -99,6 +99,17 @@ export const SPOTLIGHTS: SpotlightDef[] = [
     body: "Make groups for the people you actually plan things with. Sidequests can be shared to just one group.",
     placement: "bottom",
   },
+  {
+    id: "quest-detail-back-onboarding",
+    match: (l) =>
+      l.pathname.startsWith("/quest/") &&
+      !l.pathname.endsWith("/edit") &&
+      new URLSearchParams(l.search).get("fromOnboarding") === "1",
+    targetSelector: '[data-spotlight="quest-back"]',
+    title: "Head back home",
+    body: "Tap the back arrow whenever you're done. It'll drop you on your home feed where your friends' sidequests live.",
+    placement: "bottom",
+  },
 ];
 
 const DISMISSED_KEY = (uid: string) => `bucket:spotlights:dismissed:${uid}`;
