@@ -28,6 +28,14 @@ export const SPOTLIGHTS: SpotlightDef[] = [
     placement: "bottom",
   },
   {
+    id: "quest-detail-join-friend",
+    match: (l) => l.pathname.startsWith("/quest/") && !l.pathname.endsWith("/edit"),
+    targetSelector: '[data-spotlight="quest-join-friend"]',
+    title: "Join your friend's sidequest",
+    body: "Tap Join to RSVP. You'll show up in the participants list and it'll land in your active sidequests.",
+    placement: "bottom",
+  },
+  {
     id: "quest-detail-share",
     match: (l) => l.pathname.startsWith("/quest/") && !l.pathname.endsWith("/edit"),
     targetSelector: '[data-spotlight="quest-share"]',
