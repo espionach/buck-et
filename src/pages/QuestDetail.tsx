@@ -97,6 +97,13 @@ const QuestDetail = () => {
   };
 
   useEffect(() => { window.scrollTo(0, 0); }, [questId]);
+  // Reset the drag-commit flag after the new page mounts so subsequent
+  // chevron/button navigations get their normal slide-in animation.
+  useEffect(() => {
+    if (!commitFromDrag) return;
+    const t = setTimeout(() => setCommitFromDrag(false), 350);
+    return () => clearTimeout(t);
+  }, [questId, commitFromDrag]);
 
   // Auto-open nudge modal with a preselected target (e.g., from a friend's profile)
   useEffect(() => {
