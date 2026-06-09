@@ -251,11 +251,12 @@ const QuestDetail = () => {
           }
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: swipeDir > 0 ? "-100%" : "100%", opacity: 1 }}
-          transition={{ type: "tween", duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
+          transition={{ type: "tween", duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
           drag={siblingIds.length > 1 ? "x" : false}
           dragDirectionLock
           dragConstraints={{ left: 0, right: 0 }}
-          dragElastic={1}
+          dragElastic={0.9}
+          dragTransition={{ bounceStiffness: 400, bounceDamping: 40, power: 0 }}
           dragMomentum={false}
           onDragEnd={(_, info) => {
             // Distance-based only — must drag more than half the screen to commit.
