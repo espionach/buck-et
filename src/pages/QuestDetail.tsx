@@ -198,7 +198,7 @@ const QuestDetail = () => {
               const canJoin = userInGroup;
               return (
                 <button
-                  data-spotlight="quest-join"
+                  data-spotlight="quest-join-friend"
                   onClick={() => {
                     if (!canJoin) return;
                     toggleImIn(quest.id);
