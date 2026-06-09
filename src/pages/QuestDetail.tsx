@@ -7,7 +7,7 @@ import SidequestPhoto from "@/components/SidequestPhoto";
 import MediaViewer from "@/components/MediaViewer";
 import CommentThread from "@/components/CommentThread";
 import MapPreview from "@/components/MapPreview";
-import { ArrowLeft, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send, ExternalLink, HandMetal, Check, Globe, StickyNote, MoreVertical, Pencil, Pin, Trash2, Flag, Share2, Lock, Info } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send, ExternalLink, HandMetal, Check, Globe, StickyNote, MoreVertical, Pencil, Pin, Trash2, Flag, Share2, Lock, Info } from "lucide-react";
 import NudgeModal from "@/components/NudgeModal";
 import EmptyState from "@/components/EmptyState";
 import { useState, useEffect, useRef } from "react";
@@ -73,13 +73,21 @@ const QuestDetail = () => {
     if (Array.isArray(s) && s.length) setSiblingIds(s);
   }, [location.state]);
 
+  // Direction of the most recent sibling navigation: +1 = swiped to next, -1 = swiped to prev.
+  // Used to drive the page slide animation between sidequests.
+  const [swipeDir, setSwipeDir] = useState(0);
+
+  const siblingIdx = questId ? siblingIds.indexOf(questId) : -1;
+  const hasPrev = siblingIdx > 0;
+  const hasNext = siblingIdx >= 0 && siblingIdx < siblingIds.length - 1;
+
   const goToSibling = (dir: 1 | -1) => {
     if (!questId || siblingIds.length < 2) return;
     const idx = siblingIds.indexOf(questId);
     if (idx === -1) return;
     const target = siblingIds[idx + dir];
     if (!target) return;
-    // Drop the one-shot swipeHint so the tip only shows once.
+    setSwipeDir(dir);
     navigate(`/quest/${target}`, { replace: true, state: { siblingIds } });
   };
 
@@ -190,7 +198,53 @@ const QuestDetail = () => {
 
 
   return (
-    <div className="min-h-screen pb-28">
+    <div className="min-h-screen pb-28 relative overflow-x-hidden">
+      {/* Edge swipe chevrons — only when siblings exist */}
+      {(hasPrev || hasNext) && (
+        <>
+          {hasPrev && (
+            <button
+              onClick={() => goToSibling(-1)}
+              aria-label="Previous sidequest"
+              className="fixed left-1 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-card/80 backdrop-blur border border-border/50 text-muted-foreground hover:text-foreground active:scale-95 transition-all shadow-sm"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+          )}
+          {hasNext && (
+            <button
+              onClick={() => goToSibling(1)}
+              data-spotlight="quest-swipe-arrow"
+              aria-label="Next sidequest"
+              className="fixed right-1 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-card/80 backdrop-blur border border-border/50 text-muted-foreground hover:text-foreground active:scale-95 transition-all shadow-sm"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          )}
+        </>
+      )}
+
+      <AnimatePresence initial={false} mode="popLayout">
+        <motion.div
+          key={questId}
+          initial={{ x: swipeDir > 0 ? "100%" : swipeDir < 0 ? "-100%" : 0, opacity: swipeDir === 0 ? 1 : 0.6 }}
+          animate={{ x: 0, opacity: 1 }}
+          exit={{ x: swipeDir > 0 ? "-100%" : "100%", opacity: 0.6 }}
+          transition={{ type: "tween", duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
+          drag={siblingIds.length > 1 ? "x" : false}
+          dragDirectionLock
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.2}
+          onDragEnd={(_, info) => {
+            const threshold = 80;
+            if (Math.abs(info.offset.x) < threshold && Math.abs(info.velocity.x) < 400) return;
+            if (Math.abs(info.offset.x) < Math.abs(info.offset.y)) return;
+            const dir: 1 | -1 = info.offset.x < 0 ? 1 : -1;
+            if (dir === 1 && !hasNext) return;
+            if (dir === -1 && !hasPrev) return;
+            goToSibling(dir);
+          }}
+        >
       {/* Header */}
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg px-5 pt-14 pb-3">
         <div className="flex items-center gap-3">
@@ -306,21 +360,7 @@ const QuestDetail = () => {
         </div>
       </div>
 
-      <motion.div
-        layout
-        className="px-5 space-y-4 mt-2"
-        drag={siblingIds.length > 1 ? "x" : false}
-        dragDirectionLock
-        dragConstraints={{ left: 0, right: 0 }}
-        dragElastic={0.15}
-        dragSnapToOrigin
-        onDragEnd={(_, info) => {
-          const threshold = 80;
-          if (Math.abs(info.offset.x) < threshold && Math.abs(info.velocity.x) < 400) return;
-          if (Math.abs(info.offset.x) < Math.abs(info.offset.y)) return;
-          goToSibling(info.offset.x < 0 ? 1 : -1);
-        }}
-      >
+      <motion.div layout className="px-5 space-y-4 mt-2">
         {/* Quest Card — Expanded */}
         <div className="p-4 rounded-xl border border-border/50 bg-card space-y-4">
           {/* Creator */}
@@ -588,6 +628,8 @@ const QuestDetail = () => {
           <CommentThread quest={quest} />
         </div>
       </motion.div>
+        </motion.div>
+      </AnimatePresence>
 
       {/* Delete confirmation */}
       <AnimatePresence>
