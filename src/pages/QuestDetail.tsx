@@ -82,6 +82,27 @@ const QuestDetail = () => {
   // dragHandoff is the screen-x offset (in px) the new page should start at;
   // null means a normal (non-drag) navigation.
   const [dragHandoff, setDragHandoff] = useState<number | null>(null);
+  const [showSwipePreviews, setShowSwipePreviews] = useState(false);
+  const previewHideTimer = useRef<number | null>(null);
+
+  const hideSwipePreviews = (delay = 0) => {
+    if (previewHideTimer.current !== null) window.clearTimeout(previewHideTimer.current);
+    if (delay === 0) {
+      setShowSwipePreviews(false);
+      previewHideTimer.current = null;
+      return;
+    }
+    previewHideTimer.current = window.setTimeout(() => {
+      setShowSwipePreviews(false);
+      previewHideTimer.current = null;
+    }, delay);
+  };
+
+  const revealSwipePreviews = () => {
+    if (previewHideTimer.current !== null) window.clearTimeout(previewHideTimer.current);
+    previewHideTimer.current = null;
+    setShowSwipePreviews(true);
+  };
 
   const siblingIdx = questId ? siblingIds.indexOf(questId) : -1;
   const hasPrev = siblingIdx > 0;
@@ -106,6 +127,11 @@ const QuestDetail = () => {
     const t = setTimeout(() => setDragHandoff(null), 450);
     return () => clearTimeout(t);
   }, [questId, dragHandoff]);
+  useEffect(() => {
+    return () => {
+      if (previewHideTimer.current !== null) window.clearTimeout(previewHideTimer.current);
+    };
+  }, []);
 
   // Auto-open nudge modal with a preselected target (e.g., from a friend's profile)
   useEffect(() => {
@@ -254,36 +280,55 @@ const QuestDetail = () => {
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: swipeDir > 0 ? "-100%" : "100%", opacity: 1 }}
           transition={{ type: "tween", duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-          drag={siblingIds.length > 1 ? "x" : false}
+          drag={dragHandoff === null && siblingIds.length > 1 ? "x" : false}
           dragDirectionLock
           dragConstraints={{ left: 0, right: 0 }}
           dragElastic={0.9}
           dragTransition={{ bounceStiffness: 400, bounceDamping: 40, power: 0 }}
           dragMomentum={false}
+          onDragStart={() => {
+            if (dragHandoff === null) revealSwipePreviews();
+          }}
           onDragEnd={(_, info) => {
             // Distance-based — must drag more than ~60% of the screen to commit.
             const w = typeof window !== "undefined" ? window.innerWidth : 400;
             const distanceThreshold = w * 0.6;
-            if (Math.abs(info.offset.x) <= distanceThreshold) return;
-            if (Math.abs(info.offset.x) < Math.abs(info.offset.y)) return;
+            if (Math.abs(info.offset.x) <= distanceThreshold) {
+              hideSwipePreviews(450);
+              return;
+            }
+            if (Math.abs(info.offset.x) < Math.abs(info.offset.y)) {
+              hideSwipePreviews(450);
+              return;
+            }
             const dir: 1 | -1 = info.offset.x < 0 ? 1 : -1;
-            if (dir === 1 && !hasNext) return;
-            if (dir === -1 && !hasPrev) return;
+            if (dir === 1 && !hasNext) {
+              hideSwipePreviews(450);
+              return;
+            }
+            if (dir === -1 && !hasPrev) {
+              hideSwipePreviews(450);
+              return;
+            }
             // Hand off: the incoming page should start where its preview already is.
             // Preview sits at ±w in local space; with current drag offset info.offset.x,
             // it appears on screen at (dir === 1 ? w + info.offset.x : -w + info.offset.x).
-            const handoff = dir === 1 ? w + info.offset.x : -w + info.offset.x;
+            const rawHandoff = dir === 1 ? w + info.offset.x : -w + info.offset.x;
+            const handoff = dir === 1
+              ? Math.max(0, Math.min(w, rawHandoff))
+              : Math.min(0, Math.max(-w, rawHandoff));
+            hideSwipePreviews();
             goToSibling(dir, handoff);
           }}
           className="relative"
         >
           {/* Off-screen previews of neighboring sidequests — visible while dragging. */}
-          {prevQuest && (
+          {showSwipePreviews && prevQuest && (
             <div className="absolute inset-y-0 right-full w-full" aria-hidden>
               <QuestDetailPreview quest={prevQuest} />
             </div>
           )}
-          {nextQuest && (
+          {showSwipePreviews && nextQuest && (
             <div className="absolute inset-y-0 left-full w-full" aria-hidden>
               <QuestDetailPreview quest={nextQuest} />
             </div>
