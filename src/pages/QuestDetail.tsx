@@ -629,6 +629,8 @@ const QuestDetail = () => {
           <CommentThread quest={quest} />
         </div>
       </motion.div>
+        </motion.div>
+      </AnimatePresence>
 
       {/* Delete confirmation */}
       <AnimatePresence>
