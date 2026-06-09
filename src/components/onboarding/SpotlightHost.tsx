@@ -36,6 +36,8 @@ const SpotlightHost = () => {
   const [active, setActive] = useState<SpotlightDef | null>(null);
   const [rect, setRect] = useState<Rect | null>(null);
   const lastRectRef = useRef<Rect | null>(null);
+  const tooltipRef = useRef<HTMLDivElement | null>(null);
+  const [tooltipH, setTooltipH] = useState(TOOLTIP_HEIGHT);
 
   const getNextSpotlight = useCallback(
     (excludeIds: string[] = []) => {
