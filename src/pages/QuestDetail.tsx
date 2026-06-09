@@ -237,9 +237,13 @@ const QuestDetail = () => {
       <AnimatePresence initial={false} mode="popLayout">
         <motion.div
           key={questId}
-          initial={{ x: swipeDir > 0 ? "100%" : swipeDir < 0 ? "-100%" : 0, opacity: swipeDir === 0 ? 1 : 0.6 }}
+          initial={
+            commitFromDrag
+              ? { x: 0, opacity: 1 }
+              : { x: swipeDir > 0 ? "100%" : swipeDir < 0 ? "-100%" : 0, opacity: swipeDir === 0 ? 1 : 0.6 }
+          }
           animate={{ x: 0, opacity: 1 }}
-          exit={{ x: swipeDir > 0 ? "-100%" : "100%", opacity: 0.6 }}
+          exit={{ x: swipeDir > 0 ? "-100%" : "100%", opacity: 1 }}
           transition={{ type: "tween", duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
           drag={siblingIds.length > 1 ? "x" : false}
           dragDirectionLock
@@ -254,7 +258,7 @@ const QuestDetail = () => {
             const dir: 1 | -1 = info.offset.x < 0 ? 1 : -1;
             if (dir === 1 && !hasNext) return;
             if (dir === -1 && !hasPrev) return;
-            goToSibling(dir);
+            goToSibling(dir, true);
           }}
           className="relative"
         >
