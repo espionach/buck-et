@@ -77,33 +77,35 @@ const QuestDetail = () => {
   // Direction of the most recent sibling navigation: +1 = swiped to next, -1 = swiped to prev.
   // Used to drive the page slide animation between sidequests.
   const [swipeDir, setSwipeDir] = useState(0);
-  // When commit comes from a drag, the neighbor preview is already on-screen,
-  // so the incoming page should mount at x:0 (no entry animation) to avoid a jump.
-  const [commitFromDrag, setCommitFromDrag] = useState(false);
+  // When commit comes from a drag, the incoming page should mount where the
+  // neighbor preview already was on screen, then smoothly animate to 0.
+  // dragHandoff is the screen-x offset (in px) the new page should start at;
+  // null means a normal (non-drag) navigation.
+  const [dragHandoff, setDragHandoff] = useState<number | null>(null);
 
   const siblingIdx = questId ? siblingIds.indexOf(questId) : -1;
   const hasPrev = siblingIdx > 0;
   const hasNext = siblingIdx >= 0 && siblingIdx < siblingIds.length - 1;
 
-  const goToSibling = (dir: 1 | -1, fromDrag = false) => {
+  const goToSibling = (dir: 1 | -1, handoffPx: number | null = null) => {
     if (!questId || siblingIds.length < 2) return;
     const idx = siblingIds.indexOf(questId);
     if (idx === -1) return;
     const target = siblingIds[idx + dir];
     if (!target) return;
     setSwipeDir(dir);
-    setCommitFromDrag(fromDrag);
+    setDragHandoff(handoffPx);
     navigate(`/quest/${target}`, { replace: true, state: { siblingIds } });
   };
 
   useEffect(() => { window.scrollTo(0, 0); }, [questId]);
-  // Reset the drag-commit flag after the new page mounts so subsequent
+  // Reset the drag-handoff after the new page mounts so subsequent
   // chevron/button navigations get their normal slide-in animation.
   useEffect(() => {
-    if (!commitFromDrag) return;
-    const t = setTimeout(() => setCommitFromDrag(false), 350);
+    if (dragHandoff === null) return;
+    const t = setTimeout(() => setDragHandoff(null), 450);
     return () => clearTimeout(t);
-  }, [questId, commitFromDrag]);
+  }, [questId, dragHandoff]);
 
   // Auto-open nudge modal with a preselected target (e.g., from a friend's profile)
   useEffect(() => {
@@ -245,13 +247,13 @@ const QuestDetail = () => {
         <motion.div
           key={questId}
           initial={
-            commitFromDrag
-              ? { x: 0, opacity: 1 }
+            dragHandoff !== null
+              ? { x: dragHandoff, opacity: 1 }
               : { x: swipeDir > 0 ? "100%" : swipeDir < 0 ? "-100%" : 0, opacity: swipeDir === 0 ? 1 : 0.6 }
           }
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: swipeDir > 0 ? "-100%" : "100%", opacity: 1 }}
-          transition={{ type: "tween", duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ type: "tween", duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
           drag={siblingIds.length > 1 ? "x" : false}
           dragDirectionLock
           dragConstraints={{ left: 0, right: 0 }}
@@ -259,14 +261,19 @@ const QuestDetail = () => {
           dragTransition={{ bounceStiffness: 400, bounceDamping: 40, power: 0 }}
           dragMomentum={false}
           onDragEnd={(_, info) => {
-            // Distance-based only — must drag more than half the screen to commit.
-            const distanceThreshold = typeof window !== "undefined" ? window.innerWidth * 0.5 : 200;
+            // Distance-based — must drag more than ~60% of the screen to commit.
+            const w = typeof window !== "undefined" ? window.innerWidth : 400;
+            const distanceThreshold = w * 0.6;
             if (Math.abs(info.offset.x) <= distanceThreshold) return;
             if (Math.abs(info.offset.x) < Math.abs(info.offset.y)) return;
             const dir: 1 | -1 = info.offset.x < 0 ? 1 : -1;
             if (dir === 1 && !hasNext) return;
             if (dir === -1 && !hasPrev) return;
-            goToSibling(dir, true);
+            // Hand off: the incoming page should start where its preview already is.
+            // Preview sits at ±w in local space; with current drag offset info.offset.x,
+            // it appears on screen at (dir === 1 ? w + info.offset.x : -w + info.offset.x).
+            const handoff = dir === 1 ? w + info.offset.x : -w + info.offset.x;
+            goToSibling(dir, handoff);
           }}
           className="relative"
         >
