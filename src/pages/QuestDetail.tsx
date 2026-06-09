@@ -77,18 +77,22 @@ const QuestDetail = () => {
   // Direction of the most recent sibling navigation: +1 = swiped to next, -1 = swiped to prev.
   // Used to drive the page slide animation between sidequests.
   const [swipeDir, setSwipeDir] = useState(0);
+  // When commit comes from a drag, the neighbor preview is already on-screen,
+  // so the incoming page should mount at x:0 (no entry animation) to avoid a jump.
+  const [commitFromDrag, setCommitFromDrag] = useState(false);
 
   const siblingIdx = questId ? siblingIds.indexOf(questId) : -1;
   const hasPrev = siblingIdx > 0;
   const hasNext = siblingIdx >= 0 && siblingIdx < siblingIds.length - 1;
 
-  const goToSibling = (dir: 1 | -1) => {
+  const goToSibling = (dir: 1 | -1, fromDrag = false) => {
     if (!questId || siblingIds.length < 2) return;
     const idx = siblingIds.indexOf(questId);
     if (idx === -1) return;
     const target = siblingIds[idx + dir];
     if (!target) return;
     setSwipeDir(dir);
+    setCommitFromDrag(fromDrag);
     navigate(`/quest/${target}`, { replace: true, state: { siblingIds } });
   };
 
