@@ -100,6 +100,17 @@ export const SPOTLIGHTS: SpotlightDef[] = [
     placement: "bottom",
   },
   {
+    id: "quest-detail-swipe",
+    match: (l) =>
+      l.pathname.startsWith("/quest/") &&
+      !l.pathname.endsWith("/edit") &&
+      new URLSearchParams(l.search).get("swipeHint") === "1",
+    targetSelector: '[data-spotlight="quest-body"]',
+    title: "Swipe through sidequests",
+    body: "Drag left or right anywhere on this page to jump to the next or previous sidequest in your feed.",
+    placement: "top",
+  },
+  {
     id: "quest-detail-back-onboarding",
     match: (l) =>
       l.pathname.startsWith("/quest/") &&

@@ -45,6 +45,7 @@ const QuestDetail = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const fromOnboarding = searchParams.get("fromOnboarding") === "1";
+  const swipeHint = searchParams.get("swipeHint") === "1";
   const { questId } = useParams<{ questId: string }>();
   const handleBack = () => {
     if (fromOnboarding) navigate("/", { replace: true });
@@ -62,11 +63,31 @@ const QuestDetail = () => {
   const [joinAnim, setJoinAnim] = useState<"idle" | "morph" | "exit" | "done">("idle");
   usePopup(showDeleteConfirm);
 
+  // Sibling sidequests from the originating list — used for left/right swipe nav.
+  const [siblingIds, setSiblingIds] = useState<string[]>(() => {
+    const s = (location.state as any)?.siblingIds;
+    return Array.isArray(s) ? s : [];
+  });
+  useEffect(() => {
+    const s = (location.state as any)?.siblingIds;
+    if (Array.isArray(s) && s.length) setSiblingIds(s);
+  }, [location.state]);
+
+  const goToSibling = (dir: 1 | -1) => {
+    if (!questId || siblingIds.length < 2) return;
+    const idx = siblingIds.indexOf(questId);
+    if (idx === -1) return;
+    const target = siblingIds[idx + dir];
+    if (!target) return;
+    // Drop the one-shot swipeHint so the tip only shows once.
+    navigate(`/quest/${target}`, { replace: true, state: { siblingIds } });
+  };
+
   useEffect(() => { window.scrollTo(0, 0); }, [questId]);
 
   // Auto-open nudge modal with a preselected target (e.g., from a friend's profile)
   useEffect(() => {
-    const state = location.state as { prefillNudgeUserId?: string } | null;
+    const state = location.state as { prefillNudgeUserId?: string; siblingIds?: string[] } | null;
     const targetId = state?.prefillNudgeUserId;
     if (!targetId) return;
     const q = (hydratedQuests ?? quests).find((qq) => qq.id === questId);
@@ -74,8 +95,8 @@ const QuestDetail = () => {
     if (q.createdBy.id !== currentUser.id) return;
     setPrefillNudgeUserId(targetId);
     setShowNudge(true);
-    navigate(location.pathname, { replace: true, state: {} });
-  }, [location.state, location.pathname, hydratedQuests, quests, questId, currentUser.id, navigate]);
+    navigate(location.pathname, { replace: true, state: { siblingIds: state?.siblingIds ?? siblingIds } });
+  }, [location.state, location.pathname, hydratedQuests, quests, questId, currentUser.id, navigate, siblingIds]);
 
   const questList = hydratedQuests ?? quests;
   const quest = questList.find((q) => q.id === questId);
@@ -285,7 +306,21 @@ const QuestDetail = () => {
         </div>
       </div>
 
-      <motion.div layout className="px-5 space-y-4 mt-2">
+      <motion.div
+        layout
+        data-spotlight="quest-body"
+        className="px-5 space-y-4 mt-2"
+        drag={siblingIds.length > 1 ? "x" : false}
+        dragDirectionLock
+        dragConstraints={{ left: 0, right: 0 }}
+        dragElastic={0.15}
+        onDragEnd={(_, info) => {
+          const threshold = 80;
+          if (Math.abs(info.offset.x) < threshold && Math.abs(info.velocity.x) < 400) return;
+          if (Math.abs(info.offset.x) < Math.abs(info.offset.y)) return;
+          goToSibling(info.offset.x < 0 ? 1 : -1);
+        }}
+      >
         {/* Quest Card — Expanded */}
         <div className="p-4 rounded-xl border border-border/50 bg-card space-y-4">
           {/* Creator */}

@@ -24,6 +24,8 @@ interface QuestListProps {
   scrollToQuestId?: string;
   pinnedQuestIds?: string[];
   hidePin?: boolean;
+  enableSiblingSwipe?: boolean;
+  showSwipeTip?: boolean;
 }
 
 const QuestList = ({
@@ -46,6 +48,8 @@ const QuestList = ({
   scrollToQuestId,
   pinnedQuestIds = [],
   hidePin = false,
+  enableSiblingSwipe = true,
+  showSwipeTip = false,
 }: QuestListProps) => {
   const [visibleCount, setVisibleCount] = useState(pageSize);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -77,6 +81,7 @@ const QuestList = ({
 
   const visible = quests.slice(0, visibleCount);
   const hasMore = visibleCount < quests.length;
+  const siblingIds = enableSiblingSwipe ? visible.map((q) => q.id) : undefined;
 
   return (
     <>
@@ -98,6 +103,8 @@ const QuestList = ({
             justAdded={q.id === justAdded}
             isPinned={pinnedQuestIds.includes(q.id)}
             hidePin={hidePin}
+            siblingIds={siblingIds}
+            showSwipeTip={showSwipeTip}
           />
         </div>
       ))}
