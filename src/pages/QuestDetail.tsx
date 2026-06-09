@@ -77,33 +77,35 @@ const QuestDetail = () => {
   // Direction of the most recent sibling navigation: +1 = swiped to next, -1 = swiped to prev.
   // Used to drive the page slide animation between sidequests.
   const [swipeDir, setSwipeDir] = useState(0);
-  // When commit comes from a drag, the neighbor preview is already on-screen,
-  // so the incoming page should mount at x:0 (no entry animation) to avoid a jump.
-  const [commitFromDrag, setCommitFromDrag] = useState(false);
+  // When commit comes from a drag, the incoming page should mount where the
+  // neighbor preview already was on screen, then smoothly animate to 0.
+  // dragHandoff is the screen-x offset (in px) the new page should start at;
+  // null means a normal (non-drag) navigation.
+  const [dragHandoff, setDragHandoff] = useState<number | null>(null);
 
   const siblingIdx = questId ? siblingIds.indexOf(questId) : -1;
   const hasPrev = siblingIdx > 0;
   const hasNext = siblingIdx >= 0 && siblingIdx < siblingIds.length - 1;
 
-  const goToSibling = (dir: 1 | -1, fromDrag = false) => {
+  const goToSibling = (dir: 1 | -1, handoffPx: number | null = null) => {
     if (!questId || siblingIds.length < 2) return;
     const idx = siblingIds.indexOf(questId);
     if (idx === -1) return;
     const target = siblingIds[idx + dir];
     if (!target) return;
     setSwipeDir(dir);
-    setCommitFromDrag(fromDrag);
+    setDragHandoff(handoffPx);
     navigate(`/quest/${target}`, { replace: true, state: { siblingIds } });
   };
 
   useEffect(() => { window.scrollTo(0, 0); }, [questId]);
-  // Reset the drag-commit flag after the new page mounts so subsequent
+  // Reset the drag-handoff after the new page mounts so subsequent
   // chevron/button navigations get their normal slide-in animation.
   useEffect(() => {
-    if (!commitFromDrag) return;
-    const t = setTimeout(() => setCommitFromDrag(false), 350);
+    if (dragHandoff === null) return;
+    const t = setTimeout(() => setDragHandoff(null), 450);
     return () => clearTimeout(t);
-  }, [questId, commitFromDrag]);
+  }, [questId, dragHandoff]);
 
   // Auto-open nudge modal with a preselected target (e.g., from a friend's profile)
   useEffect(() => {
