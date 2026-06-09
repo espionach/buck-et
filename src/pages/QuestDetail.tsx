@@ -306,7 +306,21 @@ const QuestDetail = () => {
         </div>
       </div>
 
-      <motion.div layout className="px-5 space-y-4 mt-2">
+      <motion.div
+        layout
+        data-spotlight="quest-body"
+        className="px-5 space-y-4 mt-2"
+        drag={siblingIds.length > 1 ? "x" : false}
+        dragDirectionLock
+        dragConstraints={{ left: 0, right: 0 }}
+        dragElastic={0.15}
+        onDragEnd={(_, info) => {
+          const threshold = 80;
+          if (Math.abs(info.offset.x) < threshold && Math.abs(info.velocity.x) < 400) return;
+          if (Math.abs(info.offset.x) < Math.abs(info.offset.y)) return;
+          goToSibling(info.offset.x < 0 ? 1 : -1);
+        }}
+      >
         {/* Quest Card — Expanded */}
         <div className="p-4 rounded-xl border border-border/50 bg-card space-y-4">
           {/* Creator */}
