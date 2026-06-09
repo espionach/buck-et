@@ -24,6 +24,8 @@ interface QuestListProps {
   scrollToQuestId?: string;
   pinnedQuestIds?: string[];
   hidePin?: boolean;
+  enableSiblingSwipe?: boolean;
+  showSwipeTip?: boolean;
 }
 
 const QuestList = ({
@@ -46,6 +48,8 @@ const QuestList = ({
   scrollToQuestId,
   pinnedQuestIds = [],
   hidePin = false,
+  enableSiblingSwipe = true,
+  showSwipeTip = false,
 }: QuestListProps) => {
   const [visibleCount, setVisibleCount] = useState(pageSize);
   const scrollRef = useRef<HTMLDivElement>(null);
