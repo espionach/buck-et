@@ -77,22 +77,33 @@ const QuestDetail = () => {
   // Direction of the most recent sibling navigation: +1 = swiped to next, -1 = swiped to prev.
   // Used to drive the page slide animation between sidequests.
   const [swipeDir, setSwipeDir] = useState(0);
+  // When commit comes from a drag, the neighbor preview is already on-screen,
+  // so the incoming page should mount at x:0 (no entry animation) to avoid a jump.
+  const [commitFromDrag, setCommitFromDrag] = useState(false);
 
   const siblingIdx = questId ? siblingIds.indexOf(questId) : -1;
   const hasPrev = siblingIdx > 0;
   const hasNext = siblingIdx >= 0 && siblingIdx < siblingIds.length - 1;
 
-  const goToSibling = (dir: 1 | -1) => {
+  const goToSibling = (dir: 1 | -1, fromDrag = false) => {
     if (!questId || siblingIds.length < 2) return;
     const idx = siblingIds.indexOf(questId);
     if (idx === -1) return;
     const target = siblingIds[idx + dir];
     if (!target) return;
     setSwipeDir(dir);
+    setCommitFromDrag(fromDrag);
     navigate(`/quest/${target}`, { replace: true, state: { siblingIds } });
   };
 
   useEffect(() => { window.scrollTo(0, 0); }, [questId]);
+  // Reset the drag-commit flag after the new page mounts so subsequent
+  // chevron/button navigations get their normal slide-in animation.
+  useEffect(() => {
+    if (!commitFromDrag) return;
+    const t = setTimeout(() => setCommitFromDrag(false), 350);
+    return () => clearTimeout(t);
+  }, [questId, commitFromDrag]);
 
   // Auto-open nudge modal with a preselected target (e.g., from a friend's profile)
   useEffect(() => {
@@ -233,9 +244,13 @@ const QuestDetail = () => {
       <AnimatePresence initial={false} mode="popLayout">
         <motion.div
           key={questId}
-          initial={{ x: swipeDir > 0 ? "100%" : swipeDir < 0 ? "-100%" : 0, opacity: swipeDir === 0 ? 1 : 0.6 }}
+          initial={
+            commitFromDrag
+              ? { x: 0, opacity: 1 }
+              : { x: swipeDir > 0 ? "100%" : swipeDir < 0 ? "-100%" : 0, opacity: swipeDir === 0 ? 1 : 0.6 }
+          }
           animate={{ x: 0, opacity: 1 }}
-          exit={{ x: swipeDir > 0 ? "-100%" : "100%", opacity: 0.6 }}
+          exit={{ x: swipeDir > 0 ? "-100%" : "100%", opacity: 1 }}
           transition={{ type: "tween", duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
           drag={siblingIds.length > 1 ? "x" : false}
           dragDirectionLock
@@ -250,7 +265,7 @@ const QuestDetail = () => {
             const dir: 1 | -1 = info.offset.x < 0 ? 1 : -1;
             if (dir === 1 && !hasNext) return;
             if (dir === -1 && !hasPrev) return;
-            goToSibling(dir);
+            goToSibling(dir, true);
           }}
           className="relative"
         >
