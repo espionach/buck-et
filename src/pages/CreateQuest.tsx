@@ -286,7 +286,7 @@ const CreateQuest = () => {
       if (isOnboarding) {
         // Onboarding finale — land them on the quest they just created so
         // the contextual spotlight on /quest/:id can introduce the page.
-        navigate(`/quest/${questId}`, { replace: true });
+        navigate(`/quest/${questId}?fromOnboarding=1`, { replace: true });
       } else {
         navigate("/profile", { replace: true, state: { justAddedQuestId: questId } });
       }
