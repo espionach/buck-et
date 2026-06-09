@@ -234,10 +234,12 @@ const QuestDetail = () => {
           drag={siblingIds.length > 1 ? "x" : false}
           dragDirectionLock
           dragConstraints={{ left: 0, right: 0 }}
-          dragElastic={0.2}
+          dragElastic={1}
+          dragMomentum={false}
           onDragEnd={(_, info) => {
-            const threshold = 80;
-            if (Math.abs(info.offset.x) < threshold && Math.abs(info.velocity.x) < 400) return;
+            // Distance-based only — speed/velocity ignored so swipes feel consistent.
+            const distanceThreshold = typeof window !== "undefined" ? window.innerWidth * 0.2 : 80;
+            if (Math.abs(info.offset.x) < distanceThreshold) return;
             if (Math.abs(info.offset.x) < Math.abs(info.offset.y)) return;
             const dir: 1 | -1 = info.offset.x < 0 ? 1 : -1;
             if (dir === 1 && !hasNext) return;
