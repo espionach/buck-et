@@ -308,12 +308,12 @@ const QuestDetail = () => {
 
       <motion.div
         layout
-        data-spotlight="quest-body"
         className="px-5 space-y-4 mt-2"
         drag={siblingIds.length > 1 ? "x" : false}
         dragDirectionLock
         dragConstraints={{ left: 0, right: 0 }}
         dragElastic={0.15}
+        dragSnapToOrigin
         onDragEnd={(_, info) => {
           const threshold = 80;
           if (Math.abs(info.offset.x) < threshold && Math.abs(info.velocity.x) < 400) return;
