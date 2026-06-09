@@ -23,8 +23,8 @@ export const SPOTLIGHTS: SpotlightDef[] = [
     id: "quest-detail-join",
     match: (l) => l.pathname.startsWith("/quest/") && !l.pathname.endsWith("/edit"),
     targetSelector: '[data-spotlight="quest-join"]',
-    title: "Your sidequest is live",
-    body: "Friends can join right here. You can edit details, add roles, or share the link any time.",
+    title: "Your sidequest's home base",
+    body: "All the details live on this page. Use the menu in the top-right to edit anything or delete the sidequest.",
     placement: "bottom",
   },
   {
