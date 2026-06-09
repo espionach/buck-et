@@ -78,10 +78,10 @@ export const SPOTLIGHTS: SpotlightDef[] = [
   {
     id: "profile-completed",
     match: (l) => l.pathname === "/profile" && hasTab(l.search, "past"),
-    targetSelector: '[data-spotlight="completed-add-photos"]',
-    title: "Add photos after the fact",
-    body: "Tap the + on any completed sidequest to drop in pictures and relive the memory.",
-    placement: "top",
+    targetSelector: '[data-tour="profile-tab-past"]',
+    title: "Completed sidequests",
+    body: "A running log of every sidequest you've finished. Hit the + on any one to add photos after the fact.",
+    placement: "bottom",
   },
   {
     id: "profile-groups",
