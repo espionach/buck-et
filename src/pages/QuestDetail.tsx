@@ -198,7 +198,54 @@ const QuestDetail = () => {
 
 
   return (
-    <div className="min-h-screen pb-28">
+    <div className="min-h-screen pb-28 relative overflow-x-hidden">
+      {/* Edge swipe chevrons — only when siblings exist */}
+      {(hasPrev || hasNext) && (
+        <>
+          {hasPrev && (
+            <button
+              onClick={() => goToSibling(-1)}
+              aria-label="Previous sidequest"
+              className="fixed left-1 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-card/80 backdrop-blur border border-border/50 text-muted-foreground hover:text-foreground active:scale-95 transition-all shadow-sm"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+          )}
+          {hasNext && (
+            <button
+              onClick={() => goToSibling(1)}
+              data-spotlight="quest-swipe-arrow"
+              aria-label="Next sidequest"
+              className="fixed right-1 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-card/80 backdrop-blur border border-border/50 text-muted-foreground hover:text-foreground active:scale-95 transition-all shadow-sm"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          )}
+        </>
+      )}
+
+      <AnimatePresence initial={false} mode="popLayout" custom={swipeDir}>
+        <motion.div
+          key={questId}
+          custom={swipeDir}
+          initial={(dir: number) => ({ x: dir > 0 ? "100%" : dir < 0 ? "-100%" : 0, opacity: dir === 0 ? 1 : 0.6 })}
+          animate={{ x: 0, opacity: 1 }}
+          exit={(dir: number) => ({ x: dir > 0 ? "-100%" : "100%", opacity: 0.6 })}
+          transition={{ type: "tween", duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
+          drag={siblingIds.length > 1 ? "x" : false}
+          dragDirectionLock
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.2}
+          onDragEnd={(_, info) => {
+            const threshold = 80;
+            if (Math.abs(info.offset.x) < threshold && Math.abs(info.velocity.x) < 400) return;
+            if (Math.abs(info.offset.x) < Math.abs(info.offset.y)) return;
+            const dir: 1 | -1 = info.offset.x < 0 ? 1 : -1;
+            if (dir === 1 && !hasNext) return;
+            if (dir === -1 && !hasPrev) return;
+            goToSibling(dir);
+          }}
+        >
       {/* Header */}
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg px-5 pt-14 pb-3">
         <div className="flex items-center gap-3">
