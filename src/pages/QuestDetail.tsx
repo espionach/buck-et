@@ -252,7 +252,20 @@ const QuestDetail = () => {
             if (dir === -1 && !hasPrev) return;
             goToSibling(dir);
           }}
+          className="relative"
         >
+          {/* Off-screen previews of neighboring sidequests — visible while dragging. */}
+          {prevQuest && (
+            <div className="absolute inset-y-0 right-full w-full" aria-hidden>
+              <QuestDetailPreview quest={prevQuest} />
+            </div>
+          )}
+          {nextQuest && (
+            <div className="absolute inset-y-0 left-full w-full" aria-hidden>
+              <QuestDetailPreview quest={nextQuest} />
+            </div>
+          )}
+
       {/* Header */}
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg px-5 pt-14 pb-3">
         <div className="flex items-center gap-3">
