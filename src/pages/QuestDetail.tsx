@@ -11,7 +11,7 @@ import { ArrowLeft, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send,
 import NudgeModal from "@/components/NudgeModal";
 import EmptyState from "@/components/EmptyState";
 import { useState, useEffect, useRef } from "react";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useNavigate, useParams, useLocation, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePopup } from "@/hooks/use-popup";
 import { useAuth } from "@/contexts/AuthContext";
