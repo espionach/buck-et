@@ -216,6 +216,7 @@ const QuestDetail = () => {
           {/* Share button (always visible) */}
           <button
             onClick={handleShare}
+            data-spotlight="quest-share"
             className="p-1 -m-1 text-muted-foreground hover:text-foreground transition-colors"
             aria-label="Share sidequest"
           >
