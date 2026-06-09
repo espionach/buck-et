@@ -258,9 +258,9 @@ const QuestDetail = () => {
           dragElastic={1}
           dragMomentum={false}
           onDragEnd={(_, info) => {
-            // Distance-based only — speed/velocity ignored so swipes feel consistent.
-            const distanceThreshold = typeof window !== "undefined" ? window.innerWidth * 0.2 : 80;
-            if (Math.abs(info.offset.x) < distanceThreshold) return;
+            // Distance-based only — must drag more than half the screen to commit.
+            const distanceThreshold = typeof window !== "undefined" ? window.innerWidth * 0.5 : 200;
+            if (Math.abs(info.offset.x) <= distanceThreshold) return;
             if (Math.abs(info.offset.x) < Math.abs(info.offset.y)) return;
             const dir: 1 | -1 = info.offset.x < 0 ? 1 : -1;
             if (dir === 1 && !hasNext) return;
