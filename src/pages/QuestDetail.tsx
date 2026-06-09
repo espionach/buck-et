@@ -216,6 +216,7 @@ const QuestDetail = () => {
           {/* Share button (always visible) */}
           <button
             onClick={handleShare}
+            data-spotlight="quest-share"
             className="p-1 -m-1 text-muted-foreground hover:text-foreground transition-colors"
             aria-label="Share sidequest"
           >
@@ -401,6 +402,7 @@ const QuestDetail = () => {
               <button
                 type="button"
                 onClick={() => setShowNudge(true)}
+                data-spotlight="quest-nudge"
                 className="mt-3 w-full flex items-center justify-between gap-3 p-2.5 rounded-lg border border-primary/30 bg-primary/5 hover:bg-primary/10 transition-colors text-left"
               >
                 <div className="flex items-center gap-2 min-w-0">

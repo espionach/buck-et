@@ -710,7 +710,12 @@ const Profile = () => {
             <button
               key={id}
               data-tour={`profile-tab-${id}`}
-              onClick={() => setTab(id)}
+              onClick={() => {
+                setTab(id);
+                const next = new URLSearchParams(searchParams);
+                next.set("tab", id);
+                setSearchParams(next, { replace: true });
+              }}
               aria-label={label}
               aria-selected={isActive}
               className="relative flex-1 py-3 flex items-center justify-center transition-colors"
