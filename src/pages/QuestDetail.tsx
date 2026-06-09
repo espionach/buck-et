@@ -328,12 +328,12 @@ const QuestDetail = () => {
           className="relative"
         >
           {/* Off-screen previews of neighboring sidequests — visible while dragging. */}
-          {showSwipePreviews && prevQuest && (
+          {previewsForQuestId === questId && prevQuest && (
             <div className="absolute inset-y-0 right-full w-full" aria-hidden>
               <QuestDetailPreview quest={prevQuest} />
             </div>
           )}
-          {showSwipePreviews && nextQuest && (
+          {previewsForQuestId === questId && nextQuest && (
             <div className="absolute inset-y-0 left-full w-full" aria-hidden>
               <QuestDetailPreview quest={nextQuest} />
             </div>
