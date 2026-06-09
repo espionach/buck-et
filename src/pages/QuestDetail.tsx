@@ -82,18 +82,22 @@ const QuestDetail = () => {
   // dragHandoff is the screen-x offset (in px) the new page should start at;
   // null means a normal (non-drag) navigation.
   const [dragHandoff, setDragHandoff] = useState<number | null>(null);
-  const [showSwipePreviews, setShowSwipePreviews] = useState(false);
+  // The questId that previews are currently being shown for. Previews only
+  // render on the motion.div whose key matches this — preventing the exiting
+  // page (during AnimatePresence) from accidentally picking up the new
+  // page's neighbors and flashing a "quest after that" preview.
+  const [previewsForQuestId, setPreviewsForQuestId] = useState<string | null>(null);
   const previewHideTimer = useRef<number | null>(null);
 
   const hideSwipePreviews = (delay = 0) => {
     if (previewHideTimer.current !== null) window.clearTimeout(previewHideTimer.current);
     if (delay === 0) {
-      setShowSwipePreviews(false);
+      setPreviewsForQuestId(null);
       previewHideTimer.current = null;
       return;
     }
     previewHideTimer.current = window.setTimeout(() => {
-      setShowSwipePreviews(false);
+      setPreviewsForQuestId(null);
       previewHideTimer.current = null;
     }, delay);
   };
@@ -101,8 +105,9 @@ const QuestDetail = () => {
   const revealSwipePreviews = () => {
     if (previewHideTimer.current !== null) window.clearTimeout(previewHideTimer.current);
     previewHideTimer.current = null;
-    setShowSwipePreviews(true);
+    if (questId) setPreviewsForQuestId(questId);
   };
+
 
   const siblingIdx = questId ? siblingIds.indexOf(questId) : -1;
   const hasPrev = siblingIdx > 0;
@@ -323,12 +328,12 @@ const QuestDetail = () => {
           className="relative"
         >
           {/* Off-screen previews of neighboring sidequests — visible while dragging. */}
-          {showSwipePreviews && prevQuest && (
+          {previewsForQuestId === questId && prevQuest && (
             <div className="absolute inset-y-0 right-full w-full" aria-hidden>
               <QuestDetailPreview quest={prevQuest} />
             </div>
           )}
-          {showSwipePreviews && nextQuest && (
+          {previewsForQuestId === questId && nextQuest && (
             <div className="absolute inset-y-0 left-full w-full" aria-hidden>
               <QuestDetailPreview quest={nextQuest} />
             </div>
