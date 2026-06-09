@@ -197,21 +197,26 @@ const SpotlightHost = () => {
   let tooltipTop = 0;
   let tooltipLeft = 0;
   if (rect) {
+    const h = tooltipH;
     const spaceAbove = rect.top - TOOLTIP_GAP - 16;
     const spaceBelow = viewportH - (rect.top + rect.height) - TOOLTIP_GAP - 16;
     const preferred = active.placement;
     const placement: "top" | "bottom" =
-      preferred === "top" && spaceAbove >= TOOLTIP_HEIGHT
+      preferred === "top" && spaceAbove >= h
         ? "top"
-        : preferred === "bottom" && spaceBelow >= TOOLTIP_HEIGHT
+        : preferred === "bottom" && spaceBelow >= h
         ? "bottom"
-        : spaceAbove >= TOOLTIP_HEIGHT
+        : spaceAbove >= h
+        ? "top"
+        : spaceBelow >= h
+        ? "bottom"
+        : spaceAbove >= spaceBelow
         ? "top"
         : "bottom";
 
     tooltipTop =
       placement === "top"
-        ? rect.top - TOOLTIP_GAP - TOOLTIP_HEIGHT
+        ? rect.top - TOOLTIP_GAP - h
         : rect.top + rect.height + TOOLTIP_GAP;
     tooltipLeft = Math.max(
       16,
@@ -220,7 +225,18 @@ const SpotlightHost = () => {
         rect.left + rect.width / 2 - TOOLTIP_WIDTH / 2,
       ),
     );
-    tooltipTop = Math.max(16, Math.min(viewportH - TOOLTIP_HEIGHT - 16, tooltipTop));
+    // Clamp vertically, but never let the tooltip overlap the spotlight rect.
+    const maxTop = viewportH - h - 16;
+    const minTop = 16;
+    if (placement === "top") {
+      tooltipTop = Math.max(minTop, Math.min(rect.top - TOOLTIP_GAP - h, maxTop));
+      // If clamp pushed it into the rect, force above the rect anyway.
+      if (tooltipTop + h > rect.top - TOOLTIP_GAP) {
+        tooltipTop = Math.max(minTop, rect.top - TOOLTIP_GAP - h);
+      }
+    } else {
+      tooltipTop = Math.min(maxTop, Math.max(rect.top + rect.height + TOOLTIP_GAP, minTop));
+    }
   }
 
   const overlay = (
@@ -238,6 +254,13 @@ const SpotlightHost = () => {
       />
 
       <div
+        ref={(el) => {
+          tooltipRef.current = el;
+          if (el) {
+            const measured = el.getBoundingClientRect().height;
+            if (measured && Math.abs(measured - tooltipH) > 1) setTooltipH(measured);
+          }
+        }}
         className="absolute bg-card rounded-2xl shadow-xl border border-border p-4 pointer-events-auto"
         onClick={(event) => event.stopPropagation()}
         style={{
