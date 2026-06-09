@@ -71,9 +71,9 @@ const QuestDetailPreview = ({ quest }: { quest: Quest }) => {
   })();
 
   return (
-    <div className="min-h-screen pb-28 pointer-events-none select-none bg-background">
-      {/* Header (non-sticky in preview to avoid translucent overlay during swipe) */}
-      <div className="bg-background px-5 pt-14 pb-3">
+    <div className="min-h-screen pb-28 pointer-events-none select-none">
+      {/* Header */}
+      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg px-5 pt-14 pb-3">
         <div className="flex items-center gap-3">
           <div className="p-2 -ml-2 text-muted-foreground">
             <ArrowLeft className="w-5 h-5" />
