@@ -11,7 +11,7 @@ import { ArrowLeft, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send,
 import NudgeModal from "@/components/NudgeModal";
 import EmptyState from "@/components/EmptyState";
 import { useState, useEffect, useRef } from "react";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useNavigate, useParams, useLocation, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePopup } from "@/hooks/use-popup";
 import { useAuth } from "@/contexts/AuthContext";
@@ -43,7 +43,13 @@ const volunteerRoles = ALL_CONTRIBUTION_ROLES;
 const QuestDetail = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const fromOnboarding = searchParams.get("fromOnboarding") === "1";
   const { questId } = useParams<{ questId: string }>();
+  const handleBack = () => {
+    if (fromOnboarding) navigate("/", { replace: true });
+    else navigate(-1);
+  };
   const { user, loading: authLoading } = useAuth();
   const { data: hydratedQuests, isLoading: questsLoading, isFetching: questsFetching } = useQuests();
   const { quests, groups, addComment, volunteerForQuest, unvolunteerFromQuest, currentUser, pinQuest, unpinQuest, pinnedQuestIds, deleteQuest, toggleImIn } = useAppStore();
@@ -167,7 +173,7 @@ const QuestDetail = () => {
       {/* Header */}
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg px-5 pt-14 pb-3">
         <div className="flex items-center gap-3">
-          <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-muted-foreground hover:text-foreground transition-colors">
+          <button onClick={handleBack} data-spotlight="quest-back" className="p-2 -ml-2 text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div className="flex-1 min-w-0">
@@ -192,7 +198,7 @@ const QuestDetail = () => {
               const canJoin = userInGroup;
               return (
                 <button
-                  data-spotlight="quest-join"
+                  data-spotlight="quest-join-friend"
                   onClick={() => {
                     if (!canJoin) return;
                     toggleImIn(quest.id);

@@ -28,6 +28,14 @@ export const SPOTLIGHTS: SpotlightDef[] = [
     placement: "bottom",
   },
   {
+    id: "quest-detail-join-friend",
+    match: (l) => l.pathname.startsWith("/quest/") && !l.pathname.endsWith("/edit"),
+    targetSelector: '[data-spotlight="quest-join-friend"]',
+    title: "Join your friend's sidequest",
+    body: "Tap Join to RSVP. You'll show up in the participants list and it'll land in your active sidequests.",
+    placement: "bottom",
+  },
+  {
     id: "quest-detail-share",
     match: (l) => l.pathname.startsWith("/quest/") && !l.pathname.endsWith("/edit"),
     targetSelector: '[data-spotlight="quest-share"]',
@@ -89,6 +97,17 @@ export const SPOTLIGHTS: SpotlightDef[] = [
     targetSelector: '[data-tour="profile-tab-groups"]',
     title: "Friend groups",
     body: "Make groups for the people you actually plan things with. Sidequests can be shared to just one group.",
+    placement: "bottom",
+  },
+  {
+    id: "quest-detail-back-onboarding",
+    match: (l) =>
+      l.pathname.startsWith("/quest/") &&
+      !l.pathname.endsWith("/edit") &&
+      new URLSearchParams(l.search).get("fromOnboarding") === "1",
+    targetSelector: '[data-spotlight="quest-back"]',
+    title: "Head back home",
+    body: "Tap the back arrow whenever you're done. It'll drop you on your home feed where your friends' sidequests live.",
     placement: "bottom",
   },
 ];
