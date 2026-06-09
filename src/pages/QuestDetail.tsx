@@ -224,7 +224,7 @@ const QuestDetail = () => {
         </>
       )}
 
-      <AnimatePresence initial={false} mode="popLayout" custom={swipeDir}>
+      <AnimatePresence initial={false} mode="popLayout">
         <motion.div
           key={questId}
           initial={{ x: swipeDir > 0 ? "100%" : swipeDir < 0 ? "-100%" : 0, opacity: swipeDir === 0 ? 1 : 0.6 }}
