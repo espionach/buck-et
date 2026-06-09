@@ -43,7 +43,13 @@ const volunteerRoles = ALL_CONTRIBUTION_ROLES;
 const QuestDetail = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const fromOnboarding = searchParams.get("fromOnboarding") === "1";
   const { questId } = useParams<{ questId: string }>();
+  const handleBack = () => {
+    if (fromOnboarding) navigate("/", { replace: true });
+    else navigate(-1);
+  };
   const { user, loading: authLoading } = useAuth();
   const { data: hydratedQuests, isLoading: questsLoading, isFetching: questsFetching } = useQuests();
   const { quests, groups, addComment, volunteerForQuest, unvolunteerFromQuest, currentUser, pinQuest, unpinQuest, pinnedQuestIds, deleteQuest, toggleImIn } = useAppStore();
