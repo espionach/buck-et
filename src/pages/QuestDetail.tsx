@@ -197,7 +197,7 @@ const QuestDetail = () => {
           <button onClick={handleBack} data-spotlight="quest-back" className="p-2 -ml-2 text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0" data-spotlight="quest-header-title">
             <h1 className="text-lg font-bold text-foreground">{quest.title}</h1>
             <p className="text-xs text-muted-foreground">
               {group ? <span className="flex items-center gap-1"><GroupSwatch color={group.color} size={12} />{group.name}</span> : <span className="flex items-center gap-1"><Globe className="w-3 h-3" />Friends</span>}
@@ -243,7 +243,7 @@ const QuestDetail = () => {
           {/* Share button (always visible) */}
           <button
             onClick={handleShare}
-            data-spotlight="quest-share"
+            data-spotlight={isOwner ? "quest-share" : undefined}
             className="p-1 -m-1 text-muted-foreground hover:text-foreground transition-colors"
             aria-label="Share sidequest"
           >
@@ -308,12 +308,12 @@ const QuestDetail = () => {
 
       <motion.div
         layout
-        data-spotlight="quest-body"
         className="px-5 space-y-4 mt-2"
         drag={siblingIds.length > 1 ? "x" : false}
         dragDirectionLock
         dragConstraints={{ left: 0, right: 0 }}
         dragElastic={0.15}
+        dragSnapToOrigin
         onDragEnd={(_, info) => {
           const threshold = 80;
           if (Math.abs(info.offset.x) < threshold && Math.abs(info.velocity.x) < 400) return;
