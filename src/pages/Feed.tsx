@@ -165,6 +165,25 @@ const Feed = () => {
         <NotificationBell />
 
       </div>
+
+      {/* Home tabs: Quests / Activity */}
+      {!searchMode && (
+        <div className="flex bg-muted rounded-2xl p-1 mb-3">
+          {(["quests", "activity"] as const).map((t) => (
+            <button
+              key={t}
+              onClick={() => setHomeTab(t)}
+              className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
+                homeTab === t ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
+              }`}
+            >
+              {t === "quests" ? "Sidequests" : "Activity"}
+            </button>
+          ))}
+        </div>
+      )}
+
+
       
 
       {/* Search */}
