@@ -24,6 +24,7 @@ import { validateContent } from "@/lib/contentFilter";
 import LocationPicker, { LocationValue } from "@/components/LocationPicker";
 import { listDrafts } from "@/lib/drafts";
 import { FileText, ChevronRight } from "lucide-react";
+import { useSwipeNav } from "@/hooks/useSwipeNav";
 const Profile = () => {
   const {
     currentUser,
@@ -589,8 +590,24 @@ const Profile = () => {
     );
   }
 
+  const PROFILE_TABS = ["current", "past", "groups"] as const;
+  const swipeToTab = (dir: 1 | -1) => {
+    const idx = PROFILE_TABS.indexOf(tab);
+    const next = PROFILE_TABS[idx + dir];
+    if (!next) return;
+    setTab(next);
+    const sp = new URLSearchParams(searchParams);
+    sp.set("tab", next);
+    setSearchParams(sp, { replace: true });
+  };
+  const profileSwipe = useSwipeNav({
+    onSwipeLeft: () => swipeToTab(1),
+    onSwipeRight: () => swipeToTab(-1),
+    ignoreSelector: "[data-quest-card]",
+  });
+
   return (
-    <div className="min-h-screen pb-32 px-5 pt-14">
+    <div {...profileSwipe} className="min-h-screen pb-32 px-5 pt-14">
       {/* Top right — Notifications & Settings */}
       <div className="absolute top-4 right-4 flex items-center gap-1">
         <NotificationBell />

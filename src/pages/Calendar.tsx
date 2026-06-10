@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { format, parseISO, isSameDay, isPast, startOfDay, addMonths, subMonths } from "date-fns";
+import { format, parseISO, isSameDay, isPast, startOfDay, addMonths, subMonths, addDays, subDays, isSameMonth } from "date-fns";
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Clock, MapPin } from "lucide-react";
 
 import { Calendar } from "@/components/ui/calendar";
@@ -158,9 +158,33 @@ const CalendarPage = () => {
 
 
       <div className="mt-6">
-        <h2 className="text-sm font-bold text-foreground mb-3">
-          {format(activeDate, "EEEE, MMM d")}
-        </h2>
+        <div className="flex items-center justify-between mb-3">
+          <button
+            onClick={() => {
+              const prev = subDays(activeDate, 1);
+              setSelected(prev);
+              if (!isSameMonth(prev, month)) setMonth(prev);
+            }}
+            aria-label="Previous day"
+            className="p-1 text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <h2 className="text-sm font-bold text-foreground">
+            {format(activeDate, "EEEE, MMM d")}
+          </h2>
+          <button
+            onClick={() => {
+              const next = addDays(activeDate, 1);
+              setSelected(next);
+              if (!isSameMonth(next, month)) setMonth(next);
+            }}
+            aria-label="Next day"
+            className="p-1 text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </div>
 
         {myDatedQuests.length === 0 ? (
           <EmptyState

@@ -11,6 +11,7 @@ import ActivityFeed from "@/components/ActivityFeed";
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useSwipeNav } from "@/hooks/useSwipeNav";
 
 const Feed = () => {
   const { quests, groups, friends: friendsList, cleanupEmptyQuests, friendRequests, currentUser, sentFriendRequests, sendFriendRequest } = useAppStore();
@@ -142,8 +143,14 @@ const Feed = () => {
     );
   }
 
+  const swipeHandlers = useSwipeNav({
+    onSwipeLeft: () => { if (!searchMode && homeTab === "quests") setHomeTab("activity"); },
+    onSwipeRight: () => { if (!searchMode && homeTab === "activity") setHomeTab("quests"); },
+    ignoreSelector: "[data-quest-card]",
+  });
+
   return (
-    <div className="min-h-screen pb-24 px-5 pt-14">
+    <div {...swipeHandlers} className="min-h-screen pb-24 px-5 pt-14">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           {/* Bucket logo – filled */}

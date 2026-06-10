@@ -131,7 +131,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
 
   return (
     <>
-      <div className={`relative ${enableSwipe ? "overflow-hidden" : ""} ${isPinned ? "rounded-xl" : ""}`}>
+      <div data-quest-card="true" className={`relative ${enableSwipe ? "overflow-hidden" : ""} ${isPinned ? "rounded-xl" : ""}`}>
         {enableSwipe && (
           <motion.div
             style={{ opacity: underlayOpacity }}
