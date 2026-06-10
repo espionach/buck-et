@@ -410,24 +410,15 @@ const QuestDetail = () => {
           )}
 
 
-          {/* Share button (always visible) */}
-          <button
-            onClick={handleShare}
-            data-spotlight={isOwner ? "quest-share" : undefined}
-            className="p-1 -m-1 text-muted-foreground hover:text-foreground transition-colors"
-            aria-label="Share sidequest"
-          >
-            <Share2 className="w-5 h-5" />
-          </button>
-
-          {/* Owner actions menu (Edit, Pin, Delete) */}
-          {isOwner && (() => {
-            const pinned = pinnedQuestIds.includes(quest.id);
-            const pinDisabled = !pinned && pinnedQuestIds.length >= 3;
+          {/* Overflow menu — Share for everyone, plus owner actions or Report */}
+          {(() => {
+            const pinned = isOwner ? pinnedQuestIds.includes(quest.id) : false;
+            const pinDisabled = isOwner && !pinned && pinnedQuestIds.length >= 3;
             return (
               <DropdownMenu open={showMenu} onOpenChange={setShowMenu}>
                 <DropdownMenuTrigger asChild>
                   <button
+                    data-spotlight={isOwner ? "quest-share" : undefined}
                     className="p-1 -m-1 text-muted-foreground hover:text-foreground transition-colors"
                     aria-label="Sidequest actions"
                   >
@@ -435,7 +426,10 @@ const QuestDetail = () => {
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" sideOffset={4} className="min-w-[160px]">
-                  {!isFinished && (
+                  <DropdownMenuItem onSelect={handleShare} className="gap-2 text-xs">
+                    <Share2 className="w-3.5 h-3.5" /> Share
+                  </DropdownMenuItem>
+                  {isOwner && !isFinished && (
                     <DropdownMenuItem
                       onSelect={() => navigate(`/quest/${quest.id}/edit`)}
                       className="gap-2 text-xs"
@@ -443,7 +437,7 @@ const QuestDetail = () => {
                       <Pencil className="w-3.5 h-3.5" /> Edit
                     </DropdownMenuItem>
                   )}
-                  {!isFinished && (
+                  {isOwner && !isFinished && (
                     <DropdownMenuItem
                       onSelect={() => {
                         if (pinned) unpinQuest(quest.id);
@@ -456,29 +450,29 @@ const QuestDetail = () => {
                       {pinDisabled && <span className="text-[10px] text-muted-foreground ml-auto">Max 3</span>}
                     </DropdownMenuItem>
                   )}
-                  <DropdownMenuItem
-                    onSelect={() => setShowDeleteConfirm(true)}
-                    className="gap-2 text-xs text-destructive focus:text-destructive"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" /> Delete
-                  </DropdownMenuItem>
+                  {isOwner && (
+                    <DropdownMenuItem
+                      onSelect={() => setShowDeleteConfirm(true)}
+                      className="gap-2 text-xs text-destructive focus:text-destructive"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" /> Delete
+                    </DropdownMenuItem>
+                  )}
+                  {!isOwner && (
+                    <DropdownMenuItem
+                      onSelect={() => setShowReport(true)}
+                      className="gap-2 text-xs text-destructive focus:text-destructive"
+                    >
+                      <Flag className="w-3.5 h-3.5" /> Report
+                    </DropdownMenuItem>
+                  )}
                 </DropdownMenuContent>
               </DropdownMenu>
             );
           })()}
-
-          {/* Non-owner: Report button */}
-          {!isOwner && (
-            <button
-              onClick={() => setShowReport(true)}
-              className="p-1 -m-1 text-muted-foreground hover:text-foreground transition-colors"
-              aria-label="Report sidequest"
-            >
-              <Flag className="w-5 h-5" />
-            </button>
-          )}
         </div>
       </div>
+
 
       {isFinished ? (
         <motion.div layout className="px-5 space-y-4 mt-2">
