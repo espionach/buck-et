@@ -68,6 +68,14 @@ export const SPOTLIGHTS: SpotlightDef[] = [
     placement: "bottom",
   },
   {
+    id: "home-sidequests-tab",
+    match: (l) => l.pathname === "/",
+    targetSelector: '[data-spotlight="home-sidequests-tab"]',
+    title: "Your friends' sidequests",
+    body: "This feed shows active sidequests from your friends and groups. Tap one to see details or join in.",
+    placement: "bottom",
+  },
+  {
     id: "home-activity-tab",
     match: (l) => l.pathname === "/",
     targetSelector: '[data-spotlight="home-activity-tab"]',
