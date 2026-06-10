@@ -96,7 +96,7 @@ export const SPOTLIGHTS: SpotlightDef[] = [
     match: (l) => l.pathname === "/profile" && (hasTab(l.search, "current") || !l.search),
     targetSelector: '[data-tour="profile-tab-current"]',
     title: "Active sidequests",
-    body: "Your in-progress sidequests. Finish one and it slides over to Completed.",
+    body: "Your in-progress sidequests. Swipe a card right to mark it complete — it'll slide over to Completed.",
     placement: "bottom",
   },
   {
@@ -104,7 +104,7 @@ export const SPOTLIGHTS: SpotlightDef[] = [
     match: (l) => l.pathname === "/profile" && hasTab(l.search, "past"),
     targetSelector: '[data-tour="profile-tab-past"]',
     title: "Completed sidequests",
-    body: "A running log of every sidequest you've finished. Hit the + on any one to add photos after the fact.",
+    body: "A running log of every sidequest you've finished. Swipe a card right to move it back to Active, or tap + to add photos after the fact.",
     placement: "bottom",
   },
   {
