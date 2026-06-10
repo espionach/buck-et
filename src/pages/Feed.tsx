@@ -168,19 +168,37 @@ const Feed = () => {
 
       {/* Home tabs: Quests / Activity */}
       {!searchMode && (
-        <div className="flex bg-muted rounded-2xl p-1 mb-3">
-          {(["quests", "activity"] as const).map((t) => (
-            <button
-              key={t}
-              data-spotlight={t === "activity" ? "home-activity-tab" : undefined}
-              onClick={() => setHomeTab(t)}
-              className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
-                homeTab === t ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
-              }`}
-            >
-              {t === "quests" ? "Sidequests" : "Activity"}
-            </button>
-          ))}
+        <div className="flex border-b border-border mb-4">
+          {([
+            { id: "quests", label: "Sidequests", Icon: Zap },
+            { id: "activity", label: "Activity", Icon: ActivityIcon },
+          ] as const).map(({ id, label, Icon }) => {
+            const isActive = homeTab === id;
+            return (
+              <button
+                key={id}
+                data-spotlight={id === "activity" ? "home-activity-tab" : undefined}
+                onClick={() => setHomeTab(id)}
+                aria-label={label}
+                aria-selected={isActive}
+                className="relative flex-1 py-3 flex items-center justify-center transition-colors"
+              >
+                <Icon
+                  className={`w-6 h-6 transition-colors ${
+                    isActive ? "text-foreground" : "text-muted-foreground"
+                  }`}
+                  strokeWidth={isActive ? 2.25 : 2}
+                />
+                {isActive && (
+                  <motion.div
+                    layoutId="home-tab-underline"
+                    className="absolute -bottom-px left-0 right-0 h-[2px] bg-foreground rounded-full"
+                    transition={{ type: "spring", stiffness: 500, damping: 40 }}
+                  />
+                )}
+              </button>
+            );
+          })}
         </div>
       )}
 
