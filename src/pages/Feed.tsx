@@ -19,6 +19,7 @@ const Feed = () => {
   const [selectedProfile, setSelectedProfile] = useState<User | null>(null);
 
   const [feedFilter, setFeedFilter] = useState<"all" | "followers" | string>("all");
+  const [homeTab, setHomeTab] = useState<"quests" | "activity">("quests");
   const [searchMode, setSearchMode] = useState(() => !!sessionStorage.getItem("feedSearchText"));
   // Scope recent searches to the current user so multiple accounts on the
   // same browser don't share each other's history.
