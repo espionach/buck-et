@@ -68,6 +68,14 @@ export const SPOTLIGHTS: SpotlightDef[] = [
     placement: "bottom",
   },
   {
+    id: "home-activity-tab",
+    match: (l) => l.pathname === "/",
+    targetSelector: '[data-spotlight="home-activity-tab"]',
+    title: "See what friends are up to",
+    body: "Switch to Activity for a live feed of joins, comments, photos and completions from your friends. Turn it off anytime in Settings.",
+    placement: "bottom",
+  },
+  {
     id: "calendar-grid",
     match: (l) => l.pathname === "/calendar",
     targetSelector: '[data-spotlight="calendar-grid"]',
