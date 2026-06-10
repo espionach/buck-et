@@ -528,7 +528,7 @@ const CreateQuest = () => {
               onClick={() => setDetailsOpen((v) => !v)}
               className="w-full flex items-center justify-between text-left"
             >
-              <span className="text-sm font-semibold text-foreground">Sidequest Details</span>
+              <span className="text-sm font-semibold text-foreground">Additional Details</span>
               <span className="text-xs text-muted-foreground flex items-center gap-1">
                 {detailsOpen ? "Hide" : "Optional"}
                 <ChevronDown className={`w-4 h-4 transition-transform ${detailsOpen ? "rotate-180" : ""}`} />
