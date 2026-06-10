@@ -269,21 +269,8 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
           </div>
         )}
 
-        {/* Plus icon for finished quests — only the owner or someone who was
-            joined when the owner finished it can attach photos/videos. */}
-        {isFinished && (isOwner || wasJoinedWhenFinished) && onEditPast && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onEditPast(quest);
-            }}
-            data-spotlight="completed-add-photos"
-            aria-label="Add photos to completed sidequest"
-            className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-primary text-primary-foreground shadow-md hover:scale-110 transition-transform"
-          >
-            <Plus className="w-3.5 h-3.5" />
-          </button>
-        )}
+        {/* Add-photos action moved into the completed Sidequest detail page */}
+
 
         {/* Header: Creator name + group */}
         <div className={`mb-2 flex items-start gap-2.5 ${isPinned ? "pl-5" : ""}`}>
