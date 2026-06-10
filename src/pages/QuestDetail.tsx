@@ -7,7 +7,8 @@ import SidequestPhoto from "@/components/SidequestPhoto";
 import MediaViewer from "@/components/MediaViewer";
 import CommentThread from "@/components/CommentThread";
 import MapPreview from "@/components/MapPreview";
-import { ArrowLeft, ChevronLeft, ChevronRight, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send, ExternalLink, HandMetal, Check, Globe, StickyNote, MoreVertical, Pencil, Pin, Trash2, Flag, Share2, Lock, Info } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send, ExternalLink, HandMetal, Check, Globe, StickyNote, MoreVertical, Pencil, Pin, Trash2, Flag, Share2, Lock, Info, Plus, ImagePlus } from "lucide-react";
+import { uploadSidequestPhotos } from "@/lib/uploads";
 import NudgeModal from "@/components/NudgeModal";
 import EmptyState from "@/components/EmptyState";
 import QuestDetailPreview from "@/components/QuestDetailPreview";
@@ -54,7 +55,7 @@ const QuestDetail = () => {
   };
   const { user, loading: authLoading } = useAuth();
   const { data: hydratedQuests, isLoading: questsLoading, isFetching: questsFetching } = useQuests();
-  const { quests, groups, addComment, volunteerForQuest, unvolunteerFromQuest, currentUser, pinQuest, unpinQuest, pinnedQuestIds, deleteQuest, toggleImIn } = useAppStore();
+  const { quests, groups, addComment, volunteerForQuest, unvolunteerFromQuest, currentUser, pinQuest, unpinQuest, pinnedQuestIds, deleteQuest, toggleImIn, updateQuest } = useAppStore();
   const [showMenu, setShowMenu] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showReport, setShowReport] = useState(false);
@@ -62,6 +63,8 @@ const QuestDetail = () => {
   const [prefillNudgeUserId, setPrefillNudgeUserId] = useState<string | null>(null);
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
   const [joinAnim, setJoinAnim] = useState<"idle" | "morph" | "exit" | "done">("idle");
+  const [uploadingMedia, setUploadingMedia] = useState(false);
+  const completedFileInputRef = useRef<HTMLInputElement>(null);
   usePopup(showDeleteConfirm);
 
   // Sibling sidequests from the originating list — used for left/right swipe nav.
@@ -156,11 +159,9 @@ const QuestDetail = () => {
   const [newComment, setNewComment] = useState("");
   const isQuestLookupPending = authLoading || (!!user && !quest && (questsLoading || questsFetching));
 
-  useEffect(() => {
-    if (quest && isQuestCompleted(quest)) {
-      navigate(-1);
-    }
-  }, [quest, navigate]);
+  // Completed quests now render their own read-only detail view below
+  // instead of redirecting away.
+
 
   if (isQuestLookupPending) {
     return (
@@ -189,9 +190,8 @@ const QuestDetail = () => {
     );
   }
 
-  // Once the owner finishes the quest, the detail view is no longer
-  // accessible (the quest moves to history).
-  if (isQuestCompleted(quest)) return null;
+  const isFinished = isQuestCompleted(quest);
+  const wasJoinedWhenFinished = quest.completedByUserIds?.includes(currentUser.id);
   const isIn = quest.participants.some((p) => p.id === currentUser.id);
 
   const group = quest.groupId ? groups.find((g) => g.id === quest.groupId) : null;
@@ -243,6 +243,22 @@ const QuestDetail = () => {
       toast.success("Link copied to clipboard");
     } catch {
       toast.error("Couldn't copy link");
+    }
+  };
+  const canAddCompletedMedia = isFinished && (isOwner || wasJoinedWhenFinished);
+  const handleCompletedMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files ? Array.from(e.target.files) : [];
+    e.target.value = "";
+    if (!files.length) return;
+    setUploadingMedia(true);
+    try {
+      const paths = await uploadSidequestPhotos(quest.id, files);
+      updateQuest(quest.id, { photos: [...(quest.photos ?? []), ...paths] });
+      toast.success(paths.length > 1 ? "Photos added" : "Photo added");
+    } catch (err: any) {
+      toast.error(err?.message || "Couldn't upload. Try again?");
+    } finally {
+      setUploadingMedia(false);
     }
   };
 
@@ -352,8 +368,8 @@ const QuestDetail = () => {
             </p>
           </div>
 
-          {/* Owner badge / Join / Joined button */}
-          {isOwner ? (
+          {/* Owner badge / Join / Joined button — hidden once the quest is finished */}
+          {!isFinished && (isOwner ? (
             <span
               data-spotlight="quest-join"
               aria-label="You own this sidequest"
@@ -385,6 +401,11 @@ const QuestDetail = () => {
                 </button>
               );
             })()
+          ))}
+          {isFinished && (
+            <span className="shrink-0 inline-flex items-center px-2.5 py-1 rounded-full bg-muted text-muted-foreground text-[11px] font-semibold">
+              Completed
+            </span>
           )}
 
 
@@ -413,23 +434,27 @@ const QuestDetail = () => {
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" sideOffset={4} className="min-w-[160px]">
-                  <DropdownMenuItem
-                    onSelect={() => navigate(`/quest/${quest.id}/edit`)}
-                    className="gap-2 text-xs"
-                  >
-                    <Pencil className="w-3.5 h-3.5" /> Edit
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onSelect={() => {
-                      if (pinned) unpinQuest(quest.id);
-                      else pinQuest(quest.id);
-                    }}
-                    disabled={pinDisabled}
-                    className="gap-2 text-xs"
-                  >
-                    <Pin className="w-3.5 h-3.5" /> {pinned ? "Unpin" : "Pin"}
-                    {pinDisabled && <span className="text-[10px] text-muted-foreground ml-auto">Max 3</span>}
-                  </DropdownMenuItem>
+                  {!isFinished && (
+                    <DropdownMenuItem
+                      onSelect={() => navigate(`/quest/${quest.id}/edit`)}
+                      className="gap-2 text-xs"
+                    >
+                      <Pencil className="w-3.5 h-3.5" /> Edit
+                    </DropdownMenuItem>
+                  )}
+                  {!isFinished && (
+                    <DropdownMenuItem
+                      onSelect={() => {
+                        if (pinned) unpinQuest(quest.id);
+                        else pinQuest(quest.id);
+                      }}
+                      disabled={pinDisabled}
+                      className="gap-2 text-xs"
+                    >
+                      <Pin className="w-3.5 h-3.5" /> {pinned ? "Unpin" : "Pin"}
+                      {pinDisabled && <span className="text-[10px] text-muted-foreground ml-auto">Max 3</span>}
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem
                     onSelect={() => setShowDeleteConfirm(true)}
                     className="gap-2 text-xs text-destructive focus:text-destructive"
@@ -454,6 +479,183 @@ const QuestDetail = () => {
         </div>
       </div>
 
+      {isFinished ? (
+        <motion.div layout className="px-5 space-y-4 mt-2">
+          {/* Completed banner / meta */}
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Check className="w-3.5 h-3.5 text-secondary" />
+            <span>Completed{quest.completedAt ? ` ${quest.completedAt}` : ""}</span>
+          </div>
+
+          {/* Photos & Videos — primary content for completed quests */}
+          <div className="p-4 rounded-xl border border-border/50 bg-card space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-bold text-foreground">Photos & Videos</h3>
+              {canAddCompletedMedia && (
+                <>
+                  <input
+                    ref={completedFileInputRef}
+                    type="file"
+                    accept="image/*,video/*"
+                    multiple
+                    className="hidden"
+                    onChange={handleCompletedMediaUpload}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => completedFileInputRef.current?.click()}
+                    disabled={uploadingMedia}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-[11px] font-semibold disabled:opacity-60"
+                  >
+                    <ImagePlus className="w-3.5 h-3.5" />
+                    {uploadingMedia ? "Uploading…" : "Add"}
+                  </button>
+                </>
+              )}
+            </div>
+            {quest.photos && quest.photos.length > 0 ? (
+              <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4">
+                {quest.photos.map((photo, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => setViewerIndex(i)}
+                    className={`${quest.photos!.length === 1 ? "w-full aspect-[4/3]" : "w-64 h-64"} shrink-0 rounded-xl overflow-hidden border border-border/30 focus:outline-none focus:ring-2 focus:ring-ring`}
+                    aria-label={`Open photo ${i + 1}`}
+                  >
+                    <SidequestPhoto src={photo} alt={`Quest photo ${i + 1}`} thumbnail className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <EmptyState
+                icon={ImagePlus}
+                title="No photos yet"
+                description={canAddCompletedMedia ? "Add photos or videos from the day." : "No one's added photos for this sidequest yet."}
+                size="sm"
+              />
+            )}
+            {quest.photos && quest.photos.length > 0 && viewerIndex !== null && (
+              <MediaViewer
+                sources={quest.photos}
+                startIndex={viewerIndex}
+                open={viewerIndex !== null}
+                onOpenChange={(o) => !o && setViewerIndex(null)}
+              />
+            )}
+          </div>
+
+          {/* Comments */}
+          <div className="p-4 rounded-xl border border-border/50 bg-card space-y-3">
+            <h3 className="text-sm font-bold text-foreground">
+              Comments {(() => {
+                const tally = (list: typeof quest.comments): number =>
+                  list.reduce((n, c) => n + 1 + (c.replies ? tally(c.replies) : 0), 0);
+                const count = tally(quest.comments);
+                return count > 0 ? `(${count})` : "";
+              })()}
+            </h3>
+            <CommentThread quest={quest} />
+          </div>
+
+          {/* Quest details (moved to bottom, past tense, read-only) */}
+          <div className="p-4 rounded-xl border border-border/50 bg-card space-y-4">
+            <h3 className="text-sm font-bold text-foreground">Sidequest details</h3>
+
+            {/* Creator */}
+            <div className="flex items-center gap-2">
+              <UserAvatar user={quest.createdBy} size="sm" />
+              <div>
+                <span className="text-sm font-bold text-foreground">{quest.createdBy.name}</span>
+                <p className="text-[11px] text-muted-foreground">Hosted this sidequest</p>
+              </div>
+            </div>
+
+            {quest.description && (
+              <p className="text-sm text-muted-foreground">{quest.description}</p>
+            )}
+
+            {(logistics.date || logistics.location || logistics.transportation || logistics.customNotes) && (
+              <div className="space-y-2.5">
+                {logistics.date && (
+                  <div className="flex items-center gap-2.5 text-sm">
+                    <Calendar className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-foreground">{logistics.date}</span>
+                    {logistics.time && <span className="text-muted-foreground">at {logistics.time}</span>}
+                  </div>
+                )}
+                {logistics.location && (
+                  <div className="flex items-center gap-2.5 text-sm flex-wrap">
+                    <MapPin className="w-4 h-4 text-muted-foreground shrink-0" />
+                    <span className="text-foreground flex-1 min-w-0">{logistics.location}</span>
+                  </div>
+                )}
+                {logistics.transportation && TransportIcon && (
+                  <div className="flex items-center gap-2.5 text-sm">
+                    <TransportIcon className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-foreground">{transportLabels[logistics.transportation]}</span>
+                  </div>
+                )}
+                {logistics.customNotes && (
+                  <p className="text-xs text-muted-foreground p-2.5 rounded-lg bg-muted/50 flex items-start gap-1.5">
+                    <StickyNote className="w-3.5 h-3.5 shrink-0 mt-0.5" /> {logistics.customNotes}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {quest.links && quest.links.length > 0 && (
+              <div className="space-y-1">
+                {quest.links.map((link, i) => (
+                  <a key={i} href={link} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 text-xs text-primary hover:underline truncate">
+                    <ExternalLink className="w-3 h-3 shrink-0" />
+                    <span className="truncate">{link}</span>
+                  </a>
+                ))}
+              </div>
+            )}
+
+            {/* Who went */}
+            <div>
+              <p className="text-xs font-semibold text-foreground mb-2">Who went ({quest.participants.length})</p>
+              <div className="flex flex-wrap gap-2">
+                {quest.participants.map((p) => (
+                  <button
+                    key={p.id}
+                    onClick={() => {
+                      if (p.id === currentUser.id) navigate("/profile");
+                      else navigate(`/profile?viewUser=${p.id}`);
+                    }}
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-muted text-xs hover:bg-muted/80 transition-colors"
+                  >
+                    <UserAvatar user={p} size="xs" />
+                    <span className="text-foreground font-medium">{p.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Who helped (read-only volunteers) */}
+            {logistics.volunteers.length > 0 && (
+              <div>
+                <p className="text-xs font-semibold text-foreground mb-2">Who helped</p>
+                <div className="space-y-2">
+                  {logistics.volunteers.map((v) => (
+                    <div key={v.userId} className="flex items-center gap-2 p-2 rounded-xl bg-muted/50">
+                      <UserAvatar user={v.user} size="xs" />
+                      <span className="text-xs font-medium text-foreground">{v.user.name}</span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-secondary/20 text-secondary ml-auto">
+                        {volunteerRoles.find((r) => r.id === v.role)?.label || v.role}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </motion.div>
+      ) : (
       <motion.div layout className="px-5 space-y-4 mt-2">
         {/* Quest Card — Expanded */}
         <div className="p-4 rounded-xl border border-border/50 bg-card space-y-4">
@@ -722,6 +924,7 @@ const QuestDetail = () => {
           <CommentThread quest={quest} />
         </div>
       </motion.div>
+      )}
         </motion.div>
       </AnimatePresence>
 
