@@ -177,7 +177,7 @@ const Feed = () => {
             return (
               <button
                 key={id}
-                data-spotlight={id === "activity" ? "home-activity-tab" : undefined}
+                data-spotlight={id === "activity" ? "home-activity-tab" : "home-sidequests-tab"}
                 onClick={() => setHomeTab(id)}
                 aria-label={label}
                 aria-selected={isActive}
