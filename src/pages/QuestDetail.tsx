@@ -55,7 +55,7 @@ const QuestDetail = () => {
   };
   const { user, loading: authLoading } = useAuth();
   const { data: hydratedQuests, isLoading: questsLoading, isFetching: questsFetching } = useQuests();
-  const { quests, groups, addComment, volunteerForQuest, unvolunteerFromQuest, currentUser, pinQuest, unpinQuest, pinnedQuestIds, deleteQuest, toggleImIn } = useAppStore();
+  const { quests, groups, addComment, volunteerForQuest, unvolunteerFromQuest, currentUser, pinQuest, unpinQuest, pinnedQuestIds, deleteQuest, toggleImIn, updateQuest } = useAppStore();
   const [showMenu, setShowMenu] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showReport, setShowReport] = useState(false);
@@ -63,6 +63,8 @@ const QuestDetail = () => {
   const [prefillNudgeUserId, setPrefillNudgeUserId] = useState<string | null>(null);
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
   const [joinAnim, setJoinAnim] = useState<"idle" | "morph" | "exit" | "done">("idle");
+  const [uploadingMedia, setUploadingMedia] = useState(false);
+  const completedFileInputRef = useRef<HTMLInputElement>(null);
   usePopup(showDeleteConfirm);
 
   // Sibling sidequests from the originating list — used for left/right swipe nav.
