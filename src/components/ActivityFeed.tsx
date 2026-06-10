@@ -4,11 +4,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAppStore } from "@/data/appState";
 import UserAvatar from "@/components/UserAvatar";
 import EmptyState from "@/components/EmptyState";
-import { Activity as ActivityIcon, UserPlus, MessageCircle, CheckCircle2, Image as ImageIcon, Users } from "lucide-react";
+import { Activity as ActivityIcon, UserPlus, MessageCircle, CheckCircle2, Image as ImageIcon, Users, Sparkles } from "lucide-react";
 import { User } from "@/data/mockData";
 import { formatDistanceToNow } from "date-fns";
 
 type ActivityType =
+  | "launched_quest"
   | "joined_quest"
   | "completed_quest"
   | "commented_quest"
