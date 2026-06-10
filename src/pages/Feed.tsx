@@ -7,6 +7,7 @@ import { Search, Lock, UserPlus, X, Globe, UserSearch, Users } from "lucide-reac
 
 import GroupSwatch from "@/components/GroupSwatch";
 import UserProfileView from "@/components/UserProfileView";
+import ActivityFeed from "@/components/ActivityFeed";
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
