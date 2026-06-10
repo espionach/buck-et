@@ -24,7 +24,7 @@ import { validateContent } from "@/lib/contentFilter";
 import LocationPicker, { LocationValue } from "@/components/LocationPicker";
 import { listDrafts } from "@/lib/drafts";
 import { FileText, ChevronRight } from "lucide-react";
-import { useSwipeNav } from "@/hooks/useSwipeNav";
+import BackToTopButton from "@/components/BackToTopButton";
 const Profile = () => {
   const {
     currentUser,
