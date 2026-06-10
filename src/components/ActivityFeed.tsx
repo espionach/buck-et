@@ -171,6 +171,8 @@ const ActivityFeed = () => {
 
 const iconFor = (t: ActivityType) => {
   switch (t) {
+    case "launched_quest":
+      return Sparkles;
     case "joined_quest":
       return UserPlus;
     case "completed_quest":
