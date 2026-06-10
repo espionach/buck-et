@@ -11,7 +11,7 @@ import ActivityFeed from "@/components/ActivityFeed";
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useSwipeNav } from "@/hooks/useSwipeNav";
+import BackToTopButton from "@/components/BackToTopButton";
 
 const Feed = () => {
   const { quests, groups, friends: friendsList, cleanupEmptyQuests, friendRequests, currentUser, sentFriendRequests, sendFriendRequest } = useAppStore();
