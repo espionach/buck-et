@@ -819,6 +819,40 @@ const QuestDetail = () => {
           </div>
         </div>
 
+        {/* Photos & Videos Section */}
+        {quest.photos && quest.photos.length > 0 && (
+          <div className="p-4 rounded-xl border border-border/50 bg-card space-y-3">
+            <h3 className="text-sm font-bold text-foreground">Photos & Videos</h3>
+            <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4">
+              {quest.photos.map((photo, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setViewerIndex(i)}
+                  className={`${quest.photos!.length === 1 ? "w-full aspect-[4/3]" : "w-64 h-64"} shrink-0 rounded-xl overflow-hidden border border-border/30 focus:outline-none focus:ring-2 focus:ring-ring`}
+                  aria-label={`Open photo ${i + 1}`}
+                >
+                  <SidequestPhoto
+                    src={photo}
+                    alt={`Quest photo ${i + 1}`}
+                    thumbnail
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+            {viewerIndex !== null && (
+              <MediaViewer
+                sources={quest.photos}
+                startIndex={viewerIndex}
+                open={viewerIndex !== null}
+                onOpenChange={(o) => !o && setViewerIndex(null)}
+              />
+            )}
+          </div>
+        )}
+
+
         {/* Volunteer Section — only the contribution roles the creator picked (plus Driver if carpool) */}
         {(() => {
           const selectedRoleIds = logistics.contributionRoles || [];
