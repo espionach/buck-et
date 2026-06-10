@@ -170,7 +170,7 @@ const Feed = () => {
 
       {/* Home tabs: Quests / Activity */}
       {!searchMode && (
-        <div className="flex border-b border-border mb-4">
+        <div data-home-tabs className="flex border-b border-border mb-4">
           {([
             { id: "quests", label: "Sidequests", Icon: LayoutList },
             { id: "activity", label: "Activity", Icon: Heart },
