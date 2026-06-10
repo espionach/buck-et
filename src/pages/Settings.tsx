@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Mail, Lock, Bell, LifeBuoy, FileText, ShieldCheck, LogOut, Trash2, ChevronRight, Flag, ShieldOff, Compass, BookOpen, Shield, Inbox, Sparkles, UserPlus } from "lucide-react";
+import { ArrowLeft, Mail, Lock, Bell, LifeBuoy, FileText, ShieldCheck, LogOut, Trash2, ChevronRight, Flag, ShieldOff, Compass, BookOpen, Shield, Inbox, Sparkles, UserPlus, Activity } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/contexts/AuthContext";
