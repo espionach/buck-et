@@ -1,73 +1,118 @@
-# Onboarding redesign: drop Quick Tour, add contextual spotlights
+# Friends Activity Feed
 
-## Goal
-Replace the static Quick Tour step with going straight into creating the first sidequest as the onboarding finale. After onboarding completes, new users get **contextual spotlights** the first time they visit each important screen, so they discover features in context instead of in an abstract walkthrough.
+## Overview
 
-## Flow changes
+Add a live activity feed that shows what your friends are doing across SideQuest. It lives as a second tab on the Home page next to the existing quest feed, so users get one social hub without crowding the bottom nav.
 
-**Before:** Welcome → Examples → Permissions → Friends → **Tour intro → 6-step coachmark walkthrough** → First sidequest → Home
+A single Settings toggle (on by default) controls both directions: turning it off hides your activity from friends AND hides their activity from you.
 
-**After:** Welcome → Examples → Permissions → Friends → **First sidequest (finale)** → land on the new quest's detail page → spotlights appear contextually as the user navigates
+## Placement & UX
 
-## What gets built
+**Home page gets a segmented tab control at the top:**
 
-### 1. Remove the Quick Tour step
-- Delete `src/pages/onboarding/Tour.tsx` and `src/components/onboarding/GlobalTour.tsx`.
-- Remove the `/onboarding/tour` route and `GlobalTour` mount from `src/App.tsx`.
-- Remove `"tour"` from `ONBOARDING_ORDER` / `ONBOARDING_PATHS` in `src/hooks/useOnboarding.ts`.
-- In `src/pages/onboarding/Friends.tsx`, change "Continue" to advance directly to `first_quest` and navigate to `/create?onboarding=1` (the existing first-sidequest screen — unchanged copy/layout).
-- Remove `tourActive`, `startTour`, `endTour` from `src/data/appState.ts` and the `hideGlobalFab` carve-out in `BottomNav.tsx`.
+```text
+┌─────────────────────────────┐
+│  [ Quests ]   Activity      │  ← segmented control
+├─────────────────────────────┤
+│  (existing feed)            │
+│   or                        │
+│  (new activity timeline)    │
+└─────────────────────────────┘
+```
 
-### 2. Land on the new quest detail after first sidequest
-- In `src/pages/CreateQuest.tsx`, when `isOnboarding` is true and the quest is created successfully:
-  - Call `completeOnboarding(user.id)` (already imported).
-  - Mark a new flag `spotlights_pending = true` in the user's profile (or in `localStorage` keyed by user id — see Technical notes).
-  - Navigate to `/quest/<newQuestId>` instead of `/`.
+- Default tab: Quests (current behavior, no regression)
+- Activity tab: reverse-chronological timeline of friend actions
+- Search and filter chips stay scoped to the Quests tab
+- The notification bell stays as-is (it's about *you*; activity is about *others*)
 
-### 3. Contextual spotlight system (new)
-A lightweight, per-page, first-visit-only spotlight engine — separate from the existing `Coachmarks` (which is multi-step / route-driving). The existing component stays for now only if needed; new system lives in:
+## Activity Types Shown
 
-- `src/components/onboarding/SpotlightProvider.tsx` — context + state for "which spotlights has this user already seen" (persisted in `localStorage` under `bucket:spotlights:<userId>`), plus a global "skip all spotlights" flag.
-- `src/components/onboarding/Spotlight.tsx` — single-target overlay (reuses the spotlight cutout + tooltip styling from `Coachmarks.tsx`). Renders only if:
-  1. The user hasn't dismissed this spotlight id before, AND
-  2. They haven't hit "Skip all spotlights", AND
-  3. The target element is mounted.
-- Each spotlight has: `id`, `title`, `body`, `targetSelector` (or a ref). Tooltip has **"Got it"** (dismiss this one) and **"Skip all tips"** (set the global flag, dismiss everything for this user).
-- Mounted globally inside `AppLayout` so it survives route changes; reads which spotlight (if any) to show based on the current route + a small registry.
+Each activity row links to the relevant quest/profile and shows the friend's avatar + name + action + timestamp.
 
-### 4. Spotlight registry (per page)
-First-visit-only, tap to dismiss, one spotlight per surface:
+- **Joined a sidequest** — "Alex joined Pottery Night"
+- **Commented on a sidequest** — shows comment preview (truncated), tap to open quest
+- **Added a photo** — small thumbnail, tap to open quest's media viewer
+- **Completed a sidequest** — "Sam completed Sunset Hike"
+- **Became friends with someone you also know** — "Jordan and Alex are now friends" (only when both are your friends, respects mutual-friendship privacy)
 
-| Route | Spotlight target | Copy (working draft) |
-|---|---|---|
-| `/quest/:id` (first visit, right after onboarding) | "Join" / contributions area | "This is your sidequest. Friends can join and sign up for roles here." |
-| `/` (Home) | Feed first card + FAB | "Your feed of sidequests from friends and groups. Hit + anytime to start your own." |
-| `/calendar` | Calendar grid | "Everything you're going to is here on one calendar." |
-| `/profile?tab=current` | Active tab | "Your active sidequests live here — finish one and it moves to Completed." |
-| `/profile?tab=past` | Past tab | "All the sidequests you've actually done." |
-| `/profile?tab=groups` | Groups tab + Create group | "Friend groups for planning with the right people." |
-| Notification bell (any page, first time it has content) | Bell icon | "New activity shows up here — friend requests, joins, nudges." |
+**Excluded (intentionally):**
+- Group joins (groups are private lists; per memory, no group-join concept exists)
+- Creating a new sidequest (already visible in the Quests feed — would be noisy duplication)
+- Anything from non-friends or blocked users
 
-Final copy can be tightened during implementation.
+## Visibility Rules
 
-### 5. "Skip all tips" affordance
-- Every spotlight tooltip has a small "Skip all tips" link beside "Got it".
-- Tapping it sets the global skip flag in `localStorage`; no spotlight ever shows again for this user.
-- Settings → an entry to **"Replay tips"** that clears both the global flag and per-spotlight dismissals so a user can see them again. (Small addition to `src/pages/Settings.tsx`.)
+An activity row is shown to a viewer only if ALL are true:
+- Actor is a mutual friend of the viewer
+- Viewer is not blocked by the actor (and vice versa)
+- Viewer can see the referenced sidequest (reuses `can_view_sidequest`)
+- Both actor and viewer have activity sharing enabled
+- Activity is < 30 days old (keeps the feed fresh and the table bounded)
 
-## Files touched
-- **Delete:** `src/pages/onboarding/Tour.tsx`, `src/components/onboarding/GlobalTour.tsx`
-- **Edit:** `src/App.tsx`, `src/pages/onboarding/Friends.tsx`, `src/pages/CreateQuest.tsx`, `src/hooks/useOnboarding.ts`, `src/data/appState.ts`, `src/components/BottomNav.tsx`, `src/pages/Settings.tsx`
-- **New:** `src/components/onboarding/SpotlightProvider.tsx`, `src/components/onboarding/Spotlight.tsx`, `src/data/spotlights.ts` (registry)
+## Privacy Toggle
 
-## Technical notes
-- **Persistence:** Spotlight dismissals are device-level only (localStorage). They don't need to roam across devices — if a user logs in on a new phone they can see tips again, which is fine. Keep this out of the DB to avoid a migration.
-- **Onboarding completion** still flips `profiles.onboarded_at` via `completeOnboarding()` — unchanged. Spotlights are an independent layer that runs *after* onboarding.
-- **Target waiting:** reuse the `requestAnimationFrame` polling pattern from `Coachmarks.tsx` so spotlights wait for their target to mount (e.g., the first feed card after data loads).
-- **One at a time:** the provider only renders one spotlight at a time; if a route has multiple eligible spotlights it shows them sequentially as the user dismisses each.
-- **Notification bell spotlight** is gated on the bell actually rendering an unread indicator the first time, so it lands in context.
+- **Setting:** "Share activity with friends" in Settings → Privacy section
+- **Default:** ON for all existing and new users (opt-out)
+- **Behavior:** when OFF, the user neither emits new activity rows visible to others nor sees the Activity tab populated (tab shows an empty state explaining how to re-enable)
+- Disabling does NOT delete past activity — it just hides it. Re-enabling restores visibility.
 
-## Out of scope
-- No changes to Welcome / Examples / Permissions / Friends screens.
-- No changes to the create-sidequest form itself — only its post-submit navigation when `onboarding=1`.
-- No changes to quest detail layout — the spotlight just overlays it.
+## Empty & Loading States
+
+- **Loading:** skeleton rows matching activity layout
+- **No friends yet:** prompt to find friends (links to existing /find-friends)
+- **Friends exist, no activity:** "No recent activity from your friends" + Lucide icon
+- **Sharing disabled:** "Activity sharing is off. Turn it on in Settings to see what your friends are up to." with link to Settings
+
+## Pagination
+
+Per global rule: show 10 rows initially, "Load More" button for older entries.
+
+---
+
+## Technical Section
+
+### New table: `public.friend_activities`
+
+Columns:
+- `id` (uuid, pk)
+- `actor_id` (uuid, references profiles.user_id)
+- `activity_type` (enum: `joined_quest`, `commented_quest`, `added_photo`, `completed_quest`, `friendship_created`)
+- `sidequest_id` (uuid, nullable, references sidequests)
+- `target_user_id` (uuid, nullable — for friendship_created, the other party)
+- `metadata` (jsonb — comment preview, photo url, etc.)
+- `created_at` (timestamptz, default now())
+- Index on `(actor_id, created_at desc)` and `(sidequest_id)`
+
+**RLS:** SELECT allowed when actor is a mutual friend of `auth.uid()`, neither side is blocked, and both have sharing enabled (check via new column on `profiles`: `activity_sharing_enabled boolean default true`). INSERT only from triggers/edge logic (service_role); no client writes.
+
+GRANTs: `SELECT` to `authenticated`, `ALL` to `service_role`.
+
+### Triggers (server-side, so we don't trust the client)
+
+Add triggers that INSERT into `friend_activities` on:
+- `sidequest_participants` insert → `joined_quest`
+- `comments` insert → `commented_quest` (store first ~120 chars in metadata)
+- `sidequests` update where photo added → `added_photo` (or on a photos table if separate)
+- `sidequest_completions` insert → `completed_quest`
+- `friendships` insert → `friendship_created` (one row, both parties referenced)
+
+A nightly cleanup deletes rows older than 30 days (cron edge function or a `pg_cron` job).
+
+### Profile column
+
+Add `activity_sharing_enabled boolean not null default true` to `profiles`.
+
+### Frontend
+
+- New component: `src/components/ActivityFeed.tsx` — fetches from `friend_activities` with the visibility join, renders rows by type, handles pagination
+- New component: `src/components/ActivityRow.tsx` — per-type rendering
+- `src/pages/Feed.tsx` — wrap existing content in a segmented Tabs control (`Quests` / `Activity`), preserve URL state with `?tab=activity`
+- `src/pages/Settings.tsx` — add toggle row "Share activity with friends" wired to `profiles.activity_sharing_enabled`
+- Realtime subscription on `friend_activities` (filtered) so the Activity tab updates live while open
+
+### Files touched
+
+- New: `friend_activities` table + RLS + triggers (migration)
+- New: `src/components/ActivityFeed.tsx`, `src/components/ActivityRow.tsx`
+- Edited: `src/pages/Feed.tsx`, `src/pages/Settings.tsx`
+- Edited: `mem://features/notifications` or new `mem://features/activity-feed` memory documenting the rules

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Mail, Lock, Bell, LifeBuoy, FileText, ShieldCheck, LogOut, Trash2, ChevronRight, Flag, ShieldOff, Compass, BookOpen, Shield, Inbox, Sparkles, UserPlus } from "lucide-react";
+import { ArrowLeft, Mail, Lock, Bell, LifeBuoy, FileText, ShieldCheck, LogOut, Trash2, ChevronRight, Flag, ShieldOff, Compass, BookOpen, Shield, Inbox, Sparkles, UserPlus, Activity } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/contexts/AuthContext";
@@ -90,6 +90,8 @@ const Settings = () => {
   const [hasPendingAppeal, setHasPendingAppeal] = useState(false);
   const [showAppeal, setShowAppeal] = useState(false);
   const [appealReason, setAppealReason] = useState("");
+  const [activitySharing, setActivitySharing] = useState(true);
+
 
   // Support form state
   const [showSupport, setShowSupport] = useState(false);
@@ -117,6 +119,35 @@ const Settings = () => {
       setHasPendingAppeal((appeals || []).length > 0);
     })();
   }, [user]);
+
+  // Load activity sharing pref
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("activity_sharing_enabled")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (data && typeof data.activity_sharing_enabled === "boolean") {
+        setActivitySharing(data.activity_sharing_enabled);
+      }
+    })();
+  }, [user]);
+
+  const toggleActivitySharing = async (next: boolean) => {
+    if (!user) return;
+    const prev = activitySharing;
+    setActivitySharing(next);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ activity_sharing_enabled: next })
+      .eq("user_id", user.id);
+    if (error) {
+      setActivitySharing(prev);
+      toast({ title: "Couldn't save", description: getUserFriendlyError("activity sharing", error.message), variant: "destructive" });
+    }
+  };
 
   // Load notif prefs
   useEffect(() => {
@@ -393,6 +424,11 @@ const Settings = () => {
 
       <Section title="Preferences">
         <Row icon={Bell} label="Notification Settings" onClick={() => setShowNotif(true)} />
+        <Row
+          icon={Activity}
+          label="Share activity with friends"
+          trailing={<Switch checked={activitySharing} onCheckedChange={toggleActivitySharing} />}
+        />
         <Row icon={UserPlus} label="Find Friends" onClick={() => nav("/find-friends")} />
         <Row icon={ShieldOff} label="Blocked Users" onClick={() => nav("/settings/blocked")} />
         <Row icon={Compass} label="Replay Tips" onClick={handleReplayTips} />

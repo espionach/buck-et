@@ -7,6 +7,7 @@ import { Search, Lock, UserPlus, X, Globe, UserSearch, Users } from "lucide-reac
 
 import GroupSwatch from "@/components/GroupSwatch";
 import UserProfileView from "@/components/UserProfileView";
+import ActivityFeed from "@/components/ActivityFeed";
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -18,6 +19,7 @@ const Feed = () => {
   const [selectedProfile, setSelectedProfile] = useState<User | null>(null);
 
   const [feedFilter, setFeedFilter] = useState<"all" | "followers" | string>("all");
+  const [homeTab, setHomeTab] = useState<"quests" | "activity">("quests");
   const [searchMode, setSearchMode] = useState(() => !!sessionStorage.getItem("feedSearchText"));
   // Scope recent searches to the current user so multiple accounts on the
   // same browser don't share each other's history.
@@ -163,37 +165,66 @@ const Feed = () => {
         <NotificationBell />
 
       </div>
+
+      {/* Home tabs: Quests / Activity */}
+      {!searchMode && (
+        <div className="flex bg-muted rounded-2xl p-1 mb-3">
+          {(["quests", "activity"] as const).map((t) => (
+            <button
+              key={t}
+              onClick={() => setHomeTab(t)}
+              className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
+                homeTab === t ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
+              }`}
+            >
+              {t === "quests" ? "Sidequests" : "Activity"}
+            </button>
+          ))}
+        </div>
+      )}
+
+
       
 
-      {/* Search */}
-      <div className="relative mb-3">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <input
-          ref={searchInputRef}
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            if (!searchMode) setSearchMode(true);
-          }}
-          onFocus={() => {
-            if (!searchMode) setSearchMode(true);
-          }}
-          placeholder="Search sidequests or friends..."
-          className="w-full pl-10 pr-10 py-3 rounded-xl bg-card border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-        />
-        {(search || searchMode) && (
-          <button
-            onClick={() => {
-              setSearch("");
-              setSearchMode(false);
-              sessionStorage.removeItem("feedSearchText");
+      {/* Search (Quests tab only) */}
+      {homeTab === "quests" && (
+        <div className="relative mb-3">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <input
+            ref={searchInputRef}
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              if (!searchMode) setSearchMode(true);
             }}
-            className="absolute right-3.5 top-1/2 -translate-y-1/2"
-          >
-            <X className="w-4 h-4 text-destructive" />
-          </button>
-        )}
-      </div>
+            onFocus={() => {
+              if (!searchMode) setSearchMode(true);
+            }}
+            placeholder="Search sidequests or friends..."
+            className="w-full pl-10 pr-10 py-3 rounded-xl bg-card border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+          />
+          {(search || searchMode) && (
+            <button
+              onClick={() => {
+                setSearch("");
+                setSearchMode(false);
+                sessionStorage.removeItem("feedSearchText");
+              }}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2"
+            >
+              <X className="w-4 h-4 text-destructive" />
+            </button>
+          )}
+        </div>
+      )}
+
+      {homeTab === "activity" && !searchMode ? (
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+          <ActivityFeed />
+        </motion.div>
+      ) : (
+        <>
+
 
       {/* Search mode page */}
       {searchMode ? (
@@ -418,9 +449,12 @@ const Feed = () => {
           </motion.div>
         </>
       )}
+        </>
+      )}
 
       
     </div>
+
   );
 };
 
