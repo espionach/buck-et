@@ -170,8 +170,8 @@ const Feed = () => {
       {!searchMode && (
         <div className="flex border-b border-border mb-4">
           {([
-            { id: "quests", label: "Sidequests", Icon: Zap },
-            { id: "activity", label: "Activity", Icon: ActivityIcon },
+            { id: "quests", label: "Sidequests", Icon: LayoutList },
+            { id: "activity", label: "Activity", Icon: Waves },
           ] as const).map(({ id, label, Icon }) => {
             const isActive = homeTab === id;
             return (
