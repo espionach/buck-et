@@ -561,6 +561,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          activity_sharing_enabled: boolean
           avatar_url: string | null
           bio: string | null
           created_at: string
@@ -574,6 +575,7 @@ export type Database = {
           username: string
         }
         Insert: {
+          activity_sharing_enabled?: boolean
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
@@ -587,6 +589,7 @@ export type Database = {
           username: string
         }
         Update: {
+          activity_sharing_enabled?: boolean
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
@@ -711,6 +714,38 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "sidequest_participants_sidequest_id_fkey"
+            columns: ["sidequest_id"]
+            isOneToOne: false
+            referencedRelation: "sidequests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sidequest_photo_events: {
+        Row: {
+          created_at: string
+          id: string
+          photo_url: string
+          sidequest_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          photo_url: string
+          sidequest_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          photo_url?: string
+          sidequest_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sidequest_photo_events_sidequest_id_fkey"
             columns: ["sidequest_id"]
             isOneToOne: false
             referencedRelation: "sidequests"
@@ -1049,6 +1084,7 @@ export type Database = {
       ensure_current_user_profile: {
         Args: never
         Returns: {
+          activity_sharing_enabled: boolean
           avatar_url: string | null
           bio: string | null
           created_at: string
@@ -1067,6 +1103,17 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      get_friend_activity: {
+        Args: { _before?: string; _limit?: number }
+        Returns: {
+          activity_type: string
+          actor_id: string
+          created_at: string
+          metadata: Json
+          sidequest_id: string
+          target_user_id: string
+        }[]
       }
       get_user_friend_ids: { Args: { _user_id: string }; Returns: string[] }
       has_role: {
