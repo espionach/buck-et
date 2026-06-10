@@ -202,6 +202,9 @@ const ActivityRowItem = ({
 
   let verb: React.ReactNode = null;
   switch (row.activity_type) {
+    case "launched_quest":
+      verb = <>started <span className="font-semibold">{title}</span></>;
+      break;
     case "joined_quest":
       verb = <>joined <span className="font-semibold">{title}</span></>;
       break;
