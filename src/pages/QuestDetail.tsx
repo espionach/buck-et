@@ -7,7 +7,7 @@ import SidequestPhoto from "@/components/SidequestPhoto";
 import MediaViewer from "@/components/MediaViewer";
 import CommentThread from "@/components/CommentThread";
 import MapPreview from "@/components/MapPreview";
-import { ArrowLeft, ChevronLeft, ChevronRight, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send, ExternalLink, HandMetal, Check, Globe, StickyNote, MoreVertical, Pencil, Pin, Trash2, Flag, Share2, Lock, Info, Plus, ImagePlus } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send, ExternalLink, HandMetal, Check, Globe, StickyNote, MoreVertical, Pencil, Pin, Trash2, Flag, Share2, Lock, Plus, ImagePlus } from "lucide-react";
 import { uploadSidequestPhotos } from "@/lib/uploads";
 import NudgeModal from "@/components/NudgeModal";
 import EmptyState from "@/components/EmptyState";
