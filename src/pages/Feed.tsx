@@ -449,9 +449,12 @@ const Feed = () => {
           </motion.div>
         </>
       )}
+        </>
+      )}
 
       
     </div>
+
   );
 };
 
