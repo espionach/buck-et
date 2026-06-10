@@ -187,9 +187,8 @@ const QuestDetail = () => {
     );
   }
 
-  // Once the owner finishes the quest, the detail view is no longer
-  // accessible (the quest moves to history).
-  if (isQuestCompleted(quest)) return null;
+  const isFinished = isQuestCompleted(quest);
+  const wasJoinedWhenFinished = quest.completedByUserIds?.includes(currentUser.id);
   const isIn = quest.participants.some((p) => p.id === currentUser.id);
 
   const group = quest.groupId ? groups.find((g) => g.id === quest.groupId) : null;
