@@ -11,7 +11,7 @@ import ActivityFeed from "@/components/ActivityFeed";
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useSwipeNav } from "@/hooks/useSwipeNav";
+import BackToTopButton from "@/components/BackToTopButton";
 
 const Feed = () => {
   const { quests, groups, friends: friendsList, cleanupEmptyQuests, friendRequests, currentUser, sentFriendRequests, sendFriendRequest } = useAppStore();
@@ -143,14 +143,9 @@ const Feed = () => {
     );
   }
 
-  const swipeHandlers = useSwipeNav({
-    onSwipeLeft: () => { if (!searchMode && homeTab === "quests") setHomeTab("activity"); },
-    onSwipeRight: () => { if (!searchMode && homeTab === "activity") setHomeTab("quests"); },
-    ignoreSelector: "[data-quest-card]",
-  });
-
   return (
-    <div {...swipeHandlers} className="min-h-screen pb-24 px-5 pt-14">
+    <div className="min-h-screen pb-24 px-5 pt-14">
+      <BackToTopButton watchSelector="[data-home-tabs]" />
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           {/* Bucket logo – filled */}
@@ -175,7 +170,7 @@ const Feed = () => {
 
       {/* Home tabs: Quests / Activity */}
       {!searchMode && (
-        <div className="flex border-b border-border mb-4">
+        <div data-home-tabs className="flex border-b border-border mb-4">
           {([
             { id: "quests", label: "Sidequests", Icon: LayoutList },
             { id: "activity", label: "Activity", Icon: Heart },
