@@ -246,6 +246,7 @@ const QuestDetail = () => {
     }
   };
   const canAddCompletedMedia = isFinished && (isOwner || wasJoinedWhenFinished);
+  const canAddActiveMedia = !isFinished && (isOwner || isIn);
   const handleCompletedMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files ? Array.from(e.target.files) : [];
     e.target.value = "";
