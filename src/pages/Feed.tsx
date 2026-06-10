@@ -3,7 +3,7 @@ import { User, isQuestCompleted } from "@/data/mockData";
 import QuestList from "@/components/QuestList";
 import UserAvatar from "@/components/UserAvatar";
 import NotificationBell from "@/components/NotificationBell";
-import { Search, Lock, UserPlus, X, Globe, UserSearch, Users, LayoutList, Waves } from "lucide-react";
+import { Search, Lock, UserPlus, X, Globe, UserSearch, Users, LayoutList, Heart } from "lucide-react";
 
 import GroupSwatch from "@/components/GroupSwatch";
 import UserProfileView from "@/components/UserProfileView";
@@ -171,7 +171,7 @@ const Feed = () => {
         <div className="flex border-b border-border mb-4">
           {([
             { id: "quests", label: "Sidequests", Icon: LayoutList },
-            { id: "activity", label: "Activity", Icon: Waves },
+            { id: "activity", label: "Activity", Icon: Heart },
           ] as const).map(({ id, label, Icon }) => {
             const isActive = homeTab === id;
             return (
