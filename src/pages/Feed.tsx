@@ -143,14 +143,9 @@ const Feed = () => {
     );
   }
 
-  const swipeHandlers = useSwipeNav({
-    onSwipeLeft: () => { if (!searchMode && homeTab === "quests") setHomeTab("activity"); },
-    onSwipeRight: () => { if (!searchMode && homeTab === "activity") setHomeTab("quests"); },
-    ignoreSelector: "[data-quest-card]",
-  });
-
   return (
-    <div {...swipeHandlers} className="min-h-screen pb-24 px-5 pt-14">
+    <div className="min-h-screen pb-24 px-5 pt-14">
+      <BackToTopButton watchSelector="[data-home-tabs]" />
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           {/* Bucket logo – filled */}
