@@ -870,11 +870,8 @@ export const useAppStore = create<AppState>((set, get) => ({
           .map((p) => p.id)
           .filter((id) => id !== currentUser.id);
 
-        // a) photo_added — only fire when NEW photos appear on a completed quest
-        if (
-          updates.photos !== undefined &&
-          (prevQuest.completedAt || updates.completedAt)
-        ) {
+        // a) photo_added — fire whenever NEW photos appear (active OR completed quests)
+        if (updates.photos !== undefined) {
           const prevPhotos = new Set(prevQuest.photos || []);
           const added = (updates.photos || []).filter((p) => !prevPhotos.has(p));
           if (added.length > 0) {
