@@ -245,6 +245,22 @@ const QuestDetail = () => {
       toast.error("Couldn't copy link");
     }
   };
+  const canAddCompletedMedia = isFinished && (isOwner || wasJoinedWhenFinished);
+  const handleCompletedMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files ? Array.from(e.target.files) : [];
+    e.target.value = "";
+    if (!files.length) return;
+    setUploadingMedia(true);
+    try {
+      const paths = await uploadSidequestPhotos(quest.id, files);
+      updateQuest(quest.id, { photos: [...(quest.photos ?? []), ...paths] });
+      toast.success(paths.length > 1 ? "Photos added" : "Photo added");
+    } catch (err: any) {
+      toast.error(err?.message || "Couldn't upload. Try again?");
+    } finally {
+      setUploadingMedia(false);
+    }
+  };
 
 
   return (
