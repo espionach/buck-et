@@ -90,6 +90,8 @@ const Settings = () => {
   const [hasPendingAppeal, setHasPendingAppeal] = useState(false);
   const [showAppeal, setShowAppeal] = useState(false);
   const [appealReason, setAppealReason] = useState("");
+  const [activitySharing, setActivitySharing] = useState(true);
+
 
   // Support form state
   const [showSupport, setShowSupport] = useState(false);
