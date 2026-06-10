@@ -7,7 +7,7 @@ import SidequestPhoto from "@/components/SidequestPhoto";
 import MediaViewer from "@/components/MediaViewer";
 import CommentThread from "@/components/CommentThread";
 import MapPreview from "@/components/MapPreview";
-import { ArrowLeft, ChevronLeft, ChevronRight, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send, ExternalLink, HandMetal, Check, Globe, StickyNote, MoreVertical, Pencil, Pin, Trash2, Flag, Share2, Lock, Info, Plus, ImagePlus } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send, ExternalLink, HandMetal, Check, Globe, StickyNote, MoreVertical, Pencil, Pin, Trash2, Flag, Share2, Lock, Plus, ImagePlus } from "lucide-react";
 import { uploadSidequestPhotos } from "@/lib/uploads";
 import NudgeModal from "@/components/NudgeModal";
 import EmptyState from "@/components/EmptyState";
@@ -410,24 +410,15 @@ const QuestDetail = () => {
           )}
 
 
-          {/* Share button (always visible) */}
-          <button
-            onClick={handleShare}
-            data-spotlight={isOwner ? "quest-share" : undefined}
-            className="p-1 -m-1 text-muted-foreground hover:text-foreground transition-colors"
-            aria-label="Share sidequest"
-          >
-            <Share2 className="w-5 h-5" />
-          </button>
-
-          {/* Owner actions menu (Edit, Pin, Delete) */}
-          {isOwner && (() => {
-            const pinned = pinnedQuestIds.includes(quest.id);
-            const pinDisabled = !pinned && pinnedQuestIds.length >= 3;
+          {/* Overflow menu — Share for everyone, plus owner actions or Report */}
+          {(() => {
+            const pinned = isOwner ? pinnedQuestIds.includes(quest.id) : false;
+            const pinDisabled = isOwner && !pinned && pinnedQuestIds.length >= 3;
             return (
               <DropdownMenu open={showMenu} onOpenChange={setShowMenu}>
                 <DropdownMenuTrigger asChild>
                   <button
+                    data-spotlight={isOwner ? "quest-share" : undefined}
                     className="p-1 -m-1 text-muted-foreground hover:text-foreground transition-colors"
                     aria-label="Sidequest actions"
                   >
@@ -435,7 +426,10 @@ const QuestDetail = () => {
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" sideOffset={4} className="min-w-[160px]">
-                  {!isFinished && (
+                  <DropdownMenuItem onSelect={handleShare} className="gap-2 text-xs">
+                    <Share2 className="w-3.5 h-3.5" /> Share
+                  </DropdownMenuItem>
+                  {isOwner && !isFinished && (
                     <DropdownMenuItem
                       onSelect={() => navigate(`/quest/${quest.id}/edit`)}
                       className="gap-2 text-xs"
@@ -443,7 +437,7 @@ const QuestDetail = () => {
                       <Pencil className="w-3.5 h-3.5" /> Edit
                     </DropdownMenuItem>
                   )}
-                  {!isFinished && (
+                  {isOwner && !isFinished && (
                     <DropdownMenuItem
                       onSelect={() => {
                         if (pinned) unpinQuest(quest.id);
@@ -456,42 +450,45 @@ const QuestDetail = () => {
                       {pinDisabled && <span className="text-[10px] text-muted-foreground ml-auto">Max 3</span>}
                     </DropdownMenuItem>
                   )}
-                  <DropdownMenuItem
-                    onSelect={() => setShowDeleteConfirm(true)}
-                    className="gap-2 text-xs text-destructive focus:text-destructive"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" /> Delete
-                  </DropdownMenuItem>
+                  {isOwner && (
+                    <DropdownMenuItem
+                      onSelect={() => setShowDeleteConfirm(true)}
+                      className="gap-2 text-xs text-destructive focus:text-destructive"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" /> Delete
+                    </DropdownMenuItem>
+                  )}
+                  {!isOwner && (
+                    <DropdownMenuItem
+                      onSelect={() => setShowReport(true)}
+                      className="gap-2 text-xs text-destructive focus:text-destructive"
+                    >
+                      <Flag className="w-3.5 h-3.5" /> Report
+                    </DropdownMenuItem>
+                  )}
                 </DropdownMenuContent>
               </DropdownMenu>
             );
           })()}
-
-          {/* Non-owner: Report button */}
-          {!isOwner && (
-            <button
-              onClick={() => setShowReport(true)}
-              className="p-1 -m-1 text-muted-foreground hover:text-foreground transition-colors"
-              aria-label="Report sidequest"
-            >
-              <Flag className="w-5 h-5" />
-            </button>
-          )}
         </div>
       </div>
 
+
       {isFinished ? (
-        <motion.div layout className="px-5 space-y-4 mt-2">
+        <motion.div layout className="px-5 mt-2">
+
           {/* Completed banner / meta */}
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground pb-1">
             <Check className="w-3.5 h-3.5 text-secondary" />
             <span>Completed{quest.completedAt ? ` ${quest.completedAt}` : ""}</span>
           </div>
 
+
           {/* Photos & Videos — primary content for completed quests */}
-          <div className="p-4 rounded-xl border border-border/50 bg-card space-y-3">
+          <section className="py-5 border-t border-border/40 space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-foreground">Photos & Videos</h3>
+              <h3 className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Photos & Videos</h3>
+
               {canAddCompletedMedia && (
                 <>
                   <input
@@ -515,7 +512,8 @@ const QuestDetail = () => {
               )}
             </div>
             {quest.photos && quest.photos.length > 0 ? (
-              <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4">
+              <div className="flex gap-2 overflow-x-auto pb-1 -mx-5 px-5">
+
                 {quest.photos.map((photo, i) => (
                   <button
                     key={i}
@@ -544,12 +542,13 @@ const QuestDetail = () => {
                 onOpenChange={(o) => !o && setViewerIndex(null)}
               />
             )}
-          </div>
+          </section>
 
           {/* Comments */}
-          <div className="p-4 rounded-xl border border-border/50 bg-card space-y-3">
-            <h3 className="text-sm font-bold text-foreground">
+          <section className="py-5 border-t border-border/40 space-y-3">
+            <h3 className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">
               Comments {(() => {
+
                 const tally = (list: typeof quest.comments): number =>
                   list.reduce((n, c) => n + 1 + (c.replies ? tally(c.replies) : 0), 0);
                 const count = tally(quest.comments);
@@ -557,11 +556,12 @@ const QuestDetail = () => {
               })()}
             </h3>
             <CommentThread quest={quest} />
-          </div>
+          </section>
 
           {/* Quest details (moved to bottom, past tense, read-only) */}
-          <div className="p-4 rounded-xl border border-border/50 bg-card space-y-4">
-            <h3 className="text-sm font-bold text-foreground">Sidequest details</h3>
+          <section className="py-5 border-t border-border/40 space-y-4">
+            <h3 className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Sidequest details</h3>
+
 
             {/* Creator */}
             <div className="flex items-center gap-2">
@@ -654,12 +654,13 @@ const QuestDetail = () => {
                 </div>
               </div>
             )}
-          </div>
+          </section>
+
         </motion.div>
       ) : (
-      <motion.div layout className="px-5 space-y-4 mt-2">
-        {/* Quest Card — Expanded */}
-        <div className="p-4 rounded-xl border border-border/50 bg-card space-y-4">
+      <motion.div layout className="px-5 mt-2">
+        {/* Top: Creator + Date/Location/Transport/Notes + Description + Links */}
+        <section className="py-5 space-y-4">
           {/* Creator */}
           <div className="flex items-center gap-2">
             <UserAvatar user={quest.createdBy} size="sm" />
@@ -669,9 +670,9 @@ const QuestDetail = () => {
             </div>
           </div>
 
-          {/* Date / Time / Location — surfaced near the top */}
-          {(logistics.date || logistics.location) && (
-            <div className="space-y-2">
+          {/* Date / Time / Location + transport + notes — all the "what & where" */}
+          {(logistics.date || logistics.location || logistics.transportation || logistics.customNotes) ? (
+            <div className="space-y-2.5">
               {logistics.date && (
                 <div className="flex items-center gap-2.5 text-sm">
                   <Calendar className="w-4 h-4 text-primary" />
@@ -704,15 +705,31 @@ const QuestDetail = () => {
                   <span className="text-muted-foreground">Meet at: {logistics.meetupSpot}</span>
                 </div>
               )}
+              {logistics.transportation && TransportIcon && (
+                <div className="flex items-center gap-2.5 text-sm">
+                  <TransportIcon className="w-4 h-4 text-primary" />
+                  <span className="text-foreground">{transportLabels[logistics.transportation]}</span>
+                  {logistics.carpoolSlots && logistics.transportation === "car" && (
+                    <span className="text-muted-foreground text-xs">({logistics.carpoolSlots} seats available)</span>
+                  )}
+                </div>
+              )}
+              {logistics.customNotes && (
+                <p className="text-xs text-muted-foreground p-2.5 rounded-lg bg-muted/50 flex items-start gap-1.5">
+                  <StickyNote className="w-3.5 h-3.5 shrink-0 mt-0.5" /> {logistics.customNotes}
+                </p>
+              )}
             </div>
-          )}
+          ) : isOwner ? (
+            <p className="text-xs text-muted-foreground italic">
+              No details yet — add a time, place, or anything people should know.
+            </p>
+          ) : null}
 
           {/* Description */}
           {quest.description && (
             <p className="text-sm text-muted-foreground">{quest.description}</p>
           )}
-
-          {/* Photos & Videos moved to its own boxed section below Sidequest Details */}
 
           {/* Links */}
           {quest.links && quest.links.length > 0 && (
@@ -726,54 +743,54 @@ const QuestDetail = () => {
               ))}
             </div>
           )}
+        </section>
 
-          {/* Participants */}
-          <div>
-            <p className="text-xs font-semibold text-foreground mb-2">Who's In ({quest.participants.length})</p>
-            <div className="flex flex-wrap gap-2">
-              {quest.participants.map((p) => (
-                <button
-                  key={p.id}
-                  onClick={() => {
-                    if (p.id === currentUser.id) {
-                      navigate("/profile");
-                    } else {
-                      navigate(`/profile?viewUser=${p.id}`);
-                    }
-                  }}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-muted text-xs hover:bg-muted/80 transition-colors"
-                >
-                  <UserAvatar user={p} size="xs" />
-                  <span className="text-foreground font-medium">{p.name}</span>
-                </button>
-              ))}
-            </div>
-            {isOwner && (
+        {/* Participants */}
+        <section className="py-5 border-t border-border/40 space-y-3">
+          <h3 className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Who's In ({quest.participants.length})</h3>
+          <div className="flex flex-wrap gap-2">
+            {quest.participants.map((p) => (
               <button
-                type="button"
-                onClick={() => setShowNudge(true)}
-                data-spotlight="quest-nudge"
-                className="mt-3 w-full flex items-center justify-between gap-3 p-2.5 rounded-lg border border-primary/30 bg-primary/5 hover:bg-primary/10 transition-colors text-left"
+                key={p.id}
+                onClick={() => {
+                  if (p.id === currentUser.id) {
+                    navigate("/profile");
+                  } else {
+                    navigate(`/profile?viewUser=${p.id}`);
+                  }
+                }}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-muted text-xs hover:bg-muted/80 transition-colors"
               >
-                <div className="flex items-center gap-2 min-w-0">
-                  <HandMetal className="w-4 h-4 text-primary shrink-0" />
-                  <div className="min-w-0">
-                    <p className="text-xs font-semibold text-foreground">Send a nudge</p>
-                    <p className="text-[10px] text-muted-foreground leading-tight">
-                      Give friends a friendly poke to join or remember this quest.
-                    </p>
-                  </div>
-                </div>
-                <span className="text-[10px] font-semibold text-primary shrink-0">Nudge →</span>
+                <UserAvatar user={p} size="xs" />
+                <span className="text-foreground font-medium">{p.name}</span>
               </button>
-            )}
-            {!isOwner && (
-              <p className="mt-3 text-[11px] text-muted-foreground italic">
-                Only {quest.createdBy.name.split(" ")[0]} can nudge people about this sidequest.
-              </p>
-            )}
+            ))}
           </div>
-        </div>
+          {isOwner && (
+            <button
+              type="button"
+              onClick={() => setShowNudge(true)}
+              data-spotlight="quest-nudge"
+              className="mt-1 w-full flex items-center justify-between gap-3 p-2.5 rounded-lg border border-primary/30 bg-primary/5 hover:bg-primary/10 transition-colors text-left"
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <HandMetal className="w-4 h-4 text-primary shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold text-foreground">Send a nudge</p>
+                  <p className="text-[10px] text-muted-foreground leading-tight">
+                    Give friends a friendly poke to join or remember this quest.
+                  </p>
+                </div>
+              </div>
+              <span className="text-[10px] font-semibold text-primary shrink-0">Nudge →</span>
+            </button>
+          )}
+          {!isOwner && (
+            <p className="mt-1 text-[11px] text-muted-foreground italic">
+              Only {quest.createdBy.name.split(" ")[0]} can nudge people about this sidequest.
+            </p>
+          )}
+        </section>
         <NudgeModal
           open={showNudge}
           onClose={() => { setShowNudge(false); setPrefillNudgeUserId(null); }}
@@ -781,50 +798,11 @@ const QuestDetail = () => {
           initialSelectedUserId={prefillNudgeUserId}
         />
 
-
-        {/* Logistics Section */}
-        <div className="p-4 rounded-xl border border-border/50 bg-card space-y-3">
-          <h3 className="text-sm font-bold text-foreground">Sidequest Details</h3>
-
-          <div className="space-y-2.5">
-            {logistics.transportation && TransportIcon && (
-              <div className="flex items-center gap-2.5 text-sm">
-                <TransportIcon className="w-4 h-4 text-primary" />
-                <span className="text-foreground">{transportLabels[logistics.transportation]}</span>
-                {logistics.carpoolSlots && logistics.transportation === "car" && (
-                  <span className="text-muted-foreground text-xs">({logistics.carpoolSlots} seats available)</span>
-                )}
-              </div>
-            )}
-            {logistics.customNotes && (
-              <p className="text-xs text-muted-foreground mt-2 p-2.5 rounded-lg bg-muted/50 flex items-start gap-1.5">
-                <StickyNote className="w-3.5 h-3.5 shrink-0 mt-0.5" /> {logistics.customNotes}
-              </p>
-            )}
-            {!logistics.date && !logistics.location && !logistics.transportation && !logistics.customNotes && (
-              isOwner ? (
-                <EmptyState
-                  icon={Info}
-                  title="No details yet"
-                  description="Add a time, place, or anything people should know."
-                  size="sm"
-                />
-              ) : (
-                <EmptyState
-                  icon={Info}
-                  title="No details yet"
-                  size="sm"
-                />
-              )
-            )}
-          </div>
-        </div>
-
         {/* Photos & Videos Section */}
         {(quest.photos && quest.photos.length > 0) || canAddActiveMedia ? (
-          <div className="p-4 rounded-xl border border-border/50 bg-card space-y-3">
+          <section className="py-5 border-t border-border/40 space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-foreground">Photos & Videos</h3>
+              <h3 className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Photos & Videos</h3>
               {canAddActiveMedia && (
                 <>
                   <input
@@ -848,7 +826,7 @@ const QuestDetail = () => {
               )}
             </div>
             {quest.photos && quest.photos.length > 0 ? (
-              <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4">
+              <div className="flex gap-2 overflow-x-auto pb-1 -mx-5 px-5">
                 {quest.photos.map((photo, i) => (
                   <button
                     key={i}
@@ -867,12 +845,9 @@ const QuestDetail = () => {
                 ))}
               </div>
             ) : (
-              <EmptyState
-                icon={ImagePlus}
-                title="No photos yet"
-                description={canAddActiveMedia ? "Add photos or videos to share with your group." : "No one's added photos for this sidequest yet."}
-                size="sm"
-              />
+              <p className="text-xs text-muted-foreground italic">
+                {canAddActiveMedia ? "Add photos or videos to share with your group." : "No one's added photos for this sidequest yet."}
+              </p>
             )}
             {quest.photos && quest.photos.length > 0 && viewerIndex !== null && (
               <MediaViewer
@@ -882,7 +857,7 @@ const QuestDetail = () => {
                 onOpenChange={(o) => !o && setViewerIndex(null)}
               />
             )}
-          </div>
+          </section>
         ) : null}
 
 
@@ -890,7 +865,6 @@ const QuestDetail = () => {
         {(() => {
           const selectedRoleIds = logistics.contributionRoles || [];
           const isCar = logistics.transportation === "car";
-          // Build the offered list: optional driver (when car), then creator-picked roles
           const offeredRoles = volunteerRoles.filter((r) => {
             if (r.id === "driver") return isCar;
             return selectedRoleIds.includes(r.id);
@@ -899,8 +873,8 @@ const QuestDetail = () => {
           const heading = isCar ? "Carpool & Contributions" : "Contributions";
           const availableForMe = offeredRoles;
           return (
-            <div className="p-4 rounded-xl border border-border/50 bg-card space-y-3">
-              <h3 className="text-sm font-bold text-foreground">{heading}</h3>
+            <section className="py-5 border-t border-border/40 space-y-3">
+              <h3 className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">{heading}</h3>
 
               {logistics.volunteers.length > 0 && (
                 <div className="space-y-2">
@@ -946,13 +920,13 @@ const QuestDetail = () => {
                   </button>
                 </div>
               )}
-            </div>
+            </section>
           );
         })()}
 
         {/* Comments Section */}
-        <div className="p-4 rounded-xl border border-border/50 bg-card space-y-3">
-          <h3 className="text-sm font-bold text-foreground">
+        <section className="py-5 border-t border-border/40 space-y-3">
+          <h3 className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">
             Comments {(() => {
               const tally = (list: typeof quest.comments): number =>
                 list.reduce((n, c) => n + 1 + (c.replies ? tally(c.replies) : 0), 0);
@@ -961,7 +935,7 @@ const QuestDetail = () => {
             })()}
           </h3>
           <CommentThread quest={quest} />
-        </div>
+        </section>
       </motion.div>
       )}
         </motion.div>
