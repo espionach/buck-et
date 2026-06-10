@@ -654,7 +654,8 @@ const QuestDetail = () => {
                 </div>
               </div>
             )}
-          </div>
+          </section>
+
         </motion.div>
       ) : (
       <motion.div layout className="px-5 space-y-4 mt-2">
