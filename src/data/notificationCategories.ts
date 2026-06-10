@@ -163,16 +163,10 @@ export interface SettingsToggle {
 export const SETTINGS_TOGGLES: Record<NotifSection, SettingsToggle[]> = {
   social: [
     { key: "notify_friend_accepted", label: "Friend request accepted" },
-    {
-      key: "notify_friend_new_quest",
-      label: "Friend started a quest",
-      hint: "Sent occasionally — at most once per friend per week.",
-    },
   ],
   your_quests: [
     { key: "notify_quest_join", label: "Someone joined your quest" },
     { key: "notify_new_contribution", label: "New contribution on your quest" },
-    { key: "notify_photo_added", label: "Photo added" },
   ],
   activity: [
     { key: "notify_comment_reply", label: "Replies to your comments" },

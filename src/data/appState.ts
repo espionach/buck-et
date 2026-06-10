@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { supabase } from "@/integrations/supabase/client";
-import { notifyUsers, notifyFriendNewQuest } from "@/lib/notifications";
+import { notifyUsers } from "@/lib/notifications";
 import {
   Quest,
   Group,
@@ -234,14 +234,10 @@ export const useAppStore = create<AppState>((set, get) => ({
             groupId: data.group_id,
             groupName: groupName || null,
           });
-        } else {
-          // b) Friend started a new quest (occasional, top 5 friends, throttled)
-          await notifyFriendNewQuest({
-            fromUserId: currentUser.id,
-            questId: data.id,
-            questTitle: quest.title,
-          });
         }
+        // Note: non-group quests by friends now appear in the live activity
+        // feed only (as `launched_quest`); we no longer send a per-friend
+        // notification for them.
       }
       _invalidate(["quests"]);
     })();
@@ -870,12 +866,11 @@ export const useAppStore = create<AppState>((set, get) => ({
           .map((p) => p.id)
           .filter((id) => id !== currentUser.id);
 
-        // a) photo_added — fire whenever NEW photos appear (active OR completed quests)
+        // a) photo_added — log to activity feed only (no notification).
         if (updates.photos !== undefined) {
           const prevPhotos = new Set(prevQuest.photos || []);
           const added = (updates.photos || []).filter((p) => !prevPhotos.has(p));
           if (added.length > 0) {
-            // Log to activity feed (one row per photo)
             try {
               await supabase.from("sidequest_photo_events").insert(
                 added.map((url) => ({
@@ -886,16 +881,6 @@ export const useAppStore = create<AppState>((set, get) => ({
               );
             } catch (e) {
               console.warn("[photo_event log]", e);
-            }
-            if (otherParticipantIds.length > 0) {
-              await notifyUsers({
-                recipientIds: otherParticipantIds,
-                fromUserId: currentUser.id,
-                type: "photo_added",
-                message: `added a photo to '${prevQuest.title}'`,
-                entityId: questId,
-                groupId: prevQuest.groupId || null,
-              });
             }
           }
         }
