@@ -234,14 +234,10 @@ export const useAppStore = create<AppState>((set, get) => ({
             groupId: data.group_id,
             groupName: groupName || null,
           });
-        } else {
-          // b) Friend started a new quest (occasional, top 5 friends, throttled)
-          await notifyFriendNewQuest({
-            fromUserId: currentUser.id,
-            questId: data.id,
-            questTitle: quest.title,
-          });
         }
+        // Note: non-group quests by friends now appear in the live activity
+        // feed only (as `launched_quest`); we no longer send a per-friend
+        // notification for them.
       }
       _invalidate(["quests"]);
     })();
