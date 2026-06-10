@@ -3,7 +3,7 @@ import { User, isQuestCompleted } from "@/data/mockData";
 import QuestList from "@/components/QuestList";
 import UserAvatar from "@/components/UserAvatar";
 import NotificationBell from "@/components/NotificationBell";
-import { Search, Lock, UserPlus, X, Globe, UserSearch, Users } from "lucide-react";
+import { Search, Lock, UserPlus, X, Globe, UserSearch, Users, Zap, Activity as ActivityIcon } from "lucide-react";
 
 import GroupSwatch from "@/components/GroupSwatch";
 import UserProfileView from "@/components/UserProfileView";
