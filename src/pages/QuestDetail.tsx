@@ -156,11 +156,9 @@ const QuestDetail = () => {
   const [newComment, setNewComment] = useState("");
   const isQuestLookupPending = authLoading || (!!user && !quest && (questsLoading || questsFetching));
 
-  useEffect(() => {
-    if (quest && isQuestCompleted(quest)) {
-      navigate(-1);
-    }
-  }, [quest, navigate]);
+  // Completed quests now render their own read-only detail view below
+  // instead of redirecting away.
+
 
   if (isQuestLookupPending) {
     return (
