@@ -349,8 +349,8 @@ const QuestDetail = () => {
             </p>
           </div>
 
-          {/* Owner badge / Join / Joined button */}
-          {isOwner ? (
+          {/* Owner badge / Join / Joined button — hidden once the quest is finished */}
+          {!isFinished && (isOwner ? (
             <span
               data-spotlight="quest-join"
               aria-label="You own this sidequest"
@@ -382,6 +382,11 @@ const QuestDetail = () => {
                 </button>
               );
             })()
+          ))}
+          {isFinished && (
+            <span className="shrink-0 inline-flex items-center px-2.5 py-1 rounded-full bg-muted text-muted-foreground text-[11px] font-semibold">
+              Completed
+            </span>
           )}
 
 
