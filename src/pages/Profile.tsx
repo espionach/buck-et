@@ -701,7 +701,7 @@ const Profile = () => {
         )}
       </AnimatePresence>
 
-      <div className="flex border-b border-border mb-5">
+      <div data-profile-tabs className="flex border-b border-border mb-5">
         {([
           { id: "current", label: "Active sidequests", Icon: Zap },
           { id: "past", label: "Completed sidequests", Icon: Flag },
