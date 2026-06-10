@@ -120,6 +120,35 @@ const Settings = () => {
     })();
   }, [user]);
 
+  // Load activity sharing pref
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("activity_sharing_enabled")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (data && typeof data.activity_sharing_enabled === "boolean") {
+        setActivitySharing(data.activity_sharing_enabled);
+      }
+    })();
+  }, [user]);
+
+  const toggleActivitySharing = async (next: boolean) => {
+    if (!user) return;
+    const prev = activitySharing;
+    setActivitySharing(next);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ activity_sharing_enabled: next })
+      .eq("user_id", user.id);
+    if (error) {
+      setActivitySharing(prev);
+      toast({ title: "Couldn't save", description: getUserFriendlyError("activity sharing", error.message), variant: "destructive" });
+    }
+  };
+
   // Load notif prefs
   useEffect(() => {
     if (!user) return;
