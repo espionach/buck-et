@@ -246,6 +246,7 @@ const QuestDetail = () => {
     }
   };
   const canAddCompletedMedia = isFinished && (isOwner || wasJoinedWhenFinished);
+  const canAddActiveMedia = !isFinished && (isOwner || isIn);
   const handleCompletedMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files ? Array.from(e.target.files) : [];
     e.target.value = "";
@@ -820,28 +821,60 @@ const QuestDetail = () => {
         </div>
 
         {/* Photos & Videos Section */}
-        {quest.photos && quest.photos.length > 0 && (
+        {(quest.photos && quest.photos.length > 0) || canAddActiveMedia ? (
           <div className="p-4 rounded-xl border border-border/50 bg-card space-y-3">
-            <h3 className="text-sm font-bold text-foreground">Photos & Videos</h3>
-            <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4">
-              {quest.photos.map((photo, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => setViewerIndex(i)}
-                  className={`${quest.photos!.length === 1 ? "w-full aspect-[4/3]" : "w-64 h-64"} shrink-0 rounded-xl overflow-hidden border border-border/30 focus:outline-none focus:ring-2 focus:ring-ring`}
-                  aria-label={`Open photo ${i + 1}`}
-                >
-                  <SidequestPhoto
-                    src={photo}
-                    alt={`Quest photo ${i + 1}`}
-                    thumbnail
-                    className="w-full h-full object-cover"
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-bold text-foreground">Photos & Videos</h3>
+              {canAddActiveMedia && (
+                <>
+                  <input
+                    ref={completedFileInputRef}
+                    type="file"
+                    accept="image/*,video/*"
+                    multiple
+                    className="hidden"
+                    onChange={handleCompletedMediaUpload}
                   />
-                </button>
-              ))}
+                  <button
+                    type="button"
+                    onClick={() => completedFileInputRef.current?.click()}
+                    disabled={uploadingMedia}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-[11px] font-semibold disabled:opacity-60"
+                  >
+                    <ImagePlus className="w-3.5 h-3.5" />
+                    {uploadingMedia ? "Uploading…" : "Add"}
+                  </button>
+                </>
+              )}
             </div>
-            {viewerIndex !== null && (
+            {quest.photos && quest.photos.length > 0 ? (
+              <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4">
+                {quest.photos.map((photo, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => setViewerIndex(i)}
+                    className={`${quest.photos!.length === 1 ? "w-full aspect-[4/3]" : "w-64 h-64"} shrink-0 rounded-xl overflow-hidden border border-border/30 focus:outline-none focus:ring-2 focus:ring-ring`}
+                    aria-label={`Open photo ${i + 1}`}
+                  >
+                    <SidequestPhoto
+                      src={photo}
+                      alt={`Quest photo ${i + 1}`}
+                      thumbnail
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <EmptyState
+                icon={ImagePlus}
+                title="No photos yet"
+                description={canAddActiveMedia ? "Add photos or videos to share with your group." : "No one's added photos for this sidequest yet."}
+                size="sm"
+              />
+            )}
+            {quest.photos && quest.photos.length > 0 && viewerIndex !== null && (
               <MediaViewer
                 sources={quest.photos}
                 startIndex={viewerIndex}
@@ -850,7 +883,7 @@ const QuestDetail = () => {
               />
             )}
           </div>
-        )}
+        ) : null}
 
 
         {/* Volunteer Section — only the contribution roles the creator picked (plus Driver if carpool) */}
