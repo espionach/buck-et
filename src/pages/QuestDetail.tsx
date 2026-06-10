@@ -415,23 +415,27 @@ const QuestDetail = () => {
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" sideOffset={4} className="min-w-[160px]">
-                  <DropdownMenuItem
-                    onSelect={() => navigate(`/quest/${quest.id}/edit`)}
-                    className="gap-2 text-xs"
-                  >
-                    <Pencil className="w-3.5 h-3.5" /> Edit
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onSelect={() => {
-                      if (pinned) unpinQuest(quest.id);
-                      else pinQuest(quest.id);
-                    }}
-                    disabled={pinDisabled}
-                    className="gap-2 text-xs"
-                  >
-                    <Pin className="w-3.5 h-3.5" /> {pinned ? "Unpin" : "Pin"}
-                    {pinDisabled && <span className="text-[10px] text-muted-foreground ml-auto">Max 3</span>}
-                  </DropdownMenuItem>
+                  {!isFinished && (
+                    <DropdownMenuItem
+                      onSelect={() => navigate(`/quest/${quest.id}/edit`)}
+                      className="gap-2 text-xs"
+                    >
+                      <Pencil className="w-3.5 h-3.5" /> Edit
+                    </DropdownMenuItem>
+                  )}
+                  {!isFinished && (
+                    <DropdownMenuItem
+                      onSelect={() => {
+                        if (pinned) unpinQuest(quest.id);
+                        else pinQuest(quest.id);
+                      }}
+                      disabled={pinDisabled}
+                      className="gap-2 text-xs"
+                    >
+                      <Pin className="w-3.5 h-3.5" /> {pinned ? "Unpin" : "Pin"}
+                      {pinDisabled && <span className="text-[10px] text-muted-foreground ml-auto">Max 3</span>}
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem
                     onSelect={() => setShowDeleteConfirm(true)}
                     className="gap-2 text-xs text-destructive focus:text-destructive"
