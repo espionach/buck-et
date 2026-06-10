@@ -186,35 +186,45 @@ const Feed = () => {
 
       
 
-      {/* Search */}
-      <div className="relative mb-3">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <input
-          ref={searchInputRef}
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            if (!searchMode) setSearchMode(true);
-          }}
-          onFocus={() => {
-            if (!searchMode) setSearchMode(true);
-          }}
-          placeholder="Search sidequests or friends..."
-          className="w-full pl-10 pr-10 py-3 rounded-xl bg-card border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-        />
-        {(search || searchMode) && (
-          <button
-            onClick={() => {
-              setSearch("");
-              setSearchMode(false);
-              sessionStorage.removeItem("feedSearchText");
+      {/* Search (Quests tab only) */}
+      {homeTab === "quests" && (
+        <div className="relative mb-3">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <input
+            ref={searchInputRef}
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              if (!searchMode) setSearchMode(true);
             }}
-            className="absolute right-3.5 top-1/2 -translate-y-1/2"
-          >
-            <X className="w-4 h-4 text-destructive" />
-          </button>
-        )}
-      </div>
+            onFocus={() => {
+              if (!searchMode) setSearchMode(true);
+            }}
+            placeholder="Search sidequests or friends..."
+            className="w-full pl-10 pr-10 py-3 rounded-xl bg-card border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+          />
+          {(search || searchMode) && (
+            <button
+              onClick={() => {
+                setSearch("");
+                setSearchMode(false);
+                sessionStorage.removeItem("feedSearchText");
+              }}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2"
+            >
+              <X className="w-4 h-4 text-destructive" />
+            </button>
+          )}
+        </div>
+      )}
+
+      {homeTab === "activity" && !searchMode ? (
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+          <ActivityFeed />
+        </motion.div>
+      ) : (
+        <>
+
 
       {/* Search mode page */}
       {searchMode ? (
