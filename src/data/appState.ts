@@ -877,17 +877,32 @@ export const useAppStore = create<AppState>((set, get) => ({
         ) {
           const prevPhotos = new Set(prevQuest.photos || []);
           const added = (updates.photos || []).filter((p) => !prevPhotos.has(p));
-          if (added.length > 0 && otherParticipantIds.length > 0) {
-            await notifyUsers({
-              recipientIds: otherParticipantIds,
-              fromUserId: currentUser.id,
-              type: "photo_added",
-              message: `added a photo to '${prevQuest.title}'`,
-              entityId: questId,
-              groupId: prevQuest.groupId || null,
-            });
+          if (added.length > 0) {
+            // Log to activity feed (one row per photo)
+            try {
+              await supabase.from("sidequest_photo_events").insert(
+                added.map((url) => ({
+                  sidequest_id: questId,
+                  user_id: currentUser.id,
+                  photo_url: url,
+                }))
+              );
+            } catch (e) {
+              console.warn("[photo_event log]", e);
+            }
+            if (otherParticipantIds.length > 0) {
+              await notifyUsers({
+                recipientIds: otherParticipantIds,
+                fromUserId: currentUser.id,
+                type: "photo_added",
+                message: `added a photo to '${prevQuest.title}'`,
+                entityId: questId,
+                groupId: prevQuest.groupId || null,
+              });
+            }
           }
         }
+
 
         // b) quest_updated — title/desc/logistics changed (but NOT just photos/notes/links/completion)
         const meaningfulChange =
