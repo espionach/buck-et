@@ -172,6 +172,7 @@ const Feed = () => {
           {(["quests", "activity"] as const).map((t) => (
             <button
               key={t}
+              data-spotlight={t === "activity" ? "home-activity-tab" : undefined}
               onClick={() => setHomeTab(t)}
               className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
                 homeTab === t ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
