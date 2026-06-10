@@ -54,7 +54,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
   // Whether the current viewer was joined at the time the owner finished.
   const wasJoinedWhenFinished = quest.completedByUserIds.includes(currentUser.id);
   const canJoin = !disableJoin && userInGroup && !isFinished;
-  const canNavigateToDetail = !isFinished;
+  const canNavigateToDetail = true;
   const pinned = pinnedQuestIds.includes(quest.id);
 
   const [showComments, setShowComments] = useState(autoOpenComments);
