@@ -424,6 +424,11 @@ const Settings = () => {
 
       <Section title="Preferences">
         <Row icon={Bell} label="Notification Settings" onClick={() => setShowNotif(true)} />
+        <Row
+          icon={Activity}
+          label="Share activity with friends"
+          trailing={<Switch checked={activitySharing} onCheckedChange={toggleActivitySharing} />}
+        />
         <Row icon={UserPlus} label="Find Friends" onClick={() => nav("/find-friends")} />
         <Row icon={ShieldOff} label="Blocked Users" onClick={() => nav("/settings/blocked")} />
         <Row icon={Compass} label="Replay Tips" onClick={handleReplayTips} />
