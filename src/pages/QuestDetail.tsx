@@ -475,17 +475,20 @@ const QuestDetail = () => {
 
 
       {isFinished ? (
-        <motion.div layout className="px-5 space-y-4 mt-2">
+        <motion.div layout className="px-5 mt-2">
+
           {/* Completed banner / meta */}
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground pb-1">
             <Check className="w-3.5 h-3.5 text-secondary" />
             <span>Completed{quest.completedAt ? ` ${quest.completedAt}` : ""}</span>
           </div>
 
+
           {/* Photos & Videos — primary content for completed quests */}
-          <div className="p-4 rounded-xl border border-border/50 bg-card space-y-3">
+          <section className="py-5 border-t border-border/40 space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-foreground">Photos & Videos</h3>
+              <h3 className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Photos & Videos</h3>
+
               {canAddCompletedMedia && (
                 <>
                   <input
@@ -509,7 +512,8 @@ const QuestDetail = () => {
               )}
             </div>
             {quest.photos && quest.photos.length > 0 ? (
-              <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4">
+              <div className="flex gap-2 overflow-x-auto pb-1 -mx-5 px-5">
+
                 {quest.photos.map((photo, i) => (
                   <button
                     key={i}
@@ -538,12 +542,13 @@ const QuestDetail = () => {
                 onOpenChange={(o) => !o && setViewerIndex(null)}
               />
             )}
-          </div>
+          </section>
 
           {/* Comments */}
-          <div className="p-4 rounded-xl border border-border/50 bg-card space-y-3">
-            <h3 className="text-sm font-bold text-foreground">
+          <section className="py-5 border-t border-border/40 space-y-3">
+            <h3 className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">
               Comments {(() => {
+
                 const tally = (list: typeof quest.comments): number =>
                   list.reduce((n, c) => n + 1 + (c.replies ? tally(c.replies) : 0), 0);
                 const count = tally(quest.comments);
@@ -551,11 +556,12 @@ const QuestDetail = () => {
               })()}
             </h3>
             <CommentThread quest={quest} />
-          </div>
+          </section>
 
           {/* Quest details (moved to bottom, past tense, read-only) */}
-          <div className="p-4 rounded-xl border border-border/50 bg-card space-y-4">
-            <h3 className="text-sm font-bold text-foreground">Sidequest details</h3>
+          <section className="py-5 border-t border-border/40 space-y-4">
+            <h3 className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Sidequest details</h3>
+
 
             {/* Creator */}
             <div className="flex items-center gap-2">
