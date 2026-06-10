@@ -53,7 +53,7 @@ const BackToTopButton = ({ watchSelector }: Props) => {
       type="button"
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
       aria-label="Back to top"
-      className="fixed bottom-20 left-4 z-40 flex items-center gap-1.5 px-3 py-2 rounded-full bg-card/90 backdrop-blur-xl border border-border text-foreground text-xs font-semibold shadow-lg shadow-black/5 active:scale-95 transition-transform"
+      className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 flex items-center gap-1.5 px-3 py-2 rounded-full bg-card/90 backdrop-blur-xl border border-border text-foreground text-xs font-semibold shadow-lg shadow-black/5 active:scale-95 transition-transform"
     >
       <ArrowUp className="w-3.5 h-3.5" />
       Back to top
