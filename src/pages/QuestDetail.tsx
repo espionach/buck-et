@@ -485,7 +485,7 @@ const QuestDetail = () => {
 
 
           {/* Photos & Videos — primary content for completed quests */}
-          <section className="py-5 border-t border-border/40 space-y-3">
+          <section className="py-8 border-t border-border/40 space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Photos & Videos</h3>
 
@@ -545,7 +545,7 @@ const QuestDetail = () => {
           </section>
 
           {/* Comments */}
-          <section className="py-5 border-t border-border/40 space-y-3">
+          <section className="py-8 border-t border-border/40 space-y-3">
             <h3 className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">
               Comments {(() => {
 
@@ -559,7 +559,7 @@ const QuestDetail = () => {
           </section>
 
           {/* Quest details (moved to bottom, past tense, read-only) */}
-          <section className="py-5 border-t border-border/40 space-y-4">
+          <section className="py-8 border-t border-border/40 space-y-4">
             <h3 className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Sidequest details</h3>
 
 
@@ -660,7 +660,7 @@ const QuestDetail = () => {
       ) : (
       <motion.div layout className="px-5 mt-2">
         {/* Top: Creator + Date/Location/Transport/Notes + Description + Links */}
-        <section className="py-5 space-y-4">
+        <section className="py-8 space-y-4">
           {/* Creator */}
           <div className="flex items-center gap-2">
             <UserAvatar user={quest.createdBy} size="sm" />
@@ -746,7 +746,7 @@ const QuestDetail = () => {
         </section>
 
         {/* Participants */}
-        <section className="py-5 border-t border-border/40 space-y-3">
+        <section className="py-8 border-t border-border/40 space-y-3">
           <h3 className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Who's In ({quest.participants.length})</h3>
           <div className="flex flex-wrap gap-2">
             {quest.participants.map((p) => (
@@ -800,7 +800,7 @@ const QuestDetail = () => {
 
         {/* Photos & Videos Section */}
         {(quest.photos && quest.photos.length > 0) || canAddActiveMedia ? (
-          <section className="py-5 border-t border-border/40 space-y-3">
+          <section className="py-8 border-t border-border/40 space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Photos & Videos</h3>
               {canAddActiveMedia && (
@@ -873,7 +873,7 @@ const QuestDetail = () => {
           const heading = isCar ? "Carpool & Contributions" : "Contributions";
           const availableForMe = offeredRoles;
           return (
-            <section className="py-5 border-t border-border/40 space-y-3">
+            <section className="py-8 border-t border-border/40 space-y-3">
               <h3 className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">{heading}</h3>
 
               {logistics.volunteers.length > 0 && (
@@ -925,7 +925,7 @@ const QuestDetail = () => {
         })()}
 
         {/* Comments Section */}
-        <section className="py-5 border-t border-border/40 space-y-3">
+        <section className="py-8 border-t border-border/40 space-y-3">
           <h3 className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">
             Comments {(() => {
               const tally = (list: typeof quest.comments): number =>
