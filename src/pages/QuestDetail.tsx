@@ -174,7 +174,7 @@ const QuestDetail = () => {
   if (!quest) {
     return (
       <div className="min-h-screen flex flex-col">
-        <div className="px-2.5 pt-14 pb-3">
+        <div className="px-10 pt-14 pb-3">
           <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-muted-foreground hover:text-foreground transition-colors" aria-label="Back">
             <ArrowLeft className="w-5 h-5" />
           </button>
@@ -357,7 +357,7 @@ const QuestDetail = () => {
           )}
 
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg px-2.5 pt-14 pb-3">
+      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg px-10 pt-14 pb-3">
         <div className="flex items-center gap-3">
           <button onClick={handleBack} data-spotlight="quest-back" className="p-2 -ml-2 text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="w-5 h-5" />
@@ -475,7 +475,7 @@ const QuestDetail = () => {
 
 
       {isFinished ? (
-        <motion.div layout className="px-2.5 mt-2">
+        <motion.div layout className="px-10 mt-2">
 
           {/* Completed banner / meta */}
           <div className="flex items-center gap-2 text-xs text-muted-foreground pb-1">
@@ -512,7 +512,7 @@ const QuestDetail = () => {
               )}
             </div>
             {quest.photos && quest.photos.length > 0 ? (
-              <div className="flex gap-2 overflow-x-auto pb-1 -mx-2.5 px-2.5">
+              <div className="flex gap-2 overflow-x-auto pb-1 -mx-10 px-10">
 
                 {quest.photos.map((photo, i) => (
                   <button
@@ -658,7 +658,7 @@ const QuestDetail = () => {
 
         </motion.div>
       ) : (
-      <motion.div layout className="px-2.5 mt-2">
+      <motion.div layout className="px-10 mt-2">
         {/* Top: Creator + Date/Location/Transport/Notes + Description + Links */}
         <section className="py-8 space-y-4">
           {/* Creator */}
@@ -826,7 +826,7 @@ const QuestDetail = () => {
               )}
             </div>
             {quest.photos && quest.photos.length > 0 ? (
-              <div className="flex gap-2 overflow-x-auto pb-1 -mx-2.5 px-2.5">
+              <div className="flex gap-2 overflow-x-auto pb-1 -mx-10 px-10">
                 {quest.photos.map((photo, i) => (
                   <button
                     key={i}
