@@ -404,7 +404,7 @@ const QuestDetail = () => {
             })()
           ))}
           {isFinished && (
-            <span className="shrink-0 inline-flex items-center px-10 py-1 rounded-full bg-muted text-muted-foreground text-[11px] font-semibold">
+            <span className="shrink-0 inline-flex items-center px-2.5 py-1 rounded-full bg-muted text-muted-foreground text-[11px] font-semibold">
               Completed
             </span>
           )}
@@ -628,7 +628,7 @@ const QuestDetail = () => {
                       if (p.id === currentUser.id) navigate("/profile");
                       else navigate(`/profile?viewUser=${p.id}`);
                     }}
-                    className="flex items-center gap-1.5 px-10 py-1.5 rounded-full bg-muted text-xs hover:bg-muted/80 transition-colors"
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-muted text-xs hover:bg-muted/80 transition-colors"
                   >
                     <UserAvatar user={p} size="xs" />
                     <span className="text-foreground font-medium">{p.name}</span>
@@ -689,7 +689,7 @@ const QuestDetail = () => {
                       href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(logistics.location)}${logistics.placeId ? `&query_place_id=${encodeURIComponent(logistics.placeId)}` : ""}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[11px] font-semibold px-10 py-1 rounded-lg bg-muted text-foreground hover:bg-accent transition-colors"
+                      className="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-muted text-foreground hover:bg-accent transition-colors"
                     >
                       Open in Maps
                     </a>
@@ -759,7 +759,7 @@ const QuestDetail = () => {
                     navigate(`/profile?viewUser=${p.id}`);
                   }
                 }}
-                className="flex items-center gap-1.5 px-10 py-1.5 rounded-full bg-muted text-xs hover:bg-muted/80 transition-colors"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-muted text-xs hover:bg-muted/80 transition-colors"
               >
                 <UserAvatar user={p} size="xs" />
                 <span className="text-foreground font-medium">{p.name}</span>
