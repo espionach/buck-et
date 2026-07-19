@@ -96,8 +96,11 @@ function Column<T extends string | number>({ items, selected, onSelect }: Column
   const selectedRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    selectedRef.current?.scrollIntoView({ block: "center" });
-  }, []);
+    const container = ref.current;
+    const el = selectedRef.current;
+    if (!container || !el) return;
+    container.scrollTop = el.offsetTop - container.clientHeight / 2 + el.clientHeight / 2;
+  }, [selected]);
 
   return (
     <div
