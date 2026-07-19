@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Coffee, Waves, PartyPopper } from "lucide-react";
+import { Coffee, Waves, PartyPopper, BookOpen, Mic, Star, Laugh, Palette, Wine, KeyRound, Utensils, Sunrise, Plane, Ticket } from "lucide-react";
 import OnboardingLayout from "@/components/onboarding/OnboardingLayout";
 import { useAuth } from "@/contexts/AuthContext";
 import { completeOnboarding, setOnboardingStep } from "@/hooks/useOnboarding";
