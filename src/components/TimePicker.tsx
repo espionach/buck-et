@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Clock } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
@@ -14,6 +14,9 @@ interface TimePickerProps {
 const HOURS = Array.from({ length: 12 }, (_, i) => i + 1); // 1..12
 const MINUTES = Array.from({ length: 60 }, (_, i) => i);   // 0..59
 const PERIODS = ["AM", "PM"] as const;
+const PICKER_HEIGHT = 192;
+const OPTION_HEIGHT = 48;
+const EDGE_SPACER_HEIGHT = (PICKER_HEIGHT - OPTION_HEIGHT) / 2;
 
 function parseValue(value: string): { hour: number; minute: number; period: "AM" | "PM" } {
   const m = value?.match(/^(\d{1,2}):(\d{2})\s*(AM|PM|am|pm)$/);
@@ -93,13 +96,15 @@ interface ColumnProps<T extends string | number> {
 
 function Column<T extends string | number>({ items, selected, onSelect }: ColumnProps<T>) {
   const ref = useRef<HTMLDivElement>(null);
-  const selectedRef = useRef<HTMLButtonElement>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const container = ref.current;
-    const el = selectedRef.current;
-    if (!container || !el) return;
-    container.scrollTop = el.offsetTop - container.clientHeight / 2 + el.clientHeight / 2;
+    if (!container) return;
+
+    const selectedIndex = items.findIndex((item) => item.value === selected);
+    if (selectedIndex < 0) return;
+
+    container.scrollTop = selectedIndex * OPTION_HEIGHT;
   }, [selected]);
 
   return (
@@ -107,17 +112,17 @@ function Column<T extends string | number>({ items, selected, onSelect }: Column
       ref={ref}
       className="h-48 w-14 overflow-y-auto overscroll-contain rounded-lg bg-muted/40 scrollbar-thin"
     >
-      <div className="flex flex-col py-1">
+      <div className="flex flex-col">
+        <div aria-hidden="true" className="shrink-0" style={{ height: EDGE_SPACER_HEIGHT }} />
         {items.map((it) => {
           const isSel = it.value === selected;
           return (
             <button
               key={String(it.value)}
-              ref={isSel ? selectedRef : undefined}
               type="button"
               onClick={() => onSelect(it.value)}
               className={cn(
-                "px-3 py-1.5 mx-1 my-0.5 rounded-md text-center font-sans transition-colors",
+                "mx-1 h-12 shrink-0 rounded-md px-3 text-center font-sans transition-colors",
                 isSel
                   ? "bg-primary text-primary-foreground font-medium"
                   : "text-foreground hover:bg-muted hover:text-foreground",
@@ -127,6 +132,7 @@ function Column<T extends string | number>({ items, selected, onSelect }: Column
             </button>
           );
         })}
+        <div aria-hidden="true" className="shrink-0" style={{ height: EDGE_SPACER_HEIGHT }} />
       </div>
     </div>
   );
