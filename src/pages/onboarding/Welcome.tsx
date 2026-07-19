@@ -40,7 +40,7 @@ const Welcome = () => {
         By continuing, you agree to follow our{" "}
         <button
           type="button"
-          onClick={() => navigate("/settings/community-guidelines")}
+          onClick={() => navigate("/onboarding/community-guidelines")}
           className="text-primary font-semibold underline-offset-2 hover:underline"
         >
           Community Guidelines
