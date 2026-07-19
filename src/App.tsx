@@ -86,6 +86,7 @@ const AppLayout = () => {
         <Route path="/onboarding/examples" element={<ProtectedRoute><OnboardingExamples /></ProtectedRoute>} />
         <Route path="/onboarding/permissions" element={<ProtectedRoute><OnboardingPermissions /></ProtectedRoute>} />
         <Route path="/onboarding/friends" element={<ProtectedRoute><OnboardingFriends /></ProtectedRoute>} />
+        <Route path="/onboarding/community-guidelines" element={<ProtectedRoute><CommunityGuidelines /></ProtectedRoute>} />
         <Route path="/onboarding/tour" element={<Navigate to="/create?onboarding=1" replace />} />
         <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
         <Route path="/calendar" element={<ProtectedRoute><Calendar /></ProtectedRoute>} />
