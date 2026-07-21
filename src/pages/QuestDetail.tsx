@@ -358,7 +358,7 @@ const QuestDetail = () => {
 
       {/* Header */}
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg px-10 pt-14 pb-3">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3" data-spotlight="quest-header-top">
           <button onClick={handleBack} data-spotlight="quest-back" className="p-2 -ml-2 text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </button>
