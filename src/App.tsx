@@ -72,7 +72,7 @@ const AuthRoute = ({ children }: { children: React.ReactNode }) => {
 
 const AppLayout = () => {
   const location = useLocation();
-  const hideNav = ["/create", "/create-group", "/drafts", "/login", "/signup", "/forgot-password", "/reset-password", "/settings", "/settings/blocked", "/settings/community-guidelines", "/settings/privacy-policy", "/settings/terms", "/settings/legal-updates", "/admin", "/admin/reports"].includes(location.pathname) || location.pathname.startsWith("/quest/") || location.pathname.startsWith("/onboarding/") || location.pathname.startsWith("/groups/") || location.pathname.endsWith("/edit");
+  const hideNav = ["/create", "/create-group", "/drafts", "/login", "/signup", "/forgot-password", "/reset-password", "/settings", "/settings/blocked", "/settings/community-guidelines", "/settings/privacy-policy", "/settings/terms", "/settings/legal-updates", "/admin", "/admin/reports"].includes(location.pathname) || location.pathname.startsWith("/onboarding/") || location.pathname.startsWith("/groups/") || location.pathname.endsWith("/edit");
 
   return (
     <div className="max-w-md mx-auto min-h-screen relative">
