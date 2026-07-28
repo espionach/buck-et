@@ -108,7 +108,7 @@ const Signup = () => {
                 if (showPwErrors && !validatePassword(e.target.value)) setShowPwErrors(false);
               }}
               required
-              minLength={8}
+              minLength={12}
             />
             <PasswordRequirements value={password} showErrors={showPwErrors} />
           </div>

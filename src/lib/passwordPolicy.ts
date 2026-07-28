@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const PASSWORD_RULES = [
-  { id: "length", label: "At least 8 characters", test: (v: string) => v.length >= 8 },
+  { id: "length", label: "At least 12 characters", test: (v: string) => v.length >= 12 },
   { id: "upper", label: "An uppercase letter", test: (v: string) => /[A-Z]/.test(v) },
   { id: "lower", label: "A lowercase letter", test: (v: string) => /[a-z]/.test(v) },
   { id: "number", label: "A number", test: (v: string) => /[0-9]/.test(v) },
@@ -9,7 +9,7 @@ export const PASSWORD_RULES = [
 
 export const passwordSchema = z
   .string()
-  .min(8, { message: "Password must be at least 8 characters." })
+  .min(12, { message: "Password must be at least 12 characters." })
   .regex(/[A-Z]/, { message: "Password must include an uppercase letter." })
   .regex(/[a-z]/, { message: "Password must include a lowercase letter." })
   .regex(/[0-9]/, { message: "Password must include a number." });
