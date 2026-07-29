@@ -10,6 +10,7 @@ import { usePopup } from "@/hooks/use-popup";
 import { User, isQuestCompleted, placeholderUser } from "@/data/mockData";
 import UserMenu from "@/components/UserMenu";
 import NudgeQuestPicker from "@/components/NudgeQuestPicker";
+import CancelRequestDialog from "@/components/CancelRequestDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
