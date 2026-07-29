@@ -32,8 +32,10 @@ const FindFriends = () => {
   const nav = useNavigate();
   const { user } = useAuth();
   const sendFriendRequest = useAppStore((s) => s.sendFriendRequest);
+  const cancelFriendRequest = useAppStore((s) => s.cancelFriendRequest);
   const friends = useAppStore((s) => s.friends);
   const sent = useAppStore((s) => s.sentFriendRequests);
+  const [cancelTarget, setCancelTarget] = useState<Match | null>(null);
 
   const [consent, setConsent] = useState<boolean | null>(null);
   const [savingConsent, setSavingConsent] = useState(false);
