@@ -316,19 +316,36 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
           )}
 
           {/* Tabs */}
-          <div className="flex bg-muted rounded-2xl p-1 mb-5">
-
-            {(["current", "past"] as const).map((t) => (
-              <button
-                key={t}
-                onClick={() => setTab(t)}
-                className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all relative ${
-                  tab === t ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
-                }`}
-              >
-                {t === "current" ? `Active (${activeQuests.length})` : `Completed (${completedQuests.length})`}
-              </button>
-            ))}
+          <div className="flex border-b border-border mb-5">
+            {([
+              { id: "current", label: "Active sidequests", Icon: Zap },
+              { id: "past", label: "Completed sidequests", Icon: Flag },
+            ] as const).map(({ id, label, Icon }) => {
+              const isActive = tab === id;
+              return (
+                <button
+                  key={id}
+                  onClick={() => setTab(id)}
+                  aria-label={label}
+                  aria-selected={isActive}
+                  className="relative flex-1 py-3 flex items-center justify-center transition-colors"
+                >
+                  <Icon
+                    className={`w-6 h-6 transition-colors ${
+                      isActive ? "text-foreground" : "text-muted-foreground"
+                    }`}
+                    strokeWidth={isActive ? 2.25 : 2}
+                  />
+                  {isActive && (
+                    <motion.div
+                      layoutId="user-profile-tab-underline"
+                      className="absolute -bottom-px left-0 right-0 h-[2px] bg-foreground rounded-full"
+                      transition={{ type: "spring", stiffness: 500, damping: 40 }}
+                    />
+                  )}
+                </button>
+              );
+            })}
           </div>
 
           <motion.div
