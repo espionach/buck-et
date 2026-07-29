@@ -10,6 +10,7 @@ import { usePopup } from "@/hooks/use-popup";
 import { User, isQuestCompleted, placeholderUser } from "@/data/mockData";
 import UserMenu from "@/components/UserMenu";
 import NudgeQuestPicker from "@/components/NudgeQuestPicker";
+import CancelRequestDialog from "@/components/CancelRequestDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -21,14 +22,15 @@ interface UserProfileViewProps {
 }
 
 const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfileViewProps) => {
-  const { quests, friends, currentUser, sentFriendRequests, sendFriendRequest, unfriend, friendRequests, acceptFriendRequest, blockedUserIds } = useAppStore();
+  const { quests, friends, currentUser, sentFriendRequests, sendFriendRequest, cancelFriendRequest, unfriend, friendRequests, acceptFriendRequest, blockedUserIds } = useAppStore();
   const navigate = useNavigate();
   const [tab, setTab] = useState<"current" | "past">("current");
   const [showFriends, setShowFriends] = useState(false);
   const [showUnfriendConfirm, setShowUnfriendConfirm] = useState(false);
+  const [showCancelRequestConfirm, setShowCancelRequestConfirm] = useState(false);
   const [showNudgePicker, setShowNudgePicker] = useState(false);
   const [viewedUserFriends, setViewedUserFriends] = useState<User[] | null>(null);
-  usePopup(showFriends || showUnfriendConfirm);
+  usePopup(showFriends || showUnfriendConfirm || showCancelRequestConfirm);
 
   const isBlocked = blockedUserIds.includes(user.id);
   const isFriend = friends.some((f) => f.id === user.id);
@@ -281,8 +283,8 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
             </button>
           ) : hasRequested ? (
             <button
-              disabled
-              className="px-6 py-2.5 rounded-xl bg-muted text-muted-foreground font-semibold text-sm flex items-center gap-2 mx-auto cursor-default"
+              onClick={() => setShowCancelRequestConfirm(true)}
+              className="px-6 py-2.5 rounded-xl bg-muted text-muted-foreground font-semibold text-sm flex items-center gap-2 mx-auto hover:bg-muted/80 transition-colors"
             >
               <Clock className="w-4 h-4" />
               Request Sent
@@ -406,6 +408,12 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
         onClose={() => setShowNudgePicker(false)}
         quests={myActiveQuests}
         targetUser={user}
+      />
+      <CancelRequestDialog
+        open={showCancelRequestConfirm}
+        userName={user.name}
+        onConfirm={() => cancelFriendRequest(user.id)}
+        onClose={() => setShowCancelRequestConfirm(false)}
       />
     </div>
 

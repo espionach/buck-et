@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useAppStore } from "@/data/appState";
 import { toast } from "@/hooks/use-toast";
 import UserAvatar from "@/components/UserAvatar";
+import CancelRequestDialog from "@/components/CancelRequestDialog";
 import type { User } from "@/data/mockData";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -31,8 +32,10 @@ const FindFriends = () => {
   const nav = useNavigate();
   const { user } = useAuth();
   const sendFriendRequest = useAppStore((s) => s.sendFriendRequest);
+  const cancelFriendRequest = useAppStore((s) => s.cancelFriendRequest);
   const friends = useAppStore((s) => s.friends);
   const sent = useAppStore((s) => s.sentFriendRequests);
+  const [cancelTarget, setCancelTarget] = useState<Match | null>(null);
 
   const [consent, setConsent] = useState<boolean | null>(null);
   const [savingConsent, setSavingConsent] = useState(false);
@@ -262,7 +265,12 @@ const FindFriends = () => {
                           <Check className="w-3.5 h-3.5" /> Friends
                         </span>
                       ) : isSent ? (
-                        <span className="text-xs font-medium text-muted-foreground">Requested</span>
+                        <button
+                          onClick={() => setCancelTarget(m)}
+                          className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          Requested
+                        </button>
                       ) : (
                         <button
                           onClick={() => addFriend(m)}
@@ -315,6 +323,12 @@ const FindFriends = () => {
           </div>
         </>
       )}
+      <CancelRequestDialog
+        open={!!cancelTarget}
+        userName={cancelTarget?.display_name || cancelTarget?.username || undefined}
+        onConfirm={() => cancelTarget && cancelFriendRequest(cancelTarget.user_id)}
+        onClose={() => setCancelTarget(null)}
+      />
     </div>
   );
 };

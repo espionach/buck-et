@@ -71,6 +71,7 @@ interface AppState {
   acceptFriendRequest: (requestId: string) => void;
   declineFriendRequest: (requestId: string) => void;
   sendFriendRequest: (toUser: User) => void;
+  cancelFriendRequest: (toUserId: string) => void;
   unfriend: (userId: string) => void;
   addComment: (questId: string, comment: Comment) => void;
   deleteComment: (questId: string, commentId: string) => void;
@@ -595,6 +596,22 @@ export const useAppStore = create<AppState>((set, get) => ({
         from_user_id: currentUser.id,
         to_user_id: toUser.id,
       });
+      _invalidate(["sent_friend_requests"]);
+    })();
+  },
+
+  cancelFriendRequest: (toUserId) => {
+    const { currentUser, _invalidate } = get();
+    set((s) => ({
+      sentFriendRequests: s.sentFriendRequests.filter((id) => id !== toUserId),
+    }));
+    (async () => {
+      await supabase
+        .from("friend_requests")
+        .delete()
+        .eq("from_user_id", currentUser.id)
+        .eq("to_user_id", toUserId)
+        .eq("status", "pending");
       _invalidate(["sent_friend_requests"]);
     })();
   },

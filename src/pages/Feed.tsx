@@ -12,9 +12,11 @@ import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
 import BackToTopButton from "@/components/BackToTopButton";
+import CancelRequestDialog from "@/components/CancelRequestDialog";
 
 const Feed = () => {
-  const { quests, groups, friends: friendsList, cleanupEmptyQuests, friendRequests, currentUser, sentFriendRequests, sendFriendRequest } = useAppStore();
+  const { quests, groups, friends: friendsList, cleanupEmptyQuests, friendRequests, currentUser, sentFriendRequests, sendFriendRequest, cancelFriendRequest } = useAppStore();
+  const [cancelReqUser, setCancelReqUser] = useState<User | null>(null);
   const [search, setSearch] = useState(() => sessionStorage.getItem("feedSearchText") || "");
   const [searchTab, setSearchTab] = useState<"quests" | "people">("quests");
   const [selectedProfile, setSelectedProfile] = useState<User | null>(null);
@@ -381,7 +383,21 @@ const Feed = () => {
                             Friend
                           </span>
                         ) : sentFriendRequests.includes(user.id) ? (
-                          <span className="text-[10px] font-semibold text-muted-foreground px-2 py-1 rounded-full bg-muted">
+                          <span
+                            role="button"
+                            tabIndex={0}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setCancelReqUser(user);
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.stopPropagation();
+                                setCancelReqUser(user);
+                              }
+                            }}
+                            className="text-[10px] font-semibold text-muted-foreground px-2 py-1 rounded-full bg-muted cursor-pointer hover:bg-muted/80"
+                          >
                             Requested
                           </span>
                         ) : friendRequests.some((r) => r.from.id === user.id) ? (
@@ -473,7 +489,12 @@ const Feed = () => {
         </>
       )}
 
-      
+      <CancelRequestDialog
+        open={!!cancelReqUser}
+        userName={cancelReqUser?.name}
+        onConfirm={() => cancelReqUser && cancelFriendRequest(cancelReqUser.id)}
+        onClose={() => setCancelReqUser(null)}
+      />
     </div>
 
   );
