@@ -323,6 +323,12 @@ const FindFriends = () => {
           </div>
         </>
       )}
+      <CancelRequestDialog
+        open={!!cancelTarget}
+        userName={cancelTarget?.display_name || cancelTarget?.username || undefined}
+        onConfirm={() => cancelTarget && cancelFriendRequest(cancelTarget.user_id)}
+        onClose={() => setCancelTarget(null)}
+      />
     </div>
   );
 };
