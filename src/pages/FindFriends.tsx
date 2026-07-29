@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useAppStore } from "@/data/appState";
 import { toast } from "@/hooks/use-toast";
 import UserAvatar from "@/components/UserAvatar";
+import CancelRequestDialog from "@/components/CancelRequestDialog";
 import type { User } from "@/data/mockData";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
