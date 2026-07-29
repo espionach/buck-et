@@ -71,6 +71,7 @@ interface AppState {
   acceptFriendRequest: (requestId: string) => void;
   declineFriendRequest: (requestId: string) => void;
   sendFriendRequest: (toUser: User) => void;
+  cancelFriendRequest: (toUserId: string) => void;
   unfriend: (userId: string) => void;
   addComment: (questId: string, comment: Comment) => void;
   deleteComment: (questId: string, commentId: string) => void;
