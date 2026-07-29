@@ -600,6 +600,22 @@ export const useAppStore = create<AppState>((set, get) => ({
     })();
   },
 
+  cancelFriendRequest: (toUserId) => {
+    const { currentUser, _invalidate } = get();
+    set((s) => ({
+      sentFriendRequests: s.sentFriendRequests.filter((id) => id !== toUserId),
+    }));
+    (async () => {
+      await supabase
+        .from("friend_requests")
+        .delete()
+        .eq("from_user_id", currentUser.id)
+        .eq("to_user_id", toUserId)
+        .eq("status", "pending");
+      _invalidate(["sent_friend_requests"]);
+    })();
+  },
+
   unfriend: (userId) => {
     const { currentUser, _invalidate } = get();
     const state = get();
