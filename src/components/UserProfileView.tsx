@@ -26,9 +26,10 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
   const [tab, setTab] = useState<"current" | "past">("current");
   const [showFriends, setShowFriends] = useState(false);
   const [showUnfriendConfirm, setShowUnfriendConfirm] = useState(false);
+  const [showCancelRequestConfirm, setShowCancelRequestConfirm] = useState(false);
   const [showNudgePicker, setShowNudgePicker] = useState(false);
   const [viewedUserFriends, setViewedUserFriends] = useState<User[] | null>(null);
-  usePopup(showFriends || showUnfriendConfirm);
+  usePopup(showFriends || showUnfriendConfirm || showCancelRequestConfirm);
 
   const isBlocked = blockedUserIds.includes(user.id);
   const isFriend = friends.some((f) => f.id === user.id);
