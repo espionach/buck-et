@@ -265,7 +265,12 @@ const FindFriends = () => {
                           <Check className="w-3.5 h-3.5" /> Friends
                         </span>
                       ) : isSent ? (
-                        <span className="text-xs font-medium text-muted-foreground">Requested</span>
+                        <button
+                          onClick={() => setCancelTarget(m)}
+                          className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          Requested
+                        </button>
                       ) : (
                         <button
                           onClick={() => addFriend(m)}
