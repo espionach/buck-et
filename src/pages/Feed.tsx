@@ -383,7 +383,21 @@ const Feed = () => {
                             Friend
                           </span>
                         ) : sentFriendRequests.includes(user.id) ? (
-                          <span className="text-[10px] font-semibold text-muted-foreground px-2 py-1 rounded-full bg-muted">
+                          <span
+                            role="button"
+                            tabIndex={0}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setCancelReqUser(user);
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.stopPropagation();
+                                setCancelReqUser(user);
+                              }
+                            }}
+                            className="text-[10px] font-semibold text-muted-foreground px-2 py-1 rounded-full bg-muted cursor-pointer hover:bg-muted/80"
+                          >
                             Requested
                           </span>
                         ) : friendRequests.some((r) => r.from.id === user.id) ? (
