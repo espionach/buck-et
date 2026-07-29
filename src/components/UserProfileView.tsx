@@ -409,6 +409,12 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
         quests={myActiveQuests}
         targetUser={user}
       />
+      <CancelRequestDialog
+        open={showCancelRequestConfirm}
+        userName={user.name}
+        onConfirm={() => cancelFriendRequest(user.id)}
+        onClose={() => setShowCancelRequestConfirm(false)}
+      />
     </div>
 
   );
