@@ -12,9 +12,11 @@ import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
 import BackToTopButton from "@/components/BackToTopButton";
+import CancelRequestDialog from "@/components/CancelRequestDialog";
 
 const Feed = () => {
-  const { quests, groups, friends: friendsList, cleanupEmptyQuests, friendRequests, currentUser, sentFriendRequests, sendFriendRequest } = useAppStore();
+  const { quests, groups, friends: friendsList, cleanupEmptyQuests, friendRequests, currentUser, sentFriendRequests, sendFriendRequest, cancelFriendRequest } = useAppStore();
+  const [cancelReqUser, setCancelReqUser] = useState<User | null>(null);
   const [search, setSearch] = useState(() => sessionStorage.getItem("feedSearchText") || "");
   const [searchTab, setSearchTab] = useState<"quests" | "people">("quests");
   const [selectedProfile, setSelectedProfile] = useState<User | null>(null);
