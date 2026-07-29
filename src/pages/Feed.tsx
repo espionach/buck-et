@@ -489,7 +489,12 @@ const Feed = () => {
         </>
       )}
 
-      
+      <CancelRequestDialog
+        open={!!cancelReqUser}
+        userName={cancelReqUser?.name}
+        onConfirm={() => cancelReqUser && cancelFriendRequest(cancelReqUser.id)}
+        onClose={() => setCancelReqUser(null)}
+      />
     </div>
 
   );
