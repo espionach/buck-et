@@ -23,7 +23,7 @@ import { getUserFriendlyError } from "@/lib/errorMapping";
 import { validateContent } from "@/lib/contentFilter";
 import LocationPicker, { LocationValue } from "@/components/LocationPicker";
 import { listDrafts } from "@/lib/drafts";
-import { FileText, ChevronRight } from "lucide-react";
+import { FileText, ChevronRight, UserMinus } from "lucide-react";
 import BackToTopButton from "@/components/BackToTopButton";
 const Profile = () => {
   const {
@@ -41,7 +41,9 @@ const Profile = () => {
     setHideGlobalFab,
     pinnedQuestIds,
     groups,
+    unfriend,
   } = useAppStore();
+  const [unfriendUser, setUnfriendUser] = useState<{ id: string; name: string } | null>(null);
   const { user: authUser } = useAuth();
   const location = useLocation();
   const nav = useNavigate();
@@ -684,22 +686,81 @@ const Profile = () => {
                 </button>
               </div>
               {friendsList.map((u) => (
-                <button
+                <div
                   key={u.id}
-                  onClick={() => {
-                    setViewingUser(u);
-                    setShowFriends(false);
-                  }}
-                  className="w-full flex items-center gap-2 py-1.5 text-left hover:bg-muted/50 rounded-lg px-1 transition-colors"
+                  className="w-full flex items-center gap-2 py-1.5 px-1 rounded-lg hover:bg-muted/50 transition-colors"
                 >
-                  <UserAvatar user={u} size="sm" />
-                  <span className="text-sm text-foreground">{u.name}</span>
-                </button>
+                  <button
+                    onClick={() => {
+                      setViewingUser(u);
+                      setShowFriends(false);
+                    }}
+                    className="flex items-center gap-2 flex-1 text-left"
+                  >
+                    <UserAvatar user={u} size="sm" />
+                    <span className="text-sm text-foreground">{u.name}</span>
+                  </button>
+                  <button
+                    onClick={() => setUnfriendUser(u)}
+                    aria-label={`Remove ${u.name} as friend`}
+                    className="shrink-0 inline-flex items-center gap-1 text-[11px] font-semibold text-destructive px-2 py-1 rounded-full bg-destructive/10 hover:bg-destructive/20 transition-colors"
+                  >
+                    <UserMinus className="w-3.5 h-3.5" />
+                    Remove
+                  </button>
+                </div>
               ))}
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Unfriend confirmation */}
+      <AnimatePresence>
+        {unfriendUser && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] bg-foreground/40 flex items-center justify-center p-5"
+            onClick={() => setUnfriendUser(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-sm bg-card rounded-xl p-5 shadow-lg"
+            >
+              <h3 className="font-bold text-foreground text-sm mb-2">
+                Remove {unfriendUser.name} as a friend?
+              </h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                You'll both lose access to each other's private sidequests. You can send a new friend request later.
+              </p>
+              <div className="flex gap-2 justify-end">
+                <button
+                  onClick={() => setUnfriendUser(null)}
+                  className="px-4 py-2 rounded-xl bg-muted text-muted-foreground font-semibold text-sm"
+                >
+                  Keep friend
+                </button>
+                <button
+                  onClick={() => {
+                    unfriend(unfriendUser.id);
+                    setUnfriendUser(null);
+                  }}
+                  className="px-4 py-2 rounded-xl bg-destructive text-destructive-foreground font-semibold text-sm"
+                >
+                  Remove
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+
 
       <div data-profile-tabs className="flex border-b border-border mb-5">
         {([
