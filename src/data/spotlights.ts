@@ -56,7 +56,7 @@ export const SPOTLIGHTS: SpotlightDef[] = [
     match: (l) => l.pathname === "/",
     targetSelector: '[data-spotlight="home-sidequests-tab"]',
     title: "Your friends' sidequests",
-    body: "This feed shows active sidequests from your friends and groups. Tap one to see details or join in.",
+    body: "This feed shows active sidequests from your friends and friend lists. Tap one to see details or join in.",
     placement: "bottom",
   },
   {
@@ -72,7 +72,7 @@ export const SPOTLIGHTS: SpotlightDef[] = [
     match: (l) => l.pathname === "/",
     targetSelector: 'button[aria-label="Notifications"]',
     title: "Activity lives here",
-    body: "Friend requests, joins, nudges and group invites all land in this bell.",
+    body: "Friend requests, joins, nudges and friend list invites all land in this bell.",
     placement: "bottom",
   },
   {
@@ -80,7 +80,7 @@ export const SPOTLIGHTS: SpotlightDef[] = [
     match: (l) => l.pathname === "/",
     targetSelector: '[data-tour="fab"]',
     title: "Start a sidequest anytime",
-    body: "Tap + whenever an idea hits. The feed below shows what your friends and groups are up to.",
+    body: "Tap + whenever an idea hits. The feed below shows what your friends and friend lists are up to.",
     placement: "top",
   },
   {
@@ -111,8 +111,8 @@ export const SPOTLIGHTS: SpotlightDef[] = [
     id: "profile-groups",
     match: (l) => l.pathname === "/profile" && hasTab(l.search, "groups"),
     targetSelector: '[data-tour="profile-tab-groups"]',
-    title: "Friend groups",
-    body: "Make groups for the people you actually plan things with. Sidequests can be shared to just one group.",
+    title: "Friend lists",
+    body: "Make friend lists for the people you actually plan things with. Sidequests can be shared to just one friend list.",
     placement: "bottom",
   },
   {

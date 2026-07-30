@@ -35,7 +35,7 @@ const MyGroupsTab = () => {
           className="w-full rounded-xl border-2 border-dashed border-border bg-muted/30 hover:bg-muted/50 hover:border-foreground/30 transition-colors flex flex-col items-center justify-center gap-2 p-5 min-h-[124px] text-muted-foreground"
         >
           <Plus className="w-5 h-5" />
-          <span className="text-xs font-semibold">New group</span>
+          <span className="text-xs font-semibold">New friend list</span>
         </motion.button>
       )}
 
@@ -63,9 +63,9 @@ const MyGroupsTab = () => {
       {sortedGroups.length === 0 && (
         <EmptyState
           icon={UsersIcon}
-          title="No groups yet"
-          description="Create a group to launch sidequests to a hand-picked subset of friends."
-          cta={{ label: "New group", onClick: () => goCreate() }}
+          title="No friend lists yet"
+          description="Create a friend list to launch sidequests to a hand-picked subset of friends."
+          cta={{ label: "New friend list", onClick: () => goCreate() }}
         />
       )}
     </div>

@@ -33,7 +33,7 @@ const QuestList = ({
   pageSize = 10,
   emptyIcon = Users,
   emptyTitle = "Your feed is quiet",
-  emptyDescription = "Sidequests from friends and groups will show up here. Add friends to get things going.",
+  emptyDescription = "Sidequests from friends and friend lists will show up here. Add friends to get things going.",
   emptyCta,
   showGroup = true,
   hideActions = false,

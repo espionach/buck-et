@@ -70,7 +70,7 @@ const GroupMembers = () => {
         <button
           onClick={() => navigate(`/groups/${group.id}/settings`)}
           className="p-2 text-muted-foreground hover:text-foreground transition-colors"
-          aria-label="Group settings"
+          aria-label="Friend list settings"
         >
           <MoreVertical className="w-5 h-5" />
         </button>
@@ -190,7 +190,7 @@ const GroupMembers = () => {
                   <div className="flex-1 overflow-y-auto -mx-1 px-1">
                     {available.length === 0 ? (
                       <p className="text-xs text-muted-foreground py-6 text-center">
-                        All your friends are already in this group.
+                        All your friends are already in this friend list.
                       </p>
                     ) : visible.length === 0 ? (
                       <EmptyState
@@ -248,7 +248,7 @@ const GroupMembers = () => {
                 <span className="text-primary">{group.name}</span>?
               </p>
               <p className="text-xs text-muted-foreground">
-                They'll stop seeing new sidequests you launch to this group.
+                They'll stop seeing new sidequests you launch to this friend list.
               </p>
               <div className="flex gap-2">
                 <button

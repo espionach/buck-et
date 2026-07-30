@@ -64,7 +64,7 @@ const GroupSettings = () => {
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <h1 className="text-base font-bold text-foreground">Group settings</h1>
+        <h1 className="text-base font-bold text-foreground">Friend list settings</h1>
       </div>
 
       <div>

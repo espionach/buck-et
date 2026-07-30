@@ -466,10 +466,10 @@ const Feed = () => {
                 }
                 emptyDescription={
                   feedFilter === "all"
-                    ? "Sidequests from friends and groups will show up here. Add friends to get things going."
+                    ? "Sidequests from friends and friend lists will show up here. Add friends to get things going."
                     : feedFilter === "followers"
                       ? "Sidequests from friends will show up here. Add friends to get things going."
-                      : `Sidequests from ${groups.find((g) => g.id === feedFilter)?.name || "this group"} will show up here. Create a sidequest to get things going.`
+                      : `Sidequests from ${groups.find((g) => g.id === feedFilter)?.name || "this friend list"} will show up here. Create a sidequest to get things going.`
                 }
                 emptyCta={
                   feedFilter === "all" || feedFilter === "followers"
