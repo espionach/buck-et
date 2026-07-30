@@ -41,7 +41,9 @@ const Profile = () => {
     setHideGlobalFab,
     pinnedQuestIds,
     groups,
+    unfriend,
   } = useAppStore();
+  const [unfriendUser, setUnfriendUser] = useState<{ id: string; name: string } | null>(null);
   const { user: authUser } = useAuth();
   const location = useLocation();
   const nav = useNavigate();
