@@ -287,7 +287,7 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
               className="px-6 py-2.5 rounded-xl bg-muted text-muted-foreground font-semibold text-sm flex items-center gap-2 mx-auto hover:bg-muted/80 transition-colors"
             >
               <Clock className="w-4 h-4" />
-              Request Sent
+              Requested
             </button>
           ) : (
             <button
