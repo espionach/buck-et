@@ -63,7 +63,7 @@ const CommunityGuidelines = () => {
           Don't share other people's private info (addresses, phone numbers, etc.) without their
           consent. Don't impersonate others.
         </p>
-        <p>Only invite people you actually know to your groups and quests.</p>
+        <p>Only invite people you actually know to your friend lists and quests.</p>
       </Section>
 
       <Section icon={Sparkles} title="Keep it real">

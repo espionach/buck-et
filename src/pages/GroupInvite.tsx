@@ -88,9 +88,9 @@ const GroupInvite = () => {
       {!previewGroup ? (
         <div className="text-center py-16">
           <Lock className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
-          <p className="font-bold text-foreground mb-1">Private Group</p>
+          <p className="font-bold text-foreground mb-1">Private friend list</p>
           <p className="text-sm text-muted-foreground max-w-xs mx-auto">
-            You need an invite from a member to join this group. Ask someone who's already in the group to invite you.
+            You need an invite from a member to join this friend list. Ask someone who's already in the friend list to invite you.
           </p>
         </div>
       ) : (
@@ -138,7 +138,7 @@ const GroupInvite = () => {
               </>
             ) : (
               <p className="text-sm text-muted-foreground">
-                You need an invite from a member to join. Ask someone who's already in the group to invite you.
+                You need an invite from a member to join. Ask someone who's already in the friend list to invite you.
               </p>
             )}
           </div>

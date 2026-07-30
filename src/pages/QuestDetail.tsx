@@ -846,7 +846,7 @@ const QuestDetail = () => {
               </div>
             ) : (
               <p className="text-xs text-muted-foreground italic">
-                {canAddActiveMedia ? "Add photos or videos to share with your group." : "No one's added photos for this sidequest yet."}
+                {canAddActiveMedia ? "Add photos or videos to share with your friend list." : "No one's added photos for this sidequest yet."}
               </p>
             )}
             {quest.photos && quest.photos.length > 0 && viewerIndex !== null && (

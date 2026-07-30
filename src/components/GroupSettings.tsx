@@ -70,7 +70,7 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
       if (error) {
         setMuted(false);
         console.error("[GroupSettings.mute]", error);
-        toast({ title: "Couldn't mute group", description: getUserFriendlyError("group", error.message), variant: "destructive" });
+        toast({ title: "Couldn't mute friend list", description: getUserFriendlyError("group", error.message), variant: "destructive" });
       }
     } else {
       const { error } = await supabase
@@ -81,7 +81,7 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
       if (error) {
         setMuted(true);
         console.error("[GroupSettings.unmute]", error);
-        toast({ title: "Couldn't unmute group", description: getUserFriendlyError("group", error.message), variant: "destructive" });
+        toast({ title: "Couldn't unmute friend list", description: getUserFriendlyError("group", error.message), variant: "destructive" });
       }
     }
   };
@@ -154,7 +154,7 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
   return (
     <>
       <div className="space-y-4">
-        <h2 className="text-xl font-bold text-foreground">Edit Group</h2>
+        <h2 className="text-xl font-bold text-foreground">Edit friend list</h2>
 
           {/* Edit name */}
           <div className="flex gap-2 items-end">
@@ -191,7 +191,7 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
                 <Bell className="w-4 h-4 text-muted-foreground" />
               )}
               <div>
-                <p className="text-sm font-semibold text-foreground">Group notifications</p>
+                <p className="text-sm font-semibold text-foreground">Friend list notifications</p>
                 <p className="text-xs text-muted-foreground">
                   {muted ? "Muted — you won't be pinged" : "On — get pings for new activity"}
                 </p>
@@ -273,7 +273,7 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
             className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-destructive/30 text-destructive text-sm font-semibold hover:bg-destructive/5 transition-colors"
           >
             <LogOut className="w-4 h-4" />
-            Leave Group
+            Leave friend list
           </button>
       </div>
 
@@ -320,7 +320,7 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
                 Remove <span className="text-primary">{confirmRemoveUser.userName}</span> from{" "}
                 <span className="text-primary">{group.name}</span>?
               </p>
-              <p className="text-xs text-muted-foreground">They will no longer have access to this group.</p>
+              <p className="text-xs text-muted-foreground">They will no longer have access to this friend list.</p>
               <div className="flex gap-2">
                 <button
                   onClick={() => setConfirmRemoveUser(null)}
@@ -390,7 +390,7 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
                   <div className="flex-1 overflow-y-auto -mx-1 px-1">
                     {availableToInvite.length === 0 ? (
                       <p className="text-xs text-muted-foreground py-6 text-center">
-                        All your friends are already in this group.
+                        All your friends are already in this friend list.
                       </p>
                     ) : visible.length === 0 ? (
                       <EmptyState

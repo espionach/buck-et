@@ -766,7 +766,7 @@ const Profile = () => {
         {([
           { id: "current", label: "Active sidequests", Icon: Zap },
           { id: "past", label: "Completed sidequests", Icon: Flag },
-          { id: "groups", label: "Groups", Icon: Users2 },
+          { id: "groups", label: "Friend lists", Icon: Users2 },
         ] as const).map(({ id, label, Icon }) => {
           const isActive = tab === id;
           return (

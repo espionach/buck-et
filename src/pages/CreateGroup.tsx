@@ -74,12 +74,12 @@ const CreateGroup = () => {
         <button onClick={() => (fromPath ? navigate(fromPath) : navigate(-1))} className="p-2 -ml-2 text-muted-foreground hover:text-foreground transition-colors">
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <h1 className="text-xl font-bold text-foreground">New Group</h1>
+        <h1 className="text-xl font-bold text-foreground">New friend list</h1>
       </div>
 
       <div className="space-y-5">
         <div>
-          <label className="text-sm font-semibold text-foreground mb-2 block">Group Name</label>
+          <label className="text-sm font-semibold text-foreground mb-2 block">Friend list name</label>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -94,7 +94,7 @@ const CreateGroup = () => {
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="What's this group about?"
+            placeholder="What's this friend list about?"
             rows={2}
             className="w-full px-4 py-3.5 rounded-xl bg-card border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm resize-none"
           />
@@ -185,7 +185,7 @@ const CreateGroup = () => {
           className="w-full py-4 rounded-xl bg-primary text-primary-foreground font-bold text-base flex items-center justify-center gap-2 disabled:opacity-40 active:scale-[0.98] transition-transform"
         >
           <Plus className="w-5 h-5" />
-          {submitting ? "Creating..." : "Create Group"}
+          {submitting ? "Creating..." : "Create friend list"}
         </button>
       </div>
     </div>

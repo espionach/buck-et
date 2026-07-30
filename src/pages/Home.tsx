@@ -110,7 +110,7 @@ const Boards = () => {
     return (
       <UserProfileView
         user={viewingProfile}
-        backLabel="Back to Group"
+        backLabel="Back to friend list"
         onBack={() => setViewingProfile(null)}
         onViewProfile={(user) => setViewingProfile(user)}
       />
@@ -122,7 +122,7 @@ const Boards = () => {
       {/* Header - only show when no group is selected */}
       {!selectedGroup && (
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-3xl font-bold text-foreground">Your Groups</h1>
+          <h1 className="text-3xl font-bold text-foreground">Your friend lists</h1>
           <button
             onClick={() => navigate("/create-group", { state: { from: location.pathname + location.search } })}
             className="p-2 text-muted-foreground hover:text-primary transition-colors"
@@ -146,7 +146,7 @@ const Boards = () => {
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search groups or members..."
+                placeholder="Search friend lists or members..."
                 className="w-full pl-10 pr-4 py-3 rounded-xl bg-card border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
               />
             </div>
@@ -325,7 +325,7 @@ const Boards = () => {
             </button>
             <button
               onClick={handleOpenSettings}
-              aria-label="Group settings"
+              aria-label="Friend list settings"
               className="p-2 text-muted-foreground hover:text-foreground transition-colors"
             >
               <Settings className="w-5 h-5" />

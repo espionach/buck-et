@@ -212,7 +212,7 @@ const NotificationPanel = ({ open, onClose }: NotificationPanelProps) => {
         </span>{" "}
         {messageNodes}
         {n.groupName && <span className="font-bold">{n.groupName}</span>}
-        {n.type === "transfer_group" && n.groupName && " group to you"}
+        {n.type === "transfer_group" && n.groupName && " friend list to you"}
       </p>
     );
   };

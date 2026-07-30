@@ -77,7 +77,7 @@ const AddMembersModal = ({ group, open, onClose }: AddMembersModalProps) => {
                 <div className="flex-1 overflow-y-auto -mx-1 px-1">
                   {availableToInvite.length === 0 ? (
                     <p className="text-xs text-muted-foreground py-6 text-center">
-                      All your friends are already in this group.
+                      All your friends are already in this friend list.
                     </p>
                   ) : visible.length === 0 ? (
                     <EmptyState
