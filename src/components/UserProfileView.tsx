@@ -46,7 +46,11 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
   // For another user's "completed" tab, show finished quests where they were
   // joined when the owner finished it (or quests they themselves owned & finished).
   const completedQuests = profileQuests.filter(
-    (q) => isQuestCompleted(q) && q.completedByUserIds.includes(user.id)
+    (q) =>
+      isQuestCompleted(q) &&
+      q.completedByUserIds.includes(user.id) &&
+      !(q.isPrivate && q.createdBy.id === user.id) &&
+      q.completionVisibility?.[user.id] !== "private"
   );
   const shownQuests = tab === "current" ? activeQuests : completedQuests;
 

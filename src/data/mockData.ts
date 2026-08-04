@@ -91,8 +91,12 @@ export interface Quest {
   createdBy: User;
   groupId?: string;
   isFollowerOnly: boolean;
+  /** Owner made this sidequest private after completing it. */
+  isPrivate?: boolean;
   participants: User[];
   completedByUserIds: string[];
+  /** Per-participant visibility for their completed sidequest: userId -> "private" | "all_friends" */
+  completionVisibility?: Record<string, string>;
   createdAt: string;
   completedAt?: string;
   photos?: string[];
