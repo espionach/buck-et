@@ -671,22 +671,28 @@ export type Database = {
       }
       sidequest_completions: {
         Row: {
+          celebration_seen_at: string | null
           completed_at: string
           id: string
           sidequest_id: string
           user_id: string
+          visibility: string
         }
         Insert: {
+          celebration_seen_at?: string | null
           completed_at?: string
           id?: string
           sidequest_id: string
           user_id: string
+          visibility?: string
         }
         Update: {
+          celebration_seen_at?: string | null
           completed_at?: string
           id?: string
           sidequest_id?: string
           user_id?: string
+          visibility?: string
         }
         Relationships: [
           {
@@ -802,6 +808,7 @@ export type Database = {
           id: string
           is_friends_only: boolean
           is_hidden: boolean
+          is_private: boolean
           links: string[] | null
           logistics_carpool_slots: number | null
           logistics_custom_notes: string | null
@@ -827,6 +834,7 @@ export type Database = {
           id?: string
           is_friends_only?: boolean
           is_hidden?: boolean
+          is_private?: boolean
           links?: string[] | null
           logistics_carpool_slots?: number | null
           logistics_custom_notes?: string | null
@@ -852,6 +860,7 @@ export type Database = {
           id?: string
           is_friends_only?: boolean
           is_hidden?: boolean
+          is_private?: boolean
           links?: string[] | null
           logistics_carpool_slots?: number | null
           logistics_custom_notes?: string | null
