@@ -9,6 +9,7 @@ import {
   getDismissed,
   isSkippedAll,
   skipAllSpotlights,
+  syncSpotlightsFromServer,
 } from "@/data/spotlights";
 
 interface Rect {
