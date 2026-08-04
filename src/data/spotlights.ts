@@ -142,6 +142,11 @@ export const SPOTLIGHTS: SpotlightDef[] = [
 const DISMISSED_KEY = (uid: string) => `bucket:spotlights:dismissed:${uid}`;
 const SKIP_ALL_KEY = (uid: string) => `bucket:spotlights:skipAll:${uid}`;
 
+/**
+ * Dismissals are persisted on the user's profile so tips never repeat on a new
+ * device, browser or session. localStorage stays as a synchronous cache so the
+ * host component can decide what to show before paint.
+ */
 export function getDismissed(uid: string): Set<string> {
   try {
     const raw = localStorage.getItem(DISMISSED_KEY(uid));
@@ -151,14 +156,72 @@ export function getDismissed(uid: string): Set<string> {
   }
 }
 
-export function dismissSpotlight(uid: string, id: string) {
-  const set = getDismissed(uid);
-  set.add(id);
+function writeDismissed(uid: string, ids: string[]) {
   try {
-    localStorage.setItem(DISMISSED_KEY(uid), JSON.stringify([...set]));
+    localStorage.setItem(DISMISSED_KEY(uid), JSON.stringify(ids));
   } catch {
     // ignore
   }
+}
+
+function writeSkipAll(uid: string, value: boolean) {
+  try {
+    if (value) localStorage.setItem(SKIP_ALL_KEY(uid), "1");
+    else localStorage.removeItem(SKIP_ALL_KEY(uid));
+  } catch {
+    // ignore
+  }
+}
+
+async function persist(
+  uid: string,
+  patch: { dismissed_spotlights?: string[]; spotlights_skipped_all?: boolean },
+) {
+  try {
+    const { supabase } = await import("@/integrations/supabase/client");
+    await supabase.from("profiles").update(patch).eq("id", uid);
+  } catch {
+    // offline / transient — localStorage still holds the state
+  }
+}
+
+/** Pulls persisted spotlight state from the profile into the local cache. */
+export async function syncSpotlightsFromServer(uid: string) {
+  try {
+    const { supabase } = await import("@/integrations/supabase/client");
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("dismissed_spotlights, spotlights_skipped_all")
+      .eq("id", uid)
+      .maybeSingle();
+    if (error || !data) return;
+
+    const remote = new Set((data.dismissed_spotlights as string[] | null) ?? []);
+    // Union with local so dismissals made while offline aren't lost.
+    const local = getDismissed(uid);
+    const merged = new Set([...remote, ...local]);
+    writeDismissed(uid, [...merged]);
+
+    const skipAll = Boolean(data.spotlights_skipped_all) || isSkippedAll(uid);
+    writeSkipAll(uid, skipAll);
+
+    if (merged.size !== remote.size || skipAll !== Boolean(data.spotlights_skipped_all)) {
+      void persist(uid, {
+        dismissed_spotlights: [...merged],
+        spotlights_skipped_all: skipAll,
+      });
+    }
+    window.dispatchEvent(new CustomEvent("spotlight-state-changed"));
+  } catch {
+    // ignore
+  }
+}
+
+export function dismissSpotlight(uid: string, id: string) {
+  const set = getDismissed(uid);
+  set.add(id);
+  writeDismissed(uid, [...set]);
+  void persist(uid, { dismissed_spotlights: [...set] });
   window.dispatchEvent(new CustomEvent("spotlight-state-changed"));
 }
 
@@ -171,20 +234,16 @@ export function isSkippedAll(uid: string): boolean {
 }
 
 export function skipAllSpotlights(uid: string) {
-  try {
-    localStorage.setItem(SKIP_ALL_KEY(uid), "1");
-  } catch {
-    // ignore
-  }
+  writeSkipAll(uid, true);
+  void persist(uid, { spotlights_skipped_all: true });
   window.dispatchEvent(new CustomEvent("spotlight-state-changed"));
 }
 
+/** Only called from Settings → "Replay tips". */
 export function replayAllSpotlights(uid: string) {
-  try {
-    localStorage.removeItem(DISMISSED_KEY(uid));
-    localStorage.removeItem(SKIP_ALL_KEY(uid));
-  } catch {
-    // ignore
-  }
+  writeDismissed(uid, []);
+  writeSkipAll(uid, false);
+  void persist(uid, { dismissed_spotlights: [], spotlights_skipped_all: false });
   window.dispatchEvent(new CustomEvent("spotlight-state-changed"));
 }
+

@@ -565,10 +565,12 @@ export type Database = {
           avatar_url: string | null
           bio: string | null
           created_at: string
+          dismissed_spotlights: string[]
           display_name: string | null
           id: string
           onboarded_at: string | null
           onboarding_step: string | null
+          spotlights_skipped_all: boolean
           timezone: string | null
           updated_at: string
           user_id: string
@@ -579,10 +581,12 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
+          dismissed_spotlights?: string[]
           display_name?: string | null
           id?: string
           onboarded_at?: string | null
           onboarding_step?: string | null
+          spotlights_skipped_all?: boolean
           timezone?: string | null
           updated_at?: string
           user_id: string
@@ -593,10 +597,12 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
+          dismissed_spotlights?: string[]
           display_name?: string | null
           id?: string
           onboarded_at?: string | null
           onboarding_step?: string | null
+          spotlights_skipped_all?: boolean
           timezone?: string | null
           updated_at?: string
           user_id?: string
@@ -1088,10 +1094,12 @@ export type Database = {
           avatar_url: string | null
           bio: string | null
           created_at: string
+          dismissed_spotlights: string[]
           display_name: string | null
           id: string
           onboarded_at: string | null
           onboarding_step: string | null
+          spotlights_skipped_all: boolean
           timezone: string | null
           updated_at: string
           user_id: string

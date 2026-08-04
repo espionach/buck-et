@@ -9,6 +9,7 @@ import {
   getDismissed,
   isSkippedAll,
   skipAllSpotlights,
+  syncSpotlightsFromServer,
 } from "@/data/spotlights";
 
 interface Rect {
@@ -56,6 +57,15 @@ const SpotlightHost = () => {
     window.addEventListener("spotlight-state-changed", h);
     return () => window.removeEventListener("spotlight-state-changed", h);
   }, []);
+
+  // Hydrate persisted dismissals for this user so tips never repeat on a new
+  // device or session (only "Replay tips" in Settings brings them back).
+  useEffect(() => {
+    if (!user) return;
+    void syncSpotlightsFromServer(user.id);
+  }, [user?.id]);
+
+
 
   // Pick the eligible spotlight before paint so the tip appears immediately.
   useLayoutEffect(() => {
