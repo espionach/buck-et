@@ -118,6 +118,8 @@ const AppLayout = () => {
       {!hideNav && <BottomNav />}
       {!hideNav && <LegalUpdateBanner />}
       <SpotlightHost />
+      <CompletionCelebrationHost />
+
     </div>
   );
 };
