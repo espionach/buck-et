@@ -295,8 +295,12 @@ export function useQuests() {
           createdBy: getUser(q.created_by),
           groupId: q.group_id || undefined,
           isFollowerOnly: q.is_friends_only,
+          isPrivate: (q as any).is_private || false,
           participants,
           completedByUserIds,
+          completionVisibility: Object.fromEntries(
+            questCompletions.map((c) => [c.user_id, (c as any).visibility || "all_friends"])
+          ),
           createdAt: q.created_at.split("T")[0],
           completedAt: finishedAt ? finishedAt.split("T")[0] : undefined,
           photos: q.photos && q.photos.length > 0 ? q.photos : undefined,

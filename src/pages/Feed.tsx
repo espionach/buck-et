@@ -58,6 +58,7 @@ const Feed = () => {
   const friendIds = new Set(friendsList.map((f) => f.id));
   const feedQuests = quests.filter((q) => {
     if (isQuestCompleted(q)) return false;
+    if (q.isPrivate) return false;
     // Never show user's own quests on the feed
     if (q.createdBy.id === currentUser.id) return false;
     // Friends-only quests: show if creator is a friend (independent of group membership)
