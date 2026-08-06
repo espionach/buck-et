@@ -25,6 +25,8 @@ import LocationPicker, { LocationValue } from "@/components/LocationPicker";
 import { listDrafts } from "@/lib/drafts";
 import { FileText, ChevronRight, UserMinus } from "lucide-react";
 import BackToTopButton from "@/components/BackToTopButton";
+import CompletionVisibilityEditor from "@/components/CompletionVisibilityEditor";
+
 const Profile = () => {
   const {
     currentUser,
