@@ -119,13 +119,21 @@ const Feed = () => {
       )
     : sortedQuests;
 
+  const { data: remotePeople } = useUserSearch(search);
+
   const filteredPeople = search
-    ? allSearchableUsers.filter(
-        (u) =>
-          u.name.toLowerCase().includes(search.toLowerCase()) ||
-          (u.username || "").toLowerCase().includes(search.toLowerCase())
-      )
+    ? (() => {
+        const seen = new Set<string>();
+        return [...(remotePeople || []), ...allSearchableUsers]
+          .filter(
+            (u) =>
+              u.name.toLowerCase().includes(search.toLowerCase()) ||
+              (u.username || "").toLowerCase().includes(search.toLowerCase())
+          )
+          .filter((u) => (seen.has(u.id) ? false : (seen.add(u.id), true)));
+      })()
     : allSearchableUsers;
+
 
   const profileQuests = selectedProfile
     ? quests.filter(
