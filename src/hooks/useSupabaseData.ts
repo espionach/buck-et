@@ -479,6 +479,25 @@ export function useSearchableUsers() {
   });
 }
 
+// ---- People discovery search (server-side, limited fields) ----
+export function useUserSearch(query: string) {
+  const { user } = useAuth();
+  const q = query.trim();
+  return useQuery({
+    queryKey: ["user_search", user?.id, q],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any).rpc("search_profiles", { _q: q });
+      if (error) throw error;
+      return (data || [])
+        .map((row: any) => dbProfileToUser(row))
+        .filter((u: User) => u.id !== user?.id);
+    },
+    enabled: !!user && q.length >= 2,
+    staleTime: 30000,
+  });
+}
+
+
 // ---- Blocked Users (people I have blocked) ----
 export function useBlockedUsers() {
   const { user } = useAuth();
