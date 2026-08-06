@@ -1389,6 +1389,11 @@ const Profile = () => {
                 />
               </div>
 
+              {/* Visibility */}
+              <CompletionVisibilityEditor quest={editingPastQuest} userId={currentUser.id} />
+
+
+
               {/* Photo upload */}
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1.5 block">Photos & Videos</label>
