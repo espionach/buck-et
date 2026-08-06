@@ -5,6 +5,8 @@ import OnboardingLayout from "@/components/onboarding/OnboardingLayout";
 import { useAuth } from "@/contexts/AuthContext";
 import { completeOnboarding, setOnboardingStep } from "@/hooks/useOnboarding";
 import { useAppStore } from "@/data/appState";
+import { useUserSearch } from "@/hooks/useSupabaseData";
+
 import UserAvatar from "@/components/UserAvatar";
 import { toast } from "sonner";
 
