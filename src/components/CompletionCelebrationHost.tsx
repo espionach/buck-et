@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useAppStore } from "@/data/appState";
@@ -22,6 +22,9 @@ const CompletionCelebrationHost = () => {
   const { user } = useAuth();
   const { quests, groups, _invalidate } = useAppStore();
   const [pending, setPending] = useState<Pending | null>(null);
+  /** Completions already celebrated in this session — guards against the
+   * refetch racing the celebration_seen_at write and re-opening the screen. */
+  const handledRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     if (!user || pending) return;
@@ -37,15 +40,20 @@ const CompletionCelebrationHost = () => {
       if (cancelled || !data?.length) return;
       // Only celebrate quests the owner actually finished.
       const row = data.find((r) => {
+        if (handledRef.current.has(r.id)) return false;
         const q = quests.find((qq) => qq.id === r.sidequest_id);
         return q && isQuestCompleted(q);
       });
-      if (row) setPending({ completionId: row.id, questId: row.sidequest_id });
+      if (row) {
+        handledRef.current.add(row.id);
+        setPending({ completionId: row.id, questId: row.sidequest_id });
+      }
     })();
     return () => {
       cancelled = true;
     };
   }, [user, quests, pending]);
+
 
   const quest = pending ? quests.find((q) => q.id === pending.questId) : undefined;
   if (!pending || !quest || !user) return null;
