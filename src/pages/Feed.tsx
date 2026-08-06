@@ -1,4 +1,6 @@
 import { useAppStore } from "@/data/appState";
+import { useUserSearch } from "@/hooks/useSupabaseData";
+
 import { User, isQuestCompleted } from "@/data/mockData";
 import QuestList from "@/components/QuestList";
 import UserAvatar from "@/components/UserAvatar";
