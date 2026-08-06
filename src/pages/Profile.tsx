@@ -25,6 +25,8 @@ import LocationPicker, { LocationValue } from "@/components/LocationPicker";
 import { listDrafts } from "@/lib/drafts";
 import { FileText, ChevronRight, UserMinus } from "lucide-react";
 import BackToTopButton from "@/components/BackToTopButton";
+import CompletionVisibilityEditor from "@/components/CompletionVisibilityEditor";
+
 const Profile = () => {
   const {
     currentUser,
@@ -1386,6 +1388,11 @@ const Profile = () => {
                   className="w-full px-3 py-2.5 rounded-xl bg-card border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
                 />
               </div>
+
+              {/* Visibility */}
+              <CompletionVisibilityEditor quest={editingPastQuest} userId={currentUser.id} />
+
+
 
               {/* Photo upload */}
               <div>
