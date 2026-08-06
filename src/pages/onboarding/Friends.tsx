@@ -51,18 +51,24 @@ const Friends = () => {
   const sentSet = new Set(sentFriendRequests);
   const blocked = new Set(blockedUserIds);
 
+  const { data: searchResults } = useUserSearch(query);
+
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return [];
-    return allUsers
+    const pool = [...(searchResults || []), ...allUsers];
+    const seen = new Set<string>();
+    return pool
       .filter((u) => u.id !== currentUser?.id && !blocked.has(u.id))
       .filter((u) => {
         const uname = (u.username || "").toLowerCase();
         const name = (u.name || "").toLowerCase();
         return uname.includes(q) || name.includes(q);
       })
+      .filter((u) => (seen.has(u.id) ? false : (seen.add(u.id), true)))
       .slice(0, 8);
-  }, [query, allUsers, currentUser?.id, blocked]);
+  }, [query, searchResults, allUsers, currentUser?.id, blocked]);
+
 
   const handleAdd = (target: typeof allUsers[number]) => {
     sendFriendRequest(target);
