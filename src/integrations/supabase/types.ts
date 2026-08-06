@@ -1152,6 +1152,15 @@ export type Database = {
         Args: { _sidequest_id: string; _user_id: string }
         Returns: boolean
       }
+      search_profiles: {
+        Args: { _q: string }
+        Returns: {
+          avatar_url: string
+          display_name: string
+          user_id: string
+          username: string
+        }[]
+      }
       user_can_act: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
