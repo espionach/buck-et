@@ -443,7 +443,8 @@ export const useAppStore = create<AppState>((set, get) => ({
         groupId,
         groupName: groupName || null,
       });
-      _invalidate(["groups"]);
+      // Removal also unjoins them from ongoing sidequests in this friend list
+      _invalidate(["groups", "quests"]);
     })();
   },
 
@@ -455,9 +456,10 @@ export const useAppStore = create<AppState>((set, get) => ({
         .delete()
         .eq("group_id", groupId)
         .eq("user_id", currentUser.id);
-      _invalidate(["groups"]);
+      _invalidate(["groups", "quests"]);
     })();
   },
+
 
   inviteToGroup: (groupId, user) => {
     // "Invite" is now a direct add — groups are private launch lists owned by
