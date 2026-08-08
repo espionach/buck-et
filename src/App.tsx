@@ -12,6 +12,7 @@ import PublicProfile from "./pages/PublicProfile";
 import Settings from "./pages/Settings";
 
 import BlockedUsers from "./pages/BlockedUsers";
+import MyReports from "./pages/MyReports";
 import FindFriends from "./pages/FindFriends";
 import AdminReports from "./pages/AdminReports";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -100,6 +101,7 @@ const AppLayout = () => {
         <Route path="/u/:username" element={<ProtectedRoute><PublicProfile /></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
         <Route path="/settings/blocked" element={<ProtectedRoute><BlockedUsers /></ProtectedRoute>} />
+        <Route path="/settings/my-reports" element={<ProtectedRoute><MyReports /></ProtectedRoute>} />
         <Route path="/find-friends" element={<ProtectedRoute><FindFriends /></ProtectedRoute>} />
         <Route path="/settings/community-guidelines" element={<ProtectedRoute><CommunityGuidelines /></ProtectedRoute>} />
         <Route path="/settings/privacy-policy" element={<ProtectedRoute><PrivacyPolicy /></ProtectedRoute>} />
