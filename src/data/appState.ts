@@ -928,6 +928,49 @@ export const useAppStore = create<AppState>((set, get) => ({
     })();
   },
 
+  addQuestMedia: async (questId, paths) => {
+    if (!paths.length) return;
+    const { _invalidate } = get();
+    const { data, error } = await supabase.rpc("add_sidequest_media", {
+      _sidequest_id: questId,
+      _paths: paths,
+    });
+    if (error) throw error;
+    const photos = (data as string[] | null) ?? undefined;
+    set((s) => ({
+      quests: s.quests.map((q) =>
+        q.id === questId ? { ...q, photos: photos ?? [...(q.photos ?? []), ...paths] } : q
+      ),
+    }));
+    _invalidate(["quests"]);
+  },
+
+  removeQuestMedia: async (questId, path) => {
+    const { _invalidate } = get();
+    const { data, error } = await supabase.rpc("remove_sidequest_media", {
+      _sidequest_id: questId,
+      _path: path,
+    });
+    if (error) throw error;
+    const photos = (data as string[] | null) ?? undefined;
+    set((s) => ({
+      quests: s.quests.map((q) =>
+        q.id === questId
+          ? { ...q, photos: photos ?? (q.photos ?? []).filter((p) => p !== path) }
+          : q
+      ),
+    }));
+    // Best-effort: delete the underlying file (only storage paths, not legacy URLs).
+    if (!/^(data:|https?:|blob:)/.test(path)) {
+      try {
+        await supabase.storage.from("sidequest-photos").remove([path]);
+      } catch (e) {
+        console.warn("[removeQuestMedia storage]", e);
+      }
+    }
+    _invalidate(["quests"]);
+  },
+
   deleteQuest: (questId) => {
     const prevQuest = get().quests.find((q) => q.id === questId);
     set((s) => ({
