@@ -77,6 +77,8 @@ interface AppState {
   deleteComment: (questId: string, commentId: string) => void;
   toggleCommentLike: (questId: string, commentId: string) => void;
   updateQuest: (questId: string, updates: Partial<Quest>) => void;
+  addQuestMedia: (questId: string, paths: string[]) => Promise<void>;
+  removeQuestMedia: (questId: string, path: string) => Promise<void>;
   deleteQuest: (questId: string) => void;
   updateProfile: (updates: Partial<User>) => void;
   removeParticipant: (questId: string, userId: string) => void;
