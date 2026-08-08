@@ -253,7 +253,6 @@ const QuestDetail = () => {
   const canAddCompletedMedia = isFinished && (isOwner || wasJoinedWhenFinished || isIn);
   const canAddActiveMedia = !isFinished && isOwner;
   const canManageMedia = canAddActiveMedia || canAddCompletedMedia;
-  const [deletingPhoto, setDeletingPhoto] = useState<string | null>(null);
   const handleCompletedMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files ? Array.from(e.target.files) : [];
     e.target.value = "";
