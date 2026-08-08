@@ -55,7 +55,8 @@ const QuestDetail = () => {
   };
   const { user, loading: authLoading } = useAuth();
   const { data: hydratedQuests, isLoading: questsLoading, isFetching: questsFetching } = useQuests();
-  const { quests, groups, addComment, volunteerForQuest, unvolunteerFromQuest, currentUser, pinQuest, unpinQuest, pinnedQuestIds, deleteQuest, toggleImIn, updateQuest } = useAppStore();
+  const { quests, groups, addComment, volunteerForQuest, unvolunteerFromQuest, currentUser, pinQuest, unpinQuest, pinnedQuestIds, deleteQuest, toggleImIn, updateQuest, addQuestMedia, removeQuestMedia } = useAppStore();
+  const [deletingPhoto, setDeletingPhoto] = useState<string | null>(null);
   const [showMenu, setShowMenu] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showReport, setShowReport] = useState(false);
@@ -245,8 +246,13 @@ const QuestDetail = () => {
       toast.error("Couldn't copy link");
     }
   };
-  const canAddCompletedMedia = isFinished && (isOwner || wasJoinedWhenFinished);
-  const canAddActiveMedia = !isFinished && (isOwner || isIn);
+  // Media ownership rules:
+  // - Active sidequest: ONLY the owner can add or delete media.
+  // - Completed sidequest: the owner + everyone who had joined can add and
+  //   delete any media (collaborative media board).
+  const canAddCompletedMedia = isFinished && (isOwner || wasJoinedWhenFinished || isIn);
+  const canAddActiveMedia = !isFinished && isOwner;
+  const canManageMedia = canAddActiveMedia || canAddCompletedMedia;
   const handleCompletedMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files ? Array.from(e.target.files) : [];
     e.target.value = "";
@@ -254,7 +260,7 @@ const QuestDetail = () => {
     setUploadingMedia(true);
     try {
       const paths = await uploadSidequestPhotos(quest.id, files);
-      updateQuest(quest.id, { photos: [...(quest.photos ?? []), ...paths] });
+      await addQuestMedia(quest.id, paths);
       toast.success(paths.length > 1 ? "Photos added" : "Photo added");
     } catch (err: any) {
       toast.error(err?.message || "Couldn't upload. Try again?");
@@ -262,6 +268,20 @@ const QuestDetail = () => {
       setUploadingMedia(false);
     }
   };
+
+  const handleDeleteMedia = async (path: string) => {
+    setDeletingPhoto(path);
+    try {
+      await removeQuestMedia(quest.id, path);
+      setViewerIndex(null);
+      toast.success("Removed");
+    } catch (err: any) {
+      toast.error(err?.message || "Couldn't remove that. Try again?");
+    } finally {
+      setDeletingPhoto(null);
+    }
+  };
+
 
 
   return (
@@ -515,15 +535,30 @@ const QuestDetail = () => {
               <div className="flex gap-2 overflow-x-auto pb-1 -mx-10 px-10">
 
                 {quest.photos.map((photo, i) => (
-                  <button
+                  <div
                     key={i}
-                    type="button"
-                    onClick={() => setViewerIndex(i)}
-                    className={`${quest.photos!.length === 1 ? "w-full aspect-[4/3]" : "w-64 h-64"} shrink-0 rounded-xl overflow-hidden border border-border/30 focus:outline-none focus:ring-2 focus:ring-ring`}
-                    aria-label={`Open photo ${i + 1}`}
+                    className={`${quest.photos!.length === 1 ? "w-full aspect-[4/3]" : "w-64 h-64"} relative shrink-0`}
                   >
-                    <SidequestPhoto src={photo} alt={`Quest photo ${i + 1}`} thumbnail className="w-full h-full object-cover" />
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() => setViewerIndex(i)}
+                      className="w-full h-full rounded-xl overflow-hidden border border-border/30 focus:outline-none focus:ring-2 focus:ring-ring"
+                      aria-label={`Open photo ${i + 1}`}
+                    >
+                      <SidequestPhoto src={photo} alt={`Quest photo ${i + 1}`} thumbnail className="w-full h-full object-cover" />
+                    </button>
+                    {canManageMedia && (
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteMedia(photo)}
+                        disabled={deletingPhoto === photo}
+                        aria-label={`Delete photo ${i + 1}`}
+                        className="absolute top-2 right-2 p-1.5 rounded-full bg-foreground/60 text-background hover:bg-destructive transition-colors disabled:opacity-50"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
                 ))}
               </div>
             ) : (
@@ -828,20 +863,35 @@ const QuestDetail = () => {
             {quest.photos && quest.photos.length > 0 ? (
               <div className="flex gap-2 overflow-x-auto pb-1 -mx-10 px-10">
                 {quest.photos.map((photo, i) => (
-                  <button
+                  <div
                     key={i}
-                    type="button"
-                    onClick={() => setViewerIndex(i)}
-                    className={`${quest.photos!.length === 1 ? "w-full aspect-[4/3]" : "w-64 h-64"} shrink-0 rounded-xl overflow-hidden border border-border/30 focus:outline-none focus:ring-2 focus:ring-ring`}
-                    aria-label={`Open photo ${i + 1}`}
+                    className={`${quest.photos!.length === 1 ? "w-full aspect-[4/3]" : "w-64 h-64"} relative shrink-0`}
                   >
-                    <SidequestPhoto
-                      src={photo}
-                      alt={`Quest photo ${i + 1}`}
-                      thumbnail
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() => setViewerIndex(i)}
+                      className="w-full h-full rounded-xl overflow-hidden border border-border/30 focus:outline-none focus:ring-2 focus:ring-ring"
+                      aria-label={`Open photo ${i + 1}`}
+                    >
+                      <SidequestPhoto
+                        src={photo}
+                        alt={`Quest photo ${i + 1}`}
+                        thumbnail
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+                    {canManageMedia && (
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteMedia(photo)}
+                        disabled={deletingPhoto === photo}
+                        aria-label={`Delete photo ${i + 1}`}
+                        className="absolute top-2 right-2 p-1.5 rounded-full bg-foreground/60 text-background hover:bg-destructive transition-colors disabled:opacity-50"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
                 ))}
               </div>
             ) : (

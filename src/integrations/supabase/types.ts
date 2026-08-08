@@ -1092,6 +1092,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_sidequest_media: {
+        Args: { _paths: string[]; _sidequest_id: string }
+        Returns: string[]
+      }
+      can_manage_sidequest_media: {
+        Args: { _sidequest_id: string; _user_id: string }
+        Returns: boolean
+      }
       can_view_sidequest: {
         Args: { _sidequest_id: string; _user_id: string }
         Returns: boolean
@@ -1151,6 +1159,10 @@ export type Database = {
       is_sidequest_owner: {
         Args: { _sidequest_id: string; _user_id: string }
         Returns: boolean
+      }
+      remove_sidequest_media: {
+        Args: { _path: string; _sidequest_id: string }
+        Returns: string[]
       }
       search_profiles: {
         Args: { _q: string }

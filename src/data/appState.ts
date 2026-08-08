@@ -77,6 +77,8 @@ interface AppState {
   deleteComment: (questId: string, commentId: string) => void;
   toggleCommentLike: (questId: string, commentId: string) => void;
   updateQuest: (questId: string, updates: Partial<Quest>) => void;
+  addQuestMedia: (questId: string, paths: string[]) => Promise<void>;
+  removeQuestMedia: (questId: string, path: string) => Promise<void>;
   deleteQuest: (questId: string) => void;
   updateProfile: (updates: Partial<User>) => void;
   removeParticipant: (questId: string, userId: string) => void;
@@ -924,6 +926,49 @@ export const useAppStore = create<AppState>((set, get) => ({
 
       _invalidate(["quests"]);
     })();
+  },
+
+  addQuestMedia: async (questId, paths) => {
+    if (!paths.length) return;
+    const { _invalidate } = get();
+    const { data, error } = await supabase.rpc("add_sidequest_media", {
+      _sidequest_id: questId,
+      _paths: paths,
+    });
+    if (error) throw error;
+    const photos = (data as string[] | null) ?? undefined;
+    set((s) => ({
+      quests: s.quests.map((q) =>
+        q.id === questId ? { ...q, photos: photos ?? [...(q.photos ?? []), ...paths] } : q
+      ),
+    }));
+    _invalidate(["quests"]);
+  },
+
+  removeQuestMedia: async (questId, path) => {
+    const { _invalidate } = get();
+    const { data, error } = await supabase.rpc("remove_sidequest_media", {
+      _sidequest_id: questId,
+      _path: path,
+    });
+    if (error) throw error;
+    const photos = (data as string[] | null) ?? undefined;
+    set((s) => ({
+      quests: s.quests.map((q) =>
+        q.id === questId
+          ? { ...q, photos: photos ?? (q.photos ?? []).filter((p) => p !== path) }
+          : q
+      ),
+    }));
+    // Best-effort: delete the underlying file (only storage paths, not legacy URLs).
+    if (!/^(data:|https?:|blob:)/.test(path)) {
+      try {
+        await supabase.storage.from("sidequest-photos").remove([path]);
+      } catch (e) {
+        console.warn("[removeQuestMedia storage]", e);
+      }
+    }
+    _invalidate(["quests"]);
   },
 
   deleteQuest: (questId) => {
