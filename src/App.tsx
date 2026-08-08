@@ -12,6 +12,7 @@ import PublicProfile from "./pages/PublicProfile";
 import Settings from "./pages/Settings";
 
 import BlockedUsers from "./pages/BlockedUsers";
+import MyReports from "./pages/MyReports";
 import FindFriends from "./pages/FindFriends";
 import AdminReports from "./pages/AdminReports";
 import AdminDashboard from "./pages/AdminDashboard";
