@@ -430,18 +430,20 @@ const Settings = () => {
           trailing={<Switch checked={activitySharing} onCheckedChange={toggleActivitySharing} />}
         />
         <Row icon={UserPlus} label="Find Friends" onClick={() => nav("/find-friends")} />
-        <Row icon={ShieldOff} label="Blocked Users" onClick={() => nav("/settings/blocked")} />
         <Row icon={Compass} label="Replay Tips" onClick={handleReplayTips} />
       </Section>
 
-      {isMod && (
-        <Section title="Moderation">
-          {isAdmin && (
-            <Row icon={Shield} label="Admin Dashboard" onClick={() => nav("/admin")} />
-          )}
-          <Row icon={Flag} label="User Reports" onClick={() => nav("/admin/reports")} />
-        </Section>
-      )}
+      <Section title="Moderation">
+        <Row icon={ShieldOff} label="Blocked Users" onClick={() => nav("/settings/blocked")} />
+        {isAdmin && (
+          <Row icon={Shield} label="Admin Dashboard" onClick={() => nav("/admin")} />
+        )}
+        <Row icon={Flag} label="My Reports" onClick={() => nav("/settings/my-reports")} />
+        {isMod && (
+          <Row icon={Inbox} label="All User Reports" onClick={() => nav("/admin/reports")} />
+        )}
+      </Section>
+
 
       <Section title="Support & Contact">
         <div className="px-4 py-3.5">
