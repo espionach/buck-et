@@ -896,7 +896,7 @@ const QuestDetail = () => {
                         className="w-full h-full object-cover"
                       />
                     </button>
-                    {canManageMedia && (
+                    {canDeleteMedia(photo) && (
                       <button
                         type="button"
                         onClick={() => handleDeleteMedia(photo)}
