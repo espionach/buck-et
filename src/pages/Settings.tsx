@@ -439,9 +439,6 @@ const Settings = () => {
           <Row icon={Shield} label="Admin Dashboard" onClick={() => nav("/admin")} />
         )}
         <Row icon={Flag} label="My Reports" onClick={() => nav("/settings/my-reports")} />
-        {isMod && (
-          <Row icon={Inbox} label="All User Reports" onClick={() => nav("/admin/reports")} />
-        )}
       </Section>
 
 
