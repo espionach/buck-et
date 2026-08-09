@@ -562,7 +562,8 @@ const QuestDetail = () => {
                     >
                       <SidequestPhoto src={photo} alt={`Quest photo ${i + 1}`} thumbnail className="w-full h-full object-cover" />
                     </button>
-                    {canManageMedia && (
+                    {canDeleteMedia(photo) && (
+
                       <button
                         type="button"
                         onClick={() => handleDeleteMedia(photo)}
