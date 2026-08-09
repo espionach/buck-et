@@ -17,7 +17,9 @@ import { useNavigate, useParams, useLocation, useSearchParams } from "react-rout
 import { motion, AnimatePresence } from "framer-motion";
 import { usePopup } from "@/hooks/use-popup";
 import { useAuth } from "@/contexts/AuthContext";
-import { useQuests } from "@/hooks/useSupabaseData";
+import { useQuests, useCurrentUserRoles } from "@/hooks/useSupabaseData";
+import { supabase } from "@/integrations/supabase/client";
+
 import ReportContentModal from "@/components/ReportContentModal";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { validateContent } from "@/lib/contentFilter";
