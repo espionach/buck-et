@@ -200,7 +200,9 @@ const QuestDetail = () => {
   const logistics = quest.logistics || { volunteers: [] };
   const TransportIcon = logistics.transportation ? transportIcons[logistics.transportation] : null;
 
-  const myVolunteerRole = logistics.volunteers.find((v) => v.userId === currentUser.id);
+  const myVolunteerRoles = logistics.volunteers
+    .filter((v) => v.userId === currentUser.id)
+    .map((v) => v.role);
 
   // Neighboring sidequests for swipe-preview peeking.
   const prevQuest = hasPrev ? questList.find((q) => q.id === siblingIds[siblingIdx - 1]) : null;
@@ -929,7 +931,7 @@ const QuestDetail = () => {
               {logistics.volunteers.length > 0 && (
                 <div className="space-y-2">
                   {logistics.volunteers.map((v) => (
-                    <div key={v.userId} className="flex items-center gap-2 p-2 rounded-xl bg-muted/50">
+                    <div key={`${v.userId}-${v.role}`} className="flex items-center gap-2 p-2 rounded-xl bg-muted/50">
                       <UserAvatar user={v.user} size="xs" />
                       <span className="text-xs font-medium text-foreground">{v.user.name}</span>
                       <span className="text-[10px] px-2 py-0.5 rounded-full bg-secondary/20 text-secondary ml-auto">
@@ -940,36 +942,38 @@ const QuestDetail = () => {
                 </div>
               )}
 
-              {!myVolunteerRole ? (
-                availableForMe.length > 0 && (
-                  <div>
-                    <p className="text-xs text-muted-foreground mb-2">How can you help?</p>
-                    <div className="flex flex-wrap gap-2">
-                      {availableForMe.map((role) => (
+              {availableForMe.length > 0 && (
+                <div>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    How can you help? {myVolunteerRoles.length > 0 ? "Tap to add or remove." : "Pick as many as you like."}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {availableForMe.map((role) => {
+                      const mine = myVolunteerRoles.includes(role.id);
+                      return (
                         <button
                           key={role.id}
-                          onClick={() => volunteerForQuest(quest.id, role.id)}
-                          className="px-3 py-1.5 rounded-full bg-muted text-xs text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
+                          onClick={() =>
+                            mine
+                              ? unvolunteerFromQuest(quest.id, role.id)
+                              : volunteerForQuest(quest.id, role.id)
+                          }
+                          className={`px-3 py-1.5 rounded-full text-xs transition-colors ${
+                            mine
+                              ? "bg-secondary/20 text-secondary"
+                              : "bg-muted text-foreground hover:bg-primary/10 hover:text-primary"
+                          }`}
                         >
+                          {mine && <Check className="w-3 h-3 inline-block mr-1 -mt-0.5" />}
                           {role.label}
                         </button>
-                      ))}
-                    </div>
+
+                      );
+                    })}
                   </div>
-                )
-              ) : (
-                <div className="flex items-center justify-between p-2 rounded-xl bg-secondary/10">
-                  <span className="text-xs text-foreground">
-                    You're signed up as {volunteerRoles.find((r) => r.id === myVolunteerRole.role)?.label || myVolunteerRole.role}
-                  </span>
-                  <button
-                    onClick={() => unvolunteerFromQuest(quest.id)}
-                    className="text-[10px] text-muted-foreground hover:text-foreground"
-                  >
-                    Remove
-                  </button>
                 </div>
               )}
+
             </section>
           );
         })()}
