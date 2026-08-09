@@ -1301,7 +1301,8 @@ export const useAppStore = create<AppState>((set, get) => ({
       quests: s.quests.map((q) => {
         if (q.id !== questId) return q;
         const logistics = q.logistics || { volunteers: [] };
-        if (logistics.volunteers.some((v) => v.userId === currentUser.id)) return q;
+        // Multiple roles per person are allowed; only skip the exact same role.
+        if (logistics.volunteers.some((v) => v.userId === currentUser.id && v.role === role)) return q;
         return {
           ...q,
           logistics: {
@@ -1332,7 +1333,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     })();
   },
 
-  unvolunteerFromQuest: (questId) => {
+  unvolunteerFromQuest: (questId, role) => {
     const { currentUser, _invalidate } = get();
     set((s) => ({
       quests: s.quests.map((q) => {
@@ -1342,18 +1343,23 @@ export const useAppStore = create<AppState>((set, get) => ({
           ...q,
           logistics: {
             ...logistics,
-            volunteers: logistics.volunteers.filter((v) => v.userId !== currentUser.id),
+            volunteers: logistics.volunteers.filter(
+              (v) => v.userId !== currentUser.id || (role !== undefined && v.role !== role)
+            ),
           },
         };
       }),
     }));
     (async () => {
-      await supabase.from("sidequest_volunteers")
+      let query = supabase.from("sidequest_volunteers")
         .delete()
         .eq("sidequest_id", questId)
         .eq("user_id", currentUser.id);
+      if (role !== undefined) query = query.eq("role", role);
+      await query;
       _invalidate(["quests"]);
     })();
+
   },
 
   updateQuestLogistics: (questId, logisticsUpdates) => {
