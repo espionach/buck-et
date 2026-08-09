@@ -200,7 +200,9 @@ const QuestDetail = () => {
   const logistics = quest.logistics || { volunteers: [] };
   const TransportIcon = logistics.transportation ? transportIcons[logistics.transportation] : null;
 
-  const myVolunteerRole = logistics.volunteers.find((v) => v.userId === currentUser.id);
+  const myVolunteerRoles = logistics.volunteers
+    .filter((v) => v.userId === currentUser.id)
+    .map((v) => v.role);
 
   // Neighboring sidequests for swipe-preview peeking.
   const prevQuest = hasPrev ? questList.find((q) => q.id === siblingIds[siblingIdx - 1]) : null;
