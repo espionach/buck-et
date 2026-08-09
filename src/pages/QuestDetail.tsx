@@ -17,7 +17,9 @@ import { useNavigate, useParams, useLocation, useSearchParams } from "react-rout
 import { motion, AnimatePresence } from "framer-motion";
 import { usePopup } from "@/hooks/use-popup";
 import { useAuth } from "@/contexts/AuthContext";
-import { useQuests } from "@/hooks/useSupabaseData";
+import { useQuests, useCurrentUserRoles } from "@/hooks/useSupabaseData";
+import { supabase } from "@/integrations/supabase/client";
+
 import ReportContentModal from "@/components/ReportContentModal";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { validateContent } from "@/lib/contentFilter";
@@ -56,7 +58,10 @@ const QuestDetail = () => {
   const { user, loading: authLoading } = useAuth();
   const { data: hydratedQuests, isLoading: questsLoading, isFetching: questsFetching } = useQuests();
   const { quests, groups, addComment, volunteerForQuest, unvolunteerFromQuest, currentUser, pinQuest, unpinQuest, pinnedQuestIds, deleteQuest, toggleImIn, updateQuest, addQuestMedia, removeQuestMedia } = useAppStore();
+  const { data: myRoles } = useCurrentUserRoles();
+  const [mediaUploaders, setMediaUploaders] = useState<Record<string, string>>({});
   const [deletingPhoto, setDeletingPhoto] = useState<string | null>(null);
+
   const [showMenu, setShowMenu] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showReport, setShowReport] = useState(false);
@@ -250,11 +255,19 @@ const QuestDetail = () => {
   };
   // Media ownership rules:
   // - Active sidequest: ONLY the owner can add or delete media.
-  // - Completed sidequest: the owner + everyone who had joined can add and
-  //   delete any media (collaborative media board).
+  // - Completed sidequest: the owner + everyone who had joined can add media;
+  //   each person can delete their own uploads, and the owner (or an admin)
+  //   can delete anything.
   const canAddCompletedMedia = isFinished && (isOwner || wasJoinedWhenFinished || isIn);
   const canAddActiveMedia = !isFinished && isOwner;
   const canManageMedia = canAddActiveMedia || canAddCompletedMedia;
+  const isAdmin = (myRoles || []).includes("admin");
+  const canDeleteMedia = (photo: string) => {
+    if (!isFinished) return canAddActiveMedia;
+    if (isOwner || isAdmin) return true;
+    return mediaUploaders[photo] === currentUser.id;
+  };
+
   const handleCompletedMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files ? Array.from(e.target.files) : [];
     e.target.value = "";
@@ -284,6 +297,25 @@ const QuestDetail = () => {
     }
   };
 
+  // Who uploaded each photo/video — used to let people delete their own items
+  // on completed sidequests.
+  useEffect(() => {
+    if (!quest?.id) return;
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("sidequest_photo_events")
+        .select("photo_url, user_id")
+        .eq("sidequest_id", quest.id);
+      if (cancelled || !data) return;
+      const map: Record<string, string> = {};
+      for (const row of data) map[row.photo_url] = row.user_id;
+      setMediaUploaders(map);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [quest?.id, quest?.photos?.length]);
 
 
   return (
@@ -549,7 +581,8 @@ const QuestDetail = () => {
                     >
                       <SidequestPhoto src={photo} alt={`Quest photo ${i + 1}`} thumbnail className="w-full h-full object-cover" />
                     </button>
-                    {canManageMedia && (
+                    {canDeleteMedia(photo) && (
+
                       <button
                         type="button"
                         onClick={() => handleDeleteMedia(photo)}
@@ -882,7 +915,7 @@ const QuestDetail = () => {
                         className="w-full h-full object-cover"
                       />
                     </button>
-                    {canManageMedia && (
+                    {canDeleteMedia(photo) && (
                       <button
                         type="button"
                         onClick={() => handleDeleteMedia(photo)}
