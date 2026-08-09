@@ -250,11 +250,19 @@ const QuestDetail = () => {
   };
   // Media ownership rules:
   // - Active sidequest: ONLY the owner can add or delete media.
-  // - Completed sidequest: the owner + everyone who had joined can add and
-  //   delete any media (collaborative media board).
+  // - Completed sidequest: the owner + everyone who had joined can add media;
+  //   each person can delete their own uploads, and the owner (or an admin)
+  //   can delete anything.
   const canAddCompletedMedia = isFinished && (isOwner || wasJoinedWhenFinished || isIn);
   const canAddActiveMedia = !isFinished && isOwner;
   const canManageMedia = canAddActiveMedia || canAddCompletedMedia;
+  const isAdmin = (myRoles || []).includes("admin");
+  const canDeleteMedia = (photo: string) => {
+    if (!isFinished) return canAddActiveMedia;
+    if (isOwner || isAdmin) return true;
+    return mediaUploaders[photo] === currentUser.id;
+  };
+
   const handleCompletedMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files ? Array.from(e.target.files) : [];
     e.target.value = "";
