@@ -259,9 +259,17 @@ export const useAppStore = create<AppState>((set, get) => ({
           participants: isIn
             ? q.participants.filter((p) => p.id !== currentUser.id)
             : [...q.participants, currentUser],
+          // Leaving a sidequest also drops any contributions you signed up for.
+          logistics: isIn && q.logistics
+            ? {
+                ...q.logistics,
+                volunteers: q.logistics.volunteers.filter((v) => v.userId !== currentUser.id),
+              }
+            : q.logistics,
         };
       }),
     }));
+
     (async () => {
       const quest = get().quests.find((q) => q.id === questId);
       const isIn = quest?.participants.some((p) => p.id === currentUser.id);
