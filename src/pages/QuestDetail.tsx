@@ -964,8 +964,10 @@ const QuestDetail = () => {
                               : "bg-muted text-foreground hover:bg-primary/10 hover:text-primary"
                           }`}
                         >
-                          {mine ? `✓ ${role.label}` : role.label}
+                          {mine && <Check className="w-3 h-3 inline-block mr-1 -mt-0.5" />}
+                          {role.label}
                         </button>
+
                       );
                     })}
                   </div>
