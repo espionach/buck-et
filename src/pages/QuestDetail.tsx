@@ -56,7 +56,10 @@ const QuestDetail = () => {
   const { user, loading: authLoading } = useAuth();
   const { data: hydratedQuests, isLoading: questsLoading, isFetching: questsFetching } = useQuests();
   const { quests, groups, addComment, volunteerForQuest, unvolunteerFromQuest, currentUser, pinQuest, unpinQuest, pinnedQuestIds, deleteQuest, toggleImIn, updateQuest, addQuestMedia, removeQuestMedia } = useAppStore();
+  const { data: myRoles } = useCurrentUserRoles();
+  const [mediaUploaders, setMediaUploaders] = useState<Record<string, string>>({});
   const [deletingPhoto, setDeletingPhoto] = useState<string | null>(null);
+
   const [showMenu, setShowMenu] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showReport, setShowReport] = useState(false);
