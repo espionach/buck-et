@@ -1096,6 +1096,10 @@ export type Database = {
         Args: { _paths: string[]; _sidequest_id: string }
         Returns: string[]
       }
+      can_delete_sidequest_media: {
+        Args: { _path: string; _sidequest_id: string; _user_id: string }
+        Returns: boolean
+      }
       can_manage_sidequest_media: {
         Args: { _sidequest_id: string; _user_id: string }
         Returns: boolean
