@@ -185,13 +185,11 @@ const QuestDetail = () => {
             <ArrowLeft className="w-5 h-5" />
           </button>
         </div>
-        <div className="flex-1 flex items-center justify-center px-8 -mt-12">
-          <EmptyState
-            icon={Lock}
-            title="You don't have access"
-            description="This sidequest is private or unavailable."
-          />
+        <div className="flex-1 flex flex-col items-center justify-center gap-3 px-8 -mt-12">
+          <Lock className="w-8 h-8 text-muted-foreground" strokeWidth={1.75} />
+          <p className="text-sm text-muted-foreground">Sidequest unavailable</p>
         </div>
+
       </div>
     );
   }
