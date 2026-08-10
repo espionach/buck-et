@@ -7,6 +7,8 @@ import GroupStylePicker from "@/components/GroupStylePicker";
 import { usePopup } from "@/hooks/use-popup";
 import { validateContent } from "@/lib/contentFilter";
 import { toast } from "sonner";
+import { DUPLICATE_NAME_MESSAGE } from "@/lib/groupLimits";
+
 
 const GroupSettings = () => {
   const { groupId } = useParams<{ groupId: string }>();
