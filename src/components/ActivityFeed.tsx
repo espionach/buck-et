@@ -200,26 +200,59 @@ const ActivityRowItem = ({
   const Icon = iconFor(row.activity_type);
   const title = row.metadata?.quest_title ?? "a sidequest";
 
+  const goToUser = (e: React.MouseEvent, username?: string) => {
+    e.stopPropagation();
+    if (!username) return;
+    onNav(`/u/${username}`);
+  };
+
+  const goToQuest = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (row.sidequest_id) onNav(`/quest/${row.sidequest_id}`);
+  };
+
+  const questLink = (
+    <span
+      role="link"
+      tabIndex={0}
+      onClick={goToQuest}
+      className="font-semibold underline-offset-2 hover:underline cursor-pointer"
+    >
+      {title}
+    </span>
+  );
+
+  const userLink = (u: User | null) => (
+    <span
+      role="link"
+      tabIndex={0}
+      onClick={(e) => goToUser(e, u?.username)}
+      className="font-semibold underline-offset-2 hover:underline cursor-pointer"
+    >
+      {u?.name ?? "Someone"}
+    </span>
+  );
+
   let verb: React.ReactNode = null;
   switch (row.activity_type) {
     case "launched_quest":
-      verb = <>started <span className="font-semibold">{title}</span></>;
+      verb = <>started {questLink}</>;
       break;
     case "joined_quest":
-      verb = <>joined <span className="font-semibold">{title}</span></>;
+      verb = <>joined {questLink}</>;
       break;
     case "completed_quest":
-      verb = <>completed <span className="font-semibold">{title}</span></>;
+      verb = <>completed {questLink}</>;
       break;
     case "commented_quest":
-      verb = <>commented on <span className="font-semibold">{title}</span></>;
+      verb = <>commented on {questLink}</>;
       break;
     case "added_photo":
-      verb = <>added a photo to <span className="font-semibold">{title}</span></>;
+      verb = <>added a photo to {questLink}</>;
       break;
     case "friendship_created":
       verb = target ? (
-        <>and <span className="font-semibold">{target.name}</span> are now friends</>
+        <>and {userLink(target)} are now friends</>
       ) : (
         <>made a new friend</>
       );
@@ -233,20 +266,25 @@ const ActivityRowItem = ({
   };
 
   return (
-    <button
+    <div
+      role="button"
+      tabIndex={0}
       onClick={handleClick}
-      className="w-full flex items-start gap-3 py-3 text-left active:bg-muted/40 transition-colors"
+      className="w-full flex items-start gap-3 py-3 text-left active:bg-muted/40 transition-colors cursor-pointer"
     >
       <div className="relative shrink-0">
-        {actor && <UserAvatar user={actor} size="md" />}
+        {actor && (
+          <span onClick={(e) => goToUser(e, actor.username)} className="cursor-pointer">
+            <UserAvatar user={actor} size="md" />
+          </span>
+        )}
         <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-card border border-border flex items-center justify-center">
           <Icon className="w-3 h-3 text-primary" strokeWidth={2.25} />
         </span>
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm text-foreground leading-snug">
-          <span className="font-semibold">{actor?.name ?? "Someone"}</span>{" "}
-          {verb}
+          {userLink(actor)} {verb}
         </p>
         {row.activity_type === "commented_quest" && row.metadata?.preview && (
           <p className="text-xs text-muted-foreground mt-0.5 truncate">
@@ -264,8 +302,9 @@ const ActivityRowItem = ({
           className="w-12 h-12 rounded-lg object-cover shrink-0"
         />
       )}
-    </button>
+    </div>
   );
+
 };
 
 export default ActivityFeed;
