@@ -490,6 +490,20 @@ export const useAppStore = create<AppState>((set, get) => ({
   inviteToGroup: (groupId, user) => {
     // "Invite" is now a direct add — groups are private launch lists owned by
     // the current user. Members are added straight in, no acceptance step.
+    const existing = get().groups.find((g) => g.id === groupId);
+    const memberCount = existing
+      ? existing.members.filter((m) => m.id !== existing.ownerId).length
+      : 0;
+    if (existing && !existing.members.some((m) => m.id === user.id) && memberCount >= 100) {
+      (async () => {
+        const [{ MEMBER_LIMIT_MESSAGE }, { toast }] = await Promise.all([
+          import("@/lib/groupLimits"),
+          import("sonner"),
+        ]);
+        toast.error(MEMBER_LIMIT_MESSAGE);
+      })();
+      return;
+    }
     set((s) => ({
       groups: s.groups.map((g) =>
         g.id === groupId
@@ -505,14 +519,22 @@ export const useAppStore = create<AppState>((set, get) => ({
     }));
     const { _invalidate } = get();
     (async () => {
-      await supabase.from("group_members").insert({
+      const { error } = await supabase.from("group_members").insert({
         group_id: groupId,
         user_id: user.id,
         role: "member",
       });
+      if (error) {
+        const [{ mapGroupError }, { toast }] = await Promise.all([
+          import("@/lib/groupLimits"),
+          import("sonner"),
+        ]);
+        toast.error(mapGroupError(error.message) ?? "Couldn't add that friend.");
+      }
       _invalidate(["groups"]);
     })();
   },
+
 
 
   acceptGroupInvitation: (invitationId) => {
