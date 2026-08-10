@@ -360,7 +360,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   addGroup: async (group) => {
     set((s) => ({ groups: [...s.groups, group] }));
     const { currentUser, _invalidate } = get();
-    const { data } = await supabase.from("groups").insert({
+    const { data, error } = await supabase.from("groups").insert({
       name: group.name,
       emoji: group.emoji,
       color: group.color || "sky",
@@ -369,6 +369,13 @@ export const useAppStore = create<AppState>((set, get) => ({
       owner_id: currentUser.id,
     } as never).select().single();
     if (!data) {
+      // Roll back the optimistic list and surface product-limit errors.
+      set((s) => ({ groups: s.groups.filter((g) => g.id !== group.id) }));
+      const [{ mapGroupError }, { toast }] = await Promise.all([
+        import("@/lib/groupLimits"),
+        import("sonner"),
+      ]);
+      toast.error(mapGroupError(error?.message) ?? "Couldn't create that friend list.");
       _invalidate(["groups"]);
       return null;
     }
@@ -382,7 +389,15 @@ export const useAppStore = create<AppState>((set, get) => ({
         role: "member" as const,
       }));
     if (memberInserts.length > 0) {
-      await supabase.from("group_members").insert(memberInserts);
+      const { error: memberError } = await supabase.from("group_members").insert(memberInserts);
+      if (memberError) {
+        const [{ mapGroupError }, { toast }] = await Promise.all([
+          import("@/lib/groupLimits"),
+          import("sonner"),
+        ]);
+        const mapped = mapGroupError(memberError.message);
+        if (mapped) toast.error(mapped);
+      }
     }
     set((s) => ({
       groups: s.groups.map((g) => g.id === group.id ? { ...g, id: data.id } : g),
@@ -390,6 +405,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     _invalidate(["groups"]);
     return data.id as string;
   },
+
 
 
   updateGroup: (groupId, updates) => {
