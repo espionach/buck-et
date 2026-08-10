@@ -7,6 +7,8 @@ import GroupStylePicker from "@/components/GroupStylePicker";
 import { usePopup } from "@/hooks/use-popup";
 import { validateContent } from "@/lib/contentFilter";
 import { toast } from "sonner";
+import { DUPLICATE_NAME_MESSAGE } from "@/lib/groupLimits";
+
 
 const GroupSettings = () => {
   const { groupId } = useParams<{ groupId: string }>();
@@ -45,9 +47,18 @@ const GroupSettings = () => {
       toast.error(violation);
       return;
     }
+    const normalized = trimmed.toLowerCase();
+    const clash = groups.some(
+      (g) => g.id !== group.id && g.ownerId === group.ownerId && g.name.trim().toLowerCase() === normalized
+    );
+    if (clash) {
+      toast.error(DUPLICATE_NAME_MESSAGE);
+      return;
+    }
     updateGroup(group.id, { name: trimmed });
     setEditingName(false);
   };
+
 
   const handleColor = (next: string) => {
     setColor(next);

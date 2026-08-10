@@ -13,6 +13,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { validateContent } from "@/lib/contentFilter";
 import { getUserFriendlyError } from "@/lib/errorMapping";
+import { DUPLICATE_NAME_MESSAGE } from "@/lib/groupLimits";
+
 
 interface GroupSettingsProps {
   group: Group;
@@ -22,7 +24,7 @@ interface GroupSettingsProps {
 }
 
 const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettingsProps) => {
-  const { updateGroup, removeMemberFromGroup, leaveGroup, inviteToGroup, friends: friendsList, requestGroupTransfer, deleteGroup, currentUser } = useAppStore();
+  const { updateGroup, removeMemberFromGroup, leaveGroup, inviteToGroup, friends: friendsList, requestGroupTransfer, deleteGroup, currentUser, groups } = useAppStore();
   const [editName, setEditName] = useState(group.name);
   const [editColor, setEditColor] = useState(group.color || "sky");
   const [isEditingName, setIsEditingName] = useState(false);
@@ -98,10 +100,19 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
         toast({ title: violation, variant: "destructive" });
         return;
       }
+      const normalized = editName.trim().toLowerCase();
+      const clash = groups.some(
+        (g) => g.id !== group.id && g.ownerId === group.ownerId && g.name.trim().toLowerCase() === normalized
+      );
+      if (clash) {
+        toast({ title: DUPLICATE_NAME_MESSAGE, variant: "destructive" });
+        return;
+      }
       updateGroup(group.id, { name: editName.trim(), color: editColor });
     }
     setIsEditingName(false);
   };
+
 
   const handleLeave = () => {
     if (isOwner) {

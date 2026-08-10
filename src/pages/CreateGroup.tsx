@@ -12,7 +12,7 @@ const CreateGroup = () => {
   const navigate = useNavigate();
   const routeLocation = useLocation();
   const fromPath = (routeLocation.state as { from?: string } | null)?.from;
-  const { addGroup, friends: friendsList, currentUser } = useAppStore();
+  const { addGroup, friends: friendsList, currentUser, groups } = useAppStore();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [color, setColor] = useState("sky");
@@ -31,14 +31,36 @@ const CreateGroup = () => {
 
   const handleCreate = async () => {
     if (!name.trim() || submitting) return;
+    const { toast } = await import("sonner");
+    const {
+      MAX_GROUPS_PER_USER,
+      MAX_MEMBERS_PER_GROUP,
+      GROUP_LIMIT_MESSAGE,
+      MEMBER_LIMIT_MESSAGE,
+      DUPLICATE_NAME_MESSAGE,
+    } = await import("@/lib/groupLimits");
+    const ownedGroups = groups.filter((g) => g.ownerId === currentUser.id);
+    if (ownedGroups.length >= MAX_GROUPS_PER_USER) {
+      toast.error(GROUP_LIMIT_MESSAGE);
+      return;
+    }
+    const normalized = name.trim().toLowerCase();
+    if (ownedGroups.some((g) => g.name.trim().toLowerCase() === normalized)) {
+      toast.error(DUPLICATE_NAME_MESSAGE);
+      return;
+    }
+    if (selectedMembers.length > MAX_MEMBERS_PER_GROUP) {
+      toast.error(MEMBER_LIMIT_MESSAGE);
+      return;
+    }
     const { validateContent } = await import("@/lib/contentFilter");
     const violation = validateContent(name, description);
     if (violation) {
-      const { toast } = await import("sonner");
       toast.error(violation);
       return;
     }
     setSubmitting(true);
+
     const members = [
       currentUser,
       ...friendsList.filter((f) => selectedMembers.includes(f.id)),
