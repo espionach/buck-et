@@ -45,9 +45,18 @@ const GroupSettings = () => {
       toast.error(violation);
       return;
     }
+    const normalized = trimmed.toLowerCase();
+    const clash = groups.some(
+      (g) => g.id !== group.id && g.ownerId === group.ownerId && g.name.trim().toLowerCase() === normalized
+    );
+    if (clash) {
+      toast.error(DUPLICATE_NAME_MESSAGE);
+      return;
+    }
     updateGroup(group.id, { name: trimmed });
     setEditingName(false);
   };
+
 
   const handleColor = (next: string) => {
     setColor(next);
