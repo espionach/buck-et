@@ -98,10 +98,19 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
         toast({ title: violation, variant: "destructive" });
         return;
       }
+      const normalized = editName.trim().toLowerCase();
+      const clash = groups.some(
+        (g) => g.id !== group.id && g.ownerId === group.ownerId && g.name.trim().toLowerCase() === normalized
+      );
+      if (clash) {
+        toast({ title: DUPLICATE_NAME_MESSAGE, variant: "destructive" });
+        return;
+      }
       updateGroup(group.id, { name: editName.trim(), color: editColor });
     }
     setIsEditingName(false);
   };
+
 
   const handleLeave = () => {
     if (isOwner) {
