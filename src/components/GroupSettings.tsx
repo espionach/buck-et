@@ -13,6 +13,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { validateContent } from "@/lib/contentFilter";
 import { getUserFriendlyError } from "@/lib/errorMapping";
+import { DUPLICATE_NAME_MESSAGE } from "@/lib/groupLimits";
+
 
 interface GroupSettingsProps {
   group: Group;
