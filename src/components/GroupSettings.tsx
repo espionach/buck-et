@@ -24,17 +24,19 @@ interface GroupSettingsProps {
 }
 
 const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettingsProps) => {
-  const { updateGroup, removeMemberFromGroup, leaveGroup, inviteToGroup, friends: friendsList, requestGroupTransfer, deleteGroup, currentUser, groups } = useAppStore();
+  const { updateGroup, removeMemberFromGroup, leaveGroup, inviteToGroup, friends: friendsList, requestGroupTransfer, deleteGroup, currentUser, groups, quests } = useAppStore();
   const [editName, setEditName] = useState(group.name);
   const [editColor, setEditColor] = useState(group.color || "sky");
   const [isEditingName, setIsEditingName] = useState(false);
   const [showAddMembers, setShowAddMembers] = useState(false);
   const [memberSearch, setMemberSearch] = useState("");
   const [showOwnerLeave, setShowOwnerLeave] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [confirmRemoveUser, setConfirmRemoveUser] = useState<{ userId: string; userName: string } | null>(null);
   const [muted, setMuted] = useState(false);
   const [muteLoading, setMuteLoading] = useState(true);
-  usePopup(showOwnerLeave || !!confirmRemoveUser || showAddMembers);
+  usePopup(showOwnerLeave || showDeleteDialog || !!confirmRemoveUser || showAddMembers);
+
 
   const isOwner = group.ownerId === currentUser.id;
 
