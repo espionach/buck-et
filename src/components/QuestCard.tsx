@@ -498,7 +498,9 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
             >
               <p className="text-sm font-bold text-foreground">Are you sure?</p>
               <p className="text-xs text-muted-foreground">
-                This sidequest will be permanently deleted for everyone.
+                {isFinished
+                  ? "This sidequest will be removed from your profile. Everyone who completed it keeps it in their history."
+                  : "This sidequest will be permanently deleted for everyone."}
               </p>
               <div className="flex gap-2">
                 <button
