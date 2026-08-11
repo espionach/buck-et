@@ -1197,11 +1197,19 @@ export const useAppStore = create<AppState>((set, get) => ({
             ),
       transferRequests: s.transferRequests.filter((tr) => !(tr.type === "group" && tr.entityId === groupId)),
     }));
-    const { _invalidate } = get();
+    const { _invalidate, currentUser } = get();
     (async () => {
       if (affected.length) {
         if (action.mode === "delete") {
-          await supabase.from("sidequests").delete().in("id", affected);
+          if (affectedActive.length) {
+            await supabase.from("sidequests").delete().in("id", affectedActive);
+          }
+          // Completed sidequests stay available to everyone who completed them.
+          if (affectedCompleted.length) {
+            await supabase.from("sidequests")
+              .update({ archived_at: new Date().toISOString(), archived_by: currentUser.id })
+              .in("id", affectedCompleted);
+          }
         } else if (action.mode === "move") {
           await supabase.from("sidequests")
             .update({ group_id: action.targetGroupId, is_friends_only: false })
