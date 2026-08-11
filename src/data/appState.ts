@@ -1026,12 +1026,23 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   deleteQuest: (questId) => {
     const prevQuest = get().quests.find((q) => q.id === questId);
+    // Completed sidequests are never erased for the people who completed them:
+    // the owner's delete archives it instead, keeping it in their history.
+    const archiveOnly = prevQuest ? isQuestCompleted(prevQuest) : false;
     set((s) => ({
       quests: s.quests.filter((q) => q.id !== questId),
       transferRequests: s.transferRequests.filter((tr) => !(tr.type === "quest" && tr.entityId === questId)),
     }));
     const { _invalidate, currentUser } = get();
     (async () => {
+      if (archiveOnly) {
+        await supabase
+          .from("sidequests")
+          .update({ archived_at: new Date().toISOString(), archived_by: currentUser.id })
+          .eq("id", questId);
+        _invalidate(["quests", "transfer_requests"]);
+        return;
+      }
       // Notify other participants that the quest was canceled
       if (prevQuest) {
         const others = prevQuest.participants
@@ -1052,6 +1063,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       _invalidate(["quests", "transfer_requests"]);
     })();
   },
+
 
   updateProfile: (updates) => {
     const { currentUser, _invalidate } = get();
