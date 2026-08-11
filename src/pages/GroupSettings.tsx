@@ -114,46 +114,20 @@ const GroupSettings = () => {
 
       <AnimatePresence>
         {confirmDelete && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[70] bg-foreground/40 flex items-center justify-center p-5"
-            onClick={() => setConfirmDelete(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-xs bg-card rounded-xl p-5 space-y-4 shadow-lg text-center"
-            >
-              <p className="text-sm font-bold text-foreground">Delete "{group.name}"?</p>
-              <p className="text-xs text-muted-foreground">
-                The group and any sidequests launched only to it will be deleted. This can't be undone.
-              </p>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setConfirmDelete(false)}
-                  className="flex-1 py-2.5 rounded-xl bg-muted text-muted-foreground font-semibold text-sm"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => {
-                    setConfirmDelete(false);
-                    deleteGroup(group.id);
-                    navigate("/profile?tab=groups");
-                  }}
-                  className="flex-1 py-2.5 rounded-xl bg-destructive text-destructive-foreground font-semibold text-sm"
-                >
-                  Delete
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
+          <GroupDeleteDialog
+            group={group}
+            otherGroups={groups.filter((g) => g.id !== group.id)}
+            questCount={quests.filter((q) => q.groupId === group.id).length}
+            onCancel={() => setConfirmDelete(false)}
+            onConfirm={(action) => {
+              setConfirmDelete(false);
+              deleteGroup(group.id, action);
+              navigate("/profile?tab=groups");
+            }}
+          />
         )}
       </AnimatePresence>
+
     </div>
   );
 };
