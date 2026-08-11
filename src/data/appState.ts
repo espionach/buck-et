@@ -1159,18 +1159,42 @@ export const useAppStore = create<AppState>((set, get) => ({
     })();
   },
 
-  deleteGroup: (groupId) => {
+  deleteGroup: (groupId, action = { mode: "all-friends" }) => {
+    const affected = get().quests.filter((q) => q.groupId === groupId).map((q) => q.id);
     set((s) => ({
       groups: s.groups.filter((g) => g.id !== groupId),
-      quests: s.quests.filter((q) => q.groupId !== groupId),
+      quests:
+        action.mode === "delete"
+          ? s.quests.filter((q) => q.groupId !== groupId)
+          : s.quests.map((q) =>
+              q.groupId === groupId
+                ? action.mode === "move"
+                  ? { ...q, groupId: action.targetGroupId }
+                  : { ...q, groupId: undefined, isFollowerOnly: true }
+                : q
+            ),
       transferRequests: s.transferRequests.filter((tr) => !(tr.type === "group" && tr.entityId === groupId)),
     }));
     const { _invalidate } = get();
     (async () => {
+      if (affected.length) {
+        if (action.mode === "delete") {
+          await supabase.from("sidequests").delete().in("id", affected);
+        } else if (action.mode === "move") {
+          await supabase.from("sidequests")
+            .update({ group_id: action.targetGroupId, is_friends_only: false })
+            .in("id", affected);
+        } else {
+          await supabase.from("sidequests")
+            .update({ group_id: null, is_friends_only: true })
+            .in("id", affected);
+        }
+      }
       await supabase.from("groups").delete().eq("id", groupId);
       _invalidate(["groups", "quests", "transfer_requests"]);
     })();
   },
+
 
   requestQuestTransfer: (questId, newOwnerId) => {
     const { currentUser, _invalidate } = get();
