@@ -16,6 +16,12 @@ import {
   placeholderUser,
 } from "./mockData";
 
+export type GroupDeleteAction =
+  | { mode: "all-friends" }
+  | { mode: "move"; targetGroupId: string }
+  | { mode: "delete" };
+
+
 interface AppState {
   // These are populated by the DataProvider from React Query
   quests: Quest[];
