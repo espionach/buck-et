@@ -14,6 +14,7 @@ import {
   QuestLogistics,
   QuestVolunteer,
   placeholderUser,
+  isQuestCompleted,
 } from "./mockData";
 
 export type GroupDeleteAction =
