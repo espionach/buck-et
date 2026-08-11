@@ -1179,7 +1179,10 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   deleteGroup: (groupId, action = { mode: "all-friends" }) => {
-    const affected = get().quests.filter((q) => q.groupId === groupId).map((q) => q.id);
+    const affectedQuests = get().quests.filter((q) => q.groupId === groupId);
+    const affected = affectedQuests.map((q) => q.id);
+    const affectedActive = affectedQuests.filter((q) => !isQuestCompleted(q)).map((q) => q.id);
+    const affectedCompleted = affectedQuests.filter((q) => isQuestCompleted(q)).map((q) => q.id);
     set((s) => ({
       groups: s.groups.filter((g) => g.id !== groupId),
       quests:
