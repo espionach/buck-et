@@ -119,7 +119,7 @@ const GroupDeleteDialog = ({
                       : "border-border/50 bg-muted/40 hover:bg-muted/70"
                   }`}
                 >
-                  <GroupSwatch group={g} size="sm" />
+                  <GroupSwatch color={g.color} size={18} />
                   <span className="text-sm font-medium text-foreground flex-1 truncate">{g.name}</span>
                   {targetId === g.id && <Check className="w-4 h-4 text-primary" />}
                 </button>
