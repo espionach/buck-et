@@ -2,6 +2,7 @@ import { useAppStore } from "@/data/appState";
 import { Group, User } from "@/data/mockData";
 import UserAvatar from "@/components/UserAvatar";
 import OwnerLeaveDialog from "@/components/OwnerLeaveDialog";
+import GroupDeleteDialog from "@/components/GroupDeleteDialog";
 import { UserPlus, LogOut, Crown, Clock, Trash2, Pencil, Check, Bell, BellOff, Search, X, UserSearch } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
 import { useEffect, useState } from "react";
