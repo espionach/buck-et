@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Pencil, Check, Trash2 } from "lucide-react";
 import { useAppStore } from "@/data/appState";
 import GroupStylePicker from "@/components/GroupStylePicker";
+import GroupDeleteDialog from "@/components/GroupDeleteDialog";
 import { usePopup } from "@/hooks/use-popup";
 import { validateContent } from "@/lib/contentFilter";
 import { toast } from "sonner";
@@ -13,8 +14,9 @@ import { DUPLICATE_NAME_MESSAGE } from "@/lib/groupLimits";
 const GroupSettings = () => {
   const { groupId } = useParams<{ groupId: string }>();
   const navigate = useNavigate();
-  const { groups, updateGroup, deleteGroup } = useAppStore();
+  const { groups, quests, updateGroup, deleteGroup } = useAppStore();
   const group = groups.find((g) => g.id === groupId);
+
 
   const [name, setName] = useState(group?.name ?? "");
   const [editingName, setEditingName] = useState(false);
