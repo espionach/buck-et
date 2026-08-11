@@ -85,7 +85,7 @@ interface AppState {
   cleanupEmptyQuests: () => void;
   transferQuestOwnership: (questId: string, newOwnerId: string) => void;
   transferGroupOwnership: (groupId: string, newOwnerId: string) => void;
-  deleteGroup: (groupId: string) => void;
+  deleteGroup: (groupId: string, action?: GroupDeleteAction) => void;
   requestQuestTransfer: (questId: string, newOwnerId: string) => void;
   requestGroupTransfer: (groupId: string, newOwnerId: string) => void;
   acceptTransfer: (transferId: string) => void;
