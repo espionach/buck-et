@@ -1045,7 +1045,9 @@ const QuestDetail = () => {
             >
               <h3 className="text-base font-bold text-foreground mb-1">Delete sidequest?</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                "{quest.title}" will be permanently removed for everyone.
+                {isFinished
+                  ? `"${quest.title}" will be removed from your profile. Everyone who completed it keeps it in their history.`
+                  : `"${quest.title}" will be permanently removed for everyone.`}
               </p>
               <div className="flex gap-2">
                 <button
