@@ -2,6 +2,7 @@ import { useAppStore } from "@/data/appState";
 import { Group, User } from "@/data/mockData";
 import UserAvatar from "@/components/UserAvatar";
 import OwnerLeaveDialog from "@/components/OwnerLeaveDialog";
+import GroupDeleteDialog from "@/components/GroupDeleteDialog";
 import { UserPlus, LogOut, Crown, Clock, Trash2, Pencil, Check, Bell, BellOff, Search, X, UserSearch } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
 import { useEffect, useState } from "react";
@@ -24,17 +25,19 @@ interface GroupSettingsProps {
 }
 
 const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettingsProps) => {
-  const { updateGroup, removeMemberFromGroup, leaveGroup, inviteToGroup, friends: friendsList, requestGroupTransfer, deleteGroup, currentUser, groups } = useAppStore();
+  const { updateGroup, removeMemberFromGroup, leaveGroup, inviteToGroup, friends: friendsList, requestGroupTransfer, deleteGroup, currentUser, groups, quests } = useAppStore();
   const [editName, setEditName] = useState(group.name);
   const [editColor, setEditColor] = useState(group.color || "sky");
   const [isEditingName, setIsEditingName] = useState(false);
   const [showAddMembers, setShowAddMembers] = useState(false);
   const [memberSearch, setMemberSearch] = useState("");
   const [showOwnerLeave, setShowOwnerLeave] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [confirmRemoveUser, setConfirmRemoveUser] = useState<{ userId: string; userName: string } | null>(null);
   const [muted, setMuted] = useState(false);
   const [muteLoading, setMuteLoading] = useState(true);
-  usePopup(showOwnerLeave || !!confirmRemoveUser || showAddMembers);
+  usePopup(showOwnerLeave || showDeleteDialog || !!confirmRemoveUser || showAddMembers);
+
 
   const isOwner = group.ownerId === currentUser.id;
 
@@ -296,9 +299,8 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
             members={group.members}
             ownerId={currentUser.id}
             onDelete={() => {
-              deleteGroup(group.id);
               setShowOwnerLeave(false);
-              onLeave();
+              setShowDeleteDialog(true);
             }}
             onTransfer={(newOwnerId) => {
               requestGroupTransfer(group.id, newOwnerId);
@@ -309,6 +311,23 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
           />
         )}
       </AnimatePresence>
+
+      <AnimatePresence>
+        {showDeleteDialog && (
+          <GroupDeleteDialog
+            group={group}
+            otherGroups={groups.filter((g) => g.id !== group.id)}
+            questCount={quests.filter((q) => q.groupId === group.id).length}
+            onCancel={() => setShowDeleteDialog(false)}
+            onConfirm={(action) => {
+              setShowDeleteDialog(false);
+              deleteGroup(group.id, action);
+              onLeave();
+            }}
+          />
+        )}
+      </AnimatePresence>
+
 
       {/* Confirm remove member dialog */}
       <AnimatePresence>
