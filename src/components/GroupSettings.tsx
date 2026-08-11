@@ -296,9 +296,8 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
             members={group.members}
             ownerId={currentUser.id}
             onDelete={() => {
-              deleteGroup(group.id);
               setShowOwnerLeave(false);
-              onLeave();
+              setShowDeleteDialog(true);
             }}
             onTransfer={(newOwnerId) => {
               requestGroupTransfer(group.id, newOwnerId);
@@ -309,6 +308,23 @@ const GroupSettings = ({ group, onClose, onLeave, onViewProfile }: GroupSettings
           />
         )}
       </AnimatePresence>
+
+      <AnimatePresence>
+        {showDeleteDialog && (
+          <GroupDeleteDialog
+            group={group}
+            otherGroups={groups.filter((g) => g.id !== group.id)}
+            questCount={quests.filter((q) => q.groupId === group.id).length}
+            onCancel={() => setShowDeleteDialog(false)}
+            onConfirm={(action) => {
+              setShowDeleteDialog(false);
+              deleteGroup(group.id, action);
+              onLeave();
+            }}
+          />
+        )}
+      </AnimatePresence>
+
 
       {/* Confirm remove member dialog */}
       <AnimatePresence>
