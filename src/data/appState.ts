@@ -14,6 +14,7 @@ import {
   QuestLogistics,
   QuestVolunteer,
   placeholderUser,
+  isQuestCompleted,
 } from "./mockData";
 
 export type GroupDeleteAction =
@@ -1025,12 +1026,23 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   deleteQuest: (questId) => {
     const prevQuest = get().quests.find((q) => q.id === questId);
+    // Completed sidequests are never erased for the people who completed them:
+    // the owner's delete archives it instead, keeping it in their history.
+    const archiveOnly = prevQuest ? isQuestCompleted(prevQuest) : false;
     set((s) => ({
       quests: s.quests.filter((q) => q.id !== questId),
       transferRequests: s.transferRequests.filter((tr) => !(tr.type === "quest" && tr.entityId === questId)),
     }));
     const { _invalidate, currentUser } = get();
     (async () => {
+      if (archiveOnly) {
+        await supabase
+          .from("sidequests")
+          .update({ archived_at: new Date().toISOString(), archived_by: currentUser.id })
+          .eq("id", questId);
+        _invalidate(["quests", "transfer_requests"]);
+        return;
+      }
       // Notify other participants that the quest was canceled
       if (prevQuest) {
         const others = prevQuest.participants
@@ -1051,6 +1063,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       _invalidate(["quests", "transfer_requests"]);
     })();
   },
+
 
   updateProfile: (updates) => {
     const { currentUser, _invalidate } = get();
@@ -1166,7 +1179,10 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   deleteGroup: (groupId, action = { mode: "all-friends" }) => {
-    const affected = get().quests.filter((q) => q.groupId === groupId).map((q) => q.id);
+    const affectedQuests = get().quests.filter((q) => q.groupId === groupId);
+    const affected = affectedQuests.map((q) => q.id);
+    const affectedActive = affectedQuests.filter((q) => !isQuestCompleted(q)).map((q) => q.id);
+    const affectedCompleted = affectedQuests.filter((q) => isQuestCompleted(q)).map((q) => q.id);
     set((s) => ({
       groups: s.groups.filter((g) => g.id !== groupId),
       quests:
@@ -1181,11 +1197,19 @@ export const useAppStore = create<AppState>((set, get) => ({
             ),
       transferRequests: s.transferRequests.filter((tr) => !(tr.type === "group" && tr.entityId === groupId)),
     }));
-    const { _invalidate } = get();
+    const { _invalidate, currentUser } = get();
     (async () => {
       if (affected.length) {
         if (action.mode === "delete") {
-          await supabase.from("sidequests").delete().in("id", affected);
+          if (affectedActive.length) {
+            await supabase.from("sidequests").delete().in("id", affectedActive);
+          }
+          // Completed sidequests stay available to everyone who completed them.
+          if (affectedCompleted.length) {
+            await supabase.from("sidequests")
+              .update({ archived_at: new Date().toISOString(), archived_by: currentUser.id })
+              .in("id", affectedCompleted);
+          }
         } else if (action.mode === "move") {
           await supabase.from("sidequests")
             .update({ group_id: action.targetGroupId, is_friends_only: false })

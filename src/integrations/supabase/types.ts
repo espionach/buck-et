@@ -799,6 +799,8 @@ export type Database = {
       }
       sidequests: {
         Row: {
+          archived_at: string | null
+          archived_by: string | null
           completed_at: string | null
           contribution_roles: string[]
           created_at: string
@@ -825,6 +827,8 @@ export type Database = {
           title: string
         }
         Insert: {
+          archived_at?: string | null
+          archived_by?: string | null
           completed_at?: string | null
           contribution_roles?: string[]
           created_at?: string
@@ -851,6 +855,8 @@ export type Database = {
           title: string
         }
         Update: {
+          archived_at?: string | null
+          archived_by?: string | null
           completed_at?: string | null
           contribution_roles?: string[]
           created_at?: string
