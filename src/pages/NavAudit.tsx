@@ -100,7 +100,7 @@ const FORWARD: ForwardEntry[] = [
   { source: "pages/LegalUpdates.tsx:47", label: "Legal updates row", to: "/settings/<legal>" },
 
   // Nudge
-  { source: "components/NudgeQuestPicker.tsx:20", label: "Pick quest to nudge", to: "/quest/:id" },
+  
 
   // Onboarding flow
   { source: "pages/onboarding/Welcome.tsx:13", label: "Welcome -> examples", to: "/onboarding/examples" },
