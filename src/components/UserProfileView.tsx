@@ -4,12 +4,10 @@ import UserAvatar from "@/components/UserAvatar";
 import { ArrowLeft, X, Users as UsersIcon, Lock, UserPlus, Clock, UserMinus, Check, ShieldOff, Share2, Sparkles, CheckCircle2, Zap, Flag } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePopup } from "@/hooks/use-popup";
 import { User, isQuestCompleted, placeholderUser } from "@/data/mockData";
 import UserMenu from "@/components/UserMenu";
-import NudgeQuestPicker from "@/components/NudgeQuestPicker";
 import CancelRequestDialog from "@/components/CancelRequestDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -23,12 +21,12 @@ interface UserProfileViewProps {
 
 const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfileViewProps) => {
   const { quests, friends, currentUser, sentFriendRequests, sendFriendRequest, cancelFriendRequest, unfriend, friendRequests, acceptFriendRequest, blockedUserIds } = useAppStore();
-  const navigate = useNavigate();
+  
   const [tab, setTab] = useState<"current" | "past">("current");
   const [showFriends, setShowFriends] = useState(false);
   const [showUnfriendConfirm, setShowUnfriendConfirm] = useState(false);
   const [showCancelRequestConfirm, setShowCancelRequestConfirm] = useState(false);
-  const [showNudgePicker, setShowNudgePicker] = useState(false);
+  
   const [viewedUserFriends, setViewedUserFriends] = useState<User[] | null>(null);
   usePopup(showFriends || showUnfriendConfirm || showCancelRequestConfirm);
 
@@ -54,24 +52,8 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
   );
   const shownQuests = tab === "current" ? activeQuests : completedQuests;
 
-  // Current user's own active quests (for the nudge CTA on empty profiles)
-  const myActiveQuests = quests.filter(
-    (q) =>
-      (q.createdBy.id === currentUser.id ||
-        q.participants.some((p) => p.id === currentUser.id)) &&
-      !isQuestCompleted(q)
-  );
-  const canNudge = myActiveQuests.length > 0 && user.id !== currentUser.id;
 
-  const handleNudgeCta = () => {
-    if (myActiveQuests.length === 1) {
-      navigate(`/quest/${myActiveQuests[0].id}`, {
-        state: { prefillNudgeUserId: user.id },
-      });
-    } else {
-      setShowNudgePicker(true);
-    }
-  };
+
 
   // Fetch the viewed user's actual friends (visible to them and their friends).
   useEffect(() => {
@@ -305,21 +287,8 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
         </div>
       ) : (
         <>
-          {/* Nudge hint: viewer has no active quests, so cannot nudge */}
-          {user.id !== currentUser.id && myActiveQuests.length === 0 && (
-            <div className="mb-4 flex items-center gap-3 rounded-2xl border border-border/50 bg-card shadow-sm px-4 py-3">
-              <Sparkles className="w-4 h-4 text-muted-foreground shrink-0" />
-              <p className="text-xs text-muted-foreground flex-1">
-                Create a sidequest to nudge {user.name.split(" ")[0]}.
-              </p>
-              <button
-                onClick={() => navigate("/create")}
-                className="text-xs font-semibold text-primary shrink-0"
-              >
-                Create
-              </button>
-            </div>
-          )}
+
+
 
           {/* Tabs */}
           <div className="flex border-b border-border mb-5">
@@ -365,23 +334,17 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
                 icon={tab === "current" ? Sparkles : CheckCircle2}
                 title={
                   tab === "current"
-                    ? canNudge
-                      ? "No active sidequests yet"
-                      : "No upcoming sidequests"
+                    ? "No upcoming sidequests"
                     : "No completed sidequests"
                 }
                 description={
                   tab === "current"
-                    ? canNudge
-                      ? `Nudge ${user.name.split(" ")[0]} to join one of yours.`
-                      : "Nothing planned right now. Start something they can join."
+                    ? "Nothing planned right now. Start something they can join."
                     : "Finished sidequests will appear here."
                 }
                 cta={
                   tab === "current"
-                    ? canNudge
-                      ? { label: "Send a nudge", onClick: handleNudgeCta }
-                      : { label: "Create sidequest", onClick: () => { window.location.href = "/create"; } }
+                    ? { label: "Create sidequest", onClick: () => { window.location.href = "/create"; } }
                     : undefined
                 }
               />
@@ -407,12 +370,8 @@ const UserProfileView = ({ user, backLabel, onBack, onViewProfile }: UserProfile
       </div>
       )}
 
-      <NudgeQuestPicker
-        open={showNudgePicker}
-        onClose={() => setShowNudgePicker(false)}
-        quests={myActiveQuests}
-        targetUser={user}
-      />
+
+
       <CancelRequestDialog
         open={showCancelRequestConfirm}
         userName={user.name}

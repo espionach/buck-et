@@ -66,7 +66,6 @@ const QuestDetail = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showReport, setShowReport] = useState(false);
   const [showNudge, setShowNudge] = useState(false);
-  const [prefillNudgeUserId, setPrefillNudgeUserId] = useState<string | null>(null);
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
   const [joinAnim, setJoinAnim] = useState<"idle" | "morph" | "exit" | "done">("idle");
   const [uploadingMedia, setUploadingMedia] = useState(false);
@@ -147,18 +146,8 @@ const QuestDetail = () => {
     };
   }, []);
 
-  // Auto-open nudge modal with a preselected target (e.g., from a friend's profile)
-  useEffect(() => {
-    const state = location.state as { prefillNudgeUserId?: string; siblingIds?: string[] } | null;
-    const targetId = state?.prefillNudgeUserId;
-    if (!targetId) return;
-    const q = (hydratedQuests ?? quests).find((qq) => qq.id === questId);
-    if (!q) return;
-    if (q.createdBy.id !== currentUser.id) return;
-    setPrefillNudgeUserId(targetId);
-    setShowNudge(true);
-    navigate(location.pathname, { replace: true, state: { siblingIds: state?.siblingIds ?? siblingIds } });
-  }, [location.state, location.pathname, hydratedQuests, quests, questId, currentUser.id, navigate, siblingIds]);
+
+
 
   const questList = hydratedQuests ?? quests;
   const quest = questList.find((q) => q.id === questId);
@@ -846,7 +835,7 @@ const QuestDetail = () => {
                 <div className="min-w-0">
                   <p className="text-xs font-semibold text-foreground">Send a nudge</p>
                   <p className="text-[10px] text-muted-foreground leading-tight">
-                    Give friends a friendly poke to join or remember this quest.
+                    Remind people who've joined about this sidequest.
                   </p>
                 </div>
               </div>
@@ -861,9 +850,8 @@ const QuestDetail = () => {
         </section>
         <NudgeModal
           open={showNudge}
-          onClose={() => { setShowNudge(false); setPrefillNudgeUserId(null); }}
+          onClose={() => setShowNudge(false)}
           quest={quest}
-          initialSelectedUserId={prefillNudgeUserId}
         />
 
         {/* Photos & Videos Section */}

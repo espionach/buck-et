@@ -48,7 +48,7 @@ export const SPOTLIGHTS: SpotlightDef[] = [
     match: (l) => l.pathname.startsWith("/quest/") && !l.pathname.endsWith("/edit"),
     targetSelector: '[data-spotlight="quest-nudge"]',
     title: "Nudge your friends",
-    body: "A nudge is a gentle poke — it pings friends to join or remember this sidequest without spamming them.",
+    body: "A nudge is a gentle poke — it reminds people who've joined about this sidequest. One nudge per person per day.",
     placement: "top",
   },
   {
