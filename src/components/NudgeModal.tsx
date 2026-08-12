@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Search, Check, HandMetal } from "lucide-react";
+import { X, Search, Check, HandMetal, Hourglass } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAppStore } from "@/data/appState";
 import { Quest, User } from "@/data/mockData";
@@ -9,33 +9,40 @@ import EmptyState from "@/components/EmptyState";
 import { usePopup } from "@/hooks/use-popup";
 import { notifyUsers } from "@/lib/notifications";
 import { validateContent } from "@/lib/contentFilter";
+import {
+  MAX_NUDGES_PER_HOUR,
+  MAX_NUDGES_PER_DAY,
+  NUDGE_HOURLY_LIMIT_MESSAGE,
+  NUDGE_DAILY_LIMIT_MESSAGE,
+  mapNudgeError,
+} from "@/lib/nudgeLimits";
 import { toast } from "sonner";
 
 interface NudgeModalProps {
   open: boolean;
   onClose: () => void;
   quest: Quest;
-  initialSelectedUserId?: string | null;
 }
 
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+const ONE_HOUR_MS = 60 * 60 * 1000;
 
-const NudgeModal = ({ open, onClose, quest, initialSelectedUserId }: NudgeModalProps) => {
-  const { currentUser, friends, groups } = useAppStore();
+const NudgeModal = ({ open, onClose, quest }: NudgeModalProps) => {
+  const { currentUser } = useAppStore();
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [note, setNote] = useState("");
   const [recentNudges, setRecentNudges] = useState<Set<string>>(new Set());
+  const [hourlyCount, setHourlyCount] = useState(0);
+  const [dailyCount, setDailyCount] = useState(0);
   const [sending, setSending] = useState(false);
   usePopup(open);
 
-  // Candidate pool: group members for group quests, friends for friends-only
+  // Only current participants can be nudged
   const candidates: User[] = useMemo(() => {
     if (!open) return [];
-    const group = quest.groupId ? groups.find((g) => g.id === quest.groupId) : null;
-    const pool = group ? group.members : friends;
-    return pool.filter((u) => u.id !== currentUser.id);
-  }, [open, quest, groups, friends, currentUser.id]);
+    return quest.participants.filter((u) => u.id !== currentUser.id);
+  }, [open, quest.participants, currentUser.id]);
 
   // Reset state when opening
   useEffect(() => {
@@ -46,43 +53,47 @@ const NudgeModal = ({ open, onClose, quest, initialSelectedUserId }: NudgeModalP
     }
   }, [open]);
 
-  // Seed preselected user (e.g., from a friend's profile CTA) once candidates & throttle are known
-  useEffect(() => {
-    if (!open || !initialSelectedUserId) return;
-    if (recentNudges.has(initialSelectedUserId)) return;
-    if (!candidates.some((c) => c.id === initialSelectedUserId)) return;
-    setSelected((prev) => {
-      if (prev.has(initialSelectedUserId)) return prev;
-      const next = new Set(prev);
-      next.add(initialSelectedUserId);
-      return next;
-    });
-  }, [open, initialSelectedUserId, candidates, recentNudges]);
-
-  // Load who's been nudged in the last 24h for this quest
+  // Load per-recipient throttle (24h) + owner rate-limit usage (1h / 24h)
   useEffect(() => {
     if (!open) return;
     let cancelled = false;
     (async () => {
-      const since = new Date(Date.now() - ONE_DAY_MS).toISOString();
-      const { data } = await supabase
-        .from("quest_nudges")
-        .select("to_user_id")
-        .eq("sidequest_id", quest.id)
-        .eq("from_user_id", currentUser.id)
-        .gte("created_at", since);
+      const dayAgo = new Date(Date.now() - ONE_DAY_MS).toISOString();
+      const hourAgo = new Date(Date.now() - ONE_HOUR_MS).toISOString();
+      const [recentRes, hourRes, dayRes] = await Promise.all([
+        supabase
+          .from("quest_nudges")
+          .select("to_user_id")
+          .eq("sidequest_id", quest.id)
+          .eq("from_user_id", currentUser.id)
+          .gte("created_at", dayAgo),
+        supabase
+          .from("quest_nudges")
+          .select("id", { count: "exact", head: true })
+          .eq("from_user_id", currentUser.id)
+          .gte("created_at", hourAgo),
+        supabase
+          .from("quest_nudges")
+          .select("id", { count: "exact", head: true })
+          .eq("from_user_id", currentUser.id)
+          .gte("created_at", dayAgo),
+      ]);
       if (cancelled) return;
-      setRecentNudges(new Set((data || []).map((r) => r.to_user_id)));
+      setRecentNudges(new Set((recentRes.data || []).map((r) => r.to_user_id)));
+      setHourlyCount(hourRes.count ?? 0);
+      setDailyCount(dayRes.count ?? 0);
     })();
     return () => {
       cancelled = true;
     };
   }, [open, quest.id, currentUser.id]);
 
-  const participantIds = useMemo(
-    () => new Set(quest.participants.map((p) => p.id)),
-    [quest.participants]
-  );
+  const rateLimitMessage =
+    hourlyCount >= MAX_NUDGES_PER_HOUR
+      ? NUDGE_HOURLY_LIMIT_MESSAGE
+      : dailyCount >= MAX_NUDGES_PER_DAY
+      ? NUDGE_DAILY_LIMIT_MESSAGE
+      : null;
 
   const q = search.trim().toLowerCase();
   const filtered = useMemo(() => {
@@ -105,7 +116,7 @@ const NudgeModal = ({ open, onClose, quest, initialSelectedUserId }: NudgeModalP
   };
 
   const handleSend = async () => {
-    if (sending || selected.size === 0) return;
+    if (sending || selected.size === 0 || rateLimitMessage) return;
     const trimmedNote = note.trim();
     if (trimmedNote) {
       const violation = validateContent(trimmedNote);
@@ -121,7 +132,7 @@ const NudgeModal = ({ open, onClose, quest, initialSelectedUserId }: NudgeModalP
       : `nudged you about '${quest.title}'`;
 
     try {
-      // Insert audit/throttle rows
+      // Insert audit/throttle rows (DB enforces the nudge limits)
       const nudgeRows = recipients.map((to) => ({
         sidequest_id: quest.id,
         from_user_id: currentUser.id,
@@ -148,7 +159,10 @@ const NudgeModal = ({ open, onClose, quest, initialSelectedUserId }: NudgeModalP
     } catch (e: any) {
       console.error(e);
       const msg = e?.message || "";
-      if (msg.toLowerCase().includes("permission") || e?.code === "42501") {
+      const friendly = mapNudgeError(msg);
+      if (friendly) {
+        toast.error(friendly);
+      } else if (msg.toLowerCase().includes("permission") || e?.code === "42501") {
         toast.error("You need to own this sidequest to send a nudge.");
       } else {
         toast.error(msg ? `Couldn't send nudge: ${msg}` : "Couldn't send nudge");
@@ -178,8 +192,13 @@ const NudgeModal = ({ open, onClose, quest, initialSelectedUserId }: NudgeModalP
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-border/50">
               <div className="flex items-center gap-2">
-                <HandMetal className="w-4 h-4 text-primary" />
-                <h3 className="font-bold text-foreground text-base">Send a nudge</h3>
+                <HandMetal className="w-4 h-4 text-primary shrink-0" />
+                <div>
+                  <h3 className="font-bold text-foreground text-base">Send a nudge</h3>
+                  <p className="text-[11px] text-muted-foreground">
+                    Remind people who've joined this sidequest
+                  </p>
+                </div>
               </div>
               <button onClick={onClose} aria-label="Close" className="p-1 -m-1">
                 <X className="w-4 h-4 text-muted-foreground" />
@@ -207,6 +226,11 @@ const NudgeModal = ({ open, onClose, quest, initialSelectedUserId }: NudgeModalP
                   <EmptyState
                     icon={Search}
                     title={candidates.length === 0 ? "Nobody to nudge yet" : "No matches"}
+                    description={
+                      candidates.length === 0
+                        ? "Only people who've joined this sidequest can be nudged."
+                        : undefined
+                    }
                     size="sm"
                   />
                 </div>
@@ -215,7 +239,6 @@ const NudgeModal = ({ open, onClose, quest, initialSelectedUserId }: NudgeModalP
                   {filtered.map((u) => {
                     const isSelected = selected.has(u.id);
                     const isThrottled = recentNudges.has(u.id);
-                    const isJoined = participantIds.has(u.id);
                     return (
                       <li key={u.id}>
                         <button
@@ -232,11 +255,6 @@ const NudgeModal = ({ open, onClose, quest, initialSelectedUserId }: NudgeModalP
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-semibold text-foreground truncate">
                               {u.name}
-                              {isJoined && (
-                                <span className="ml-1.5 text-[10px] font-medium text-primary align-middle">
-                                  • Joined
-                                </span>
-                              )}
                             </p>
                             <p className="text-[11px] text-muted-foreground truncate">
                               {isThrottled
@@ -263,30 +281,41 @@ const NudgeModal = ({ open, onClose, quest, initialSelectedUserId }: NudgeModalP
               )}
             </div>
 
-            {/* Note + send bar */}
+            {/* Rate-limit notice / note + send bar */}
             <AnimatePresence>
-              {selected.size > 0 && (
+              {(selected.size > 0 || rateLimitMessage) && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 20 }}
                   className="border-t border-border/50 p-3 space-y-2 bg-card"
                 >
-                  <input
-                    type="text"
-                    value={note}
-                    onChange={(e) => setNote(e.target.value.slice(0, 140))}
-                    placeholder="Add a note (optional)"
-                    className="w-full px-3 py-2 rounded-lg bg-card border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleSend}
-                    disabled={sending}
-                    className="w-full py-2.5 rounded-full bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 active:scale-[0.98] transition-all disabled:opacity-60"
-                  >
-                    {sending ? "Sending…" : `Send a nudge! (${selected.size})`}
-                  </button>
+                  {rateLimitMessage ? (
+                    <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg bg-muted/60">
+                      <Hourglass className="w-4 h-4 text-muted-foreground shrink-0" />
+                      <p className="text-xs text-muted-foreground leading-snug">
+                        {rateLimitMessage}
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      <input
+                        type="text"
+                        value={note}
+                        onChange={(e) => setNote(e.target.value.slice(0, 140))}
+                        placeholder="Add a note (optional)"
+                        className="w-full px-3 py-2 rounded-lg bg-card border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleSend}
+                        disabled={sending}
+                        className="w-full py-2.5 rounded-full bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 active:scale-[0.98] transition-all disabled:opacity-60"
+                      >
+                        {sending ? "Sending…" : `Send a nudge! (${selected.size})`}
+                      </button>
+                    </>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>
