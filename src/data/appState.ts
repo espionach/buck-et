@@ -40,6 +40,7 @@ interface AppState {
   hideGlobalFab: boolean;
   popupCount: number;
   pinnedQuestIds: string[];
+  removedFromQuestIds: string[];
   _initialized: boolean;
 
   // Setters for data from React Query
@@ -55,6 +56,7 @@ interface AppState {
   setAllUsers: (users: User[]) => void;
   setBlockedUserIds: (ids: string[]) => void;
   setCurrentUserRoles: (roles: string[]) => void;
+  setRemovedFromQuestIds: (ids: string[]) => void;
   setInitialized: (v: boolean) => void;
 
   setHideGlobalFab: (hide: boolean) => void;
@@ -155,6 +157,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   hideGlobalFab: false,
   popupCount: 0,
   pinnedQuestIds: JSON.parse(localStorage.getItem("pinnedQuestIds") || "[]"),
+  removedFromQuestIds: [],
   _initialized: false,
   _invalidate: () => {},
 
@@ -171,6 +174,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   setAllUsers: (allUsers) => set({ allUsers }),
   setBlockedUserIds: (blockedUserIds) => set({ blockedUserIds }),
   setCurrentUserRoles: (currentUserRoles) => set({ currentUserRoles }),
+  setRemovedFromQuestIds: (removedFromQuestIds) => set({ removedFromQuestIds }),
   setInitialized: (v) => set({ _initialized: v }),
   _setInvalidate: (fn) => set({ _invalidate: fn }),
 
@@ -254,9 +258,11 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   toggleImIn: (questId) => {
-    const { currentUser, _invalidate } = get();
+    const { currentUser, _invalidate, removedFromQuestIds } = get();
     const questBefore = get().quests.find((q) => q.id === questId);
     const wasIn = !!questBefore?.participants.some((p) => p.id === currentUser.id);
+    // Users removed by the owner can never rejoin (also enforced by RLS).
+    if (!wasIn && removedFromQuestIds.includes(questId)) return;
     set((s) => ({
       quests: s.quests.map((q) => {
         if (q.id !== questId) return q;
@@ -1092,23 +1098,14 @@ export const useAppStore = create<AppState>((set, get) => ({
           : q
       ),
     }));
-    const { _invalidate, currentUser, quests } = get();
-    const removedFromQuest = quests.find((q) => q.id === questId);
+    const { _invalidate } = get();
     (async () => {
+      // The DB trigger records the removal (which blocks rejoining). Per
+      // product rules, the removed user is NOT notified.
       await supabase.from("sidequest_participants")
         .delete()
         .eq("sidequest_id", questId)
         .eq("user_id", userId);
-      if (removedFromQuest) {
-        await notifyUsers({
-          recipientIds: [userId],
-          fromUserId: currentUser.id,
-          type: "removed_from_quest",
-          message: `removed you from '${removedFromQuest.title}'`,
-          entityId: questId,
-          groupId: removedFromQuest.groupId || null,
-        });
-      }
       _invalidate(["quests"]);
     })();
   },

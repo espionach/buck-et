@@ -516,6 +516,24 @@ export function useBlockedUsers() {
   });
 }
 
+// ---- Sidequests the current user was removed from (cannot rejoin) ----
+export function useRemovedFromQuests() {
+  const { user } = useAuth();
+  return useQuery({
+    queryKey: ["sidequest_removed_participants", user?.id],
+    queryFn: async () => {
+      if (!user) return [] as string[];
+      const { data, error } = await supabase
+        .from("sidequest_removed_participants")
+        .select("sidequest_id")
+        .eq("user_id", user.id);
+      if (error) throw error;
+      return (data || []).map((r) => r.sidequest_id);
+    },
+    enabled: !!user,
+  });
+}
+
 // ---- Current user roles (admin/moderator) ----
 export function useCurrentUserRoles() {
   const { user } = useAuth();
