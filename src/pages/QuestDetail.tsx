@@ -57,7 +57,7 @@ const QuestDetail = () => {
   };
   const { user, loading: authLoading } = useAuth();
   const { data: hydratedQuests, isLoading: questsLoading, isFetching: questsFetching } = useQuests();
-  const { quests, groups, addComment, volunteerForQuest, unvolunteerFromQuest, currentUser, pinQuest, unpinQuest, pinnedQuestIds, deleteQuest, toggleImIn, updateQuest, addQuestMedia, removeQuestMedia } = useAppStore();
+  const { quests, groups, addComment, volunteerForQuest, unvolunteerFromQuest, currentUser, pinQuest, unpinQuest, pinnedQuestIds, deleteQuest, toggleImIn, updateQuest, addQuestMedia, removeQuestMedia, removedFromQuestIds } = useAppStore();
   const { data: myRoles } = useCurrentUserRoles();
   const [mediaUploaders, setMediaUploaders] = useState<Record<string, string>>({});
   const [deletingPhoto, setDeletingPhoto] = useState<string | null>(null);
@@ -65,12 +65,13 @@ const QuestDetail = () => {
   const [showMenu, setShowMenu] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showReport, setShowReport] = useState(false);
+  const [showJoinBlocked, setShowJoinBlocked] = useState(false);
   const [showNudge, setShowNudge] = useState(false);
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
   const [joinAnim, setJoinAnim] = useState<"idle" | "morph" | "exit" | "done">("idle");
   const [uploadingMedia, setUploadingMedia] = useState(false);
   const completedFileInputRef = useRef<HTMLInputElement>(null);
-  usePopup(showDeleteConfirm);
+  usePopup(showDeleteConfirm || showJoinBlocked);
 
   // Sibling sidequests from the originating list — used for left/right swipe nav.
   const [siblingIds, setSiblingIds] = useState<string[]>(() => {
@@ -186,6 +187,8 @@ const QuestDetail = () => {
   const isFinished = isQuestCompleted(quest);
   const wasJoinedWhenFinished = quest.completedByUserIds?.includes(currentUser.id);
   const isIn = quest.participants.some((p) => p.id === currentUser.id);
+  // Whether the owner removed this user from the quest — they cannot rejoin.
+  const wasRemoved = removedFromQuestIds.includes(quest.id);
 
   const group = quest.groupId ? groups.find((g) => g.id === quest.groupId) : null;
   const isOwner = quest.createdBy.id === currentUser.id;
@@ -422,15 +425,19 @@ const QuestDetail = () => {
           ) : (
             (() => {
               const userInGroup = group ? group.members.some((m) => m.id === currentUser.id) : true;
-              const canJoin = userInGroup;
+              const canJoin = userInGroup && !wasRemoved;
               return (
                 <button
                   data-spotlight="quest-join-friend"
                   onClick={() => {
+                    if (wasRemoved) {
+                      setShowJoinBlocked(true);
+                      return;
+                    }
                     if (!canJoin) return;
                     toggleImIn(quest.id);
                   }}
-                  disabled={!canJoin}
+                  disabled={!canJoin && !wasRemoved}
                   className={`shrink-0 flex items-center justify-center transition-all active:scale-95 px-3 py-1.5 rounded-full text-xs font-semibold ${
                     isIn
                       ? "bg-background text-primary border border-primary hover:bg-primary/5"
@@ -1055,6 +1062,42 @@ const QuestDetail = () => {
                   Delete
                 </button>
               </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Join-blocked popup — shown when a removed participant taps Join.
+          Copy intentionally never mentions removal. */}
+      <AnimatePresence>
+        {showJoinBlocked && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] bg-foreground/40 flex items-center justify-center p-5"
+            onClick={() => setShowJoinBlocked(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-card rounded-2xl p-5 max-w-sm w-full shadow-xl text-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="mx-auto w-10 h-10 rounded-full bg-muted flex items-center justify-center mb-3">
+                <Lock className="w-5 h-5 text-muted-foreground" />
+              </div>
+              <h3 className="text-base font-bold text-foreground mb-1">Unable to join</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                This sidequest isn't available to join right now.
+              </p>
+              <button
+                onClick={() => setShowJoinBlocked(false)}
+                className="w-full py-2.5 rounded-xl bg-secondary text-secondary-foreground font-semibold text-sm"
+              >
+                Got it
+              </button>
             </motion.div>
           </motion.div>
         )}
