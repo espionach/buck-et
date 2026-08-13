@@ -765,6 +765,38 @@ export type Database = {
           },
         ]
       }
+      sidequest_removed_participants: {
+        Row: {
+          created_at: string
+          id: string
+          removed_by: string
+          sidequest_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          removed_by: string
+          sidequest_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          removed_by?: string
+          sidequest_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sidequest_removed_participants_sidequest_id_fkey"
+            columns: ["sidequest_id"]
+            isOneToOne: false
+            referencedRelation: "sidequests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sidequest_volunteers: {
         Row: {
           created_at: string
