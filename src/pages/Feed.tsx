@@ -17,7 +17,7 @@ import BackToTopButton from "@/components/BackToTopButton";
 import CancelRequestDialog from "@/components/CancelRequestDialog";
 
 const Feed = () => {
-  const { quests, groups, friends: friendsList, cleanupEmptyQuests, friendRequests, currentUser, sentFriendRequests, sendFriendRequest, cancelFriendRequest } = useAppStore();
+  const { quests, groups, friends: friendsList, cleanupEmptyQuests, friendRequests, currentUser, sentFriendRequests, sendFriendRequest, cancelFriendRequest, removedFromQuestIds } = useAppStore();
   const [cancelReqUser, setCancelReqUser] = useState<User | null>(null);
   const [search, setSearch] = useState(() => sessionStorage.getItem("feedSearchText") || "");
   const [searchTab, setSearchTab] = useState<"quests" | "people">("quests");
@@ -61,6 +61,8 @@ const Feed = () => {
   const feedQuests = quests.filter((q) => {
     if (isQuestCompleted(q)) return false;
     if (q.isPrivate) return false;
+    // Hide sidequests the user was removed from — they can never rejoin
+    if (removedFromQuestIds.includes(q.id)) return false;
     // Never show user's own quests on the feed
     if (q.createdBy.id === currentUser.id) return false;
     // Friends-only quests: show if creator is a friend (independent of group membership)

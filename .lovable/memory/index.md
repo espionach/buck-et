@@ -23,3 +23,4 @@ Home feed excludes user's own quests, showing friends/shared friend lists.
 - [Filtering & Search](mem://ux/filtering-and-search) — Feed filtering logic, search mode, and history persistence
 - [Contact Discovery](mem://features/contact-discovery) — Privacy-first friend matching via hashed emails (no raw contacts stored)
 - [Nudge Limits](mem://features/nudge-limits) — Participants-only recipients, 1/24h per person, 20/hr + 50/day owner caps, no self/completed nudges
+- [Participant Removal](mem://features/participant-removal) — Silent owner removals, no rejoin ever, hidden from home feed, neutral "Unable to join" popup

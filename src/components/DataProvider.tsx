@@ -18,6 +18,7 @@ import {
   useSearchableUsers,
   useBlockedUsers,
   useCurrentUserRoles,
+  useRemovedFromQuests,
 } from "@/hooks/useSupabaseData";
 
 let errorIdCounter = 0;
@@ -84,6 +85,7 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
   const allUsers = useSearchableUsers();
   const blockedUsers = useBlockedUsers();
   const userRoles = useCurrentUserRoles();
+  const removedFromQuests = useRemovedFromQuests();
 
   // Log errors from each query
   useEffect(() => {
@@ -117,6 +119,10 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (transferRequests.error) logError("Transfer Requests", transferRequests.error);
   }, [transferRequests.error]);
+
+  useEffect(() => {
+    if (removedFromQuests.error) logError("Quests", removedFromQuests.error);
+  }, [removedFromQuests.error]);
 
   useEffect(() => {
     if (allUsers.error) logError("User Search", allUsers.error);
@@ -179,6 +185,10 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (userRoles.data) store.setCurrentUserRoles(userRoles.data);
   }, [userRoles.data]);
+
+  useEffect(() => {
+    if (removedFromQuests.data) store.setRemovedFromQuestIds(removedFromQuests.data);
+  }, [removedFromQuests.data]);
 
   useEffect(() => {
     if (user && profile.data) store.setInitialized(true);

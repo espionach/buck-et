@@ -7,7 +7,7 @@ import MediaViewer from "@/components/MediaViewer";
 import CommentThread from "@/components/CommentThread";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, MessageCircle, ChevronDown, ChevronUp, Send, MoreVertical, Plus, Undo2, ExternalLink, X, Calendar, Globe, Pin, Pencil, Trash2, Share2, Flag } from "lucide-react";
+import { Check, MessageCircle, ChevronDown, ChevronUp, Send, MoreVertical, Plus, Undo2, ExternalLink, X, Calendar, Globe, Pin, Pencil, Trash2, Share2, Flag, Lock } from "lucide-react";
 import OwnerLeaveDialog from "@/components/OwnerLeaveDialog";
 import ReportContentModal from "@/components/ReportContentModal";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
@@ -42,7 +42,7 @@ interface QuestCardProps {
 
 const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPast, disableJoin = false, onMarkDone, onMarkUndone, autoOpenComments = false, highlightCommentId, hideActions = false, onViewProfile, onQuestClick, justAdded = false, isPinned = false, hidePin = false, siblingIds, showSwipeTip = false }: QuestCardProps) => {
   const navigate = useNavigate();
-  const { toggleImIn, markDone, markUndone, groups, addComment, deleteQuest, transferQuestOwnership, requestQuestTransfer, transferRequests, acceptTransfer, declineTransfer, currentUser, pinQuest, unpinQuest, pinnedQuestIds } = useAppStore();
+  const { toggleImIn, markDone, markUndone, groups, addComment, deleteQuest, transferQuestOwnership, requestQuestTransfer, transferRequests, acceptTransfer, declineTransfer, currentUser, pinQuest, unpinQuest, pinnedQuestIds, removedFromQuestIds } = useAppStore();
   const isIn = quest.participants.some((p) => p.id === currentUser.id);
   const group = quest.groupId ? groups.find((g) => g.id === quest.groupId) : null;
   const userInGroup = group ? group.members.some((m) => m.id === currentUser.id) : true;
@@ -53,7 +53,9 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
   const isFinished = isQuestCompleted(quest);
   // Whether the current viewer was joined at the time the owner finished.
   const wasJoinedWhenFinished = quest.completedByUserIds.includes(currentUser.id);
-  const canJoin = !disableJoin && userInGroup && !isFinished;
+  // Whether the owner removed this user from the quest — they cannot rejoin.
+  const wasRemoved = removedFromQuestIds.includes(quest.id);
+  const canJoin = !disableJoin && userInGroup && !isFinished && !wasRemoved;
   const canNavigateToDetail = true;
   const pinned = pinnedQuestIds.includes(quest.id);
 
@@ -63,7 +65,8 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
   const [showMenu, setShowMenu] = useState(false);
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
   const [showReport, setShowReport] = useState(false);
-  usePopup(showDeleteConfirm || showOwnerLeave);
+  const [showJoinBlocked, setShowJoinBlocked] = useState(false);
+  usePopup(showDeleteConfirm || showOwnerLeave || showJoinBlocked);
 
   // Check for pending transfer request for this quest targeting current user
   const pendingTransfer = transferRequests.find(
@@ -71,6 +74,10 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
   );
 
   const handleToggleImIn = () => {
+    if (wasRemoved) {
+      setShowJoinBlocked(true);
+      return;
+    }
     if (!canJoin) return;
       if (isOwner && isIn) {
         if (group && !isFollowersOnly) {
@@ -301,7 +308,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
                 e.stopPropagation();
                 handleToggleImIn();
               }}
-              disabled={!canJoin}
+              disabled={!canJoin && !wasRemoved}
               className={`shrink-0 flex items-center justify-center transition-all active:scale-95 px-3 py-1.5 rounded-full text-xs font-semibold ${
                 isIn
                   ? "bg-background text-primary border border-primary hover:bg-primary/5"
@@ -519,6 +526,42 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
                   Delete
                 </button>
               </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Join-blocked popup — shown when a removed participant taps Join.
+          Copy intentionally never mentions removal. */}
+      <AnimatePresence>
+        {showJoinBlocked && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] bg-foreground/40 flex items-center justify-center p-5"
+            onClick={() => setShowJoinBlocked(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-xs bg-card rounded-xl p-5 space-y-3 shadow-lg text-center"
+            >
+              <div className="mx-auto w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+                <Lock className="w-5 h-5 text-muted-foreground" />
+              </div>
+              <p className="text-sm font-bold text-foreground">Unable to join</p>
+              <p className="text-xs text-muted-foreground">
+                This sidequest isn't available to join right now.
+              </p>
+              <button
+                onClick={() => setShowJoinBlocked(false)}
+                className="w-full py-2.5 rounded-xl bg-secondary text-secondary-foreground font-semibold text-sm"
+              >
+                Got it
+              </button>
             </motion.div>
           </motion.div>
         )}
