@@ -42,22 +42,7 @@ const PublicProfile = () => {
   }, [username, currentUser.id, nav]);
 
   if (notFound) {
-    return (
-      <div className="min-h-screen pt-14 px-5">
-        <button
-          onClick={() => nav(-1)}
-          aria-label="Back"
-          className="p-2 -ml-2 text-muted-foreground hover:text-foreground transition-colors mb-4"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-        <div className="text-center py-20">
-          <UserX className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
-          <p className="font-bold text-foreground mb-1">User not found</p>
-          <p className="text-sm text-muted-foreground">No account exists for @{username}.</p>
-        </div>
-      </div>
-    );
+    return <UnavailableState label="Profile" icon={UserX} />;
   }
 
   if (!user) return null;
