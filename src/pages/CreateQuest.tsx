@@ -15,6 +15,7 @@ import { uploadSidequestPhotos } from "@/lib/uploads";
 import { toast } from "sonner";
 import { getUserFriendlyError } from "@/lib/errorMapping";
 import { deleteDraft, getDraft, newDraftId, saveDraft, draftHasContent } from "@/lib/drafts";
+import { MAX_LINKS_PER_QUEST, validateNewLink, mapLinkError } from "@/lib/linkLimits";
 
 const CreateQuest = () => {
   const navigate = useNavigate();
@@ -44,6 +45,7 @@ const CreateQuest = () => {
   const [pendingPhotos, setPendingPhotos] = useState<File[]>([]);
   const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
   const [links, setLinks] = useState<string[]>([]);
+  const [linkError, setLinkError] = useState<string | null>(null);
   const [newLink, setNewLink] = useState("");
   const photoInputRef = useRef<HTMLInputElement>(null);
   const [submitting, setSubmitting] = useState(false);

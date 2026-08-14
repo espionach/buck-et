@@ -15,6 +15,7 @@ import { uploadSidequestPhotos } from "@/lib/uploads";
 import { toast } from "sonner";
 import { validateContent } from "@/lib/contentFilter";
 import { usePopup } from "@/hooks/use-popup";
+import { MAX_LINKS_PER_QUEST, validateNewLink } from "@/lib/linkLimits";
 
 const EditQuest = () => {
   const navigate = useNavigate();
@@ -37,6 +38,7 @@ const EditQuest = () => {
   const [participants, setParticipants] = useState<User[]>([]);
   const [photos, setPhotos] = useState<string[]>([]);
   const [links, setLinks] = useState<string[]>([]);
+  const [linkError, setLinkError] = useState<string | null>(null);
   const [newLink, setNewLink] = useState("");
 
   const [date, setDate] = useState("");
@@ -128,8 +130,14 @@ const EditQuest = () => {
 
   const handleAddLink = () => {
     if (!newLink.trim()) return;
-    setLinks((prev) => [...prev, newLink.trim()]);
+    const result = validateNewLink(newLink, links);
+    if (result.error) {
+      setLinkError(result.error);
+      return;
+    }
+    setLinks((prev) => [...prev, result.link]);
     setNewLink("");
+    setLinkError(null);
   };
 
   const toggleContributionRole = (id: string) => {
