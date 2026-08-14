@@ -174,9 +174,16 @@ const CreateQuest = () => {
 
   const handleAddLink = () => {
     if (!newLink.trim()) return;
-    setLinks((prev) => [...prev, newLink.trim()]);
+    const result = validateNewLink(newLink, links);
+    if (result.error) {
+      setLinkError(result.error);
+      return;
+    }
+    setLinks((prev) => [...prev, result.link]);
     setNewLink("");
+    setLinkError(null);
   };
+
 
   const handleCreate = async () => {
     if (!title.trim() || submitting) return;
