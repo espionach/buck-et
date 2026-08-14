@@ -947,7 +947,7 @@ export const useAppStore = create<AppState>((set, get) => ({
             import("sonner"),
           ]);
           toast.error(mapLinkError(updateError.message) ?? "Couldn't save those changes.");
-          _invalidate();
+          _invalidate(["quests"]);
           return;
         }
       }
