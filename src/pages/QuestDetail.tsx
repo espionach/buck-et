@@ -168,20 +168,7 @@ const QuestDetail = () => {
   }
 
   if (!quest) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <div className="px-10 pt-14 pb-3">
-          <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-muted-foreground hover:text-foreground transition-colors" aria-label="Back">
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-        </div>
-        <div className="flex-1 flex flex-col items-center justify-center gap-3 px-8 -mt-12">
-          <Lock className="w-8 h-8 text-muted-foreground" strokeWidth={1.75} />
-          <p className="text-sm text-muted-foreground">Sidequest unavailable</p>
-        </div>
-
-      </div>
-    );
+    return <UnavailableState label="Sidequest" onBack={handleBack} />;
   }
 
   const isFinished = isQuestCompleted(quest);
