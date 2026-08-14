@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAppStore } from "@/data/appState";
+import UnavailableState from "@/components/UnavailableState";
 import UserProfileView from "@/components/UserProfileView";
 import { User } from "@/data/mockData";
-import { ArrowLeft, UserX } from "lucide-react";
+import { UserX } from "lucide-react";
 
 const PublicProfile = () => {
   const { username } = useParams<{ username: string }>();
