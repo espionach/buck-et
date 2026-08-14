@@ -937,7 +937,19 @@ export const useAppStore = create<AppState>((set, get) => ({
         }
       }
       if (Object.keys(dbUpdates).length > 0) {
-        await supabase.from("sidequests").update(dbUpdates).eq("id", questId);
+        const { error: updateError } = await supabase
+          .from("sidequests")
+          .update(dbUpdates)
+          .eq("id", questId);
+        if (updateError) {
+          const [{ mapLinkError }, { toast }] = await Promise.all([
+            import("@/lib/linkLimits"),
+            import("sonner"),
+          ]);
+          toast.error(mapLinkError(updateError.message) ?? "Couldn't save those changes.");
+          _invalidate();
+          return;
+        }
       }
 
       // ---- Notifications ----

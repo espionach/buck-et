@@ -301,7 +301,7 @@ const CreateQuest = () => {
       }
     } catch (err: any) {
       console.error("[CreateQuest]", err);
-      toast.error(getUserFriendlyError("sidequest", err?.message || ""));
+      toast.error(mapLinkError(err?.message) ?? getUserFriendlyError("sidequest", err?.message || ""));
       setSubmitting(false);
     }
   };
