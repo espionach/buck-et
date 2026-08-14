@@ -89,7 +89,7 @@ const CreateQuest = () => {
     setTransportation(d.transportation);
     setCarpoolSlots(d.carpoolSlots);
     setCustomNotes(d.customNotes);
-    setLinks(d.links);
+    setLinks((d.links || []).slice(0, MAX_LINKS_PER_QUEST));
     setContributionRoles(d.contributionRoles);
     if (d.transportation || d.carpoolSlots || d.customNotes || d.links.length || d.contributionRoles.length) {
       setDetailsOpen(true);
