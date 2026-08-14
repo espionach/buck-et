@@ -8,7 +8,7 @@ import MediaViewer from "@/components/MediaViewer";
 import UnavailableState from "@/components/UnavailableState";
 import CommentThread from "@/components/CommentThread";
 import MapPreview from "@/components/MapPreview";
-import { ArrowLeft, ChevronLeft, ChevronRight, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send, ExternalLink, HandMetal, Check, Globe, StickyNote, MoreVertical, Pencil, Pin, Trash2, Flag, Share2, Lock, Plus, ImagePlus } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, MapPin, Calendar, Clock, Car, Bike, Train, Footprints, Send, ExternalLink, HandMetal, Check, Globe, StickyNote, MessageCircleOff, MoreVertical, Pencil, Pin, Trash2, Flag, Share2, Lock, Plus, ImagePlus } from "lucide-react";
 import { uploadSidequestPhotos } from "@/lib/uploads";
 import NudgeModal from "@/components/NudgeModal";
 import EmptyState from "@/components/EmptyState";
@@ -51,6 +51,7 @@ const QuestDetail = () => {
   const [searchParams] = useSearchParams();
   const fromOnboarding = searchParams.get("fromOnboarding") === "1";
   const swipeHint = searchParams.get("swipeHint") === "1";
+  const deepLinkCommentId = searchParams.get("commentId");
   const { questId } = useParams<{ questId: string }>();
   const handleBack = () => {
     if (fromOnboarding) navigate("/", { replace: true });
@@ -171,6 +172,20 @@ const QuestDetail = () => {
   if (!quest) {
     return <UnavailableState label="Sidequest" onBack={handleBack} />;
   }
+
+  // Deep-linked comment may have been deleted (or be invisible to this user).
+  const commentExists = (() => {
+    if (!deepLinkCommentId) return true;
+    const walk = (list: typeof quest.comments): boolean =>
+      (list ?? []).some((c) => c.id === deepLinkCommentId || walk(c.replies ?? []));
+    return walk(quest.comments);
+  })();
+  const missingCommentNotice = !commentExists ? (
+    <div className="flex items-center gap-2 mb-3 text-xs text-muted-foreground">
+      <MessageCircleOff className="w-4 h-4" strokeWidth={1.75} />
+      <span>Comment unavailable</span>
+    </div>
+  ) : null;
 
   const isFinished = isQuestCompleted(quest);
   const wasJoinedWhenFinished = quest.completedByUserIds?.includes(currentUser.id);
@@ -607,7 +622,7 @@ const QuestDetail = () => {
                 return count > 0 ? `(${count})` : "";
               })()}
             </h3>
-            <CommentThread quest={quest} />
+            <>{missingCommentNotice}<CommentThread quest={quest} highlightCommentId={commentExists ? deepLinkCommentId ?? undefined : undefined} /></>
           </section>
 
           {/* Quest details (moved to bottom, past tense, read-only) */}
@@ -1002,7 +1017,7 @@ const QuestDetail = () => {
               return count > 0 ? `(${count})` : "";
             })()}
           </h3>
-          <CommentThread quest={quest} />
+          <>{missingCommentNotice}<CommentThread quest={quest} highlightCommentId={commentExists ? deepLinkCommentId ?? undefined : undefined} /></>
         </section>
       </motion.div>
       )}
