@@ -609,7 +609,9 @@ const CreateQuest = () => {
 
             {/* Links */}
             <div>
-              <label className="text-[11px] text-muted-foreground mb-1 block">Links</label>
+              <label className="text-[11px] text-muted-foreground mb-1 block">
+                Links <span className="text-muted-foreground/70">({links.length}/{MAX_LINKS_PER_QUEST})</span>
+              </label>
               {links.map((link, i) => (
                 <div key={i} className="flex items-center gap-2 mb-1.5">
                   <LinkIcon className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
@@ -623,20 +625,22 @@ const CreateQuest = () => {
                 <input
                   type="url"
                   value={newLink}
-                  onChange={(e) => setNewLink(e.target.value)}
+                  onChange={(e) => { setNewLink(e.target.value); setLinkError(null); }}
                   onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleAddLink())}
-                  placeholder="Paste a URL..."
-                  className="flex-1 px-3 py-2 rounded-xl bg-card border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  placeholder={links.length >= MAX_LINKS_PER_QUEST ? `Max ${MAX_LINKS_PER_QUEST} links` : "Paste a URL..."}
+                  disabled={links.length >= MAX_LINKS_PER_QUEST}
+                  className="flex-1 px-3 py-2 rounded-xl bg-card border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-50"
                 />
                 <button
                   type="button"
                   onClick={handleAddLink}
-                  disabled={!newLink.trim()}
+                  disabled={!newLink.trim() || links.length >= MAX_LINKS_PER_QUEST}
                   className="px-3 py-2 rounded-xl bg-primary/10 text-primary text-sm font-semibold disabled:opacity-40"
                 >
                   Add
                 </button>
             </div>
+              {linkError && <p className="text-[11px] text-destructive mt-1">{linkError}</p>}
             </div>
 
             {/* Additional Notes — last */}
