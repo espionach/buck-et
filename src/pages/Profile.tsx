@@ -22,7 +22,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { getUserFriendlyError } from "@/lib/errorMapping";
 import { validateContent } from "@/lib/contentFilter";
 import LocationPicker, { LocationValue } from "@/components/LocationPicker";
-import { listDrafts } from "@/lib/drafts";
+import { useDrafts } from "@/hooks/useDrafts";
 import { FileText, ChevronRight, UserMinus } from "lucide-react";
 import BackToTopButton from "@/components/BackToTopButton";
 import CompletionVisibilityEditor from "@/components/CompletionVisibilityEditor";
