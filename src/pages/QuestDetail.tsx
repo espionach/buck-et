@@ -157,6 +157,27 @@ const QuestDetail = () => {
   const [newComment, setNewComment] = useState("");
   const isQuestLookupPending = authLoading || (!!user && !quest && (questsLoading || questsFetching));
 
+  // Who uploaded each photo/video — used to let people delete their own items
+  // on completed sidequests. Must stay above any early return so the hook order
+  // is stable across renders.
+  useEffect(() => {
+    if (!quest?.id) return;
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("sidequest_photo_events")
+        .select("photo_url, user_id")
+        .eq("sidequest_id", quest.id);
+      if (cancelled || !data) return;
+      const map: Record<string, string> = {};
+      for (const row of data) map[row.photo_url] = row.user_id;
+      setMediaUploaders(map);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [quest?.id, quest?.photos?.length]);
+
   // Completed quests now render their own read-only detail view below
   // instead of redirecting away.
 
@@ -290,25 +311,8 @@ const QuestDetail = () => {
     }
   };
 
-  // Who uploaded each photo/video — used to let people delete their own items
-  // on completed sidequests.
-  useEffect(() => {
-    if (!quest?.id) return;
-    let cancelled = false;
-    (async () => {
-      const { data } = await supabase
-        .from("sidequest_photo_events")
-        .select("photo_url, user_id")
-        .eq("sidequest_id", quest.id);
-      if (cancelled || !data) return;
-      const map: Record<string, string> = {};
-      for (const row of data) map[row.photo_url] = row.user_id;
-      setMediaUploaders(map);
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [quest?.id, quest?.photos?.length]);
+
+
 
 
   return (
