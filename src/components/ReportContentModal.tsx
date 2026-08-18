@@ -5,12 +5,14 @@ import { useAppStore } from "@/data/appState";
 import { usePopup } from "@/hooks/use-popup";
 import { toast } from "sonner";
 
-export type ReportTargetType = "sidequest" | "comment";
+export type ReportTargetType = "sidequest" | "comment" | "media";
 
 interface ReportContentModalProps {
   targetType: ReportTargetType;
   targetId: string;
   reportedUserId: string;
+  /** For media reports: the storage path of the reported photo/video. */
+  targetPath?: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
