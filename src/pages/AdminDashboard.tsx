@@ -274,7 +274,9 @@ const AdminDashboard = () => {
     const nameMap = new Map((profiles || []).map((p) => [p.user_id, p.display_name || (p.username ? `@${p.username}` : "User")]));
 
     // Fetch content previews for sidequest/comment targets
-    const sidequestIds = rows.filter((r) => r.target_type === "sidequest" && r.target_id).map((r) => r.target_id as string);
+    const sidequestIds = rows
+      .filter((r) => (r.target_type === "sidequest" || r.target_type === "media") && r.target_id)
+      .map((r) => r.target_id as string);
     const commentIds = rows.filter((r) => r.target_type === "comment" && r.target_id).map((r) => r.target_id as string);
     const [{ data: sqs }, { data: cms }] = await Promise.all([
       sidequestIds.length
@@ -294,6 +296,7 @@ const AdminDashboard = () => {
       target_preview:
         r.target_type === "sidequest" && r.target_id ? sqMap.get(r.target_id) :
         r.target_type === "comment" && r.target_id ? cmMap.get(r.target_id) :
+        r.target_type === "media" && r.target_id ? `Media in "${sqMap.get(r.target_id) ?? "sidequest"}"` :
         undefined,
     })));
   };
