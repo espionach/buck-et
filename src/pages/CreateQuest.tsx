@@ -27,6 +27,7 @@ const CreateQuest = () => {
   const isOnboarding = searchParams.get("onboarding") === "1";
   const { user } = useAuth();
   const { groups, addQuest, currentUser } = useAppStore();
+  const queryClient = useQueryClient();
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
