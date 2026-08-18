@@ -610,6 +610,75 @@ export type Database = {
         }
         Relationships: []
       }
+      quest_drafts: {
+        Row: {
+          carpool_slots: string | null
+          contribution_roles: string[]
+          created_at: string
+          custom_notes: string | null
+          description: string
+          group_id: string | null
+          id: string
+          links: string[]
+          location_latitude: number | null
+          location_longitude: number | null
+          location_place_id: string | null
+          location_text: string | null
+          logistics_date: string | null
+          logistics_time: string | null
+          meetup_spot: string | null
+          photo_placeholder_count: number
+          title: string
+          transportation: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          carpool_slots?: string | null
+          contribution_roles?: string[]
+          created_at?: string
+          custom_notes?: string | null
+          description?: string
+          group_id?: string | null
+          id?: string
+          links?: string[]
+          location_latitude?: number | null
+          location_longitude?: number | null
+          location_place_id?: string | null
+          location_text?: string | null
+          logistics_date?: string | null
+          logistics_time?: string | null
+          meetup_spot?: string | null
+          photo_placeholder_count?: number
+          title?: string
+          transportation?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          carpool_slots?: string | null
+          contribution_roles?: string[]
+          created_at?: string
+          custom_notes?: string | null
+          description?: string
+          group_id?: string | null
+          id?: string
+          links?: string[]
+          location_latitude?: number | null
+          location_longitude?: number | null
+          location_place_id?: string | null
+          location_text?: string | null
+          logistics_date?: string | null
+          logistics_time?: string | null
+          meetup_spot?: string | null
+          photo_placeholder_count?: number
+          title?: string
+          transportation?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       quest_nudges: {
         Row: {
           created_at: string
