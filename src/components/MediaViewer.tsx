@@ -173,7 +173,15 @@ const MediaViewer = ({ sources, startIndex = 0, open, onOpenChange, canReport, o
                     if (e.target === e.currentTarget) close();
                   }}
                 >
-                  <Slide src={src} onClose={close} />
+                  <Slide
+                    src={src}
+                    onClose={close}
+                    onReport={
+                      onReport && (!canReport || canReport(src))
+                        ? () => onReport(src)
+                        : undefined
+                    }
+                  />
                 </CarouselItem>
               ))}
             </CarouselContent>
