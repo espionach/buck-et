@@ -17,6 +17,45 @@ import {
   isQuestCompleted,
 } from "./mockData";
 
+// ---- quest_updated notification debounce ----
+// Several saves in a row should produce ONE notification per sidequest.
+// Recipients' notification rows aren't readable by the sender, so the window is
+// tracked locally on the editing device.
+const QUEST_UPDATE_NOTIFY_WINDOW_MINUTES = 10;
+const QUEST_UPDATE_NOTIFY_KEY = "quest_update_notify_v1";
+
+function readQuestUpdateNotifyLog(): Record<string, number> {
+  try {
+    const raw = localStorage.getItem(QUEST_UPDATE_NOTIFY_KEY);
+    const parsed = raw ? JSON.parse(raw) : null;
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function shouldNotifyQuestUpdate(questId: string): boolean {
+  const last = readQuestUpdateNotifyLog()[questId];
+  if (!last) return true;
+  return Date.now() - last > QUEST_UPDATE_NOTIFY_WINDOW_MINUTES * 60_000;
+}
+
+function markQuestUpdateNotified(questId: string) {
+  try {
+    const log = readQuestUpdateNotifyLog();
+    const cutoff = Date.now() - QUEST_UPDATE_NOTIFY_WINDOW_MINUTES * 60_000;
+    const next: Record<string, number> = {};
+    for (const [id, ts] of Object.entries(log)) {
+      if (typeof ts === "number" && ts > cutoff) next[id] = ts;
+    }
+    next[questId] = Date.now();
+    localStorage.setItem(QUEST_UPDATE_NOTIFY_KEY, JSON.stringify(next));
+  } catch {
+    // storage unavailable — debounce simply degrades to no-op
+  }
+}
+
+
 export type GroupDeleteAction =
   | { mode: "all-friends" }
   | { mode: "move"; targetGroupId: string }
@@ -978,12 +1017,22 @@ export const useAppStore = create<AppState>((set, get) => ({
         }
 
 
-        // b) quest_updated — title/desc/logistics changed (but NOT just photos/notes/links/completion)
-        const meaningfulChange =
-          (updates.title !== undefined && updates.title !== prevQuest.title) ||
-          (updates.description !== undefined && updates.description !== prevQuest.description) ||
-          updates.logistics !== undefined;
-        if (meaningfulChange && otherParticipantIds.length > 0) {
+        // b) quest_updated — ONLY when the date, time, or location changed.
+        // Title/description/notes/links/photos/meetup/transport/roles are silent.
+        const prevL = prevQuest.logistics;
+        const nextL = updates.logistics;
+        const scheduleChanged =
+          updates.logistics !== undefined &&
+          (
+            (nextL?.date || "") !== (prevL?.date || "") ||
+            (nextL?.time || "") !== (prevL?.time || "") ||
+            (nextL?.location || "") !== (prevL?.location || "") ||
+            (nextL?.placeId || "") !== (prevL?.placeId || "") ||
+            (nextL?.latitude ?? null) !== (prevL?.latitude ?? null) ||
+            (nextL?.longitude ?? null) !== (prevL?.longitude ?? null)
+          );
+
+        if (scheduleChanged && otherParticipantIds.length > 0 && shouldNotifyQuestUpdate(questId)) {
           await notifyUsers({
             recipientIds: otherParticipantIds,
             fromUserId: currentUser.id,
@@ -992,7 +1041,9 @@ export const useAppStore = create<AppState>((set, get) => ({
             entityId: questId,
             groupId: prevQuest.groupId || null,
           });
+          markQuestUpdateNotified(questId);
         }
+
       }
 
       _invalidate(["quests"]);
