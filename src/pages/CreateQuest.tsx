@@ -76,29 +76,42 @@ const CreateQuest = () => {
     hydratedRef.current = true;
     const id = searchParams.get("draftId");
     if (!id || !currentUser?.id) return;
-    const d = getDraft(currentUser.id, id);
-    if (!d) return;
-    setTitle(d.title);
-    setDescription(d.description);
-    setSelectedGroup(d.groupId);
-    setDate(d.date);
-    setTime(d.time);
-    setLocation(d.location);
-    setMeetupSpot(d.meetupSpot);
-    if (d.meetupSpot) setMeetupOpen(true);
-    setTransportation(d.transportation);
-    setCarpoolSlots(d.carpoolSlots);
-    setCustomNotes(d.customNotes);
-    setLinks((d.links || []).slice(0, MAX_LINKS_PER_QUEST));
-    setContributionRoles(d.contributionRoles);
-    if (d.transportation || d.carpoolSlots || d.customNotes || d.links.length || d.contributionRoles.length) {
-      setDetailsOpen(true);
-    }
-    if (d.photoPlaceholderCount > 0) {
-      toast(`${d.photoPlaceholderCount} photo${d.photoPlaceholderCount > 1 ? "s" : ""} from your draft need to be re-added.`);
-    }
+    let cancelled = false;
+    (async () => {
+      let d: Awaited<ReturnType<typeof getDraft>> = null;
+      try {
+        d = await getDraft(currentUser.id, id);
+      } catch (err: any) {
+        console.error("[CreateQuest] draft load", err);
+        return;
+      }
+      if (!d || cancelled) return;
+      setTitle(d.title);
+      setDescription(d.description);
+      setSelectedGroup(d.groupId);
+      setDate(d.date);
+      setTime(d.time);
+      setLocation(d.location);
+      setMeetupSpot(d.meetupSpot);
+      if (d.meetupSpot) setMeetupOpen(true);
+      setTransportation(d.transportation);
+      setCarpoolSlots(d.carpoolSlots);
+      setCustomNotes(d.customNotes);
+      setLinks((d.links || []).slice(0, MAX_LINKS_PER_QUEST));
+      setContributionRoles(d.contributionRoles);
+      if (d.transportation || d.carpoolSlots || d.customNotes || d.links.length || d.contributionRoles.length) {
+        setDetailsOpen(true);
+      }
+      if (d.photoPlaceholderCount > 0) {
+        toast(`${d.photoPlaceholderCount} photo${d.photoPlaceholderCount > 1 ? "s" : ""} from your draft need to be re-added.`);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser?.id]);
+
 
   // Keep a live ref of all field values for the unmount autosave
   const stateRef = useRef({
