@@ -65,6 +65,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
   const [showMenu, setShowMenu] = useState(false);
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
   const [showReport, setShowReport] = useState(false);
+  const [reportMediaPath, setReportMediaPath] = useState<string | null>(null);
   const [showJoinBlocked, setShowJoinBlocked] = useState(false);
   usePopup(showDeleteConfirm || showOwnerLeave || showJoinBlocked);
 
@@ -358,6 +359,12 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
             startIndex={viewerIndex}
             open={viewerIndex !== null}
             onOpenChange={(o) => !o && setViewerIndex(null)}
+            canReport={() => !isOwner}
+            onReport={(src) => {
+              setViewerIndex(null);
+              setReportMediaPath(src);
+              setShowReport(true);
+            }}
           />
         )}
 
@@ -590,11 +597,15 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
       {/* Report sidequest modal (non-owners) */}
       {!isOwner && (
         <ReportContentModal
-          targetType="sidequest"
+          targetType={reportMediaPath ? "media" : "sidequest"}
           targetId={quest.id}
+          targetPath={reportMediaPath ?? undefined}
           reportedUserId={quest.createdBy.id}
           open={showReport}
-          onOpenChange={setShowReport}
+          onOpenChange={(o) => {
+            setShowReport(o);
+            if (!o) setReportMediaPath(null);
+          }}
         />
       )}
     </>

@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { X } from "lucide-react";
+import { X, Flag } from "lucide-react";
 import {
   Carousel,
   CarouselContent,
@@ -23,6 +23,8 @@ interface MediaViewerProps {
   startIndex?: number;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  canReport?: (src: string) => boolean;
+  onReport?: (src: string) => void;
 }
 
 // Module-level caches so flipping between slides doesn't re-show the
@@ -30,7 +32,16 @@ interface MediaViewerProps {
 const slideUrlCache = new Map<string, string>();
 const slideLoadedCache = new Set<string>();
 
-const Slide = ({ src, onClose }: { src: string; onClose: () => void }) => {
+const Slide = ({
+  src,
+  onClose,
+  onReport,
+}: {
+  src: string;
+  onClose: () => void;
+  onReport?: () => void;
+}) => {
+
   const [url, setUrl] = useState<string | null>(() => slideUrlCache.get(src) ?? null);
   const [loaded, setLoaded] = useState<boolean>(() => slideLoadedCache.has(src));
 
@@ -88,6 +99,17 @@ const Slide = ({ src, onClose }: { src: string; onClose: () => void }) => {
           onError={markLoaded}
         />
       ))}
+      {loaded && onReport && (
+        <button
+          type="button"
+          onClick={onReport}
+          aria-label="Report this media"
+          title="Report this media"
+          className="absolute top-2 left-2 h-8 w-8 rounded-full bg-black/60 hover:bg-destructive text-white flex items-center justify-center backdrop-blur-sm transition-colors"
+        >
+          <Flag className="h-4 w-4" />
+        </button>
+      )}
       {loaded && (
         <button
           type="button"
@@ -102,7 +124,8 @@ const Slide = ({ src, onClose }: { src: string; onClose: () => void }) => {
   );
 };
 
-const MediaViewer = ({ sources, startIndex = 0, open, onOpenChange }: MediaViewerProps) => {
+const MediaViewer = ({ sources, startIndex = 0, open, onOpenChange, canReport, onReport }: MediaViewerProps) => {
+
   usePopup(open);
   const [api, setApi] = useState<CarouselApi | null>(null);
   const [current, setCurrent] = useState(startIndex);
@@ -150,7 +173,15 @@ const MediaViewer = ({ sources, startIndex = 0, open, onOpenChange }: MediaViewe
                     if (e.target === e.currentTarget) close();
                   }}
                 >
-                  <Slide src={src} onClose={close} />
+                  <Slide
+                    src={src}
+                    onClose={close}
+                    onReport={
+                      onReport && (!canReport || canReport(src))
+                        ? () => onReport(src)
+                        : undefined
+                    }
+                  />
                 </CarouselItem>
               ))}
             </CarouselContent>

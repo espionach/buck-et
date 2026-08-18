@@ -633,6 +633,12 @@ const QuestDetail = () => {
                 startIndex={viewerIndex}
                 open={viewerIndex !== null}
                 onOpenChange={(o) => !o && setViewerIndex(null)}
+                canReport={canReportMedia}
+                onReport={(src) => {
+                  setViewerIndex(null);
+                  setReportMediaPath(src);
+                  setShowReport(true);
+                }}
               />
             )}
           </section>
@@ -976,6 +982,12 @@ const QuestDetail = () => {
                 startIndex={viewerIndex}
                 open={viewerIndex !== null}
                 onOpenChange={(o) => !o && setViewerIndex(null)}
+                canReport={canReportMedia}
+                onReport={(src) => {
+                  setViewerIndex(null);
+                  setReportMediaPath(src);
+                  setShowReport(true);
+                }}
               />
             )}
           </section>
