@@ -1050,6 +1050,10 @@ export const useAppStore = create<AppState>((set, get) => ({
     set((s) => ({
       quests: s.quests.filter((q) => q.id !== questId),
       transferRequests: s.transferRequests.filter((tr) => !(tr.type === "quest" && tr.entityId === questId)),
+      // Notifications about a hard-deleted sidequest disappear entirely.
+      notifications: archiveOnly
+        ? s.notifications
+        : s.notifications.filter((n) => n.entityId !== questId),
     }));
     const { _invalidate, currentUser } = get();
     (async () => {
@@ -1078,7 +1082,7 @@ export const useAppStore = create<AppState>((set, get) => ({
         }
       }
       await supabase.from("sidequests").delete().eq("id", questId);
-      _invalidate(["quests", "transfer_requests"]);
+      _invalidate(["quests", "transfer_requests", "notifications"]);
     })();
   },
 

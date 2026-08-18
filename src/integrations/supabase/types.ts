@@ -635,7 +635,15 @@ export type Database = {
           sidequest_id?: string
           to_user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "quest_nudges_sidequest_id_fkey"
+            columns: ["sidequest_id"]
+            isOneToOne: false
+            referencedRelation: "sidequests"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       quest_reminders_sent: {
         Row: {
