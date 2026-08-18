@@ -67,6 +67,7 @@ const QuestDetail = () => {
   const [showMenu, setShowMenu] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showReport, setShowReport] = useState(false);
+  const [reportMediaPath, setReportMediaPath] = useState<string | null>(null);
   const [showJoinBlocked, setShowJoinBlocked] = useState(false);
   const [showNudge, setShowNudge] = useState(false);
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
