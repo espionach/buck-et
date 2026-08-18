@@ -112,7 +112,7 @@ const MyReports = () => {
                 <span className="font-semibold">{names[r.reported_user_id] || "a user"}</span>
                 {r.target_type && r.target_type !== "user" && (
                   <span className="text-muted-foreground">
-                    's {r.target_type === "sidequest" ? "sidequest" : "comment"}
+                    's {r.target_type === "sidequest" ? "sidequest" : r.target_type === "media" ? "media" : "comment"}
                   </span>
                 )}
               </p>
