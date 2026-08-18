@@ -152,11 +152,12 @@ interface AppState {
   unblockUser: (userId: string) => Promise<void>;
   reportUser: (userId: string, reason: string, description?: string) => Promise<void>;
   reportContent: (
-    targetType: "sidequest" | "comment",
+    targetType: "sidequest" | "comment" | "media",
     targetId: string,
     reportedUserId: string,
     reason: string,
-    description?: string
+    description?: string,
+    targetPath?: string
   ) => Promise<void>;
 
   // invalidation callback — set by DataProvider
@@ -1666,7 +1667,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     });
   },
 
-  reportContent: async (targetType, targetId, reportedUserId, reason, description) => {
+  reportContent: async (targetType, targetId, reportedUserId, reason, description, targetPath) => {
     const { currentUser } = get();
     if (!currentUser.id) return;
     await supabase.from("user_reports").insert({
@@ -1676,6 +1677,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       description: description?.trim() || null,
       target_type: targetType,
       target_id: targetId,
+      target_path: targetPath ?? null,
     });
   },
 }));

@@ -67,6 +67,7 @@ const QuestDetail = () => {
   const [showMenu, setShowMenu] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showReport, setShowReport] = useState(false);
+  const [reportMediaPath, setReportMediaPath] = useState<string | null>(null);
   const [showJoinBlocked, setShowJoinBlocked] = useState(false);
   const [showNudge, setShowNudge] = useState(false);
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
@@ -281,6 +282,10 @@ const QuestDetail = () => {
     if (isOwner || isAdmin) return true;
     return mediaUploaders[photo] === currentUser.id;
   };
+  const mediaOwnerId = (photo: string) => mediaUploaders[photo] || quest.createdBy.id;
+  const canReportMedia = (photo: string) => !!currentUser.id && mediaOwnerId(photo) !== currentUser.id;
+
+
 
   const handleCompletedMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files ? Array.from(e.target.files) : [];
@@ -515,7 +520,10 @@ const QuestDetail = () => {
                   )}
                   {!isOwner && (
                     <DropdownMenuItem
-                      onSelect={() => setShowReport(true)}
+                      onSelect={() => {
+                        setReportMediaPath(null);
+                        setShowReport(true);
+                      }}
                       className="gap-2 text-xs text-destructive focus:text-destructive"
                     >
                       <Flag className="w-3.5 h-3.5" /> Report
@@ -592,6 +600,20 @@ const QuestDetail = () => {
                         className="absolute top-2 right-2 p-1.5 rounded-full bg-foreground/60 text-background hover:bg-destructive transition-colors disabled:opacity-50"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                    {canReportMedia(photo) && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setReportMediaPath(photo);
+                          setShowReport(true);
+                        }}
+                        aria-label={`Report photo ${i + 1}`}
+                        title="Report this media"
+                        className="absolute top-2 left-2 p-1.5 rounded-full bg-foreground/60 text-background hover:bg-destructive transition-colors"
+                      >
+                        <Flag className="w-3.5 h-3.5" />
                       </button>
                     )}
                   </div>
@@ -926,6 +948,20 @@ const QuestDetail = () => {
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     )}
+                    {canReportMedia(photo) && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setReportMediaPath(photo);
+                          setShowReport(true);
+                        }}
+                        aria-label={`Report photo ${i + 1}`}
+                        title="Report this media"
+                        className="absolute top-2 left-2 p-1.5 rounded-full bg-foreground/60 text-background hover:bg-destructive transition-colors"
+                      >
+                        <Flag className="w-3.5 h-3.5" />
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
@@ -1111,11 +1147,15 @@ const QuestDetail = () => {
       </AnimatePresence>
 
       <ReportContentModal
-        targetType="sidequest"
+        targetType={reportMediaPath ? "media" : "sidequest"}
         targetId={quest.id}
-        reportedUserId={quest.createdBy.id}
+        targetPath={reportMediaPath ?? undefined}
+        reportedUserId={reportMediaPath ? mediaOwnerId(reportMediaPath) : quest.createdBy.id}
         open={showReport}
-        onOpenChange={setShowReport}
+        onOpenChange={(o) => {
+          setShowReport(o);
+          if (!o) setReportMediaPath(null);
+        }}
       />
     </div>
   );

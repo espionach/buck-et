@@ -1155,6 +1155,7 @@ export type Database = {
           reporter_id: string
           status: string
           target_id: string | null
+          target_path: string | null
           target_type: string
         }
         Insert: {
@@ -1166,6 +1167,7 @@ export type Database = {
           reporter_id: string
           status?: string
           target_id?: string | null
+          target_path?: string | null
           target_type?: string
         }
         Update: {
@@ -1177,6 +1179,7 @@ export type Database = {
           reporter_id?: string
           status?: string
           target_id?: string | null
+          target_path?: string | null
           target_type?: string
         }
         Relationships: []

@@ -15,7 +15,7 @@ interface ReportRow {
 }
 
 const targetLabel = (t: string | null) =>
-  t === "sidequest" ? "Sidequest" : t === "comment" ? "Comment" : "User";
+  t === "sidequest" ? "Sidequest" : t === "comment" ? "Comment" : t === "media" ? "Media" : "User";
 
 const MyReports = () => {
   const nav = useNavigate();
@@ -112,7 +112,7 @@ const MyReports = () => {
                 <span className="font-semibold">{names[r.reported_user_id] || "a user"}</span>
                 {r.target_type && r.target_type !== "user" && (
                   <span className="text-muted-foreground">
-                    's {r.target_type === "sidequest" ? "sidequest" : "comment"}
+                    's {r.target_type === "sidequest" ? "sidequest" : r.target_type === "media" ? "media" : "comment"}
                   </span>
                 )}
               </p>

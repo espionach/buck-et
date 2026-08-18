@@ -5,12 +5,14 @@ import { useAppStore } from "@/data/appState";
 import { usePopup } from "@/hooks/use-popup";
 import { toast } from "sonner";
 
-export type ReportTargetType = "sidequest" | "comment";
+export type ReportTargetType = "sidequest" | "comment" | "media";
 
 interface ReportContentModalProps {
   targetType: ReportTargetType;
   targetId: string;
   reportedUserId: string;
+  /** For media reports: the storage path of the reported photo/video. */
+  targetPath?: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -26,6 +28,7 @@ const ReportContentModal = ({
   targetType,
   targetId,
   reportedUserId,
+  targetPath,
   open,
   onOpenChange,
 }: ReportContentModalProps) => {
@@ -36,12 +39,16 @@ const ReportContentModal = ({
   usePopup(open);
 
   const titleLabel =
-    targetType === "sidequest" ? "Report sidequest" : "Report comment";
+    targetType === "sidequest"
+      ? "Report sidequest"
+      : targetType === "media"
+      ? "Report media"
+      : "Report comment";
 
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
-      await reportContent(targetType, targetId, reportedUserId, reason, description);
+      await reportContent(targetType, targetId, reportedUserId, reason, description, targetPath);
       toast.success("Thanks, we'll review this.");
       onOpenChange(false);
       setReason("spam");
