@@ -99,6 +99,17 @@ const Slide = ({
           onError={markLoaded}
         />
       ))}
+      {loaded && onReport && (
+        <button
+          type="button"
+          onClick={onReport}
+          aria-label="Report this media"
+          title="Report this media"
+          className="absolute top-2 left-2 h-8 w-8 rounded-full bg-black/60 hover:bg-destructive text-white flex items-center justify-center backdrop-blur-sm transition-colors"
+        >
+          <Flag className="h-4 w-4" />
+        </button>
+      )}
       {loaded && (
         <button
           type="button"
@@ -113,7 +124,8 @@ const Slide = ({
   );
 };
 
-const MediaViewer = ({ sources, startIndex = 0, open, onOpenChange }: MediaViewerProps) => {
+const MediaViewer = ({ sources, startIndex = 0, open, onOpenChange, canReport, onReport }: MediaViewerProps) => {
+
   usePopup(open);
   const [api, setApi] = useState<CarouselApi | null>(null);
   const [current, setCurrent] = useState(startIndex);
