@@ -1082,7 +1082,7 @@ export const useAppStore = create<AppState>((set, get) => ({
         }
       }
       await supabase.from("sidequests").delete().eq("id", questId);
-      _invalidate(["quests", "transfer_requests"]);
+      _invalidate(["quests", "transfer_requests", "notifications"]);
     })();
   },
 
