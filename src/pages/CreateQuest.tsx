@@ -14,8 +14,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { uploadSidequestPhotos } from "@/lib/uploads";
 import { toast } from "sonner";
 import { getUserFriendlyError } from "@/lib/errorMapping";
-import { deleteDraft, getDraft, newDraftId, saveDraft, draftHasContent } from "@/lib/drafts";
+import { deleteDraft, getDraft, newDraftId, saveDraft, draftHasContent, mapDraftError } from "@/lib/drafts";
 import { MAX_LINKS_PER_QUEST, validateNewLink, mapLinkError } from "@/lib/linkLimits";
+import { useQueryClient } from "@tanstack/react-query";
 
 const CreateQuest = () => {
   const navigate = useNavigate();
@@ -26,6 +27,7 @@ const CreateQuest = () => {
   const isOnboarding = searchParams.get("onboarding") === "1";
   const { user } = useAuth();
   const { groups, addQuest, currentUser } = useAppStore();
+  const queryClient = useQueryClient();
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -76,29 +78,42 @@ const CreateQuest = () => {
     hydratedRef.current = true;
     const id = searchParams.get("draftId");
     if (!id || !currentUser?.id) return;
-    const d = getDraft(currentUser.id, id);
-    if (!d) return;
-    setTitle(d.title);
-    setDescription(d.description);
-    setSelectedGroup(d.groupId);
-    setDate(d.date);
-    setTime(d.time);
-    setLocation(d.location);
-    setMeetupSpot(d.meetupSpot);
-    if (d.meetupSpot) setMeetupOpen(true);
-    setTransportation(d.transportation);
-    setCarpoolSlots(d.carpoolSlots);
-    setCustomNotes(d.customNotes);
-    setLinks((d.links || []).slice(0, MAX_LINKS_PER_QUEST));
-    setContributionRoles(d.contributionRoles);
-    if (d.transportation || d.carpoolSlots || d.customNotes || d.links.length || d.contributionRoles.length) {
-      setDetailsOpen(true);
-    }
-    if (d.photoPlaceholderCount > 0) {
-      toast(`${d.photoPlaceholderCount} photo${d.photoPlaceholderCount > 1 ? "s" : ""} from your draft need to be re-added.`);
-    }
+    let cancelled = false;
+    (async () => {
+      let d: Awaited<ReturnType<typeof getDraft>> = null;
+      try {
+        d = await getDraft(currentUser.id, id);
+      } catch (err: any) {
+        console.error("[CreateQuest] draft load", err);
+        return;
+      }
+      if (!d || cancelled) return;
+      setTitle(d.title);
+      setDescription(d.description);
+      setSelectedGroup(d.groupId);
+      setDate(d.date);
+      setTime(d.time);
+      setLocation(d.location);
+      setMeetupSpot(d.meetupSpot);
+      if (d.meetupSpot) setMeetupOpen(true);
+      setTransportation(d.transportation);
+      setCarpoolSlots(d.carpoolSlots);
+      setCustomNotes(d.customNotes);
+      setLinks((d.links || []).slice(0, MAX_LINKS_PER_QUEST));
+      setContributionRoles(d.contributionRoles);
+      if (d.transportation || d.carpoolSlots || d.customNotes || d.links.length || d.contributionRoles.length) {
+        setDetailsOpen(true);
+      }
+      if (d.photoPlaceholderCount > 0) {
+        toast(`${d.photoPlaceholderCount} photo${d.photoPlaceholderCount > 1 ? "s" : ""} from your draft need to be re-added.`);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser?.id]);
+
 
   // Keep a live ref of all field values for the unmount autosave
   const stateRef = useRef({
@@ -118,7 +133,7 @@ const CreateQuest = () => {
       if (!currentUser?.id) return;
       const id = draftIdRef.current;
       if (submittedRef.current) {
-        deleteDraft(currentUser.id, id);
+        void deleteDraft(currentUser.id, id).catch(() => {});
         return;
       }
       const s = stateRef.current;
@@ -141,10 +156,18 @@ const CreateQuest = () => {
         photoPlaceholderCount: s.pendingPhotosCount,
       };
       if (draftHasContent(payload)) {
-        saveDraft(payload);
+        void saveDraft(payload)
+          .then(() => {
+            queryClient.invalidateQueries({ queryKey: ["quest_drafts", currentUser.id] });
+          })
+          .catch((err: any) => {
+            const friendly = mapDraftError(err?.message);
+            toast.error(friendly ?? "We couldn't save your draft. Please try again.");
+          });
       } else {
-        deleteDraft(currentUser.id, id);
+        void deleteDraft(currentUser.id, id).catch(() => {});
       }
+
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser?.id]);

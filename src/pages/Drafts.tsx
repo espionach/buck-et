@@ -1,9 +1,12 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ArrowLeft, Trash2, FileText, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Trash2, FileText } from "lucide-react";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAppStore } from "@/data/appState";
-import { listDrafts, deleteDraft, type QuestDraft } from "@/lib/drafts";
+import { deleteDraft, MAX_DRAFTS_PER_USER, type QuestDraft } from "@/lib/drafts";
+import { useDrafts, draftsQueryKey } from "@/hooks/useDrafts";
 import GroupSwatch from "@/components/GroupSwatch";
 import EmptyState from "@/components/EmptyState";
 
@@ -24,24 +27,26 @@ const Drafts = () => {
   const location = useLocation();
   const backTo = (location.state as { from?: string } | null)?.from || "/profile";
   const { currentUser, groups } = useAppStore();
-  const [drafts, setDrafts] = useState<QuestDraft[]>([]);
+  const queryClient = useQueryClient();
+  const { data, isLoading, error } = useDrafts(currentUser?.id);
+  const drafts = data || [];
   const [confirmId, setConfirmId] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!currentUser?.id) return;
-    setDrafts(listDrafts(currentUser.id));
-  }, [currentUser?.id]);
 
   const handleOpen = (d: QuestDraft) => {
     nav(`/create?draftId=${encodeURIComponent(d.id)}`);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (!currentUser?.id) return;
-    deleteDraft(currentUser.id, id);
-    setDrafts(listDrafts(currentUser.id));
     setConfirmId(null);
+    try {
+      await deleteDraft(currentUser.id, id);
+      queryClient.invalidateQueries({ queryKey: draftsQueryKey(currentUser.id) });
+    } catch {
+      toast.error("We couldn't delete that draft. Please try again.");
+    }
   };
+
 
   return (
     <div className="min-h-screen px-5 pt-14 pb-10">
@@ -54,17 +59,18 @@ const Drafts = () => {
           <ArrowLeft className="w-5 h-5" />
         </button>
         <h1 className="text-xl font-bold text-foreground">Drafts</h1>
+        <span className="text-xs text-muted-foreground ml-auto">
+          {drafts.length}/{MAX_DRAFTS_PER_USER}
+        </span>
       </div>
 
-      <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-muted/60 border border-border mb-5">
-        <AlertTriangle className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
-        <p className="text-xs text-muted-foreground leading-snug">
-          Drafts are saved on this device only. Clearing your browser data or signing in
-          on another device will erase them.
+      {isLoading ? (
+        <p className="text-sm text-muted-foreground">Loading drafts...</p>
+      ) : error ? (
+        <p className="text-sm text-muted-foreground">
+          We couldn't load your drafts right now. Please try again.
         </p>
-      </div>
-
-      {drafts.length === 0 ? (
+      ) : drafts.length === 0 ? (
         <EmptyState
           icon={FileText}
           title="No drafts"
@@ -72,6 +78,7 @@ const Drafts = () => {
           cta={{ label: "Start a sidequest", onClick: () => nav("/create") }}
         />
       ) : (
+
         <div className="divide-y divide-border">
           {drafts.map((d) => {
             const group = d.groupId ? groups.find((g) => g.id === d.groupId) : null;

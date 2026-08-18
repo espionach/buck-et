@@ -22,7 +22,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { getUserFriendlyError } from "@/lib/errorMapping";
 import { validateContent } from "@/lib/contentFilter";
 import LocationPicker, { LocationValue } from "@/components/LocationPicker";
-import { listDrafts } from "@/lib/drafts";
+import { useDrafts } from "@/hooks/useDrafts";
 import { FileText, ChevronRight, UserMinus } from "lucide-react";
 import BackToTopButton from "@/components/BackToTopButton";
 import CompletionVisibilityEditor from "@/components/CompletionVisibilityEditor";
@@ -216,12 +216,9 @@ const Profile = () => {
 
   const active = tab === "current" ? current : tab === "past" ? past : [];
 
-  // Local-only drafts count — refresh on mount + when location changes (e.g. returning from /drafts or /create)
-  const [draftCount, setDraftCount] = useState(0);
-  useEffect(() => {
-    if (!currentUser?.id) return;
-    setDraftCount(listDrafts(currentUser.id).length);
-  }, [currentUser?.id, location.key]);
+  // Drafts count — synced from the backend
+  const draftCount = useDrafts(currentUser?.id).data?.length ?? 0;
+
 
   const handleSaveProfile = async () => {
     const trimmedUsername = editUsername.trim();
