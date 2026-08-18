@@ -65,6 +65,7 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
   const [showMenu, setShowMenu] = useState(false);
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
   const [showReport, setShowReport] = useState(false);
+  const [reportMediaPath, setReportMediaPath] = useState<string | null>(null);
   const [showJoinBlocked, setShowJoinBlocked] = useState(false);
   usePopup(showDeleteConfirm || showOwnerLeave || showJoinBlocked);
 
