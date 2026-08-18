@@ -14,8 +14,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { uploadSidequestPhotos } from "@/lib/uploads";
 import { toast } from "sonner";
 import { getUserFriendlyError } from "@/lib/errorMapping";
-import { deleteDraft, getDraft, newDraftId, saveDraft, draftHasContent } from "@/lib/drafts";
+import { deleteDraft, getDraft, newDraftId, saveDraft, draftHasContent, mapDraftError } from "@/lib/drafts";
 import { MAX_LINKS_PER_QUEST, validateNewLink, mapLinkError } from "@/lib/linkLimits";
+import { useQueryClient } from "@tanstack/react-query";
 
 const CreateQuest = () => {
   const navigate = useNavigate();
