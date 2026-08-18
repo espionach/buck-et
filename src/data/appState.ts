@@ -152,11 +152,12 @@ interface AppState {
   unblockUser: (userId: string) => Promise<void>;
   reportUser: (userId: string, reason: string, description?: string) => Promise<void>;
   reportContent: (
-    targetType: "sidequest" | "comment",
+    targetType: "sidequest" | "comment" | "media",
     targetId: string,
     reportedUserId: string,
     reason: string,
-    description?: string
+    description?: string,
+    targetPath?: string
   ) => Promise<void>;
 
   // invalidation callback — set by DataProvider
