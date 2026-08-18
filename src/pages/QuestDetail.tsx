@@ -945,6 +945,20 @@ const QuestDetail = () => {
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     )}
+                    {canReportMedia(photo) && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setReportMediaPath(photo);
+                          setShowReport(true);
+                        }}
+                        aria-label={`Report photo ${i + 1}`}
+                        title="Report this media"
+                        className="absolute top-2 left-2 p-1.5 rounded-full bg-foreground/60 text-background hover:bg-destructive transition-colors"
+                      >
+                        <Flag className="w-3.5 h-3.5" />
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
