@@ -28,6 +28,7 @@ const ReportContentModal = ({
   targetType,
   targetId,
   reportedUserId,
+  targetPath,
   open,
   onOpenChange,
 }: ReportContentModalProps) => {
@@ -38,12 +39,16 @@ const ReportContentModal = ({
   usePopup(open);
 
   const titleLabel =
-    targetType === "sidequest" ? "Report sidequest" : "Report comment";
+    targetType === "sidequest"
+      ? "Report sidequest"
+      : targetType === "media"
+      ? "Report media"
+      : "Report comment";
 
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
-      await reportContent(targetType, targetId, reportedUserId, reason, description);
+      await reportContent(targetType, targetId, reportedUserId, reason, description, targetPath);
       toast.success("Thanks, we'll review this.");
       onOpenChange(false);
       setReason("spam");
