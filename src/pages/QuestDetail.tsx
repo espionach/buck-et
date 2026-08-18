@@ -290,25 +290,8 @@ const QuestDetail = () => {
     }
   };
 
-  // Who uploaded each photo/video — used to let people delete their own items
-  // on completed sidequests.
-  useEffect(() => {
-    if (!quest?.id) return;
-    let cancelled = false;
-    (async () => {
-      const { data } = await supabase
-        .from("sidequest_photo_events")
-        .select("photo_url, user_id")
-        .eq("sidequest_id", quest.id);
-      if (cancelled || !data) return;
-      const map: Record<string, string> = {};
-      for (const row of data) map[row.photo_url] = row.user_id;
-      setMediaUploaders(map);
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [quest?.id, quest?.photos?.length]);
+
+
 
 
   return (
