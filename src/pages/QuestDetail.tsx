@@ -282,6 +282,10 @@ const QuestDetail = () => {
     if (isOwner || isAdmin) return true;
     return mediaUploaders[photo] === currentUser.id;
   };
+  const mediaOwnerId = (photo: string) => mediaUploaders[photo] || quest.createdBy.id;
+  const canReportMedia = (photo: string) => !!currentUser.id && mediaOwnerId(photo) !== currentUser.id;
+
+
 
   const handleCompletedMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files ? Array.from(e.target.files) : [];
