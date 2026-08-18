@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { X } from "lucide-react";
+import { X, Flag } from "lucide-react";
 import {
   Carousel,
   CarouselContent,
@@ -23,6 +23,8 @@ interface MediaViewerProps {
   startIndex?: number;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  canReport?: (src: string) => boolean;
+  onReport?: (src: string) => void;
 }
 
 // Module-level caches so flipping between slides doesn't re-show the
@@ -30,7 +32,16 @@ interface MediaViewerProps {
 const slideUrlCache = new Map<string, string>();
 const slideLoadedCache = new Set<string>();
 
-const Slide = ({ src, onClose }: { src: string; onClose: () => void }) => {
+const Slide = ({
+  src,
+  onClose,
+  onReport,
+}: {
+  src: string;
+  onClose: () => void;
+  onReport?: () => void;
+}) => {
+
   const [url, setUrl] = useState<string | null>(() => slideUrlCache.get(src) ?? null);
   const [loaded, setLoaded] = useState<boolean>(() => slideLoadedCache.has(src));
 
