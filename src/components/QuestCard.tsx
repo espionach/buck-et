@@ -358,6 +358,12 @@ const QuestCard = ({ quest, index = 0, showGroup = true, onEditCurrent, onEditPa
             startIndex={viewerIndex}
             open={viewerIndex !== null}
             onOpenChange={(o) => !o && setViewerIndex(null)}
+            canReport={() => !isOwner}
+            onReport={(src) => {
+              setViewerIndex(null);
+              setReportMediaPath(src);
+              setShowReport(true);
+            }}
           />
         )}
 
