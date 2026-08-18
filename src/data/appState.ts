@@ -978,12 +978,22 @@ export const useAppStore = create<AppState>((set, get) => ({
         }
 
 
-        // b) quest_updated — title/desc/logistics changed (but NOT just photos/notes/links/completion)
-        const meaningfulChange =
-          (updates.title !== undefined && updates.title !== prevQuest.title) ||
-          (updates.description !== undefined && updates.description !== prevQuest.description) ||
-          updates.logistics !== undefined;
-        if (meaningfulChange && otherParticipantIds.length > 0) {
+        // b) quest_updated — ONLY when the date, time, or location changed.
+        // Title/description/notes/links/photos/meetup/transport/roles are silent.
+        const prevL = prevQuest.logistics;
+        const nextL = updates.logistics;
+        const scheduleChanged =
+          updates.logistics !== undefined &&
+          (
+            (nextL?.date || "") !== (prevL?.date || "") ||
+            (nextL?.time || "") !== (prevL?.time || "") ||
+            (nextL?.location || "") !== (prevL?.location || "") ||
+            (nextL?.placeId || "") !== (prevL?.placeId || "") ||
+            (nextL?.latitude ?? null) !== (prevL?.latitude ?? null) ||
+            (nextL?.longitude ?? null) !== (prevL?.longitude ?? null)
+          );
+
+        if (scheduleChanged && otherParticipantIds.length > 0 && shouldNotifyQuestUpdate(questId)) {
           await notifyUsers({
             recipientIds: otherParticipantIds,
             fromUserId: currentUser.id,
@@ -992,7 +1002,9 @@ export const useAppStore = create<AppState>((set, get) => ({
             entityId: questId,
             groupId: prevQuest.groupId || null,
           });
+          markQuestUpdateNotified(questId);
         }
+
       }
 
       _invalidate(["quests"]);
