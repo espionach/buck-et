@@ -15,7 +15,7 @@ interface ReportRow {
 }
 
 const targetLabel = (t: string | null) =>
-  t === "sidequest" ? "Sidequest" : t === "comment" ? "Comment" : "User";
+  t === "sidequest" ? "Sidequest" : t === "comment" ? "Comment" : t === "media" ? "Media" : "User";
 
 const MyReports = () => {
   const nav = useNavigate();
