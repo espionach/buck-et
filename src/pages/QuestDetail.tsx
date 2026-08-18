@@ -520,7 +520,10 @@ const QuestDetail = () => {
                   )}
                   {!isOwner && (
                     <DropdownMenuItem
-                      onSelect={() => setShowReport(true)}
+                      onSelect={() => {
+                        setReportMediaPath(null);
+                        setShowReport(true);
+                      }}
                       className="gap-2 text-xs text-destructive focus:text-destructive"
                     >
                       <Flag className="w-3.5 h-3.5" /> Report
