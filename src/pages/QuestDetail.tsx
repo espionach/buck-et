@@ -1144,11 +1144,15 @@ const QuestDetail = () => {
       </AnimatePresence>
 
       <ReportContentModal
-        targetType="sidequest"
+        targetType={reportMediaPath ? "media" : "sidequest"}
         targetId={quest.id}
-        reportedUserId={quest.createdBy.id}
+        targetPath={reportMediaPath ?? undefined}
+        reportedUserId={reportMediaPath ? mediaOwnerId(reportMediaPath) : quest.createdBy.id}
         open={showReport}
-        onOpenChange={setShowReport}
+        onOpenChange={(o) => {
+          setShowReport(o);
+          if (!o) setReportMediaPath(null);
+        }}
       />
     </div>
   );
