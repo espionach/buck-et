@@ -131,7 +131,7 @@ const CreateQuest = () => {
       if (!currentUser?.id) return;
       const id = draftIdRef.current;
       if (submittedRef.current) {
-        deleteDraft(currentUser.id, id);
+        void deleteDraft(currentUser.id, id).catch(() => {});
         return;
       }
       const s = stateRef.current;
@@ -154,10 +154,18 @@ const CreateQuest = () => {
         photoPlaceholderCount: s.pendingPhotosCount,
       };
       if (draftHasContent(payload)) {
-        saveDraft(payload);
+        void saveDraft(payload)
+          .then(() => {
+            queryClient.invalidateQueries({ queryKey: ["quest_drafts", currentUser.id] });
+          })
+          .catch((err: any) => {
+            const friendly = mapDraftError(err?.message);
+            toast.error(friendly ?? "We couldn't save your draft. Please try again.");
+          });
       } else {
-        deleteDraft(currentUser.id, id);
+        void deleteDraft(currentUser.id, id).catch(() => {});
       }
+
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser?.id]);
