@@ -1,9 +1,5 @@
 # Remix of Backend Bucket
 
-Create a mobile app based on this PRD:
-
-SideQuest App PRD (Refined V3)
-
 Product Concept
 
 A collaborative, mobile side‑questing app that turns friend‑group ideas into action. Friends can add, vote, and nudge each other to act—making spontaneous adventures easy to start, track, and remember.
